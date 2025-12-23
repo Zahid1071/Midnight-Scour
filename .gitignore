@@ -1,0 +1,62 @@
+# === UNITY PROJESI ICIN DUZELTILMIS GITIGNORE ===
+
+# En kritik engelleme: Basindaki '/' işaretleri kalkti ki 'My project' icini de gorsun
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# Gecici veriler ve hafiza kayitlari
+[Mm]emoryCaptures/
+[Rr]ecordings/
+
+# Kod editoru ayarlari (Senin klasorunde gordugumuz ozel dosyalar)
+.cursor/
+.vscode/
+.vs/
+.gradle/
+
+# Asset Store araclarini engellemek istersen (istege bagli)
+# [Aa]ssets/AssetStoreTools*
+
+# JetBrains Rider ve Visual Studio cache
+[Aa]ssets/Plugins/Editor/JetBrains*
+ExportedObj/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Unity paket listesi HARIC paket icerikleri
+Packages/
+!Packages/manifest.json
+!Packages/packages-lock.json
+
+# Build ciktilari
+*.apk
+*.aab
+*.unitypackage
+*.app
+
+# Crash raporlari ve sistem bilgileri
+sysinfo.txt
+crashlytics-build.properties
+
+# Adressables ve StreamingAssets gecici dosyalari
+[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+[Aa]ssets/[Ss]treamingAssets/aa.meta
+[Aa]ssets/[Ss]treamingAssets/aa/*
