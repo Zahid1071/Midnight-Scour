@@ -1,0 +1,12 @@
+# Auto detect text files
+* text=auto
+
+# Unity scenes & configs (NORMAL GIT)
+*.unity text
+*.prefab text
+*.mat text
+*.asset text
+*.meta text
+*.cs text
+
+
