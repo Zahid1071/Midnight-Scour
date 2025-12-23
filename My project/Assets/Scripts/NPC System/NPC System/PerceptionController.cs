@@ -78,31 +78,35 @@ public class PerceptionController : MonoBehaviour
     {
         if (!player) { CanSeePlayer = false; return; }
 
-        var playerCol = player.GetComponentInChildren<Collider>();
-        if (!playerCol) { CanSeePlayer = false; return; }
+        Vector3 eye   = transform.position + Vector3.up * 1.7f;
+        Vector3 head  = player.position     + Vector3.up * 1.6f;
+        Vector3 dir   = (head - eye).normalized;
 
-        Vector3 eye  = transform.position + Vector3.up * 1.7f;
-        Vector3 aim  = playerCol.bounds.center;              // ✅ dynamic target
-        Vector3 dir  = (aim - eye).normalized;
+        float dist  = Vector3.Distance(eye, head);
+        float angle = Vector3.Angle(transform.forward, dir);
 
+        // Close-quarters: while chasing, keep visibility sticky
+        if (npc.currentState == NPCController.AIState.Chase && dist < 1.5f)
+        {
+            LastKnownPlayerPosition = head;
+            CanSeePlayer = true;
+            return;
+        }
+        // ignoreLayer should be set to LayerMask.GetMask("WindowGlass") or similar
         if (Physics.Raycast(eye, dir, out RaycastHit hit, maxViewDistance, ~ignoreLayer, QueryTriggerInteraction.Ignore))
         {
-            
-            //Debug.Log($"Hit: {hit.collider.name} layer={LayerMask.LayerToName(hit.collider.gameObject.layer)} CanSee={CanSeePlayer}");
-
-            // ✅ robust: child colliders still count
-            if (hit.collider.transform.root == player.root)
+            if (hit.collider.CompareTag("Player"))
             {
-                LastKnownPlayerPosition = aim;
+                LastKnownPlayerPosition = head;
                 CanSeePlayer = true;
                 return;
             }
         }
-            Debug.DrawRay(eye,dir.normalized * maxViewDistance,CanSeePlayer ? Color.green : Color.red);
+
+
 
         CanSeePlayer = false;
     }
-
 
     private void UpdateVisionMeters()
     {
@@ -145,7 +149,7 @@ public class PerceptionController : MonoBehaviour
             suspicionAmount *= ambushAudioMul;
 
         string home = npc.interaction?.data?.homeID ?? string.Empty;
-        Transform anchor = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(soundSource.position, home);
+        Transform anchor = NPCAnchorManager.Instance.FindClosestOwnedAnchor(soundSource.position, 10f, home);
         if (!anchor) return;
 
         LastKnownPlayerPosition = soundSource.position;
@@ -169,8 +173,8 @@ public class PerceptionController : MonoBehaviour
             else
             {
                 lostSightTimer += Time.deltaTime;
-                // if (lostSightTimer >= gracePeriod)
-                //     npc.fsm.SetState(NPCController.AIState.Suspicious);
+                if (lostSightTimer >= gracePeriod)
+                    npc.fsm.SetState(NPCController.AIState.Suspicious);
             }
         }
     }

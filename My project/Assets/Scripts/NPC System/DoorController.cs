@@ -33,7 +33,6 @@ namespace FS_Atmo
         [SerializeField] private float obstacleFailsafeDelay = 0.10f;
 
         [Header("State")]
-        [Tooltip("Note: Lock is now handled by SimpleOpenClose. This field is kept for backward compatibility but AI ignores it.")]
         public bool isLocked = false;
         public bool IsOpen { get; private set; }
 
@@ -98,7 +97,7 @@ namespace FS_Atmo
 
         public void RequestOpen(Action<bool> onDone = null)
         {
-            // ✅ AI için lock kontrolü yok - AI her zaman kapıyı açabilir
+            if (isLocked) { onDone?.Invoke(false); return; }
             if (state == DoorState.Open || state == DoorState.Opening) { onDone?.Invoke(true); return; }
 
             StopAllCoroutines();
@@ -148,7 +147,7 @@ namespace FS_Atmo
             state = DoorState.Opening;
 
             if (triggerAnim && simpleOpenClose && !simpleOpenClose.objectOpen)
-                simpleOpenClose.ObjectClicked(bypassLock: true); // ✅ AI için lock bypass
+                simpleOpenClose.ObjectClicked();
 
             yield return new WaitForSeconds(openCarveDelay);
 
