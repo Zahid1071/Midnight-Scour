@@ -1,0 +1,76 @@
+═══════════════════════════════════════════════════════════════════════════
+                       INTERACTION UI MANAGER - SETUP GUIDE
+═══════════════════════════════════════════════════════════════════════════
+
+QUICK SETUP (2 Minutes)
+═══════════════════════════════════════════════════════════════════════════
+
+1. Add Component to Player/Camera
+   - Select your Player GameObject (or Main Camera)
+   - Add Component → InteractionUIManager
+
+2. Assign Settings in Inspector
+   
+   Detection Settings:
+   ├─ Camera Transform: [Drag your Main Camera]
+   ├─ Detection Range: 3
+   └─ Interact Layer: [Select your interactable layer]
+
+   Existing UI Elements:
+   ├─ Empty Crosshair: [Drag your empty circle UI element]
+   ├─ Filled Crosshair: [Drag your filled circle UI element]
+   └─ Button Prompt: [Drag your "Press E" icon UI element]
+
+   Outline Settings:
+   ├─ Outline Color: Yellow (255, 255, 0)
+   └─ Outline Width: 3
+
+3. Test
+   - Press Play
+   - Look at an interactable item
+   - You should see:
+     ✓ Filled circle appears
+     ✓ Button icon appears on bottom right
+     ✓ Object gets outlined (yellow)
+
+═══════════════════════════════════════════════════════════════════════════
+
+WHAT THIS SCRIPT DOES
+═══════════════════════════════════════════════════════════════════════════
+
+✓ Raycasts from camera to detect IInteractable objects
+✓ Shows your filled circle crosshair when looking at interactable
+✓ Shows your button prompt icon on bottom right when looking at interactable
+✓ Adds outline to interactable object using QuickOutline
+✓ Hides UI and removes outline when looking away
+
+═══════════════════════════════════════════════════════════════════════════
+
+REQUIREMENTS
+═══════════════════════════════════════════════════════════════════════════
+
+You must have:
+✓ Empty circle crosshair (UI Image) - already in your Canvas
+✓ Filled circle crosshair (UI Image) - already in your Canvas
+✓ Button icon prompt (UI Image) - already in your Canvas (bottom right)
+✓ QuickOutline system - already in Assets/QuickOutline/
+✓ Interactable objects with IInteractable interface
+
+═══════════════════════════════════════════════════════════════════════════
+
+CUSTOMIZATION
+═══════════════════════════════════════════════════════════════════════════
+
+Change outline color: Edit "Outline Color" in Inspector
+Change outline thickness: Edit "Outline Width" in Inspector
+Change detection range: Edit "Detection Range" in Inspector
+
+═══════════════════════════════════════════════════════════════════════════
+
+THAT'S IT!
+═══════════════════════════════════════════════════════════════════════════
+
+No shaders to create, no sprites to generate - just assign your existing UI
+elements and it works with your QuickOutline system.
+
+

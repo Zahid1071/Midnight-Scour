@@ -1,0 +1,94 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24531184c746449478f100b14a7d09e5, type: 3}
+  m_Name: Joe NPC Data
+  m_EditorClassIdentifier: 
+  npcName: Joe
+  npcPrefab: {fileID: 4884186263421869, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+  homeID: House_001
+  isInfected: 0
+  infectionLevel: 0
+  searchChance: 0
+  weightedRoutinePlans:
+  - zoneID: House_001
+    weight: 0.247
+    roomPlans:
+    - roomAnchorID: Basement_Room
+      weight: 0
+      hotspots:
+      - hotspotID: Hotspot_Idle2
+        weight: 0.165
+        duration: 3
+        actionType: 10
+        requiresVisualOffset: 0
+    - roomAnchorID: Corridor-Kitchen_Room
+      weight: 0.205
+      hotspots:
+      - hotspotID: Hotspot_Idle
+        weight: 0.165
+        duration: 3
+        actionType: 10
+        requiresVisualOffset: 0
+      - hotspotID: Hotspot_SearchPockets
+        weight: 0.165
+        duration: 3
+        actionType: 12
+        requiresVisualOffset: 0
+    - roomAnchorID: Garden_Room
+      weight: 0
+      hotspots:
+      - hotspotID: Hotspot_JumpingJacks
+        weight: 0.165
+        duration: 3
+        actionType: 11
+        requiresVisualOffset: 0
+      - hotspotID: Hotspot_Idle
+        weight: 0.165
+        duration: 3
+        actionType: 10
+        requiresVisualOffset: 0
+    - roomAnchorID: Livingroom_Room
+      weight: 0.099
+      hotspots:
+      - hotspotID: Hotspot_Sofa
+        weight: 0.165
+        duration: 5
+        actionType: 0
+        requiresVisualOffset: 1
+  patrolChance: 0.556
+  patrolDuration: 20
+  ambushChance: 0.51
+  ambushWaitRange: {x: 5, y: 20}
+  footstepVolume: 0.5
+  vision:
+    maxViewDistance: 10
+    maxViewAngle: 80
+    ignoreLayer:
+      serializedVersion: 2
+      m_Bits: 1536
+    confirmSeconds: 1.5
+    preAlertSeconds: 0.45
+    buildRate: 1
+    decayRate: 0.1
+  hearing:
+    ambushSuspicionMultiplier: 0.5
+  suspicion:
+    baseThreshold: 100
+    baseDecayPerSecond: 5
+    footstepThreshold: 100
+    footstepDecayPerSecond: 10
+  locomotion:
+    walkingSpeed: 2.5
+    runningSpeed: 4
+  chaseRetention:
+    gracePeriod: 2
+    keepChasingDistance: 3
