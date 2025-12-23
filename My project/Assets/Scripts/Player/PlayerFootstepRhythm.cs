@@ -43,6 +43,11 @@ public class PlayerFootstepRhythm : MonoBehaviour
 
     void HandleFootstepRhythm()
     {
+        if (fpsController == null) 
+        {
+            fpsController = GetComponent<FirstPersonController>();
+            if (fpsController == null) return; 
+        }
         if (!fpsController.enabled)
             return;
 
