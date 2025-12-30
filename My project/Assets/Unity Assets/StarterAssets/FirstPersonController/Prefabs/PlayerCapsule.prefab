@@ -277,7 +277,6 @@ GameObject:
   - component: {fileID: 1978471637655604388}
   - component: {fileID: 5420857361349278248}
   - component: {fileID: 4385367944622275737}
-  - component: {fileID: 259726685144623500}
   - component: {fileID: 4452460983465209085}
   - component: {fileID: 8782256225151303304}
   - component: {fileID: 694658246220161566}
@@ -611,22 +610,6 @@ MonoBehaviour:
     m_Bits: 64
   cameraTransform: {fileID: 0}
   isCaptured: 0
---- !u!114 &259726685144623500
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8616685848737228372}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6bf1e14cc4b48004fb407ec7e644f49d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isHidden: 0
-  visualRoot: {fileID: 5393215578589016642}
-  scriptsToDisable:
-  - {fileID: 8616685848737228371}
 --- !u!114 &4452460983465209085
 MonoBehaviour:
   m_ObjectHideFlags: 0
