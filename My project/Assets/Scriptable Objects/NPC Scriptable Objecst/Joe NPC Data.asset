@@ -23,10 +23,10 @@ MonoBehaviour:
     weight: 0.247
     roomPlans:
     - roomAnchorID: Basement_Room
-      weight: 0
+      weight: 1
       hotspots:
       - hotspotID: Hotspot_Idle2
-        weight: 0.165
+        weight: 1
         duration: 3
         actionType: 10
         requiresVisualOffset: 0
@@ -74,7 +74,7 @@ MonoBehaviour:
     maxViewAngle: 80
     ignoreLayer:
       serializedVersion: 2
-      m_Bits: 1536
+      m_Bits: 5248
     confirmSeconds: 1.5
     preAlertSeconds: 0.45
     buildRate: 1

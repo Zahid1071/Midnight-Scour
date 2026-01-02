@@ -16,9 +16,9 @@ TagManager:
   - HiddenPlayer
   - Obstacles
   - Door
-  - Window
-  - 
-  - 
+  - Transparent Non Interactible
+  - Transparent Interactible
+  - Captive
   - 
   - 
   - 

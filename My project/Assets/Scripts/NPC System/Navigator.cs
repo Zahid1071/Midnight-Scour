@@ -41,10 +41,10 @@ namespace FS_Atmo
             var initialRoom = FindCurrentRoom();
             if (logPlannedRoute)
             {
-                if (initialRoom != null)
-                    Debug.Log($"[Navigator] Game Start - Initial room: {initialRoom.roomID ?? initialRoom.name}");
-                else
-                    Debug.LogWarning("[Navigator] Game Start - Could not determine initial room!");
+                // if (initialRoom != null)
+                //     Debug.Log($"[Navigator] Game Start - Initial room: {initialRoom.roomID ?? initialRoom.name}");
+                // else
+                //     Debug.LogWarning("[Navigator] Game Start - Could not determine initial room!");
             }
         }
 
@@ -74,8 +74,8 @@ namespace FS_Atmo
             // 1) ODA AYNIYSA ve finalPoint VARSA: anchor waypointe hiç gerek yok → direkt final point
             if (startRoom == targetRoom && finalPoint.HasValue)
             {
-                if (logPlannedRoute)
-                    Debug.Log($"[Navigator] Same room, going directly to final point");
+                // if (logPlannedRoute)
+                //     Debug.Log($"[Navigator] Same room, going directly to final point");
                 route.Add(CreateTempPoint(finalPoint.Value, destinationName, parentName));
                 StartFollowing();
                 return;
@@ -84,8 +84,8 @@ namespace FS_Atmo
             // 2) Normal kapılı/kapısız rota
             if (!RoomGraph.Instance.TryGetRoute(startRoom, targetRoom, route))
             {
-                if (logPlannedRoute)
-                    Debug.LogWarning($"[Navigator] TryGetRoute FAILED: {startRoomName} -> {targetRoomName}");
+                // if (logPlannedRoute)
+                //     Debug.LogWarning($"[Navigator] TryGetRoute FAILED: {startRoomName} -> {targetRoomName}");
                 return;
             }
 
@@ -117,8 +117,8 @@ namespace FS_Atmo
                     if (targetRoom != null)
                     {
                         targetAnchorT = parentTransform;
-                        if (logPlannedRoute)
-                            Debug.Log($"[Navigator] GoToPoint: Found target room by parent name: {targetRoom.roomID ?? targetRoom.name} for {destinationName ?? "point"}");
+                        // if (logPlannedRoute)
+                        //     Debug.Log($"[Navigator] GoToPoint: Found target room by parent name: {targetRoom.roomID ?? targetRoom.name} for {destinationName ?? "point"}");
                     }
                 }
             }
@@ -132,8 +132,8 @@ namespace FS_Atmo
                 if (targetAnchorT != null)
                 {
                     targetRoom = targetAnchorT.GetComponent<RoomAnchor>();
-                    if (logPlannedRoute)
-                        Debug.Log($"[Navigator] GoToPoint: Found target room by door-voting: {targetRoom?.roomID ?? targetRoom?.name ?? "null"} for {destinationName ?? "point"}");
+                    // if (logPlannedRoute)
+                    //     Debug.Log($"[Navigator] GoToPoint: Found target room by door-voting: {targetRoom?.roomID ?? targetRoom?.name ?? "null"} for {destinationName ?? "point"}");
                 }
             }
 
@@ -209,9 +209,9 @@ namespace FS_Atmo
                 // ✅ Anchor kontrolü - anchor'lara gitme, sadece prepoint'ler ve final point'e git
                 if (waypoint.TryGetComponent<RoomAnchor>(out var roomAnchor) && roomAnchor != null)
                 {
-                    // Bu bir anchor, atla (anchor'lar sadece route planlama için kullanılıyor)
-                    if (logPlannedRoute)
-                        Debug.Log($"[Navigator] Skipping anchor waypoint: {roomAnchor.roomID ?? roomAnchor.name}");
+                    // // Bu bir anchor, atla (anchor'lar sadece route planlama için kullanılıyor)
+                    // if (logPlannedRoute)
+                    //     Debug.Log($"[Navigator] Skipping anchor waypoint: {roomAnchor.roomID ?? roomAnchor.name}");
                     continue;
                 }
 
@@ -274,7 +274,7 @@ namespace FS_Atmo
             if (logPlannedRoute)
             {
                 string roomName = room?.roomID ?? room?.name ?? "null";
-                Debug.Log($"[Navigator] FindCurrentRoom: {roomName}");
+                //Debug.Log($"[Navigator] FindCurrentRoom: {roomName}");
             }
 
             return room; // No fallback - system must work correctly

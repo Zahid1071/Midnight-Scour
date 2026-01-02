@@ -157,7 +157,7 @@ public class NPCAnchorManager : MonoBehaviour
                 {
                     string doorName = edge.door ? edge.door.name : "Unknown";
                     string roomName = edge.roomA.roomID ?? edge.roomA.name;
-                    Debug.Log($"[NPCAnchorManager] DEFINITIVE: Door={doorName}, PrepointA reachable (path={pathLengthA:F2}m) → Room={roomName}");
+                    //Debug.Log($"[NPCAnchorManager] DEFINITIVE: Door={doorName}, PrepointA reachable (path={pathLengthA:F2}m) → Room={roomName}");
                     return edge.roomA.transform;
                 }
             }
@@ -168,7 +168,7 @@ public class NPCAnchorManager : MonoBehaviour
                 {
                     string doorName = edge.door ? edge.door.name : "Unknown";
                     string roomName = edge.roomB.roomID ?? edge.roomB.name;
-                    Debug.Log($"[NPCAnchorManager] DEFINITIVE: Door={doorName}, PrepointB reachable (path={pathLengthB:F2}m) → Room={roomName}");
+                    //Debug.Log($"[NPCAnchorManager] DEFINITIVE: Door={doorName}, PrepointB reachable (path={pathLengthB:F2}m) → Room={roomName}");
                     return edge.roomB.transform;
                 }
             }
@@ -263,7 +263,7 @@ public class NPCAnchorManager : MonoBehaviour
         if (bestRoom != null)
         {
             string roomName = bestRoom.roomID ?? bestRoom.name;
-            Debug.Log($"[NPCAnchorManager] CLOSEST: Door={bestDoorName}, {bestPrepoint} closest (path={bestPathLength:F2}m) → Room={roomName}");
+            //Debug.Log($"[NPCAnchorManager] CLOSEST: Door={bestDoorName}, {bestPrepoint} closest (path={bestPathLength:F2}m) → Room={roomName}");
             return bestRoom.transform;
         }
         

@@ -55,12 +55,11 @@ public class FSMController
                 break;
             case NPCController.AIState.Suspicious:
                 Debug.Log("🤔 State: Suspicous");
-                //npc.StartCoroutine(SearchRoutine());
+                npc.StartCoroutine(SearchRoutine());
                 break;
 
 
             case NPCController.AIState.Search:
-                Debug.Log("🔎 State: SEARCH");
                 npc.StartCoroutine(SearchRoutine());
                 break;
 
@@ -95,15 +94,7 @@ public class FSMController
     public void Update()
     {
         EnsureLocomotion();
-
-            // DEBUG: force patrol with Space key
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                //SetState(NPCController.AIState.Patrol);
-                npc.interaction.StartNextRoutine();
-            }
         
-
         switch (npc.currentState)
         {
             case NPCController.AIState.Natural:
@@ -360,6 +351,7 @@ public class FSMController
     // === SEARCH ===
     private IEnumerator SearchRoutine()
     {
+        Debug.Log("🔎 State: SEARCH");
         yield return new WaitForSeconds(2);
 
         Transform roomAnchor = npc.perception.searchTarget;
@@ -376,7 +368,7 @@ public class FSMController
 
         yield return new WaitUntil(() =>
             !npc.GetComponent<NavMeshAgent>().pathPending &&
-            npc.GetComponent<NavMeshAgent>().remainingDistance < 0.3f);
+            npc.GetComponent<NavMeshAgent>().remainingDistance <2f);
 
         var hidingSpots = roomAnchor.GetComponentsInChildren<HidingSpot>();
 
@@ -393,7 +385,7 @@ public class FSMController
 
             yield return new WaitUntil(() =>
                 !npc.GetComponent<NavMeshAgent>().pathPending &&
-                npc.GetComponent<NavMeshAgent>().remainingDistance < 0.3f);
+                npc.GetComponent<NavMeshAgent>().remainingDistance < 2f);
 
             bool willSearch = UnityEngine.Random.value < npc.interaction.data.searchChance;
 
@@ -408,11 +400,11 @@ public class FSMController
 
             yield return new WaitForSeconds(1f);
         }
-
-        if (UnityEngine.Random.value < npc.interaction.data.patrolChance)
-            SetState(NPCController.AIState.Patrol);
-        else
-            SetState(NPCController.AIState.Natural);
+        SetState(NPCController.AIState.Natural);
+        // if (UnityEngine.Random.value < npc.interaction.data.patrolChance)
+        //     SetState(NPCController.AIState.Patrol);
+        // else
+        //     SetState(NPCController.AIState.Natural);
             
     }
 
@@ -423,56 +415,65 @@ public class FSMController
         var agent = npc.interaction.agent;
         if (npc.perception == null || nav == null || agent == null) return;
 
-        // 1) Capture check
-        if (npc.perception.PlayerTransform != null)
+        // 1. Durum Tespiti
+        bool isHidden = (npc.perception.PlayerTransform != null && npc.perception.PlayerTransform.gameObject.layer == 7);
+        bool canSee   = !isHidden && npc.perception.CanSeePlayer; // Gizliyse göremez, değilse Perception'a sor
+
+        // 2. Yakalama Kontrolü (Sadece Görüyor ve Yakınsa)
+        if (canSee && npc.perception.PlayerTransform != null)
         {
             float dist = Vector3.Distance(npc.transform.position, npc.perception.PlayerTransform.position);
             if (dist <= npc.captureDistance)
             {
-                // Enter Capture; freeze nav
                 SetState(NPCController.AIState.Capture);
                 agent.ResetPath();
                 return;
             }
         }
 
-        // 2) Choose target (LoS vs Last Known)
-        Vector3 target;
-        bool   hasTarget = false;
+        // 3. Hedef Belirleme
+        Vector3 targetPosition;
 
-        if (npc.perception.PlayerTransform != null)
+        if (canSee)
         {
-            Vector3 playerPos = npc.perception.PlayerTransform.position;
-            if (npc.perception.CanSeePlayer)
-            {
-                target = playerPos;
-                hasTarget = true;
-            }
-            else
-            {
-                target = npc.perception.LastKnownPlayerPosition;
-                hasTarget = true;
-            }
+            // Görüyorum: Direkt üzerine koş (Canlı Takip)
+            targetPosition = npc.perception.PlayerTransform.position;
         }
         else
         {
-            target = npc.perception.LastKnownPlayerPosition;
-            hasTarget = true;
+            // Görmüyorum (Ya saklandı ya da kaçtı): Son bilinen yere git
+            targetPosition = npc.perception.LastKnownPlayerPosition;
+
+            // --- VAZGEÇME MANTIĞI (Burada birleştirdik) ---
+            // Eğer oyuncuyu göremiyorsam VE gitmem gereken yere (LSP) vardıysam:
+            float distToLSP = Vector3.Distance(npc.transform.position, targetPosition);
+
+            if (distToLSP < 1.5f)
+            {
+                Debug.Log("Chase bitti: İzini kaybettim. Odayı aramaya başlıyorum.");
+
+                // Bulunduğumuz (veya LSP'nin olduğu) odayı arama hedefi yap
+                string homeID = npc.interaction.data.homeID;
+                var anchor = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(targetPosition, homeID);
+                
+                if (anchor != null) npc.perception.searchTarget = anchor;
+
+                // Modu değiştir
+                SetState(NPCController.AIState.Search);
+                return; // Chase'den çık
+            }
         }
-        
-        if (!hasTarget) return;
 
-        // 3) Debounce re-planning to avoid stomping door transit
+        // 4. Hareket (Navigation)
         float now = Time.time;
-
         bool targetMovedEnough =
             (npc._lastChaseTarget.x == float.PositiveInfinity) ||
-            (target - npc._lastChaseTarget).sqrMagnitude > (npc.chaseReplanDist * npc.chaseReplanDist);
+            (targetPosition - npc._lastChaseTarget).sqrMagnitude > (npc.chaseReplanDist * npc.chaseReplanDist);
 
         if (targetMovedEnough || now >= npc._nextChaseReplanTime)
         {
-            nav.GoToPoint(target);
-            npc._lastChaseTarget     = target;
+            nav.GoToPoint(targetPosition);
+            npc._lastChaseTarget = targetPosition;
             npc._nextChaseReplanTime = now + npc.chaseReplanCooldown;
         }
     }
