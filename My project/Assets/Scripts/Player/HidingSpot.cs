@@ -43,20 +43,24 @@ public class HidingSpot : MonoBehaviour, IInteractable
         if (!hider.isHidden)
         {
             // --- MESAFE KONTROLÜ (BEYİN BURASI) ---
-            float distToLeft = Vector3.Distance(player.transform.position, leftPivot.position);
-            float distToRight = Vector3.Distance(player.transform.position, rightPivot.position);
+            float distToLeft = Vector3.Distance(player.transform.position, leftPivot.parent.parent.position);
+            float distToRight = Vector3.Distance(player.transform.position, rightPivot.parent.parent.position);
+
+
 
             if (distToLeft < distToRight)
             {
                 // Sol taraf daha yakın
                 activePivot = leftPivot;
                 activeAnimator = leftAnimator;
+                Debug.Log("left");
             }
             else
             {
                 // Sağ taraf daha yakın
                 activePivot = rightPivot;
                 activeAnimator = rightAnimator;
+                Debug.Log("right");
             }
 
             StartCoroutine(EnterHidingRoutine(player, hider));

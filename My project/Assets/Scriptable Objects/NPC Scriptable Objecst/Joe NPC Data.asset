@@ -15,7 +15,6 @@ MonoBehaviour:
   npcName: Joe
   npcPrefab: {fileID: 4884186263421869, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
   homeID: House_001
-  isInfected: 0
   infectionLevel: 0
   searchChance: 0
   weightedRoutinePlans:
@@ -23,7 +22,7 @@ MonoBehaviour:
     weight: 0.247
     roomPlans:
     - roomAnchorID: Basement_Room
-      weight: 1
+      weight: 0
       hotspots:
       - hotspotID: Hotspot_Idle2
         weight: 1
@@ -44,7 +43,7 @@ MonoBehaviour:
         actionType: 12
         requiresVisualOffset: 0
     - roomAnchorID: Garden_Room
-      weight: 0
+      weight: 0.13
       hotspots:
       - hotspotID: Hotspot_JumpingJacks
         weight: 0.165
