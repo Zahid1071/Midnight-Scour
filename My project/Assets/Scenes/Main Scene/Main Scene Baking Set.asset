@@ -37,6 +37,7 @@ MonoBehaviour:
   m_LightingScenarios:
   - Default
   cellDescs:
+<<<<<<< Updated upstream
     m_Keys: 00000000030000000100000004000000
     m_Values:
     - position: {x: -1, y: -1, z: -1}
@@ -46,6 +47,17 @@ MonoBehaviour:
       indexChunkCount: 91
       shChunkCount: 1
       bricksCount: 32
+=======
+    m_Keys: 00000000030000000c00000001000000040000000d000000
+    m_Values:
+    - position: {x: -1, y: -1, z: -1}
+      index: 0
+      probeCount: 640
+      minSubdiv: 0
+      indexChunkCount: 91
+      shChunkCount: 1
+      bricksCount: 10
+>>>>>>> Stashed changes
       indirectionEntryInfo:
       - positionInBricks: {x: -27, y: -27, z: -27}
         minSubdiv: 0
@@ -55,11 +67,19 @@ MonoBehaviour:
         hasOnlyBiggerBricks: 0
     - position: {x: -1, y: 0, z: -1}
       index: 3
+<<<<<<< Updated upstream
       probeCount: 3392
       minSubdiv: 0
       indexChunkCount: 91
       shChunkCount: 1
       bricksCount: 53
+=======
+      probeCount: 10304
+      minSubdiv: 0
+      indexChunkCount: 91
+      shChunkCount: 2
+      bricksCount: 161
+>>>>>>> Stashed changes
       indirectionEntryInfo:
       - positionInBricks: {x: -27, y: 0, z: -27}
         minSubdiv: 0
@@ -67,6 +87,7 @@ MonoBehaviour:
         maxBrickPosPlusOne: {x: 28, y: 28, z: 28}
         hasMinMax: 1
         hasOnlyBiggerBricks: 0
+<<<<<<< Updated upstream
     - position: {x: 0, y: -1, z: -1}
       index: 1
       probeCount: 5248
@@ -74,6 +95,29 @@ MonoBehaviour:
       indexChunkCount: 91
       shChunkCount: 1
       bricksCount: 82
+=======
+    - position: {x: -1, y: 0, z: 0}
+      index: 12
+      probeCount: 1664
+      minSubdiv: 0
+      indexChunkCount: 91
+      shChunkCount: 1
+      bricksCount: 26
+      indirectionEntryInfo:
+      - positionInBricks: {x: -27, y: 0, z: 0}
+        minSubdiv: 0
+        minBrickPos: {x: 0, y: 0, z: 0}
+        maxBrickPosPlusOne: {x: 28, y: 28, z: 28}
+        hasMinMax: 1
+        hasOnlyBiggerBricks: 0
+    - position: {x: 0, y: -1, z: -1}
+      index: 1
+      probeCount: 3904
+      minSubdiv: 0
+      indexChunkCount: 91
+      shChunkCount: 1
+      bricksCount: 61
+>>>>>>> Stashed changes
       indirectionEntryInfo:
       - positionInBricks: {x: 0, y: -27, z: -27}
         minSubdiv: 0
@@ -83,11 +127,19 @@ MonoBehaviour:
         hasOnlyBiggerBricks: 0
     - position: {x: 0, y: 0, z: -1}
       index: 4
+<<<<<<< Updated upstream
       probeCount: 8384
       minSubdiv: 0
       indexChunkCount: 91
       shChunkCount: 2
       bricksCount: 131
+=======
+      probeCount: 17728
+      minSubdiv: 0
+      indexChunkCount: 91
+      shChunkCount: 3
+      bricksCount: 277
+>>>>>>> Stashed changes
       indirectionEntryInfo:
       - positionInBricks: {x: 0, y: 0, z: -27}
         minSubdiv: 0
@@ -95,83 +147,160 @@ MonoBehaviour:
         maxBrickPosPlusOne: {x: 28, y: 28, z: 28}
         hasMinMax: 1
         hasOnlyBiggerBricks: 0
+<<<<<<< Updated upstream
   m_SerializedPerSceneCellList:
   - sceneGUID: 99c9720ab356a0642a771bea13969a05
     cellList: 00000000030000000100000004000000
+=======
+    - position: {x: 0, y: 0, z: 0}
+      index: 13
+      probeCount: 2560
+      minSubdiv: 0
+      indexChunkCount: 91
+      shChunkCount: 1
+      bricksCount: 40
+      indirectionEntryInfo:
+      - positionInBricks: {x: 0, y: 0, z: 0}
+        minSubdiv: 0
+        minBrickPos: {x: 0, y: 0, z: 0}
+        maxBrickPosPlusOne: {x: 28, y: 28, z: 28}
+        hasMinMax: 1
+        hasOnlyBiggerBricks: 0
+  m_SerializedPerSceneCellList:
+  - sceneGUID: 99c9720ab356a0642a771bea13969a05
+    cellList: 00000000030000000c00000001000000040000000d000000
+>>>>>>> Stashed changes
   cellSharedDataAsset:
     m_AssetGUID: ff3d5a3c18c18ae4998bfe6a83e2d76e
-    m_StreamableAssetPath: APVStreamingAssets\cc2cedd20cdac2148be8c8da0c205b6f\ff3d5a3c18c18ae4998bfe6a83e2d76e.bytes
+    m_StreamableAssetPath: APVStreamingAssets/cc2cedd20cdac2148be8c8da0c205b6f/ff3d5a3c18c18ae4998bfe6a83e2d76e.bytes
     m_ElementSize: 8192
     m_StreamableCellDescs:
+<<<<<<< Updated upstream
       m_Keys: 00000000030000000100000004000000
+=======
+      m_Keys: 00000000030000000c00000001000000040000000d000000
+>>>>>>> Stashed changes
       m_Values:
       - offset: 0
         elementCount: 1
       - offset: 8192
-        elementCount: 1
-      - offset: 16384
-        elementCount: 1
+        elementCount: 2
       - offset: 24576
+<<<<<<< Updated upstream
         elementCount: 2
     m_Asset: {fileID: 4900000, guid: ff3d5a3c18c18ae4998bfe6a83e2d76e, type: 3}
+=======
+        elementCount: 1
+      - offset: 32768
+        elementCount: 1
+      - offset: 40960
+        elementCount: 3
+      - offset: 65536
+        elementCount: 1
+    m_Asset: {fileID: 0}
+>>>>>>> Stashed changes
   scenarios:
     m_Keys:
     - Default
     m_Values:
+<<<<<<< Updated upstream
     - sceneHash: -2020652584
+=======
+    - sceneHash: -944759927
+>>>>>>> Stashed changes
       cellDataAsset:
         m_AssetGUID: 47a333d60a63eb247891970eeaed8e42
-        m_StreamableAssetPath: APVStreamingAssets\cc2cedd20cdac2148be8c8da0c205b6f\47a333d60a63eb247891970eeaed8e42.bytes
+        m_StreamableAssetPath: APVStreamingAssets/cc2cedd20cdac2148be8c8da0c205b6f/47a333d60a63eb247891970eeaed8e42.bytes
         m_ElementSize: 131072
         m_StreamableCellDescs:
+<<<<<<< Updated upstream
           m_Keys: 00000000030000000100000004000000
+=======
+          m_Keys: 00000000030000000c00000001000000040000000d000000
+>>>>>>> Stashed changes
           m_Values:
           - offset: 0
             elementCount: 1
           - offset: 131072
-            elementCount: 1
-          - offset: 262144
-            elementCount: 1
+            elementCount: 2
           - offset: 393216
+<<<<<<< Updated upstream
             elementCount: 2
         m_Asset: {fileID: 4900000, guid: 47a333d60a63eb247891970eeaed8e42, type: 3}
+=======
+            elementCount: 1
+          - offset: 524288
+            elementCount: 1
+          - offset: 655360
+            elementCount: 3
+          - offset: 1048576
+            elementCount: 1
+        m_Asset: {fileID: 0}
+>>>>>>> Stashed changes
       cellOptionalDataAsset:
         m_AssetGUID: f68e8b219689b06428fd5ad07e60266b
-        m_StreamableAssetPath: APVStreamingAssets\cc2cedd20cdac2148be8c8da0c205b6f\f68e8b219689b06428fd5ad07e60266b.bytes
+        m_StreamableAssetPath: APVStreamingAssets/cc2cedd20cdac2148be8c8da0c205b6f/f68e8b219689b06428fd5ad07e60266b.bytes
         m_ElementSize: 131072
         m_StreamableCellDescs:
+<<<<<<< Updated upstream
           m_Keys: 00000000030000000100000004000000
+=======
+          m_Keys: 00000000030000000c00000001000000040000000d000000
+>>>>>>> Stashed changes
           m_Values:
           - offset: 0
             elementCount: 1
           - offset: 131072
-            elementCount: 1
-          - offset: 262144
-            elementCount: 1
+            elementCount: 2
           - offset: 393216
+<<<<<<< Updated upstream
             elementCount: 2
         m_Asset: {fileID: 4900000, guid: f68e8b219689b06428fd5ad07e60266b, type: 3}
+=======
+            elementCount: 1
+          - offset: 524288
+            elementCount: 1
+          - offset: 655360
+            elementCount: 3
+          - offset: 1048576
+            elementCount: 1
+        m_Asset: {fileID: 0}
+>>>>>>> Stashed changes
       cellProbeOcclusionDataAsset:
         m_AssetGUID: 396ef4d9a8b58ff44aef98aec6ab9003
-        m_StreamableAssetPath: APVStreamingAssets\cc2cedd20cdac2148be8c8da0c205b6f\396ef4d9a8b58ff44aef98aec6ab9003.bytes
+        m_StreamableAssetPath: APVStreamingAssets/cc2cedd20cdac2148be8c8da0c205b6f/396ef4d9a8b58ff44aef98aec6ab9003.bytes
         m_ElementSize: 32768
         m_StreamableCellDescs:
+<<<<<<< Updated upstream
           m_Keys: 00000000030000000100000004000000
+=======
+          m_Keys: 00000000030000000c00000001000000040000000d000000
+>>>>>>> Stashed changes
           m_Values:
           - offset: 0
             elementCount: 1
           - offset: 32768
-            elementCount: 1
-          - offset: 65536
-            elementCount: 1
+            elementCount: 2
           - offset: 98304
+<<<<<<< Updated upstream
             elementCount: 2
         m_Asset: {fileID: 4900000, guid: 396ef4d9a8b58ff44aef98aec6ab9003, type: 3}
+=======
+            elementCount: 1
+          - offset: 131072
+            elementCount: 1
+          - offset: 163840
+            elementCount: 3
+          - offset: 262144
+            elementCount: 1
+        m_Asset: {fileID: 0}
+>>>>>>> Stashed changes
   cellBricksDataAsset:
     m_AssetGUID: 5c63252646e03634e8def70e89fc8019
-    m_StreamableAssetPath: APVStreamingAssets\cc2cedd20cdac2148be8c8da0c205b6f\5c63252646e03634e8def70e89fc8019.bytes
+    m_StreamableAssetPath: APVStreamingAssets/cc2cedd20cdac2148be8c8da0c205b6f/5c63252646e03634e8def70e89fc8019.bytes
     m_ElementSize: 16
     m_StreamableCellDescs:
+<<<<<<< Updated upstream
       m_Keys: 00000000030000000100000004000000
       m_Values:
       - offset: 0
@@ -183,22 +312,52 @@ MonoBehaviour:
       - offset: 2672
         elementCount: 131
     m_Asset: {fileID: 4900000, guid: 5c63252646e03634e8def70e89fc8019, type: 3}
+=======
+      m_Keys: 00000000030000000c00000001000000040000000d000000
+      m_Values:
+      - offset: 0
+        elementCount: 10
+      - offset: 160
+        elementCount: 161
+      - offset: 2736
+        elementCount: 26
+      - offset: 3152
+        elementCount: 61
+      - offset: 4128
+        elementCount: 277
+      - offset: 8560
+        elementCount: 40
+    m_Asset: {fileID: 0}
+>>>>>>> Stashed changes
   cellSupportDataAsset:
     m_AssetGUID: 557e1b89e8908b345aa6cfa31f6927e2
-    m_StreamableAssetPath: APVStreamingAssets\cc2cedd20cdac2148be8c8da0c205b6f\557e1b89e8908b345aa6cfa31f6927e2.bytes
+    m_StreamableAssetPath: APVStreamingAssets/cc2cedd20cdac2148be8c8da0c205b6f/557e1b89e8908b345aa6cfa31f6927e2.bytes
     m_ElementSize: 262144
     m_StreamableCellDescs:
+<<<<<<< Updated upstream
       m_Keys: 00000000030000000100000004000000
+=======
+      m_Keys: 00000000030000000c00000001000000040000000d000000
+>>>>>>> Stashed changes
       m_Values:
       - offset: 0
         elementCount: 1
       - offset: 262144
-        elementCount: 1
-      - offset: 524288
-        elementCount: 1
+        elementCount: 2
       - offset: 786432
+<<<<<<< Updated upstream
         elementCount: 2
     m_Asset: {fileID: 4900000, guid: 557e1b89e8908b345aa6cfa31f6927e2, type: 3}
+=======
+        elementCount: 1
+      - offset: 1048576
+        elementCount: 1
+      - offset: 1310720
+        elementCount: 3
+      - offset: 2097152
+        elementCount: 1
+    m_Asset: {fileID: 0}
+>>>>>>> Stashed changes
   chunkSizeInBricks: 128
   maxCellPosition: {x: 1, y: 1, z: 0}
   minCellPosition: {x: -1, y: -1, z: -1}
@@ -217,7 +376,7 @@ MonoBehaviour:
     y: 0
     z: 0
     w: 0
-  maxSHChunkCount: 2
+  maxSHChunkCount: 3
   L0ChunkSize: 65536
   L1ChunkSize: 32768
   L2TextureChunkSize: 32768

@@ -1,6 +1,10 @@
 fileFormatVersion: 2
-guid: 3c072400e6a67774f81856863cb893e9
+<<<<<<<< Updated upstream:My project/Assets/UI/Sprites.meta
+guid: ad1690d333d224431897fcddf412f76b
 folderAsset: yes
+========
+guid: a180204c308bd4b6c92e22c13e7e9801
+>>>>>>>> Stashed changes:My project/Assets/Scenes/CreditsScene.unity.meta
 DefaultImporter:
   externalObjects: {}
   userData: 

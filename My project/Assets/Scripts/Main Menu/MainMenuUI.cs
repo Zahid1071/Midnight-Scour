@@ -1,37 +1,79 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class MainMenuUI : MonoBehaviour
 {
     [Header("Panels")]
-    [SerializeField] private GameObject mainMenuPanel;   // Play / Multiplayer / Settings / Quit
-    [SerializeField] private GameObject settingsPanel;   // The white settings card in your screenshot
-    [SerializeField] private SettingsMenu settingsMenu;  // Script below, on the settings panel
+    [SerializeField] private GameObject mainMenuPanel;
+    [SerializeField] private GameObject settingsPanel;
+    [SerializeField] private SettingsMenu settingsMenu;
 
-    [Header("Scene")]
-    [SerializeField] private string gameSceneName = "Main Scene"; // change to your scene name
+    [Header("Buttons")]
+    [SerializeField] private Button continueButton;
+
+    [Header("Scenes")]
+    [SerializeField] private string gameSceneName = "Main Scene";
+    [SerializeField] private string creditsSceneName = "CreditsScene";
 
     private void Start()
     {
         mainMenuPanel.SetActive(true);
-        settingsPanel.SetActive(false);
+        if (settingsPanel) settingsPanel.SetActive(false);
+
+        // Grey-out Continue when there is nothing to resume
+        bool hasSave = SaveManager.Instance != null && SaveManager.Instance.HasSave();
+        if (continueButton != null)
+            continueButton.interactable = hasSave;
     }
 
-    public void PlayGame() => SceneManager.LoadScene(gameSceneName);
+    // ───── Button callbacks ─────
+
+    /// <summary>Resume from the last save.</summary>
+    public void ContinueGame()
+    {
+        if (SaveManager.Instance == null || !SaveManager.Instance.HasSave()) return;
+        SaveManager.Instance.LoadGame();
+    }
+
+    /// <summary>Start a brand-new game (overwrites any existing save).</summary>
+    public void NewGame()
+    {
+
+
+        if (SaveManager.Instance != null)
+            SaveManager.Instance.DeleteSave();
+        //if (InventoryManager.Instance != null)
+            //InventoryManager.Instance.ClearInventory();
+
+        SceneManager.LoadScene(gameSceneName);
+
+    }
+
+    /// <summary>Placeholder — wire to your online / multiplayer flow later.</summary>
+    public void OnOnline()
+    {
+        Debug.Log("[MainMenu] Online — not implemented yet.");
+    }
 
     public void OpenSettings()
     {
+        if (settingsPanel == null || settingsMenu == null) return;
         mainMenuPanel.SetActive(false);
         settingsPanel.SetActive(true);
-        settingsMenu.BeginEditing(); // load last saved values into the UI
+        settingsMenu.BeginEditing();
     }
 
-    // Called by the Back button **inside** Settings
     public void CloseSettingsWithoutApply()
     {
-        settingsMenu.CancelEditing(); // throw away unsaved changes
+        settingsMenu.CancelEditing();
         settingsPanel.SetActive(false);
         mainMenuPanel.SetActive(true);
+    }
+
+    public void OpenCredits()
+    {
+        SceneManager.LoadScene(creditsSceneName);
     }
 
     public void QuitGame()

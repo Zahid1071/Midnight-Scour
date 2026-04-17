@@ -171,9 +171,9 @@ public class SoundManager : MonoBehaviour
     public void ApplyMixerFromPrefs()
     {
         // values are stored 0..1 (linear) by your settings menu
-        float master = PlayerPrefs.GetFloat("masterVol", 0.8f);
-        float music = PlayerPrefs.GetFloat("musicVol", 0.8f);
-        float sfx = PlayerPrefs.GetFloat("sfxVol", 0.8f);
+        float master = PlayerPrefs.GetFloat("masterVol", 0.5f);
+        float music = PlayerPrefs.GetFloat("musicVol", 0.5f);
+        float sfx = PlayerPrefs.GetFloat("sfxVol", 0.5f);
 
         if (mixer)
         {

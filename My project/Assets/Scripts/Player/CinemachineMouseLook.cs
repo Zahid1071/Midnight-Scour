@@ -1,27 +1,3 @@
-/*
- * =============================================================================
- *                    CINEMACHINE MOUSE LOOK
- * =============================================================================
- * 
- * PURPOSE:
- * Handles first-person camera look based on mouse input.
- * Reads mouse sensitivity and invert Y settings from GameSettingsManager.
- * 
- * SETUP:
- * ------
- * 1. Attach to the camera root object
- * 2. Assign the player body transform (for yaw rotation)
- * 3. Ensure GameSettingsManager exists in the scene (or as DontDestroyOnLoad)
- * 
- * SETTINGS INTEGRATION:
- * ---------------------
- * This script reads from GameSettingsManager.Instance:
- * - MouseSensitivity: multiplier for mouse input
- * - InvertYAxis: if true, vertical look is inverted
- * 
- * =============================================================================
- */
-
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -50,7 +26,9 @@ public class CinemachineMouseLook : MonoBehaviour
                 return baseSensitivity * GameSettingsManager.Instance.MouseSensitivity;
             return fallbackSensitivity;
         }
-    }
+    } // HATA 1: BURADAKİ EKSİK PARANTEZ EKLENDİ
+
+    // HATA 2: Çift yazılmış playerBody, pitch, min/maxSensitivity değişkenleri temizlendi.
 
     void Update()
     {
@@ -69,11 +47,16 @@ public class CinemachineMouseLook : MonoBehaviour
 
         // Horizontal look — rotate the player (yaw)
         if (playerBody != null)
+        {
             playerBody.Rotate(Vector3.up * mouseDelta.x);
-
+        }
+        
         // Vertical look — rotate this camera root (pitch)
         float yInput = invertY ? mouseDelta.y : -mouseDelta.y;
         pitch += yInput;
+
+        // HATA 3: Update içindeki çift yazılmış mouseDelta ve rotate işlemleri temizlendi.
+
         pitch = Mathf.Clamp(pitch, -80f, 80f);
         transform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
     }
