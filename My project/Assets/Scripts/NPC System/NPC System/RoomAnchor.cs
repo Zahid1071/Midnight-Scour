@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class RoomAnchor : MonoBehaviour
 {
-     public string roomID;
-     public string zoneID;
+    [HideInInspector] public string roomID;
+    [HideInInspector] public string zoneID;
 
     void Awake()
     {

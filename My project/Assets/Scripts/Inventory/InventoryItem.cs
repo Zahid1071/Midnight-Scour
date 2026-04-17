@@ -7,7 +7,5 @@ public class InventoryItem : ScriptableObject
     public Sprite icon;
 
     public AudioClip pickUpSFX;
-
-    public bool consumeOnUse = true;
     [TextArea] public string description;
 }

@@ -1,7 +1,6 @@
 // Navigator.cs
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,12 +9,13 @@ namespace FS_Atmo
     [RequireComponent(typeof(NavMeshAgent))]
     public class Navigator : MonoBehaviour
     {
+        [Header("Search radii (≤0 = unlimited)")]
+        [SerializeField] float currentRoomSearchRadius = 0;   // was 10f
+        [SerializeField] float targetRoomSearchRadius  = 0;   // was 30f
+
         [Header("Movement")]
         [SerializeField] float waypointTolerance = 0.2f;      // use >= agent.stoppingDistance
         [SerializeField] float stuckTimeout      = 3f;        // seconds without progress
-
-        [Header("DEBUG")]
-        [SerializeField] bool logPlannedRoute = true;
 
         private NavMeshAgent agent;
         private InteractionController interaction;
@@ -24,10 +24,11 @@ namespace FS_Atmo
         private readonly List<Transform> tempPoints = new();
         private int idx = -1;
         private Coroutine followCo;
+        private RoomAnchor lastKnownRoom;
 
         // Door-transit lock: prevents replans while crossing
         private bool isDoorTransit;
-        public bool IsInDoorTransit => isDoorTransit;
+        public  bool IsInDoorTransit => isDoorTransit;
 
         void Awake()
         {
@@ -50,26 +51,14 @@ namespace FS_Atmo
 
         // === Public APIs ===
 
-        public void GoToRoom(RoomAnchor targetRoom, Vector3? finalPoint = null, string destinationName = null, string parentName = null)
+        public void GoToRoom(RoomAnchor targetRoom, Vector3? finalPoint = null)
         {
             if (isDoorTransit) return;
 
-            // CRITICAL: Find current room BEFORE planning any path
             var startRoom = FindCurrentRoom();
-            if (!startRoom || !targetRoom)
-            {
-                if (logPlannedRoute)
-                    Debug.LogWarning($"[Navigator] GoToRoom failed: startRoom={startRoom?.roomID ?? "null"}, targetRoom={targetRoom?.roomID ?? "null"}");
-                return;
-            }
+            if (!startRoom || !targetRoom) return;
 
             route.Clear();
-
-            string startRoomName = startRoom.roomID ?? startRoom.name;
-            string targetRoomName = targetRoom.roomID ?? targetRoom.name;
-
-            if (logPlannedRoute)
-                //Debug.Log($"[Navigator] GoToRoom: {startRoomName} -> {targetRoomName}");
 
             // 1) ODA AYNIYSA ve finalPoint VARSA: anchor waypointe hiç gerek yok → direkt final point
             if (startRoom == targetRoom && finalPoint.HasValue)
@@ -93,22 +82,22 @@ namespace FS_Atmo
                 //Debug.Log($"[Navigator] TryGetRoute SUCCESS: route has {route.Count} waypoints before adding final point");
 
             if (finalPoint.HasValue)
-                route.Add(CreateTempPoint(finalPoint.Value, destinationName, parentName));
+                route.Add(CreateTempPoint(finalPoint.Value));
 
             StartFollowing();
         }
 
-        public void GoToPoint(Vector3 worldPoint, string destinationName = null, string parentName = null)
+
+        public void GoToPoint(Vector3 worldPoint)
         {
             if (isDoorTransit) return; // do not re-route mid-door
 
             var home = interaction?.data?.homeID;
-            Transform targetAnchorT = null;
-            RoomAnchor targetRoom = null;
+            var targetAnchorT = NPCAnchorManager.Instance.FindClosestOwnedAnchor(
+                worldPoint, RadiusOrHuge(targetRoomSearchRadius), home);
 
-            // METHOD 1: If parentName is provided, try to find the room anchor directly by name
-            // This is the most reliable method since hotspots are children of room anchors
-            if (!string.IsNullOrEmpty(parentName))
+            // If even that fails, just go direct to be safe.
+            if (!targetAnchorT)
             {
                 var parentTransform = NPCAnchorManager.Instance.GetAnchor(parentName);
                 if (parentTransform != null)
@@ -147,8 +136,17 @@ namespace FS_Atmo
                 return;
             }
 
-            GoToRoom(targetRoom, worldPoint, destinationName, parentName);
+            GoToRoom(targetAnchorT.GetComponent<RoomAnchor>(), worldPoint);
         }
+
+        /// <summary>
+        /// Optional utility if you still want timed chase replans elsewhere (not required).
+        /// </summary>
+        // public void Pursue(Transform target, float replanInterval = 0.25f)
+        // {
+        //     if (followCo != null) StopCoroutine(followCo);
+        //     followCo = StartCoroutine(PursueCo(target, replanInterval));
+        // }
 
         // === Internals ===
 
@@ -156,10 +154,6 @@ namespace FS_Atmo
         {
             if (followCo != null) StopCoroutine(followCo);
             idx = -1;
-
-            if (logPlannedRoute)
-                LogPlannedRoute();
-
             followCo = StartCoroutine(FollowRoute());
         }
 
@@ -225,6 +219,17 @@ namespace FS_Atmo
             tempPoints.Clear();
         }
 
+        private IEnumerator PursueCo(Transform target, float interval)
+        {
+            while (target != null)
+            {
+                if (!isDoorTransit) // respect transit lock
+                    GoToPoint(target.position);
+
+                yield return new WaitForSeconds(interval);
+            }
+        }
+
         private IEnumerator MoveTo(Vector3 pos)
         {
             // Sample onto NavMesh to avoid invalid goals at doorway edges
@@ -251,7 +256,6 @@ namespace FS_Atmo
                         timer += Time.deltaTime;
                     else
                         timer = 0f;
-
                     lastRemaining = agent.remainingDistance;
 
                     if (timer > stuckTimeout) yield break; // give up; caller re-plans soon
@@ -265,11 +269,24 @@ namespace FS_Atmo
         {
             string home = interaction?.data?.homeID ?? "";
 
-            // Use the refactored path-based room finding (checks all doors and prepoints)
-            var t = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(
-                transform.position, home);
+            // 1) Check nearby doors first (cheap, helps when standing at a doorway)
+            foreach (var edge in RoomGraph.Instance.edges)
+            {
+                if (!edge.prePointA || !edge.prePointB) continue;
+
+                float distA = Vector3.Distance(transform.position, edge.prePointA.position);
+                float distB = Vector3.Distance(transform.position, edge.prePointB.position);
+
+                if (distA < 1.0f || distB < 1.0f)
+                    return (distA < distB) ? edge.roomA : edge.roomB;
+            }
+
+            // 2) If not near any doorway, fall back to "closest owned anchor" logic
+            var t = NPCAnchorManager.Instance.FindClosestOwnedAnchor(
+                transform.position, RadiusOrHuge(currentRoomSearchRadius), home);
 
             var room = t ? t.GetComponent<RoomAnchor>() : null;
+            if (room) lastKnownRoom = room;
 
             if (logPlannedRoute)
             {
@@ -280,88 +297,15 @@ namespace FS_Atmo
             return room; // No fallback - system must work correctly
         }
 
+        private float RadiusOrHuge(float r) => (r <= 0f ? 1e6f : r);
 
-        private Transform CreateTempPoint(Vector3 position, string destinationName = null, string parentName = null)
+        private Transform CreateTempPoint(Vector3 position)
         {
-            string name;
-            if (!string.IsNullOrEmpty(destinationName))
-            {
-                if (!string.IsNullOrEmpty(parentName))
-                    name = $"{parentName}/{destinationName}";
-                else
-                    name = destinationName;
-            }
-            else
-            {
-                name = "NavTempPoint";
-            }
-            
-            var go = new GameObject(name);
+            var go = new GameObject("NavTempPoint");
             go.transform.position = position;
             go.transform.SetParent(RoomGraph.Instance.transform, true);
             tempPoints.Add(go.transform);
             return go.transform;
         }
-
-        private void LogPlannedRoute()
-        {
-            if (route == null || route.Count == 0)
-            {
-                Debug.Log("[Navigator] Planned route: EMPTY");
-                return;
-            }
-
-            var summary = new System.Text.StringBuilder(256);
-            summary.Append("<color=green>[Navigator] Route: ");
-
-            DoorController lastDoor = null;
-            bool firstToken = true;
-
-            for (int i = 0; i < route.Count; i++)
-            {
-                Transform wp = route[i];
-                if (!wp) continue;
-
-                var edge = RoomGraph.Instance.GetEdgeByPrepoint(wp);
-
-                // Kapı: aynı kapının iki prepoint'ini TEK kez yaz
-                if (edge != null && edge.door != null)
-                {
-                    if (edge.door != lastDoor)
-                    {
-                        if (!firstToken) summary.Append(" > ");
-                        summary.Append("DOOR:");
-                        summary.Append(edge.door.name);
-                        firstToken = false;
-                        lastDoor = edge.door;
-                    }
-                    continue;
-                }
-
-                lastDoor = null;
-
-                string token;
-
-                if (wp.TryGetComponent<RoomAnchor>(out var room) && room != null)
-                {
-                    token = string.IsNullOrEmpty(room.roomID) ? wp.name : room.roomID;
-                }
-                else
-                {
-                    // FINAL / NavTempPoint / diğer noktalar
-                    token = wp.name;
-                }
-
-                if (!firstToken) summary.Append(" > ");
-                summary.Append(token);
-                firstToken = false;
-            }
-
-            summary.Append("</color>");
-            Debug.Log(summary.ToString());
-        }
-
     }
-
-
 }

@@ -1,7 +1,6 @@
 using UnityEngine;
-using UnityEngine.AI;
 using System.Collections.Generic;
-using FS_Atmo;
+using System.Linq;
 
 public class NPCAnchorManager : MonoBehaviour
 {
@@ -10,8 +9,7 @@ public class NPCAnchorManager : MonoBehaviour
     [Header("Assign anchor roots here (e.g., RoomAnchors or Zone roots):")]
     [SerializeField] private Transform[] anchorRoots;
 
-    private readonly Dictionary<string, Transform> anchorMap = new();
-    private readonly Dictionary<string, List<RoomAnchor>> roomAnchorsByZone = new();
+    private Dictionary<string, Transform> anchorMap = new();
 
     private void Awake()
     {
@@ -22,12 +20,12 @@ public class NPCAnchorManager : MonoBehaviour
         }
 
         Instance = this;
-
         anchorMap.Clear();
-        roomAnchorsByZone.Clear();
 
         foreach (var root in anchorRoots)
             RegisterHierarchy(root);
+
+        // NOTE: modern API (not deprecated)
     }
 
     private void RegisterHierarchy(Transform t)
@@ -38,19 +36,30 @@ public class NPCAnchorManager : MonoBehaviour
         if (!anchorMap.ContainsKey(t.name))
             anchorMap[t.name] = t;
 
-        // Cache RoomAnchors by zone (so we don't GetComponent in loops later)
-        if (t.TryGetComponent<RoomAnchor>(out var room))
-        {
-            if (!roomAnchorsByZone.TryGetValue(room.zoneID, out var list))
-            {
-                list = new List<RoomAnchor>(32);
-                roomAnchorsByZone.Add(room.zoneID, list);
-            }
-            list.Add(room);
-        }
-
         foreach (Transform child in t)
             RegisterHierarchy(child);
+    }
+
+    public Transform FindClosestOwnedAnchor(Vector3 position, float maxDistance, string ownerZoneID)
+    {
+        Transform closest = null;
+        float closestDistance = maxDistance;
+
+        foreach (var kvp in anchorMap)
+        {
+            Transform t = kvp.Value;
+            RoomAnchor anchor = t.GetComponent<RoomAnchor>();
+            if (anchor == null) continue;
+            if (!anchor.zoneID.Equals(ownerZoneID)) continue;
+
+            float dist = Vector3.Distance(position, t.position);
+            if (dist < closestDistance)
+            {
+                closest = t;
+                closestDistance = dist;
+            }
+        }
+        return closest;
     }
 
     public Transform GetAnchor(string id)
@@ -59,56 +68,10 @@ public class NPCAnchorManager : MonoBehaviour
         return result;
     }
 
-    /// <summary>
-    /// Finds which room contains a position by checking immediate doors.
-    /// Returns the room anchor for the first valid immediate door found.
-    /// Logic: If only one prepoint is reachable → that's our room. If both are reachable → use the closer one (by NavMesh path distance).
-    /// Only considers rooms in the owner's zone.
-    /// </summary>
-    public Transform FindClosestOwnedAnchorByPath(
-        Vector3 fromPosition,
-        string ownerZoneID,
-        int areaMask = NavMesh.AllAreas)
+    public List<Transform> GetClosestAnchorsInZone(string zoneID, Vector3 center, int maxCount)
     {
-        if (string.IsNullOrEmpty(ownerZoneID))
-            return null;
-
-        if (RoomGraph.Instance == null || RoomGraph.Instance.edges == null)
-            return null;
-
-        var path = new NavMeshPath();
-        const float prepointThreshold = 0.5f;
-        
-        // Collect all prepoints for quick lookup
-        var allPrepoints = new HashSet<Transform>();
-        foreach (var edge in RoomGraph.Instance.edges)
-        {
-            if (edge.prePointA) allPrepoints.Add(edge.prePointA);
-            if (edge.prePointB) allPrepoints.Add(edge.prePointB);
-        }
-        
-        // Make sure start is on navmesh
-        if (!NavMesh.SamplePosition(fromPosition, out var startHit, 1.0f, areaMask))
-            return null; // Position not on NavMesh
-        fromPosition = startHit.position;
-        
-        // First pass: Look for definitive answers (only one prepoint reachable)
-        foreach (var edge in RoomGraph.Instance.edges)
-        {
-            if (!edge.prePointA || !edge.prePointB || !edge.door) continue;
-
-            // Filter by zone ownership - only consider doors connected to rooms in the owner's zone
-            bool roomAInZone = edge.roomA && edge.roomA.zoneID == ownerZoneID;
-            bool roomBInZone = edge.roomB && edge.roomB.zoneID == ownerZoneID;
-            
-            if (!roomAInZone && !roomBInZone) continue; // Skip doors not in owner's zone
-
-            // Check path to prepoint A
-            bool canReachA = false;
-            float pathLengthA = float.PositiveInfinity;
-            
-            Vector3 prepointA = edge.prePointA.position;
-            if (NavMesh.SamplePosition(prepointA, out var hitA, 1.0f, areaMask))
+        return anchorMap.Values
+            .Where(t =>
             {
                 prepointA = hitA.position;
                 

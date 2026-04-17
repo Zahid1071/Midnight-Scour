@@ -1,3 +1,4 @@
+using System.Collections; // Coroutine (IEnumerator) kullanmak için bu şart
 using UnityEngine;
 using System.Collections;
 

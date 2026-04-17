@@ -3,7 +3,6 @@ using UnityEngine.AI;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using FS_Atmo;
 
 public class InteractionController : MonoBehaviour
 {
@@ -40,13 +39,11 @@ public class InteractionController : MonoBehaviour
     private NPCController npc;
     private bool hasVisualOffset = false;
     private bool isCancelled = false;
-    private Navigator navigator;
 
     void Awake()
     {
         animator = GetComponentInChildren<Animator>();
         npc = GetComponent<NPCController>();
-        navigator = GetComponent<Navigator>();
     }
 
     void Update()
@@ -129,17 +126,12 @@ public class InteractionController : MonoBehaviour
 
         Transform hotspotTransform = NPCAnchorManager.Instance.GetAnchor(currentHotspot.hotspotID);
         if (hotspotTransform != null)
-        {
-            string parentName = hotspotTransform.parent != null ? hotspotTransform.parent.name : null;
-            string destinationName = hotspotTransform.name;
-            navigator.GoToPoint(hotspotTransform.position, destinationName, parentName);
-        }
+            agent.SetDestination(hotspotTransform.position);
 
         if (interactionRoutine != null)
             StopCoroutine(interactionRoutine);
 
         interactionRoutine = StartCoroutine(WaitForArrival(hotspotTransform));
-        // Debug.Log(hotspotTransform);
     }
 
     private IEnumerator RetryPickNextRoutineDelayed()
@@ -150,28 +142,12 @@ public class InteractionController : MonoBehaviour
 
     private IEnumerator WaitForArrival(Transform hotspotTransform)
     {
-        const float hotspotArriveRadius = 2f; // tweak if needed
-
-        while (true)
+        while (agent.pathPending || agent.remainingDistance > 0.1f)
         {
-            if (!agent.pathPending &&
-                agent.remainingDistance <= 0.1f)
-            {
-                // Only accept arrival if we're actually close to the hotspot,
-                // not just some intermediate waypoint (door prepoint).
-                if (hotspotTransform == null ||
-                    Vector3.Distance(transform.position, hotspotTransform.position) <= hotspotArriveRadius)
-                {
-                    break;
-                }
-            }
-
             yield return null;
         }
-
         StartInteraction(currentHotspot);
     }
-
 
     private int interactionInstanceID = 0;
     public void StartInteraction(WeightedHotspot hotspot)
@@ -179,7 +155,7 @@ public class InteractionController : MonoBehaviour
         interactionInstanceID++;
         int thisInstance = interactionInstanceID;
 
-        //Debug.Log($"[StartInteraction] ID={thisInstance}");
+        Debug.Log($"[StartInteraction] ID={thisInstance}");
         if (interactionRoutine != null)
         {
             StopCoroutine(interactionRoutine);
@@ -246,9 +222,6 @@ public class InteractionController : MonoBehaviour
         IsPerformingHotspotAction = false;
         animator.SetInteger("Behaviour", -1);
         interactionRoutine = null;
-
-        StartNextRoutine();
-        
     }
 
     private IEnumerator InterpolateBackToStandingPosition()

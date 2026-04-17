@@ -58,7 +58,7 @@ MonoBehaviour:
       weight: 0.239
       hotspots:
       - hotspotID: Hotspot_Sofa
-        weight: 0.165
+        weight: 0.721
         duration: 5
         actionType: 0
         requiresVisualOffset: 1

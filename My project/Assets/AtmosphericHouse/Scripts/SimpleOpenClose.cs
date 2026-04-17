@@ -4,53 +4,42 @@ using UnityEngine;
 
 namespace FS_Atmo
 {
-    public class SimpleOpenClose : MonoBehaviour, IItemReceiver, IInteractable
+    public class SimpleOpenClose : MonoBehaviour
     {
         [Header("State Names (Animator)")]
         [SerializeField] private string openStateName  = "Open";
         [SerializeField] private string closeStateName = "Close";
-        [Tooltip("Animator penceresindeki Trigger parametresinin adı")]
-        [SerializeField] private string lockedTriggerName = "Locked";
 
         [Header("Blending")]
+        [Tooltip("Seconds to blend when (re)starting Open/Close.")]
         [SerializeField] private float crossFadeDuration = 0.10f;
+
+        [Tooltip("Allow input when current state has reached this % progress (0..1).")]
         [Range(0f, 1f)]
-        [SerializeField] private float minToggleProgress = 0.25f;
+        [SerializeField] private float minToggleProgress = 0.25f; // 25%
 
-        [Header("Lock Settings (Player Only)")]
-        public bool isLocked = false;
-        [SerializeField] private InventoryItem requiredKey;
-        
-        [Tooltip("Kilitli animasyonu kaç saniye sürüyor? Bu süre boyunca tekrar tıklanamaz.")]
-        [SerializeField] private float lockedAnimationDuration = 1.0f; // YENİ: Spam engelleyici süre
-
-        [Header("Audio SFX")]
-        [SerializeField] private AudioClip openSound;
-        [SerializeField] private AudioClip closeSound;
-        [SerializeField] private AudioClip unlockSound; 
-        [SerializeField] private AudioClip lockedSound; 
-
-        [Header("Runtime Setup")]
+        [Header("Initial/Runtime Flags")]
         public bool objectOpen;
         public bool objectOpenAdditional;
+
+        [Header("Optional Paired Door (e.g., double door)")]
         public GameObject animateAdditional;
 
         private Animator myAnimator;
         private Animator additionalAnimator;
         private bool hasAdditional = false;
-        private int openHash, closeHash, lockedHash;
-        
-        // YENİ: Spam koruması için zamanlayıcı
-        private float nextInteractTime = 0f;
+
+        private int openHash;
+        private int closeHash;
 
         void Awake()
         {
             myAnimator = GetComponent<Animator>();
-            if (myAnimator == null) myAnimator = GetComponentInParent<Animator>();
+            if (myAnimator == null)
+                myAnimator = GetComponentInParent<Animator>();
 
-            openHash   = Animator.StringToHash(openStateName);
-            closeHash  = Animator.StringToHash(closeStateName);
-            lockedHash = Animator.StringToHash(lockedTriggerName);
+            openHash  = Animator.StringToHash(openStateName);
+            closeHash = Animator.StringToHash(closeStateName);
 
             if (animateAdditional != null && animateAdditional.GetComponent<SimpleOpenClose>())
             {
@@ -58,136 +47,74 @@ namespace FS_Atmo
                 hasAdditional = additionalAnimator != null;
                 objectOpenAdditional = animateAdditional.GetComponent<SimpleOpenClose>().objectOpen;
             }
-        }
-
-
-        public void Interact()
-        {
-            
-        }
-
-        public void ObjectClicked() => ObjectClicked(bypassLock: false);
-
-        public void ObjectClicked(bool bypassLock)
-        {
-            // --- KİLİTLİ DURUM KONTROLÜ (Burası aynı kalıyor) ---
-            if (!bypassLock && !objectOpen && isLocked)
+            else
             {
-                InventoryItem selectedItem = InventoryUI.Instance?.GetSelectedItem();
-                if (selectedItem != null && requiredKey != null && selectedItem == requiredKey) return; 
-                if (Time.time < nextInteractTime) return;
-
-                Debug.Log("❌ Kapı kilitli! (Animasyon Tetikleniyor)");
-                myAnimator.SetTrigger(lockedHash);
-                if (hasAdditional) additionalAnimator.SetTrigger(lockedHash);
-                nextInteractTime = Time.time + lockedAnimationDuration;
-                return;
+                hasAdditional = false;
             }
+        }
 
-            // ============================================================
-            // 🔥 YENİ MANTIK: Sadece Open/Close ise Blending Yap 🔥
-            // ============================================================
-            
+        void Start()
+        {
+            // Set initial pose instantly (no blend on boot to avoid a visible pop)
+            if (objectOpen)
+                myAnimator.Play(openHash, 0, 1f);
+            else
+                myAnimator.Play(closeHash, 0, 1f);
+
+            if (hasAdditional)
+            {
+                if (objectOpenAdditional)
+                    additionalAnimator.Play(openHash, 0, 1f);
+                else
+                    additionalAnimator.Play(closeHash, 0, 1f);
+            }
+        }
+
+        /// <summary>
+        /// Called by your player/use script.
+        /// </summary>
+        public void ObjectClicked()
+        {
+            // If currently transitioning, we can still accept input, but read from next/ current safely.
             var info = myAnimator.GetCurrentAnimatorStateInfo(0);
-            
-            // Varsayılan değer: 1f 
-            // (ToggleSelf içinde 1-t yapıldığı için sonuç 0 olur, yani BAŞTAN başlar)
-            float t = 1f; 
+            float t = GetClampedProgress(info);
 
-            // Eğer şu an oynayan şey AÇILMA veya KAPANMA ise, kaldığımız yeri hesapla
-            if (info.shortNameHash == openHash || info.shortNameHash == closeHash)
-            {
-                t = GetClampedProgress(info);
-            }
+            // Only allow early re-toggle after minToggleProgress (25% by default)
+            if (t < minToggleProgress && !info.loop) // for non-looping door clips
+                return;
 
-            // Min toggle süresi kontrolü (Sadece loop olmayan ve hareket halindeki animasyonlar için)
-            if (t < minToggleProgress && !info.loop && t != 1f) return;
-
-            // --- TEK KAPIYSA ---
             if (!hasAdditional)
             {
                 ToggleSelf(t);
                 return;
             }
 
-            // --- ÇİFT KAPIYSA ---
+            // With paired door: try to keep their poses coherent and states aligned
             var addInfo = additionalAnimator.GetCurrentAnimatorStateInfo(0);
-            float tAdd = 1f; // İkinci kapı için de varsayılan "Sıfırdan Başla"
-
-            // İkinci kapı hareket halindeyse hesapla
-            if (addInfo.shortNameHash == openHash || addInfo.shortNameHash == closeHash)
-            {
-                tAdd = GetClampedProgress(addInfo);
-            }
+            float tAdd = GetClampedProgress(addInfo);
 
             ToggleSelf(t);
             ToggleAdditional(tAdd);
         }
 
-        public void ReceiveItem(InventoryItem item)
-        {
-            if (objectOpen) return;
-            if (!isLocked) return;
-
-            if (item == null || requiredKey == null || item != requiredKey)
-            {
-                // Yanlış anahtarda da spam koruması yapalım
-                if (Time.time < nextInteractTime) return;
-
-                myAnimator.SetTrigger(lockedHash);
-                nextInteractTime = Time.time + lockedAnimationDuration;
-                return;
-            }
-
-            var inventory = InventoryManager.Instance.GetInventory();
-            if (!inventory.Contains(item)) return;
-
-            // ✅ KİLİT AÇILDI
-            isLocked = false;
-            Debug.Log($"✅ {item.itemName} ile kilit açıldı.");
-
-            if (item.consumeOnUse)
-            {
-                InventoryManager.Instance.RemoveItem(item);
-                InventoryUI.Instance?.RefreshUI();
-            }
-
-            PlaySound(unlockSound);
-        }
-
-        // --- Helper Methods ---
-        
-        // PUBLIC: Animation Event için
-        public void PlaySound(AudioClip clip)
-        {
-            if (SoundManager.Instance != null && clip != null)
-                SoundManager.Instance.PlaySFXSafe(clip, transform.position);
-        }
-
-        public void PlayLockedSound()
-        {
-            if (SoundManager.Instance != null && lockedSound != null)
-                SoundManager.Instance.PlaySFXAt(lockedSound, transform.position);
-        }
-
-        public void SetLocked(bool locked) => isLocked = locked;
-        public void SetRequiredKey(InventoryItem key) => requiredKey = key;
-
         private void ToggleSelf(float currentT)
         {
             if (objectOpen)
             {
+                // Going Open -> Close
+                // Map pose so it continues from where it is:
+                // if you authored Open (0->1) and Close (0->1) as time-mirrors,
+                // use (1 - currentT) when entering the opposite clip.
                 float mapped = 1f - currentT;
                 myAnimator.CrossFade(closeHash, crossFadeDuration, 0, mapped);
                 objectOpen = false;
-                PlaySound(closeSound);
             }
             else
             {
+                // Going Close -> Open
                 float mapped = 1f - currentT;
                 myAnimator.CrossFade(openHash, crossFadeDuration, 0, mapped);
                 objectOpen = true;
-                PlaySound(openSound);
             }
         }
 
@@ -203,9 +130,6 @@ namespace FS_Atmo
                 objectOpenAdditional = false;
                 other.objectOpen = false;
                 other.objectOpenAdditional = false;
-                
-                if (SoundManager.Instance != null)
-                    SoundManager.Instance.PlaySFXSafe(closeSound, animateAdditional.transform.position);
             }
             else
             {
@@ -214,15 +138,15 @@ namespace FS_Atmo
                 objectOpenAdditional = true;
                 other.objectOpen = true;
                 other.objectOpenAdditional = true;
-                
-                if (SoundManager.Instance != null)
-                    SoundManager.Instance.PlaySFXSafe(openSound, animateAdditional.transform.position);
             }
         }
 
         private static float GetClampedProgress(AnimatorStateInfo info)
         {
+            // For non-looping door clips, normalizedTime grows past 1 after it ends.
+            // We want the fractional progress within 0..1.
             float t = info.normalizedTime;
+            // If it’s a non-looping clip, clamp; if loop, take fractional part:
             return info.loop ? Mathf.Repeat(t, 1f) : Mathf.Clamp01(t);
         }
     }

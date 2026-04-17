@@ -49,25 +49,27 @@ public class PauseManager : MonoBehaviour
     public void OnOpenSettings()
     {
         if (settingsPanel == null) return;
-        if (!pauseRoot.activeSelf) pauseRoot.SetActive(true);
-
+        if (pauseRoot) pauseRoot.SetActive(false);
         settingsPanel.SetActive(true);
-        settingsMenu?.BeginEditing(); // load saved values into the UI
+        settingsMenu?.BeginEditing();
     }
 
-    public void OnCloseSettings() // Back inside settings
+    public void OnCloseSettings()
     {
         settingsMenu?.CancelEditing();
         if (settingsPanel) settingsPanel.SetActive(false);
+        if (pauseRoot) pauseRoot.SetActive(true);
     }
 
     public void OnQuitToMenu()
     {
-        // Make sure time/audio are normal
+        // Persist progress before leaving the game scene
+        if (SaveManager.Instance != null)
+            SaveManager.Instance.SaveGame();
+
         Time.timeScale = 1f;
         AudioListener.pause = false;
 
-        // Menu needs a free cursor
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
