@@ -15,8 +15,6 @@ MonoBehaviour:
   npcName: Joe
   npcPrefab: {fileID: 4884186263421869, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
   homeID: House_001
-  isInfected: 0
-  infectionLevel: 0
   searchChance: 0
   weightedRoutinePlans:
   - zoneID: House_001
@@ -26,15 +24,15 @@ MonoBehaviour:
       weight: 0
       hotspots:
       - hotspotID: Hotspot_Idle2
-        weight: 0.165
+        weight: 1
         duration: 3
         actionType: 10
         requiresVisualOffset: 0
     - roomAnchorID: Corridor-Kitchen_Room
-      weight: 0.205
+      weight: 1
       hotspots:
       - hotspotID: Hotspot_Idle
-        weight: 0.165
+        weight: 0.868
         duration: 3
         actionType: 10
         requiresVisualOffset: 0
@@ -57,26 +55,26 @@ MonoBehaviour:
         actionType: 10
         requiresVisualOffset: 0
     - roomAnchorID: Livingroom_Room
-      weight: 0.099
+      weight: 0.239
       hotspots:
       - hotspotID: Hotspot_Sofa
         weight: 0.721
         duration: 5
         actionType: 0
         requiresVisualOffset: 1
-  patrolChance: 0.556
+  patrolChance: 1
   patrolDuration: 20
   ambushChance: 0.51
   ambushWaitRange: {x: 5, y: 20}
   footstepVolume: 0.5
   vision:
     maxViewDistance: 10
-    maxViewAngle: 80
+    maxViewAngle: 90
     ignoreLayer:
       serializedVersion: 2
-      m_Bits: 1536
-    confirmSeconds: 1.5
-    preAlertSeconds: 0.45
+      m_Bits: 5248
+    confirmSeconds: 0.1
+    preAlertSeconds: 0.1
     buildRate: 1
     decayRate: 0.1
   hearing:
@@ -90,5 +88,5 @@ MonoBehaviour:
     walkingSpeed: 2.5
     runningSpeed: 4
   chaseRetention:
-    gracePeriod: 2
-    keepChasingDistance: 3
+    gracePeriod: 3
+    keepChasingDistance: 5

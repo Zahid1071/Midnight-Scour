@@ -32,6 +32,7 @@ public class SuspicionSystem : MonoBehaviour
 
     void Update()
     {
+
         if (suspicionLevel > 0f)
         {
             suspicionLevel -= suspicionDecay * Time.deltaTime;

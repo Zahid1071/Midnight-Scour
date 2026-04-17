@@ -65,10 +65,7 @@ public class NPCData : ScriptableObject
 
     [RoutineID(RoutineIDAttribute.IDType.Zone)]
     public string homeID;
-
-    [Header("Infection")]
-    public bool isInfected = false;
-    [Range(0f, 1f)] public float infectionLevel = 0f;
+    
 
     [Header("Routine / Search")]
     [Range(0f, 1f)] public float searchChance = 0.3f; // chance to actually search a hiding spot

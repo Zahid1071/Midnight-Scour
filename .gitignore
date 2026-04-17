@@ -42,9 +42,9 @@ ExportedObj/
 *.VC.db
 
 # Unity paket listesi HARIC paket icerikleri
-Packages/
-!Packages/manifest.json
-!Packages/packages-lock.json
+/Packages/*
+!/Packages/manifest.json
+!/Packages/packages-lock.json
 
 # Build ciktilari
 *.apk

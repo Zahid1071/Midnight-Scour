@@ -28,7 +28,6 @@ public class PlayerFootstepRhythm : MonoBehaviour
     void Awake()
     {
         controller = GetComponent<CharacterController>();
-        fpsController = GetComponent<FirstPersonController>();
     }
 
     void Start()
@@ -43,9 +42,6 @@ public class PlayerFootstepRhythm : MonoBehaviour
 
     void HandleFootstepRhythm()
     {
-        if (!fpsController.enabled)
-            return;
-
         float speed = new Vector3(controller.velocity.x, 0, controller.velocity.z).magnitude;
         if (!controller.isGrounded || speed <= sneakThreshold)
         {
@@ -60,7 +56,6 @@ public class PlayerFootstepRhythm : MonoBehaviour
         float delta = Vector3.Distance(transform.position, lastFramePosition);
         distanceAccumulator += delta;
         lastFramePosition = transform.position;
-
         while (distanceAccumulator >= stepDistance)
         {
             footstepController.PlayFootstep(volume);
@@ -75,8 +70,9 @@ public class PlayerFootstepRhythm : MonoBehaviour
                 suspicionValue = 0f;
                 sneakingLuck = 0.9f;
             }
-
+            Debug.Log(suspicionValue);
             NotifyNPCsOfFootstep(suspicionValue, sneakingLuck);
+
 
             distanceAccumulator -= stepDistance; // keep remainder for smooth rhythm
         }

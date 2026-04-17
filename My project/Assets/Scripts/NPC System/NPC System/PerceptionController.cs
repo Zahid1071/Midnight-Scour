@@ -69,41 +69,61 @@ public class PerceptionController : MonoBehaviour
 
     void Update()
     {
-        VisionCheck();
+        PlayerCheckVision();
         UpdateVisionMeters();
         HandleVisionLoss();
+        CageCheckVision();
     }
 
-    private void VisionCheck()
+    private void PlayerCheckVision()
     {
         if (!player) { CanSeePlayer = false; return; }
 
-        Vector3 eye   = transform.position + Vector3.up * 1.7f;
-        Vector3 head  = player.position     + Vector3.up * 1.6f;
-        Vector3 dir   = (head - eye).normalized;
-
-        float dist  = Vector3.Distance(eye, head);
-        float angle = Vector3.Angle(transform.forward, dir);
-
-        // Close-quarters: while chasing, keep visibility sticky
-        if (npc.currentState == NPCController.AIState.Chase && dist < 1.5f)
+        // 1. GİZLİLİK KONTROLÜ (Önceki düzeltmemiz)
+        if (player.gameObject.layer == 7)
         {
-            LastKnownPlayerPosition = head;
-            CanSeePlayer = true;
+            CanSeePlayer = false;
             return;
         }
-        // ignoreLayer should be set to LayerMask.GetMask("WindowGlass") or similar
-        if (Physics.Raycast(eye, dir, out RaycastHit hit, maxViewDistance, ~ignoreLayer, QueryTriggerInteraction.Ignore))
+
+        var playerCol = player.GetComponentInChildren<Collider>();
+        if (!playerCol) { CanSeePlayer = false; return; }
+
+        // Vektör Hesaplamaları
+        Vector3 eye = transform.position + Vector3.up * 1.7f; // Göz hizası
+        Vector3 aim = playerCol.bounds.center;                // Hedef (Oyuncu göğsü)
+        Vector3 dirToTarget = (aim - eye).normalized;         // Hedefe giden yön vektörü
+
+        // --- EKLENEN KISIM: AÇI KONTROLÜ (FOV) ---
+        
+        // NPC'nin yüzü (transform.forward) ile Hedef arasındaki açıyı bul
+        float angleToTarget = Vector3.Angle(transform.forward, dirToTarget);
+
+        // Eğer açı, izin verilen yarı-açıdan (maxViewHalfAngle) büyükse
+        // (Örneğin 60 dereceden büyükse, yani oyuncu çok yandaysa veya arkadaysa)
+        if (angleToTarget > maxViewHalfAngle)
         {
-            if (hit.collider.CompareTag("Player"))
+            CanSeePlayer = false;
+            return; // Göremez, fonksiyondan çık
+        }
+        // -----------------------------------------
+
+        // 2. RAYCAST (Mesafe ve Duvar Kontrolü)
+        // Açı tutuyorsa şimdi de arada duvar var mı diye bakıyoruz
+        if (Physics.Raycast(eye, dirToTarget, out RaycastHit hit, maxViewDistance, ~ignoreLayer, QueryTriggerInteraction.Ignore))
+        {
+            if (hit.collider.transform.root == player.root)
             {
                 LastKnownPlayerPosition = head;
                 CanSeePlayer = true;
+                //Debug.Log(hit.transform.name);
                 return;
+
             }
         }
 
-
+        // Çizim debug (Sadece sahne ekranında görünür)
+        Debug.DrawRay(eye, dirToTarget * maxViewDistance, CanSeePlayer ? Color.green : Color.red);
 
         CanSeePlayer = false;
     }
@@ -175,6 +195,59 @@ public class PerceptionController : MonoBehaviour
                 lostSightTimer += Time.deltaTime;
                 if (lostSightTimer >= gracePeriod)
                     npc.fsm.SetState(NPCController.AIState.Suspicious);
+            }
+        }
+    }
+
+    [Header("Cage Settings")]
+    public Cage targetCage; // Inspector'dan Cage.cs olan objeyi sürükle
+    private bool cageAlertTriggered = false; // Sürekli spamlamaması için
+
+    private void CageCheckVision()
+    {
+        if (targetCage == null || cageAlertTriggered) return;
+
+        // Göz ve Hedef Vektörleri
+        Vector3 eye = transform.position + Vector3.up * 1.7f;
+        
+        // Kafes Merkezini Bul
+        Vector3 cageCenter = targetCage.transform.position;
+        Collider triggerCol = targetCage.GetComponent<Collider>();
+        if (triggerCol != null) cageCenter = triggerCol.bounds.center;
+        else cageCenter += Vector3.up * 1.5f;
+
+        Vector3 dirToCage = (cageCenter - eye).normalized;
+        float distToCage = Vector3.Distance(eye, cageCenter);
+
+        if (distToCage > maxViewDistance) return;
+
+        // RAYCAST (Layer filtresi yok, direkt bakıyor)
+        if (Physics.Raycast(eye, dirToCage, out RaycastHit hit, maxViewDistance))
+        {
+            Cage hitCage = hit.transform.GetComponentInParent<Cage>();
+
+            if (hitCage != null && hitCage == targetCage)
+            {
+                
+                // 1. Durum: İçerisi Boş mu?
+                bool isEmpty = (hitCage.isOccupied == false);
+
+                // 2. Durum: Kapı Açık mı? (Referans atanmışsa kontrol et, yoksa kapalı varsay)
+                bool isOpen = (hitCage.cageDoor != null && hitCage.cageDoor.objectOpen);
+
+                // VEYA (||) mantığı: Boşsa VEYA Açıksa -> ALARM!
+                if (isEmpty || isOpen)
+                {
+                    Debug.Log($"⚠️ NPC: Player Escaped! (isEmpty: {isEmpty}, isOpen: {isOpen})");
+                    
+                    npc.fsm.SetState(NPCController.AIState.Search);
+                    
+                    string homeID = npc.interaction.data.homeID;
+                    var anchor = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(cageCenter, homeID);
+                    if (anchor) npc.perception.searchTarget = anchor;
+
+                    cageAlertTriggered = true; // Tekrar spamlamasın
+                }
             }
         }
     }

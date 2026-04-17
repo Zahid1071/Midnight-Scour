@@ -1,66 +1,54 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerHider : MonoBehaviour
 {
-    public bool isHidden = false;
-    private HidingSpot currentSpot;
-    public GameObject visualRoot; // Drag "Mesh" here
-    public MonoBehaviour[] scriptsToDisable; // Drag First Person Controller, Player Input, etc.
+    public bool isHidden { get; private set; }
+    private HidingSpot currentHidingSpot;
+    
+    [Header("Visuals")]
+    public GameObject visualRoot; 
+    
+    [Header("Components to Disable")]
+    public MonoBehaviour[] scriptsToDisable;
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        // Space tuşu ile çıkış
+        if (isHidden && currentHidingSpot != null)
         {
-            if (isHidden && currentSpot != null)
+            if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
             {
-                currentSpot.RevealPlayer(gameObject);
-                currentSpot = null;
-            }
-            else if (!isHidden && currentSpot != null)
-            {
-                currentSpot.HidePlayer(gameObject);
+                currentHidingSpot.RevealPlayer(gameObject);
+                // currentHidingSpot = null; // Bunu RevealPlayer içindeki mantık halledecek
             }
         }
     }
 
-
-
-    public void SetHidden(bool value)
+    // Sadece Input/Hareket scriptlerini kapatır
+    public void DisableControlsOnly()
     {
-        isHidden = value;
-
-        // Hide visuals
-        if (visualRoot != null)
-            visualRoot.SetActive(!value);
-
-        // Disable movement/input
         foreach (var script in scriptsToDisable)
-        {
-            if (script != null)
-                script.enabled = !value;
-        }
-
-        // Optional: lock camera or pause other systems
+            if (script != null) script.enabled = false;
     }
 
-    private void OnTriggerEnter(Collider other)
+    // Sadece Input/Hareket scriptlerini açar
+    public void EnableControls()
     {
-        if (!isHidden && other.TryGetComponent(out HidingSpot spot))
-        {
-            currentSpot = spot;
-        }
+        foreach (var script in scriptsToDisable)
+            if (script != null) script.enabled = true;
     }
 
-    private void OnTriggerExit(Collider other)
+    // Görselliği aç/kapat
+    public void SetVisuals(bool isActive)
     {
-        if (!isHidden && other.TryGetComponent(out HidingSpot spot))
-        {
-            if (spot == currentSpot)
-            {
-                currentSpot = null;
-            }
-        }
+        if (visualRoot != null) visualRoot.SetActive(isActive);
     }
 
-
+    // Durum güncellemesi
+    public void SetHiddenState(bool hidden, HidingSpot spot)
+    {
+        isHidden = hidden;
+        currentHidingSpot = spot;
+    }
 }

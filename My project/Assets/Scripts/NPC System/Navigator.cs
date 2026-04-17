@@ -36,6 +36,19 @@ namespace FS_Atmo
             interaction = GetComponent<InteractionController>();
         }
 
+        void Start()
+        {
+            // CRITICAL: Initialize current room at game start BEFORE any path planning
+            var initialRoom = FindCurrentRoom();
+            if (logPlannedRoute)
+            {
+                // if (initialRoom != null)
+                //     Debug.Log($"[Navigator] Game Start - Initial room: {initialRoom.roomID ?? initialRoom.name}");
+                // else
+                //     Debug.LogWarning("[Navigator] Game Start - Could not determine initial room!");
+            }
+        }
+
         // === Public APIs ===
 
         public void GoToRoom(RoomAnchor targetRoom, Vector3? finalPoint = null)
@@ -50,13 +63,23 @@ namespace FS_Atmo
             // 1) ODA AYNIYSA ve finalPoint VARSA: anchor waypointe hiç gerek yok → direkt final point
             if (startRoom == targetRoom && finalPoint.HasValue)
             {
-                route.Add(CreateTempPoint(finalPoint.Value));  // ANCHOR’I EKLEME!
+                // if (logPlannedRoute)
+                //     Debug.Log($"[Navigator] Same room, going directly to final point");
+                route.Add(CreateTempPoint(finalPoint.Value, destinationName, parentName));
                 StartFollowing();
                 return;
             }
 
             // 2) Normal kapılı/kapısız rota
-            if (!RoomGraph.Instance.TryGetRoute(startRoom, targetRoom, route)) return;
+            if (!RoomGraph.Instance.TryGetRoute(startRoom, targetRoom, route))
+            {
+                // if (logPlannedRoute)
+                //     Debug.LogWarning($"[Navigator] TryGetRoute FAILED: {startRoomName} -> {targetRoomName}");
+                return;
+            }
+
+            if (logPlannedRoute)
+                //Debug.Log($"[Navigator] TryGetRoute SUCCESS: route has {route.Count} waypoints before adding final point");
 
             if (finalPoint.HasValue)
                 route.Add(CreateTempPoint(finalPoint.Value));
@@ -76,6 +99,38 @@ namespace FS_Atmo
             // If even that fails, just go direct to be safe.
             if (!targetAnchorT)
             {
+                var parentTransform = NPCAnchorManager.Instance.GetAnchor(parentName);
+                if (parentTransform != null)
+                {
+                    targetRoom = parentTransform.GetComponent<RoomAnchor>();
+                    if (targetRoom != null)
+                    {
+                        targetAnchorT = parentTransform;
+                        // if (logPlannedRoute)
+                        //     Debug.Log($"[Navigator] GoToPoint: Found target room by parent name: {targetRoom.roomID ?? targetRoom.name} for {destinationName ?? "point"}");
+                    }
+                }
+            }
+
+            // METHOD 2: Fallback to door-voting consensus if parent lookup failed
+            if (targetRoom == null)
+            {
+                targetAnchorT = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(
+                    worldPoint, home);
+
+                if (targetAnchorT != null)
+                {
+                    targetRoom = targetAnchorT.GetComponent<RoomAnchor>();
+                    // if (logPlannedRoute)
+                    //     Debug.Log($"[Navigator] GoToPoint: Found target room by door-voting: {targetRoom?.roomID ?? targetRoom?.name ?? "null"} for {destinationName ?? "point"}");
+                }
+            }
+
+            // If both methods failed, fall back to direct NavMesh
+            if (targetRoom == null)
+            {
+                if (logPlannedRoute)
+                    Debug.LogWarning($"[Navigator] GoToPoint: Failed to find target room for {destinationName ?? "point"}, falling back to direct NavMesh");
                 if (followCo != null) StopCoroutine(followCo);
                 followCo = StartCoroutine(MoveTo(worldPoint));
                 return;
@@ -145,7 +200,16 @@ namespace FS_Atmo
                     continue;
                 }
 
-                // Normal waypoint/anchor
+                // ✅ Anchor kontrolü - anchor'lara gitme, sadece prepoint'ler ve final point'e git
+                if (waypoint.TryGetComponent<RoomAnchor>(out var roomAnchor) && roomAnchor != null)
+                {
+                    // // Bu bir anchor, atla (anchor'lar sadece route planlama için kullanılıyor)
+                    // if (logPlannedRoute)
+                    //     Debug.Log($"[Navigator] Skipping anchor waypoint: {roomAnchor.roomID ?? roomAnchor.name}");
+                    continue;
+                }
+
+                // Normal waypoint (prepoint veya final point)
                 yield return MoveTo(waypoint.position);
             }
 
@@ -224,7 +288,13 @@ namespace FS_Atmo
             var room = t ? t.GetComponent<RoomAnchor>() : null;
             if (room) lastKnownRoom = room;
 
-            return room ? room : lastKnownRoom; // fallback to last known if outside radius
+            if (logPlannedRoute)
+            {
+                string roomName = room?.roomID ?? room?.name ?? "null";
+                //Debug.Log($"[Navigator] FindCurrentRoom: {roomName}");
+            }
+
+            return room; // No fallback - system must work correctly
         }
 
         private float RadiusOrHuge(float r) => (r <= 0f ? 1e6f : r);
