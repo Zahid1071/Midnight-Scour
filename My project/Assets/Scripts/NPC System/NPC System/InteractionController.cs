@@ -308,20 +308,8 @@ public class InteractionController : MonoBehaviour
         if (animator == null) return;
 
         int baseBehaviour = (int)hotspot.actionType;
-        int finalBehaviour = baseBehaviour;
 
-        float infection = data.infectionLevel;
-
-        if (infection > 0.7f)
-        {
-            finalBehaviour = baseBehaviour + 200; // fully infected
-        }
-        else if (infection > 0.3f)
-        {
-            finalBehaviour = baseBehaviour + 100; // semi-infected
-        }
-
-        animator.SetInteger("Behaviour", finalBehaviour);
+        animator.SetInteger("Behaviour", baseBehaviour);
     }
 
     public bool IsBusyWithRoutine()

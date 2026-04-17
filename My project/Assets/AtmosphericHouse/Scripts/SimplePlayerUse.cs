@@ -38,14 +38,17 @@ namespace FS_Atmo
         {
             RaycastHit hit;
 
-            if (Physics.Raycast(mainCamera.transform.position, mainCamera.transform.TransformDirection(Vector3.forward), out hit, 2.3f))
+            if (Physics.Raycast(mainCamera.transform.position, mainCamera.transform.TransformDirection(Vector3.forward), out hit, 3))
             {
                 // ✅ Direkt component'e erişip parametre ile çağır (oyuncu için bypassLock = false)
                 SimpleOpenClose door = hit.collider.GetComponent<SimpleOpenClose>();
+                Debug.Log(hit.transform.name);
                 if (door != null)
                 {
                     // Debug.Log("Object with SimpleOpenClose script found");
                     door.ObjectClicked(bypassLock: false); // Oyuncu için lock kontrolü yapılır
+                    
+                    
                 }
 
                 else

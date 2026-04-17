@@ -116,7 +116,7 @@ public class PerceptionController : MonoBehaviour
             {
                 LastKnownPlayerPosition = aim;
                 CanSeePlayer = true;
-                Debug.Log(hit.transform.name);
+                //Debug.Log(hit.transform.name);
                 return;
 
             }

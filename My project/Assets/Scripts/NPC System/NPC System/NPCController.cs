@@ -4,7 +4,7 @@ using UnityEngine.AI;
 
 public class NPCController : MonoBehaviour
 {
-    public enum AIState { Natural, Alerted, Suspicious, Search, Chase, Capture, Dead, Patrol, Ambush }
+    public enum AIState { Natural, Alerted, Suspicious, Search, Chase, Capture, Dead, Patrol, Ambush , Scripted}
     public AIState currentState;
 
     [HideInInspector] public FSMController fsm;
@@ -66,7 +66,7 @@ public class NPCController : MonoBehaviour
 
     void Start()
     {
-        fsm.SetState(AIState.Natural);
+        fsm.SetState(AIState.Scripted);
         ApplyLocomotionForState(currentState);
     }
 
@@ -117,7 +117,7 @@ public class NPCController : MonoBehaviour
 
     private void HandleVisionConfirmed()
     {
-        if (currentState == AIState.Capture || currentState == AIState.Dead) return;
+        if (currentState == AIState.Capture || currentState == AIState.Dead || currentState == AIState.Scripted) return;
 
         // Leave any current activity and switch to Chase
         interaction?.CancelAndExitGracefully(AIState.Chase);
