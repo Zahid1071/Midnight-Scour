@@ -114,7 +114,7 @@ public class PerceptionController : MonoBehaviour
         {
             if (hit.collider.transform.root == player.root)
             {
-                LastKnownPlayerPosition = head;
+                LastKnownPlayerPosition = aim;
                 CanSeePlayer = true;
                 //Debug.Log(hit.transform.name);
                 return;
@@ -169,7 +169,7 @@ public class PerceptionController : MonoBehaviour
             suspicionAmount *= ambushAudioMul;
 
         string home = npc.interaction?.data?.homeID ?? string.Empty;
-        Transform anchor = NPCAnchorManager.Instance.FindClosestOwnedAnchor(soundSource.position, 10f, home);
+        Transform anchor = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(soundSource.position, home);
         if (!anchor) return;
 
         LastKnownPlayerPosition = soundSource.position;
@@ -193,8 +193,8 @@ public class PerceptionController : MonoBehaviour
             else
             {
                 lostSightTimer += Time.deltaTime;
-                if (lostSightTimer >= gracePeriod)
-                    npc.fsm.SetState(NPCController.AIState.Suspicious);
+                // if (lostSightTimer >= gracePeriod)
+                //     npc.fsm.SetState(NPCController.AIState.Suspicious);
             }
         }
     }

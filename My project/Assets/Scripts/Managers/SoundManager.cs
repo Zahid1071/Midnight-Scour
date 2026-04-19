@@ -168,6 +168,17 @@ public class SoundManager : MonoBehaviour
         StartCoroutine(Return3DWhenDone(src, clip.length / Mathf.Abs(pitch)));
     }
 
+    public void PlaySFXSafe(AudioClip clip, Vector3 position, float volume = 1f, float pitch = 1f)
+    {
+        if (clip == null) return;
+
+        // Eğer bu ses, bu pozisyonda zaten çalıyorsa tekrar çalma (Anti-Spam)
+        if (!IsClipPlayingAt(clip, position))
+        {
+            PlaySFXAt(clip, position, volume, pitch);
+        }
+    }
+
     public void ApplyMixerFromPrefs()
     {
         // values are stored 0..1 (linear) by your settings menu

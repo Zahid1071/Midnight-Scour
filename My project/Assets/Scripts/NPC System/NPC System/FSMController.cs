@@ -11,15 +11,20 @@ public class FSMController
     private Animator animator;
     private Navigator nav; // <-- door-aware pathing
 
+    NavMeshAgent agent;
+
     float walkingSpeed = 2.5f;   // cached from SO at first Update
     float runningSpeed = 6f;
     bool locomotionCached;
+
+    
     
     public FSMController(NPCController controller)
     {
         npc = controller;
         animator = npc.transform.root.GetComponentInChildren<Animator>();
-        nav = npc.GetComponent<Navigator>(); // <-- cache navigator
+        nav = npc.GetComponent<Navigator>();
+        agent = npc.GetComponent<NavMeshAgent>();
     }
 
     void EnsureLocomotion()
@@ -44,7 +49,7 @@ public class FSMController
         {
             case NPCController.AIState.Alerted:
                 Debug.Log("⚠️ State: ALERTED");
-                //npc.StartCoroutine(AlertedRoutine());
+                npc.StartCoroutine(AlertedRoutine());
                 if (prev != NPCController.AIState.Alerted)  // play once on entry
                     SoundManager.Instance.PlaySFX(SoundManager.Instance.sfxBank[3]);
                 break;
@@ -58,19 +63,20 @@ public class FSMController
                 npc.StartCoroutine(SearchRoutine());
                 break;
 
-            case NPCController.AIState.Ambush:
-                Debug.Log("😈 State: AMBUSH");
-                npc.StartCoroutine(AmbushRoutine());
-                break;
+            // case NPCController.AIState.Ambush:
+            //     Debug.Log("😈 State: AMBUSH");
+            //     npc.StartCoroutine(AmbushRoutine());
+            //     break;
 
-            case NPCController.AIState.Patrol:
-                Debug.Log("🚶 State: PATROL");
-                npc.StartCoroutine(PatrolRoutine());
-                break;
+            // case NPCController.AIState.Patrol:
+            //     Debug.Log("🚶 State: PATROL");
+            //     npc.StartCoroutine(PatrolRoutine());
+            //     break;
 
             case NPCController.AIState.Natural:
                 Debug.Log("🌿 State: NATURAL");
                 SoundManager.Instance.PlayMusic(SoundManager.Instance.musicBank[0]);
+                npc.interaction.StartNextRoutine();
                 break;
 
             case NPCController.AIState.Chase:
@@ -88,18 +94,11 @@ public class FSMController
     public void Update()
     {
         EnsureLocomotion();
-
-            // // DEBUG: force patrol with Space key
-            // if (Input.GetKeyDown(KeyCode.Space))
-            // {
-            //     SetState(NPCController.AIState.Patrol);
-            // }
-        var agent = npc.GetComponent<NavMeshAgent>();
-
         
         switch (npc.currentState)
         {
             case NPCController.AIState.Natural:
+                
                 agent.speed = walkingSpeed;
                 break;
 
@@ -230,7 +229,7 @@ public class FSMController
         {
             string homeZone = npc.interaction.data.homeID;
 
-            Transform anchor = NPCAnchorManager.Instance.FindClosestOwnedAnchor(targetPosition, 10f, homeZone);
+            Transform anchor = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(targetPosition, homeZone);
 
             if (anchor != null)
             {
@@ -245,109 +244,109 @@ public class FSMController
     }
 
     // === AMBUSH ===
-    private IEnumerator AmbushRoutine()
-    {
-        string zoneID = npc.interaction.data.homeID;
+    // private IEnumerator AmbushRoutine()
+    // {
+    //     string zoneID = npc.interaction.data.homeID;
 
-        // prefer searchTarget, then last known, then self
-        Vector3 center =
-            npc.perception.searchTarget != null ? npc.perception.searchTarget.position :
-            (npc.perception.LastKnownPlayerPosition != Vector3.zero ? npc.perception.LastKnownPlayerPosition :
-            npc.transform.position);
+    //     // prefer searchTarget, then last known, then self
+    //     Vector3 center =
+    //         npc.perception.searchTarget != null ? npc.perception.searchTarget.position :
+    //         (npc.perception.LastKnownPlayerPosition != Vector3.zero ? npc.perception.LastKnownPlayerPosition :
+    //         npc.transform.position);
 
-        // progressively widen the search for ambush_position children
-        List<Transform> ambushSpots = new List<Transform>();
-        int[] batches = { 3, 8, 16, 32, 64 }; // widen until we find any (cap to something sane)
-        foreach (int count in batches)
-        {
-            var rooms = NPCAnchorManager.Instance.GetClosestAnchorsInZone(zoneID, center, count);
-            ambushSpots.Clear();
+    //     // progressively widen the search for ambush_position children
+    //     List<Transform> ambushSpots = new List<Transform>();
+    //     int[] batches = { 3, 8, 16, 32, 64 }; // widen until we find any (cap to something sane)
+    //     foreach (int count in batches)
+    //     {
+    //         var rooms = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(zoneID, center, count);
+    //         ambushSpots.Clear();
 
-            foreach (var room in rooms)
-            {
-                if (!room) continue;
+    //         foreach (var room in rooms)
+    //         {
+    //             if (!room) continue;
 
-                for (int i = 0; i < room.childCount; i++)
-                {
-                    var child = room.GetChild(i);
-                    if (!child) continue;
+    //             for (int i = 0; i < room.childCount; i++)
+    //             {
+    //                 var child = room.GetChild(i);
+    //                 if (!child) continue;
 
-                    string n = child.name;
-                    if (!string.IsNullOrEmpty(n) &&
-                        n.IndexOf("ambush_position", System.StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
-                        ambushSpots.Add(child);
-                    }
-                }
-            }
+    //                 string n = child.name;
+    //                 if (!string.IsNullOrEmpty(n) &&
+    //                     n.IndexOf("ambush_position", System.StringComparison.OrdinalIgnoreCase) >= 0)
+    //                 {
+    //                     ambushSpots.Add(child);
+    //                 }
+    //             }
+    //         }
 
-            if (ambushSpots.Count > 0)
-                break; // found at least one; stop widening
-        }
+    //         if (ambushSpots.Count > 0)
+    //             break; // found at least one; stop widening
+    //     }
 
-        if (ambushSpots.Count == 0)
-        {
-            SetState(NPCController.AIState.Search);
-            yield break;
-        }
+    //     if (ambushSpots.Count == 0)
+    //     {
+    //         SetState(NPCController.AIState.Search);
+    //         yield break;
+    //     }
 
-        if (npc.perception.searchTarget != null)
-            ambushSpots.RemoveAll(t => t == npc.perception.searchTarget);
+    //     if (npc.perception.searchTarget != null)
+    //         ambushSpots.RemoveAll(t => t == npc.perception.searchTarget);
 
-        Transform ambushPoint = ambushSpots[UnityEngine.Random.Range(0, ambushSpots.Count)];
+    //     Transform ambushPoint = ambushSpots[UnityEngine.Random.Range(0, ambushSpots.Count)];
 
-        var agent = npc.interaction.agent ?? npc.GetComponent<NavMeshAgent>();
-        if (nav != null) nav.GoToPoint(ambushPoint.position);
-        else if (agent != null) agent.SetDestination(ambushPoint.position);
+    //     var agent = npc.interaction.agent ?? npc.GetComponent<NavMeshAgent>();
+    //     if (nav != null) nav.GoToPoint(ambushPoint.position);
+    //     else if (agent != null) agent.SetDestination(ambushPoint.position);
 
-        yield return new WaitUntil(() =>
-            !agent.pathPending && agent.remainingDistance < 0.3f);
+    //     yield return new WaitUntil(() =>
+    //         !agent.pathPending && agent.remainingDistance < 0.3f);
 
-        float waitTime = UnityEngine.Random.Range(
-            npc.interaction.data.ambushWaitRange.x,
-            npc.interaction.data.ambushWaitRange.y
-        );
+    //     float waitTime = UnityEngine.Random.Range(
+    //         npc.interaction.data.ambushWaitRange.x,
+    //         npc.interaction.data.ambushWaitRange.y
+    //     );
 
-        float confirm = Mathf.Max(0f, npc.interaction.data.vision.confirmSeconds / 2f);
-        float seenTimer = 0f;
+    //     float confirm = Mathf.Max(0f, npc.interaction.data.vision.confirmSeconds / 2f);
+    //     float seenTimer = 0f;
 
-        float timer = 0f;
-        Transform target = npc.perception.PlayerTransform;
+    //     float timer = 0f;
+    //     Transform target = npc.perception.PlayerTransform;
 
-        while (timer < waitTime)
-        {
-            timer += Time.deltaTime;
+    //     while (timer < waitTime)
+    //     {
+    //         timer += Time.deltaTime;
 
-            if (target != null)
-            {
-                Vector3 dir = target.position - npc.transform.position;
-                dir.y = 0f;
-                if (dir.sqrMagnitude > 0.0001f)
-                {
-                    var lookRot = Quaternion.LookRotation(dir);
-                    npc.transform.rotation = Quaternion.Slerp(npc.transform.rotation, lookRot, Time.deltaTime * 5f);
-                }
-            }
+    //         if (target != null)
+    //         {
+    //             Vector3 dir = target.position - npc.transform.position;
+    //             dir.y = 0f;
+    //             if (dir.sqrMagnitude > 0.0001f)
+    //             {
+    //                 var lookRot = Quaternion.LookRotation(dir);
+    //                 npc.transform.rotation = Quaternion.Slerp(npc.transform.rotation, lookRot, Time.deltaTime * 5f);
+    //             }
+    //         }
 
-            if (npc.perception.CanSeePlayer)
-            {
-                seenTimer += Time.deltaTime;
-                if (seenTimer >= confirm)
-                {
-                    SetState(NPCController.AIState.Chase);
-                    yield break;
-                }
-            }
-            else
-            {
-                seenTimer = 0f;
-            }
+    //         if (npc.perception.CanSeePlayer)
+    //         {
+    //             seenTimer += Time.deltaTime;
+    //             if (seenTimer >= confirm)   
+    //             {
+    //                 SetState(NPCController.AIState.Chase);
+    //                 yield break;
+    //             }
+    //         }
+    //         else
+    //         {
+    //             seenTimer = 0f;
+    //         }
 
-            yield return null;
-        }
+    //         yield return null;
+    //     }
 
-        SetState(NPCController.AIState.Search);
-    }
+    //     SetState(NPCController.AIState.Search);
+    // }
 
     // === SEARCH ===
     private IEnumerator SearchRoutine()
@@ -377,7 +376,7 @@ public class FSMController
         {
             if (npc.perception.CanSeePlayer)
             {
-                SetState(NPCController.AIState.Alerted);
+                //SetState(NPCController.AIState.Alerted);
                 yield break;
             }
 
@@ -481,74 +480,74 @@ public class FSMController
 
 
     // === PATROL ===
-    private IEnumerator PatrolRoutine()
-    {
-        Debug.Log("📍 Starting Patrol");
+    // private IEnumerator PatrolRoutine()
+    // {
+    //     Debug.Log("📍 Starting Patrol");
 
-        string zoneID = npc.interaction.data.homeID;
-        Vector3 center = npc.perception.LastKnownPlayerPosition;
+    //     string zoneID = npc.interaction.data.homeID;
+    //     Vector3 center = npc.perception.LastKnownPlayerPosition;
 
-        List<Transform> patrolPoints = NPCAnchorManager.Instance.GetClosestAnchorsInZone(zoneID, center, 3);
+    //     List<Transform> patrolPoints = NPCAnchorManager.Instance.GetClosestAnchorsInZone(zoneID, center, 3);
 
-        if (patrolPoints.Count == 0)
-        {
-            Debug.LogWarning("⚠️ No patrol points found.");
-            SetState(NPCController.AIState.Natural);
-            yield break;
-        }
+    //     if (patrolPoints.Count == 0)
+    //     {
+    //         Debug.LogWarning("⚠️ No patrol points found.");
+    //         SetState(NPCController.AIState.Natural);
+    //         yield break;
+    //     }
 
-        Transform lastVisited = null;
-        float endTime = Time.time + npc.interaction.data.patrolDuration;
+    //     Transform lastVisited = null;
+    //     float endTime = Time.time + npc.interaction.data.patrolDuration;
 
-        while (Time.time < endTime)
-        {
-            if (npc.perception.CanSeePlayer)
-            {
-                SetState(NPCController.AIState.Alerted);
-                yield break;
-            }
+    //     while (Time.time < endTime)
+    //     {
+    //         if (npc.perception.CanSeePlayer)
+    //         {
+    //             SetState(NPCController.AIState.Alerted);
+    //             yield break;
+    //         }
 
-            List<Transform> options = patrolPoints.Where(p => p != lastVisited).ToList();
+    //         List<Transform> options = patrolPoints.Where(p => p != lastVisited).ToList();
 
-            if (options.Count == 0)
-            {
-                Debug.LogWarning("⚠️ Only one patrol room available, forcing repeat.");
-                options = patrolPoints;
-            }
+    //         if (options.Count == 0)
+    //         {
+    //             Debug.LogWarning("⚠️ Only one patrol room available, forcing repeat.");
+    //             options = patrolPoints;
+    //         }
 
-            Transform nextPoint = options[UnityEngine.Random.Range(0, options.Count)];
-            lastVisited = nextPoint;
+    //         Transform nextPoint = options[UnityEngine.Random.Range(0, options.Count)];
+    //         lastVisited = nextPoint;
 
-            if (nav != null) nav.GoToPoint(nextPoint.position);
+    //         if (nav != null) nav.GoToPoint(nextPoint.position);
 
-            var agent = npc.interaction.agent ?? npc.GetComponent<UnityEngine.AI.NavMeshAgent>();
+    //         var agent = npc.interaction.agent ?? npc.GetComponent<UnityEngine.AI.NavMeshAgent>();
 
-            int settled = 0;
-            while (true)
-            {
-                bool arrived = !agent.pathPending &&
-                            agent.remainingDistance <= Mathf.Max(0.3f, agent.stoppingDistance + 0.05f);
+    //         int settled = 0;
+    //         while (true)
+    //         {
+    //             bool arrived = !agent.pathPending &&
+    //                         agent.remainingDistance <= Mathf.Max(0.3f, agent.stoppingDistance + 0.05f);
 
-                // avoid one-frame flicker at intermediate waypoints
-                settled = arrived ? settled + 1 : 0;
+    //             // avoid one-frame flicker at intermediate waypoints
+    //             settled = arrived ? settled + 1 : 0;
 
-                // also ensure we’re not mid-door step
-                if (settled >= 3 && (nav == null || !nav.IsInDoorTransit))
-                    break;
+    //             // also ensure we’re not mid-door step
+    //             if (settled >= 3 && (nav == null || !nav.IsInDoorTransit))
+    //                 break;
 
-                yield return null;
-            }
+    //             yield return null;
+    //         }
             
-            Debug.Log($"🕵️ Patrolling to: {nextPoint.name}");
+    //         Debug.Log($"🕵️ Patrolling to: {nextPoint.name}");
 
-            yield return new WaitUntil(() =>
-                !npc.GetComponent<NavMeshAgent>().pathPending &&
-                npc.GetComponent<NavMeshAgent>().remainingDistance < 0.3f);
+    //         yield return new WaitUntil(() =>
+    //             !npc.GetComponent<NavMeshAgent>().pathPending &&
+    //             npc.GetComponent<NavMeshAgent>().remainingDistance < 0.3f);
 
-            yield return new WaitForSeconds(UnityEngine.Random.Range(1f, 2f));
-        }
+    //         yield return new WaitForSeconds(UnityEngine.Random.Range(1f, 2f));
+    //     }
 
-        Debug.Log("✅ Finished Patrol");
-        SetState(NPCController.AIState.Natural);
-    }
+    //     Debug.Log("✅ Finished Patrol");
+    //     SetState(NPCController.AIState.Natural);
+    // }
 }
