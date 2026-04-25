@@ -155,7 +155,7 @@ public class InteractionController : MonoBehaviour
         while (true)
         {
             if (!agent.pathPending &&
-                agent.remainingDistance <= 0.1f)
+                agent.remainingDistance <= agent.stoppingDistance)
             {
                 // Only accept arrival if we're actually close to the hotspot,
                 // not just some intermediate waypoint (door prepoint).
