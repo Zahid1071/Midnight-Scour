@@ -106,13 +106,13 @@ public class NPCController : MonoBehaviour
     private void HandleVisionAlerted()
     {
         if (currentState == AIState.Chase || currentState == AIState.Capture || currentState == AIState.Dead) return;
-        interaction?.CancelAndExitGracefully(AIState.Alerted);
+        interaction?.CancelAndExitGracefully(AIState.Chase);
     }
 
     private void HandleSuspicionReached()
     {
         if (currentState == AIState.Chase || currentState == AIState.Capture || currentState == AIState.Dead) return;
-        interaction?.CancelAndExitGracefully(AIState.Alerted);
+        interaction?.CancelAndExitGracefully(AIState.Chase);
     }
 
     private void HandleVisionConfirmed()

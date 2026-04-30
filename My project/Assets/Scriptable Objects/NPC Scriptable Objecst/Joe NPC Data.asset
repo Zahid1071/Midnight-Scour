@@ -29,7 +29,7 @@ MonoBehaviour:
         actionType: 10
         requiresVisualOffset: 0
     - roomAnchorID: Corridor-Kitchen_Room
-      weight: 1
+      weight: 0.265
       hotspots:
       - hotspotID: Hotspot_Idle
         weight: 0.868
@@ -55,10 +55,10 @@ MonoBehaviour:
         actionType: 10
         requiresVisualOffset: 0
     - roomAnchorID: Livingroom_Room
-      weight: 0.239
+      weight: 0.238
       hotspots:
       - hotspotID: Hotspot_Sofa
-        weight: 0.721
+        weight: 0.062
         duration: 5
         actionType: 0
         requiresVisualOffset: 1

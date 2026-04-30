@@ -41,6 +41,8 @@ public class FSMController
 
     public void SetState(NPCController.AIState newState)
     {
+
+        
         npc.interaction.CancelInteraction();
         var prev = npc.currentState;
         npc.currentState = newState;
@@ -74,9 +76,9 @@ public class FSMController
             //     break;
 
             case NPCController.AIState.Natural:
-                Debug.Log("🌿 State: NATURAL");
                 SoundManager.Instance.PlayMusic(SoundManager.Instance.musicBank[0]);
                 npc.interaction.StartNextRoutine();
+                Debug.Log("🌿 State: NATURAL");
                 break;
 
             case NPCController.AIState.Chase:
@@ -365,7 +367,7 @@ public class FSMController
         // ensure we actually route to the room (door-aware)
         var room = roomAnchor.GetComponent<RoomAnchor>();
         if (nav != null && room != null) nav.GoToRoom(room);
-
+        
         yield return new WaitUntil(() =>
             !npc.GetComponent<NavMeshAgent>().pathPending &&
             npc.GetComponent<NavMeshAgent>().remainingDistance <2f);
@@ -398,7 +400,7 @@ public class FSMController
                 }
             }
 
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(3f);
         }
         SetState(NPCController.AIState.Natural);
         // if (UnityEngine.Random.value < npc.interaction.data.patrolChance)

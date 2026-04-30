@@ -1,6 +1,5 @@
 using System.Collections; // Coroutine (IEnumerator) kullanmak için bu şart
 using UnityEngine;
-using System.Collections;
 
 public class HidingSpot : MonoBehaviour, IInteractable
 {
@@ -24,6 +23,7 @@ public class HidingSpot : MonoBehaviour, IInteractable
     private int defaultLayer;
     private int hiddenLayer = 7;
     private bool isToggling = false;
+    
 
     void Start()
     {
@@ -43,25 +43,32 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
         if (!hider.isHidden)
         {
-            // --- MESAFE KONTROLÜ (BEYİN BURASI) ---
-            float distToLeft = Vector3.Distance(player.transform.position, leftPivot.parent.parent.position);
-            float distToRight = Vector3.Distance(player.transform.position, rightPivot.parent.parent.position);
-
-
-
-            if (distToLeft < distToRight)
+            // --- MESAFE KONTROLÜ ---
+            // If there is no right side assigned (like a locker), default to the left side.
+            if (rightPivot == null)
             {
-                // Sol taraf daha yakın
                 activePivot = leftPivot;
                 activeAnimator = leftAnimator;
-                Debug.Log("left");
+                Debug.Log("Single entry point used (e.g. Locker).");
             }
             else
             {
-                // Sağ taraf daha yakın
-                activePivot = rightPivot;
-                activeAnimator = rightAnimator;
-                Debug.Log("right");
+                // Two sides exist (like a bed). Compare distances.
+                float distToLeft = Vector3.Distance(player.transform.position, leftPivot.parent.parent.position);
+                float distToRight = Vector3.Distance(player.transform.position, rightPivot.parent.parent.position);
+
+                if (distToLeft < distToRight)
+                {
+                    activePivot = leftPivot;
+                    activeAnimator = leftAnimator;
+                    Debug.Log("left");
+                }
+                else
+                {
+                    activePivot = rightPivot;
+                    activeAnimator = rightAnimator;
+                    Debug.Log("right");
+                }
             }
 
             StartCoroutine(EnterHidingRoutine(player, hider));

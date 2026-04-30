@@ -67,7 +67,7 @@ AnimatorStateMachine:
     m_Position: {x: 310, y: 110, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -7119142566552945567}
-    m_Position: {x: 440, y: -20, z: 0}
+    m_Position: {x: 450, y: -30, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -8766765280209611276}
     m_Position: {x: 160, y: -80, z: 0}
@@ -87,7 +87,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Hiding Pivot
+  m_Name: Bed Hiding Pivot
   serializedVersion: 5
   m_AnimatorParameters:
   - m_Name: Enter

@@ -6,18 +6,23 @@ public class CinematicSignalFunctions : MonoBehaviour
     NPCController npc;
     Navigator navigator;
     public Transform destination;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    
+    // Flag to track when the cinematic move is active
+    private bool isMoving = false;
+
     void Start()
     {
         navigator = GetComponent<Navigator>();
         npc = GetComponent<NPCController>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if ((transform.position-destination.position).magnitude < 1)
+        // Only check distance if the Timeline signal has started the movement
+        if (isMoving && (transform.position - destination.position).magnitude < 0.1f)
         {
+            // Shut off the flag immediately to prevent Update from firing this again
+            isMoving = false; 
             
             npc.fsm.SetState(NPCController.AIState.Natural);
         }
@@ -25,7 +30,10 @@ public class CinematicSignalFunctions : MonoBehaviour
 
     public void LeaveBasement()
     {
+        // Open the gate so Update starts looking for the destination
+        isMoving = true; 
+        
         navigator.GoToPoint(destination.position);
-        npc.walkSpeed = 1;
+        npc.walkSpeed = 1f;
     }
 }
