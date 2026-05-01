@@ -23,7 +23,8 @@ public class HidingSpot : MonoBehaviour, IInteractable
     private int defaultLayer;
     private int hiddenLayer = 7;
     private bool isToggling = false;
-    
+
+    public Transform PivotForNPCSearchRoutine;    
 
     void Start()
     {

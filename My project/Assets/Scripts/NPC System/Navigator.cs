@@ -20,7 +20,7 @@ namespace FS_Atmo
         private NavMeshAgent agent;
         private InteractionController interaction;
 
-        private readonly List<Transform> route = new();
+        public readonly List<Transform> route = new();
         private readonly List<Transform> tempPoints = new();
         private int idx = -1;
         private Coroutine followCo;
@@ -361,7 +361,14 @@ namespace FS_Atmo
             Debug.Log(summary.ToString());
         }
 
+        public void ClearRoute()
+        {
+            route.Clear(); // Stops the sequence of future points
+            agent.ResetPath(); // Stops the current physical movement immediately
+        }
+
     }
+    
 
 
 }

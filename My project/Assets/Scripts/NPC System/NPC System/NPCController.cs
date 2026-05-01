@@ -1,5 +1,4 @@
 using UnityEngine;
-using System;
 using UnityEngine.AI;
 
 public class NPCController : MonoBehaviour
@@ -112,6 +111,7 @@ public class NPCController : MonoBehaviour
     private void HandleSuspicionReached()
     {
         if (currentState == AIState.Chase || currentState == AIState.Capture || currentState == AIState.Dead) return;
+        navigator.ClearRoute();
         interaction?.CancelAndExitGracefully(AIState.Chase);
     }
 

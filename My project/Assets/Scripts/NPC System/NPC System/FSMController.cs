@@ -1,9 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using FS_Atmo; // <-- Navigator, RoomAnchor
+using FS_Atmo;
 
 public class FSMController
 {
@@ -88,6 +86,7 @@ public class FSMController
                 break;
 
             case NPCController.AIState.Capture:
+                Debug.Log("State: CAPTURE");
                 CapturePlayer();
                 break;
         }
@@ -202,6 +201,7 @@ public class FSMController
     
     private void CapturePlayer()
     {
+        nav.ClearRoute();
         var interactor = npc.perception.PlayerTransform.GetComponent<PlayerInteractor>();
         interactor.GetComponent<PlayerFootstepRhythm>().enabled = false;
 
@@ -216,8 +216,9 @@ public class FSMController
 
         var npcController = npc.GetComponent<NPCController>();
         JumpscareManager.Instance.TriggerJumpscare(npcController.jumpscarePoint, npcController.transform);
+        npc.SetState(NPCController.AIState.Capture);
     }
-
+    
     // === SUSPICIOUS → move to LKP ===
     private void MoveToSuspiciousTarget()
     {
@@ -378,12 +379,12 @@ public class FSMController
         {
             if (npc.perception.CanSeePlayer)
             {
-                //SetState(NPCController.AIState.Alerted);
+                SetState(NPCController.AIState.Chase);
                 yield break;
             }
 
-            if (nav != null) nav.GoToPoint(spot.transform.position);
-            else npc.GetComponent<NavMeshAgent>().SetDestination(spot.transform.position);
+            if (nav != null) nav.GoToPoint(spot.PivotForNPCSearchRoutine.transform.position);
+            else npc.GetComponent<NavMeshAgent>().SetDestination(spot.PivotForNPCSearchRoutine.transform.position);
 
             yield return new WaitUntil(() =>
                 !npc.GetComponent<NavMeshAgent>().pathPending &&
@@ -400,9 +401,12 @@ public class FSMController
                 }
             }
 
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(4f);
         }
-        SetState(NPCController.AIState.Natural);
+        if(npc.currentState !=NPCController.AIState.Capture)        
+            SetState(NPCController.AIState.Natural);
+            
+
         // if (UnityEngine.Random.value < npc.interaction.data.patrolChance)
         //     SetState(NPCController.AIState.Patrol);
         // else
