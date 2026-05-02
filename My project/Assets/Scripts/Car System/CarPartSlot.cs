@@ -11,9 +11,15 @@ public class CarPartSlot : MonoBehaviour, IInteractable
 
     public void Interact()
     {
+        if (requiredItem == null)
+        {
+            HudManager.Instance?.ShowSubtitle("This slot is not configured.", 3f);
+            return;
+        }
+
         if (isInstalled)
         {
-            Debug.Log($"{requiredItem.itemName} already installed.");
+            HudManager.Instance?.ShowSubtitle($"{requiredItem.itemName} is already installed.", 3f);
             PlaySound(installFailSFX,transform);
             return;
         }
@@ -21,14 +27,15 @@ public class CarPartSlot : MonoBehaviour, IInteractable
         InventoryItem selectedItem = InventoryUI.Instance?.GetSelectedItem();
         if (selectedItem == null)
         {
-            Debug.Log("❌ No item selected.");
+            HudManager.Instance?.ShowSubtitle("Select a car part from your inventory first.", 3f);
             PlaySound(installFailSFX,transform);
             return;
         }
 
         if (selectedItem != requiredItem)
         {
-            Debug.Log($"❌ {selectedItem.itemName} is not the correct part. You need a {requiredItem.itemName}.");
+            HudManager.Instance?.ShowSubtitle(
+                $"{selectedItem.itemName} does not fit here. You need {requiredItem.itemName}.", 4f);
             PlaySound(installFailSFX,transform);
             return;
         }
@@ -36,7 +43,7 @@ public class CarPartSlot : MonoBehaviour, IInteractable
         var inventory = InventoryManager.Instance.GetInventory();
         if (!inventory.Contains(selectedItem))
         {
-            Debug.Log($"❌ You don’t have a {selectedItem.itemName}.");
+            HudManager.Instance?.ShowSubtitle($"You do not have {selectedItem.itemName}.", 3f);
             PlaySound(installFailSFX,transform);
             return;
         }
@@ -45,7 +52,7 @@ public class CarPartSlot : MonoBehaviour, IInteractable
         isInstalled = true;
         InventoryManager.Instance.RemoveItem(selectedItem);
         InventoryUI.Instance?.RefreshUI();
-        Debug.Log($"✅ Installed {requiredItem.itemName}.");
+        HudManager.Instance?.ShowSubtitle($"{requiredItem.itemName} installed.", 3f);
         PlaySound(installSuccessSFX,transform);
         
         gameObject.SetActive(false);
@@ -58,5 +65,5 @@ public class CarPartSlot : MonoBehaviour, IInteractable
     }
 
     public bool IsInstalled() => isInstalled;
-    public string GetRequiredItemName() => requiredItem.itemName;
+    public string GetRequiredItemName() => requiredItem != null ? requiredItem.itemName : "?";
 }

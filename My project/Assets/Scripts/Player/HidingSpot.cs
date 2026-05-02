@@ -33,39 +33,48 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        if (isToggling) return;
+        if (isToggling)
+        {
+            HudManager.Instance?.ShowSubtitle("Wait a moment.", 2f);
+            return;
+        }
 
         GameObject player = GameObject.FindWithTag("Player");
-        if (player == null) return;
-        
+        if (player == null)
+            return;
+
         PlayerHider hider = player.GetComponent<PlayerHider>();
-        if (hider == null) return;
+        if (hider == null)
+            return;
 
-        if (!hider.isHidden)
+        if (hider.isHidden)
         {
-            // --- MESAFE KONTROLÜ (BEYİN BURASI) ---
-            float distToLeft = Vector3.Distance(player.transform.position, leftPivot.parent.parent.position);
-            float distToRight = Vector3.Distance(player.transform.position, rightPivot.parent.parent.position);
-
-
-
-            if (distToLeft < distToRight)
-            {
-                // Sol taraf daha yakın
-                activePivot = leftPivot;
-                activeAnimator = leftAnimator;
-                Debug.Log("left");
-            }
-            else
-            {
-                // Sağ taraf daha yakın
-                activePivot = rightPivot;
-                activeAnimator = rightAnimator;
-                Debug.Log("right");
-            }
-
-            StartCoroutine(EnterHidingRoutine(player, hider));
+            HudManager.Instance?.ShowSubtitle("You are already hiding.", 2.5f);
+            return;
         }
+
+        // --- MESAFE KONTROLÜ (BEYİN BURASI) ---
+        float distToLeft = Vector3.Distance(player.transform.position, leftPivot.parent.parent.position);
+        float distToRight = Vector3.Distance(player.transform.position, rightPivot.parent.parent.position);
+
+
+
+        if (distToLeft < distToRight)
+        {
+            // Sol taraf daha yakın
+            activePivot = leftPivot;
+            activeAnimator = leftAnimator;
+            Debug.Log("left");
+        }
+        else
+        {
+            // Sağ taraf daha yakın
+            activePivot = rightPivot;
+            activeAnimator = rightAnimator;
+            Debug.Log("right");
+        }
+
+        StartCoroutine(EnterHidingRoutine(player, hider));
     }
 
     private IEnumerator EnterHidingRoutine(GameObject player, PlayerHider hider)
