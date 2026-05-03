@@ -243,8 +243,8 @@ public class PerceptionController : MonoBehaviour
                     npc.fsm.SetState(NPCController.AIState.Search);
                     
                     string homeID = npc.interaction.data.homeID;
-                    var anchor = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(cageCenter, homeID);
-                    if (anchor) npc.perception.searchTarget = anchor;
+                    // var anchor = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(cageCenter, homeID);
+                    // if (anchor) npc.perception.searchTarget = anchor;
 
                     cageAlertTriggered = true; // Tekrar spamlamasın
                 }
