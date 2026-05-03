@@ -42,7 +42,7 @@ namespace FS_Atmo
             {
                 // ✅ Direkt component'e erişip parametre ile çağır (oyuncu için bypassLock = false)
                 SimpleOpenClose door = hit.collider.GetComponent<SimpleOpenClose>();
-                Debug.Log(hit.transform.name);
+                //Debug.Log(hit.transform.name);
                 if (door != null)
                 {
                     // Debug.Log("Object with SimpleOpenClose script found");

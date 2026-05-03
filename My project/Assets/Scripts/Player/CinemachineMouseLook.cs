@@ -1,17 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-/// <summary>
-/// First-person mouse look for the Cinemachine camera root.
-/// 
-/// Sensitivity is sourced from <see cref="GameSettingsManager"/> (single source
-/// of truth). The script reacts to live setting changes through both:
-///   - Per-frame read of <see cref="GameSettingsManager.MouseSensitivityMultiplier"/>
-///     (works without any subscription)
-///   - <see cref="GameSettingsManager.OnMouseSensitivityChanged"/> event
-///     (used to refresh a cached multiplier; useful if the value is read
-///     in many places per frame in the future)
-/// </summary>
 public class CinemachineMouseLook : MonoBehaviour
 {
     [Header("References")]
@@ -76,7 +65,7 @@ public class CinemachineMouseLook : MonoBehaviour
         if (Mouse.current == null) return;
 
         // Don't process mouse look when the game is paused.
-        if (PauseMenuController.IsPaused) return;
+        if (PauseManager.IsPaused) return;
 
         float sensitivity = CurrentSensitivity;
         bool invertY = GameSettingsManager.Instance != null && GameSettingsManager.Instance.InvertYAxis;
