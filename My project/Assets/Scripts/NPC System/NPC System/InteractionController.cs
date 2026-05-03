@@ -128,6 +128,7 @@ public class InteractionController : MonoBehaviour
         lastHotspotID = currentHotspot.hotspotID;
 
         Transform hotspotTransform = NPCAnchorManager.Instance.GetAnchor(currentHotspot.hotspotID);
+
         if (hotspotTransform != null)
         {
             string parentName = hotspotTransform.parent != null ? hotspotTransform.parent.name : null;
@@ -139,7 +140,7 @@ public class InteractionController : MonoBehaviour
             StopCoroutine(interactionRoutine);
 
         interactionRoutine = StartCoroutine(WaitForArrival(hotspotTransform));
-        // Debug.Log(hotspotTransform);
+        Debug.Log(hotspotTransform);
     }
 
     private IEnumerator RetryPickNextRoutineDelayed()
@@ -151,21 +152,17 @@ public class InteractionController : MonoBehaviour
     private IEnumerator WaitForArrival(Transform hotspotTransform)
     {
         const float hotspotArriveRadius = 2f; // tweak if needed
-
         while (true)
         {
-            if (!agent.pathPending &&
-                agent.remainingDistance <= agent.stoppingDistance)
+            if (!agent.pathPending &&   agent.remainingDistance <= agent.stoppingDistance)
             {
                 // Only accept arrival if we're actually close to the hotspot,
                 // not just some intermediate waypoint (door prepoint).
-                if (hotspotTransform == null ||
-                    Vector3.Distance(transform.position, hotspotTransform.position) <= hotspotArriveRadius)
+                if (hotspotTransform == null ||  Vector3.Distance(transform.position, hotspotTransform.position) <= hotspotArriveRadius)
                 {
                     break;
                 }
             }
-
             yield return null;
         }
 

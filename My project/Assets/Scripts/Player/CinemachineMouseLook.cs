@@ -94,4 +94,5 @@ public class CinemachineMouseLook : MonoBehaviour
         pitch = Mathf.Clamp(pitch + yInput, minPitch, maxPitch);
         transform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
     }
+
 }

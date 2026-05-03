@@ -3,7 +3,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerInteractor : MonoBehaviour
 {
-    [SerializeField] private float interactRange = 3f;
+    [SerializeField] private float interactRange = 1f;
     [SerializeField] private LayerMask interactLayer;
     [SerializeField] private Transform cameraTransform;
     

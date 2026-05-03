@@ -1,6 +1,5 @@
 using System.Collections; // Coroutine (IEnumerator) kullanmak için bu şart
 using UnityEngine;
-using System.Collections;
 
 public class HidingSpot : MonoBehaviour, IInteractable
 {
@@ -25,6 +24,8 @@ public class HidingSpot : MonoBehaviour, IInteractable
     private int hiddenLayer = 7;
     private bool isToggling = false;
 
+    public Transform PivotForNPCSearchRoutine;    
+
     void Start()
     {
         GameObject player = GameObject.FindWithTag("Player");
@@ -33,47 +34,53 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
     public void Interact()
     {
+        // 1. İşlem devam ediyorsa yeni girdi alma
         if (isToggling)
         {
             HudManager.Instance?.ShowSubtitle("Wait a moment.", 2f);
             return;
         }
 
+        // 2. Referans kontrolleri
         GameObject player = GameObject.FindWithTag("Player");
-        if (player == null)
-            return;
+        if (player == null) return;
 
         PlayerHider hider = player.GetComponent<PlayerHider>();
-        if (hider == null)
-            return;
+        if (hider == null) return;
 
+        // 3. Oyuncu zaten saklanıyorsa sadece uyarı ver ve çık
         if (hider.isHidden)
         {
             HudManager.Instance?.ShowSubtitle("You are already hiding.", 2.5f);
             return;
         }
 
-        // --- MESAFE KONTROLÜ (BEYİN BURASI) ---
-        float distToLeft = Vector3.Distance(player.transform.position, leftPivot.parent.parent.position);
-        float distToRight = Vector3.Distance(player.transform.position, rightPivot.parent.parent.position);
-
-
-
-        if (distToLeft < distToRight)
+        // 4. Pivot Belirleme (Locker mı yoksa Bed mi?)
+        if (rightPivot == null)
         {
-            // Sol taraf daha yakın
+            // Tek girişli (Dolap vb.)
             activePivot = leftPivot;
             activeAnimator = leftAnimator;
-            Debug.Log("left");
         }
         else
         {
-            // Sağ taraf daha yakın
-            activePivot = rightPivot;
-            activeAnimator = rightAnimator;
-            Debug.Log("right");
+            // Çift girişli (Yatak vb.) - Mesafe Karşılaştırması
+            float distToLeft = Vector3.Distance(player.transform.position, leftPivot.parent.parent.position);
+            float distToRight = Vector3.Distance(player.transform.position, rightPivot.parent.parent.position);
+
+            if (distToLeft < distToRight)
+            {
+                activePivot = leftPivot;
+                activeAnimator = leftAnimator;
+            }
+            else
+            {
+                activePivot = rightPivot;
+                activeAnimator = rightAnimator;
+            }
         }
 
+        // 5. Rutini başlat
         StartCoroutine(EnterHidingRoutine(player, hider));
     }
 
