@@ -609,7 +609,6 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   cameraTransform: {fileID: 0}
-  isCaptured: 0
 --- !u!114 &4452460983465209085
 MonoBehaviour:
   m_ObjectHideFlags: 0

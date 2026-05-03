@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class BodyBagDrop : MonoBehaviour
 {
+
     [Header("Rig References")]
     public Transform topAnchorBone;
     public Transform bottomBone;
@@ -17,6 +18,11 @@ public class BodyBagDrop : MonoBehaviour
     public AudioClip impactSound;
     public float impactDelay = 1.2f;
 
+    [Header("NPC Perception")]
+    [Tooltip("Footstep suspicion added per NPC on impact — keep high so footstep + base thresholds trip like a max footstep hit.")]
+    [Min(1f)]
+    public float npcSuspicionFromImpact = 300f;
+
     private bool hasDropped = false;
     private Rigidbody topRb;
     private Rigidbody bottomRb;
@@ -29,6 +35,7 @@ public class BodyBagDrop : MonoBehaviour
 
     void Update()
     {
+
         if (hasDropped || topAnchorBone == null || bottomBone == null) return;
 
         // Check 1: Did it swing too far?
@@ -70,9 +77,12 @@ public class BodyBagDrop : MonoBehaviour
 
     private void PlayImpactSound()
     {
+        Vector3 impactPos = bottomBone != null ? bottomBone.position : transform.position;
+
         if (impactSound != null && SoundManager.Instance != null)
-        {
-            SoundManager.Instance.PlaySFXAt(impactSound, bottomBone.position);
-        }
+            SoundManager.Instance.PlaySFXAt(impactSound, impactPos);
+
+        foreach (var perception in Object.FindObjectsByType<PerceptionController>(FindObjectsSortMode.None))
+            perception.HearLoudWorldNoise(impactPos, npcSuspicionFromImpact);
     }
 }

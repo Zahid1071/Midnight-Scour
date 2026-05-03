@@ -63,14 +63,14 @@ public class PlayerFootstepRhythm : MonoBehaviour
             float suspicionValue = 0f;
             float sneakingLuck = 1f;
 
-            if (speed > runThreshold)        suspicionValue = 80;
-            else if (speed > walkThreshold)  suspicionValue = 50;
+            if (speed > runThreshold)        suspicionValue = 50;
+            else if (speed > walkThreshold)  suspicionValue = 20;
             else if (speed > sneakThreshold)
             {
                 suspicionValue = 0f;
                 sneakingLuck = 0.9f;
             }
-            Debug.Log(suspicionValue);
+            //Debug.Log(suspicionValue);
             NotifyNPCsOfFootstep(suspicionValue, sneakingLuck);
 
 

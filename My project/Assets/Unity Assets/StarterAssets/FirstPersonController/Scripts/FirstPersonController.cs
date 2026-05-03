@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -70,8 +70,6 @@ namespace StarterAssets
 		private float _fallTimeoutDelta;
 
 
-		private PlayerInteractor _playerInteractor;
-	
 #if ENABLE_INPUT_SYSTEM
 		private PlayerInput _playerInput;
 #endif
@@ -112,7 +110,6 @@ namespace StarterAssets
 			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
 #endif
 
-			_playerInteractor = GetComponent<PlayerInteractor>();
 			// reset our timeouts on start
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
@@ -121,8 +118,8 @@ namespace StarterAssets
 		private void Update()
 		{
 
-			if (_playerInteractor != null && _playerInteractor.isCaptured)
-        		return; // Block ALL movement if captured
+			if (PlayerControlGate.IsInputBlocked)
+        		return;
 			JumpAndGravity();
 			GroundedCheck();
 			Move();

@@ -178,6 +178,26 @@ public class PerceptionController : MonoBehaviour
         npc.GetComponent<SuspicionSystem>()?.AddFootstepSuspicion(suspicionAmount);
     }
 
+    /// <summary>
+    /// Loud one-shot at a world position (e.g. body bag impact). Unlike <see cref="HearPlayerFootstep"/>,
+    /// does not abort when no anchor is found — NPC still gets footstep suspicion and last-known point.
+    /// </summary>
+    public void HearLoudWorldNoise(Vector3 worldPosition, float footstepSuspicionToAdd = 300f)
+    {
+        if (npc.currentState == NPCController.AIState.Ambush)
+            footstepSuspicionToAdd *= ambushAudioMul;
+
+        string home = npc.interaction?.data?.homeID ?? string.Empty;
+        Transform anchor = NPCAnchorManager.Instance != null
+            ? NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(worldPosition, home)
+            : null;
+
+        LastKnownPlayerPosition = worldPosition;
+        searchTarget = anchor;
+
+        npc.GetComponent<SuspicionSystem>()?.AddFootstepSuspicion(footstepSuspicionToAdd);
+    }
+
     private void HandleVisionLoss()
     {
         if (CanSeePlayer) { lostSightTimer = 0f; return; }

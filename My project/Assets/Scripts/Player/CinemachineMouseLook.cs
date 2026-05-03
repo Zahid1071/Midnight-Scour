@@ -18,7 +18,7 @@ public class CinemachineMouseLook : MonoBehaviour
     [SerializeField] private float minPitch = -80f;
     [SerializeField] private float maxPitch =  80f;
 
-    private float pitch = 0f;
+    private float pitch = 24f;
     private float _cachedMultiplier;
 
     /// <summary>
@@ -64,8 +64,8 @@ public class CinemachineMouseLook : MonoBehaviour
         if (!Application.isFocused) return;
         if (Mouse.current == null) return;
 
-        // Don't process mouse look when the game is paused.
-        if (PauseManager.IsPaused) return;
+        // Don't process mouse look when gameplay input is locked (pause, cinematic, capture, etc.)
+        if (PlayerControlGate.IsInputBlocked) return;
 
         float sensitivity = CurrentSensitivity;
         bool invertY = GameSettingsManager.Instance != null && GameSettingsManager.Instance.InvertYAxis;

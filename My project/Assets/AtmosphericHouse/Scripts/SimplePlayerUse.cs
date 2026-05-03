@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,6 +20,9 @@ namespace FS_Atmo
 
         void Update()
         {
+            if (PlayerControlGate.IsInputBlocked)
+                return;
+
             if (Input.GetKeyDown(OpenClose)) // Open and close action
             {
                 RaycastCheck();
@@ -36,6 +39,9 @@ namespace FS_Atmo
 
         void RaycastCheck()
         {
+            if (mainCamera == null)
+                return;
+
             RaycastHit hit;
 
             if (Physics.Raycast(mainCamera.transform.position, mainCamera.transform.TransformDirection(Vector3.forward), out hit, 3))

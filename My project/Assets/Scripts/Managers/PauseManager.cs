@@ -21,6 +21,12 @@ public class PauseManager : MonoBehaviour
 
     public static bool IsPaused { get; private set; }
 
+    void OnDestroy()
+    {
+        if (IsPaused)
+            PlayerControlGate.Release(PlayerControlGate.ReasonPause);
+    }
+
     void Awake()
     {
         if (pauseRoot) pauseRoot.SetActive(false);
@@ -67,6 +73,9 @@ public class PauseManager : MonoBehaviour
         if (SaveManager.Instance != null)
             SaveManager.Instance.SaveGame();
 
+        PlayerControlGate.Clear();
+
+        IsPaused = false;
         Time.timeScale = 1f;
         AudioListener.pause = false;
 
@@ -81,6 +90,7 @@ public class PauseManager : MonoBehaviour
     private void Pause_Internal()
     {
         IsPaused = true;
+        PlayerControlGate.Acquire(PlayerControlGate.ReasonPause);
         Time.timeScale = 0f;
         AudioListener.pause = true;
 
@@ -95,6 +105,7 @@ public class PauseManager : MonoBehaviour
     private void Resume_Internal()
     {
         IsPaused = false;
+        PlayerControlGate.Release(PlayerControlGate.ReasonPause);
         Time.timeScale = 1f;
         AudioListener.pause = false;
 
