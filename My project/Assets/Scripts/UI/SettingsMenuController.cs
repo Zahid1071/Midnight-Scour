@@ -149,6 +149,14 @@ public class SettingsMenuController : MonoBehaviour
     private GameObject[] _categoryPanels;
     private Coroutine _fadeCoroutine;
     private GameSettingsManager.SettingsData _pendingSettings;
+    /// <summary>
+    /// Snapshot of the manager's settings at <see cref="Open"/> time. Used by
+    /// <see cref="Close"/> to roll back live-preview changes (camera, audio,
+    /// brightness) when the user closes without pressing Apply.
+    /// </summary>
+    private GameSettingsManager.SettingsData _openSnapshot;
+    private bool _hasSnapshot;
+    private bool _appliedThisSession;
     private bool _isOpen = false;
 
     // =========================================================================
@@ -192,24 +200,50 @@ public class SettingsMenuController : MonoBehaviour
     
     private void SetupSliderListeners()
     {
-        // Audio sliders - update text display in real-time
+        // All sliders live-push their value into GameSettingsManager so the
+        // user gets immediate audio/camera feedback. Persistence only happens
+        // when Apply is pressed (rolled back by Close() otherwise).
         if (masterVolumeSlider)
         {
-            masterVolumeSlider.onValueChanged.AddListener(v => UpdateVolumeText(masterVolumeText, v));
+            masterVolumeSlider.onValueChanged.AddListener(v =>
+            {
+                UpdateVolumeText(masterVolumeText, v);
+                _pendingSettings.masterVolume = Mathf.Clamp01(v);
+                if (GameSettingsManager.Instance != null)
+                    GameSettingsManager.Instance.MasterVolume = _pendingSettings.masterVolume;
+            });
         }
         if (musicVolumeSlider)
         {
-            musicVolumeSlider.onValueChanged.AddListener(v => UpdateVolumeText(musicVolumeText, v));
+            musicVolumeSlider.onValueChanged.AddListener(v =>
+            {
+                UpdateVolumeText(musicVolumeText, v);
+                _pendingSettings.musicVolume = Mathf.Clamp01(v);
+                if (GameSettingsManager.Instance != null)
+                    GameSettingsManager.Instance.MusicVolume = _pendingSettings.musicVolume;
+            });
         }
         if (sfxVolumeSlider)
         {
-            sfxVolumeSlider.onValueChanged.AddListener(v => UpdateVolumeText(sfxVolumeText, v));
+            sfxVolumeSlider.onValueChanged.AddListener(v =>
+            {
+                UpdateVolumeText(sfxVolumeText, v);
+                _pendingSettings.sfxVolume = Mathf.Clamp01(v);
+                if (GameSettingsManager.Instance != null)
+                    GameSettingsManager.Instance.SFXVolume = _pendingSettings.sfxVolume;
+            });
         }
         
-        // Mouse sensitivity slider
+        // Mouse sensitivity slider — slider value IS the (normalized) sensitivity.
         if (mouseSensitivitySlider)
         {
-            mouseSensitivitySlider.onValueChanged.AddListener(v => UpdateSensitivityText(mouseSensitivityText, v));
+            mouseSensitivitySlider.onValueChanged.AddListener(v =>
+            {
+                UpdateSensitivityText(mouseSensitivityText, v);
+                _pendingSettings.mouseSensitivity = Mathf.Clamp01(v);
+                if (GameSettingsManager.Instance != null)
+                    GameSettingsManager.Instance.MouseSensitivity = _pendingSettings.mouseSensitivity;
+            });
         }
     }
 
@@ -275,9 +309,15 @@ public class SettingsMenuController : MonoBehaviour
         
         // Populate resolution spinner with current available resolutions
         PopulateResolutionSpinner();
-        
+
+        // Snapshot the currently-applied state so Close() can revert any live
+        // preview changes the user makes without pressing Apply.
+        _openSnapshot = GameSettingsManager.Instance.CurrentSettings;
+        _hasSnapshot = true;
+        _appliedThisSession = false;
+
         // Load current settings into pending
-        _pendingSettings = GameSettingsManager.Instance.CurrentSettings;
+        _pendingSettings = _openSnapshot;
         
         // Update all UI elements
         SyncUIFromSettings();
@@ -303,14 +343,25 @@ public class SettingsMenuController : MonoBehaviour
     }
     
     /// <summary>
-    /// Closes the settings menu. Unsaved changes are discarded.
+    /// Closes the settings menu. If the user did NOT press Apply during this
+    /// session, revert any live-preview changes (camera, audio, brightness)
+    /// to the snapshot taken at <see cref="Open"/>.
     /// </summary>
     public void Close()
     {
         if (!_isOpen) return;
         
         _isOpen = false;
-        
+
+        // Roll back live-preview changes if they were never confirmed.
+        if (_hasSnapshot && !_appliedThisSession && GameSettingsManager.Instance != null)
+        {
+            GameSettingsManager.Instance.SetSettings(_openSnapshot);
+            GameSettingsManager.Instance.ApplyAllSettings();
+        }
+        _hasSnapshot = false;
+        _appliedThisSession = false;
+
         if (canvasGroup != null)
         {
             if (_fadeCoroutine != null) StopCoroutine(_fadeCoroutine);
@@ -334,6 +385,12 @@ public class SettingsMenuController : MonoBehaviour
             GameSettingsManager.Instance.SetSettings(_pendingSettings);
             GameSettingsManager.Instance.ApplyAllSettings();
             GameSettingsManager.Instance.SaveSettings();
+
+            // Refresh the snapshot so a subsequent Close doesn't roll back the
+            // values the user just confirmed.
+            _openSnapshot = GameSettingsManager.Instance.CurrentSettings;
+            _hasSnapshot = true;
+            _appliedThisSession = true;
         }
         
         PlayClickSound();
@@ -433,12 +490,14 @@ public class SettingsMenuController : MonoBehaviour
         }
         
         // Controls
+        // mouseSensitivity is already a normalized [0,1] value (slider's native range)
+        // so we set it directly. No lerp/inverse-lerp needed. This is what fixes the
+        // "Main Menu shows centered, Main Scene shows far-left" inconsistency.
         if (mouseSensitivitySlider != null)
         {
-            // Map 0.1-10.0 range to 0-1 slider
-            float normalizedSens = Mathf.InverseLerp(0.1f, 10f, _pendingSettings.mouseSensitivity);
-            mouseSensitivitySlider.SetValueWithoutNotify(normalizedSens);
-            UpdateSensitivityText(mouseSensitivityText, normalizedSens);
+            float sens = Mathf.Clamp01(_pendingSettings.mouseSensitivity);
+            mouseSensitivitySlider.SetValueWithoutNotify(sens);
+            UpdateSensitivityText(mouseSensitivityText, sens);
         }
         
         if (invertYToggle != null)
@@ -477,11 +536,10 @@ public class SettingsMenuController : MonoBehaviour
         if (sfxVolumeSlider != null)
             _pendingSettings.sfxVolume = sfxVolumeSlider.value;
         
-        // Controls
+        // Controls — slider value IS the (normalized) sensitivity.
         if (mouseSensitivitySlider != null)
         {
-            // Map 0-1 slider back to 0.1-10.0 range
-            _pendingSettings.mouseSensitivity = Mathf.Lerp(0.1f, 10f, mouseSensitivitySlider.value);
+            _pendingSettings.mouseSensitivity = Mathf.Clamp01(mouseSensitivitySlider.value);
         }
         
         if (invertYToggle != null)
@@ -507,11 +565,10 @@ public class SettingsMenuController : MonoBehaviour
     
     private void UpdateSensitivityText(TextMeshProUGUI text, float normalizedValue)
     {
-        if (text != null)
-        {
-            float actualValue = Mathf.Lerp(0.1f, 10f, normalizedValue);
-            text.text = actualValue.ToString("F1");
-        }
+        if (text == null) return;
+        // Show as a percentage so the label scales naturally with the slider's
+        // 0..1 range (matches the volume sliders' presentation).
+        text.text = $"{Mathf.RoundToInt(Mathf.Clamp01(normalizedValue) * 100f)}%";
     }
     
     private void OnBackClicked()

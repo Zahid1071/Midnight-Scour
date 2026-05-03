@@ -80,23 +80,35 @@ public class InventoryUI : MonoBehaviour
     {
         InventoryItem selected = GetSelectedItem();
         if (selected == null)
-        {
-            Debug.Log("No item selected.");
             return;
-        }
+
+        if (Camera.main == null)
+            return;
 
         // Raycast to detect interactable
         if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, 3f))
         {
             IInteractable target = hit.collider.GetComponent<IInteractable>();
+            if (target == null)
+                target = hit.collider.GetComponentInParent<IInteractable>();
+
             if (target is IItemReceiver receiver)
             {
                 receiver.ReceiveItem(selected);
             }
+            else if (target != null)
+            {
+                // ConditionalInteractible, InteractableItem, etc. — resolved via PlayerInteractor.Interact(), not item-on-receiver
+                return;
+            }
             else
             {
-                Debug.Log("❌ This object doesn’t accept items.");
+                HudManager.Instance?.ShowSubtitle("You cannot use that here.", 3f);
             }
+        }
+        else
+        {
+            HudManager.Instance?.ShowSubtitle("Nothing in reach.", 2.5f);
         }
     }
 

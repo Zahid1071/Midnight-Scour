@@ -15,4 +15,6 @@ MonoBehaviour:
   itemName: Bone
   icon: {fileID: 21300000, guid: 4272ca2e710606c48a91c02e8294c9c5, type: 3}
   pickUpSFX: {fileID: 8300000, guid: a20a83f2d98682a4986d107d16f19d2a, type: 3}
+  consumeOnUse: 1
+  pickUpText: Bone added to inventory
   description: 

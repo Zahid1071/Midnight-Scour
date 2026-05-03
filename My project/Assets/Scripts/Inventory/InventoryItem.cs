@@ -9,5 +9,7 @@ public class InventoryItem : ScriptableObject
     public AudioClip pickUpSFX;
 
     public bool consumeOnUse = true;
+
+    [TextArea] public string pickUpText;
     [TextArea] public string description;
 }

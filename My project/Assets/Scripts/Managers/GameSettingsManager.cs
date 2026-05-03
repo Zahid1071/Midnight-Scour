@@ -11,10 +11,16 @@
  * -----------------------------
  * Access the singleton instance anywhere in your code:
  * 
- *     GameSettingsManager.Instance.MouseSensitivity  // Get/set mouse sensitivity (0.1-10.0)
- *     GameSettingsManager.Instance.InvertYAxis       // Get/set Y-axis inversion
- *     GameSettingsManager.Instance.MasterVolume      // Get/set master volume (0.0-1.0 linear)
- *     GameSettingsManager.Instance.Difficulty        // Get current difficulty (0=Easy, 1=Normal, 2=Hard)
+ *     GameSettingsManager.Instance.MouseSensitivity            // NORMALIZED 0.0-1.0 (slider value)
+ *     GameSettingsManager.Instance.MouseSensitivityMultiplier  // Camera multiplier (camera scripts use this)
+ *     GameSettingsManager.Instance.InvertYAxis                 // Get/set Y-axis inversion
+ *     GameSettingsManager.Instance.MasterVolume                // Get/set master volume (0.0-1.0 linear)
+ *     GameSettingsManager.Instance.Difficulty                  // Get current difficulty (0=Easy, 1=Normal, 2=Hard)
+ *
+ * Subscribe to live changes:
+ *
+ *     GameSettingsManager.OnMouseSensitivityChanged += newValue => { ... };
+ *     GameSettingsManager.OnInvertYAxisChanged      += newValue => { ... };
  * 
  * The manager automatically applies settings to Unity systems when changed.
  * Settings persist across sessions via PlayerPrefs.
@@ -22,8 +28,9 @@
  * INTEGRATION POINTS:
  * -------------------
  * - SettingsMenuController: Opens/closes settings UI, reads/writes via this manager
+ * - SettingsMenu (legacy main menu): Delegates mouseSensitivity to this manager
  * - PauseMenuController: Uses this manager indirectly through SettingsMenuController
- * - Player scripts: Read MouseSensitivity, InvertYAxis for camera controls
+ * - Player scripts: Read MouseSensitivityMultiplier, InvertYAxis for camera controls
  * - Audio systems: SoundManager already reads from PlayerPrefs (synced with this)
  * 
  * =============================================================================
@@ -41,6 +48,61 @@ public class GameSettingsManager : MonoBehaviour
     // =========================================================================
     
     public static GameSettingsManager Instance { get; private set; }
+
+    // =========================================================================
+    // CONSTANTS
+    // =========================================================================
+
+    /// <summary>
+    /// Single source-of-truth PlayerPrefs key for mouse sensitivity.
+    /// Stored as a NORMALIZED 0-1 value (== slider value directly).
+    /// </summary>
+    public const string MOUSE_SENSITIVITY_KEY = "MouseSensitivity";
+
+    /// <summary>
+    /// Single source-of-truth PlayerPrefs key for brightness.
+    /// Stored as a NORMALIZED 0-1 value (== slider value directly).
+    /// </summary>
+    public const string BRIGHTNESS_KEY = "Brightness";
+
+    /// <summary>
+    /// Effective sensitivity multiplier range applied by camera scripts.
+    /// MouseSensitivity (0..1) is mapped to [MIN, MAX] before being multiplied
+    /// against the camera's baseSensitivity.
+    /// </summary>
+    public const float MIN_SENSITIVITY_MULTIPLIER = 0.25f;
+    public const float MAX_SENSITIVITY_MULTIPLIER = 20f;
+
+    /// <summary>
+    /// URP ColorAdjustments postExposure range that <see cref="Brightness"/>
+    /// (0..1) is mapped to. Negative = darker, positive = brighter.
+    /// Scene components (e.g. BrightnessApplier) consume <see cref="BrightnessExposure"/>.
+    /// </summary>
+    public const float MIN_BRIGHTNESS_EXPOSURE = -2f;
+    public const float MAX_BRIGHTNESS_EXPOSURE =  2f;
+
+    // =========================================================================
+    // EVENTS
+    // =========================================================================
+
+    /// <summary>
+    /// Fired whenever MouseSensitivity changes. Subscribers get the new
+    /// normalized [0,1] value. Useful for camera scripts that want to react
+    /// instantly without polling.
+    /// </summary>
+    public static event Action<float> OnMouseSensitivityChanged;
+
+    /// <summary>
+    /// Fired whenever InvertYAxis changes.
+    /// </summary>
+    public static event Action<bool> OnInvertYAxisChanged;
+
+    /// <summary>
+    /// Fired whenever Brightness changes. Subscribers get the new normalized
+    /// [0,1] value. Scene components (e.g. <c>BrightnessApplier</c>) listen to
+    /// this to update the URP Volume's ColorAdjustments postExposure live.
+    /// </summary>
+    public static event Action<float> OnBrightnessChanged;
 
     // =========================================================================
     // INSPECTOR REFERENCES
@@ -74,9 +136,14 @@ public class GameSettingsManager : MonoBehaviour
         public float sfxVolume;
         
         // Controls
-        public float mouseSensitivity;    // 0.1 - 10.0
+        public float mouseSensitivity;    // NORMALIZED 0.0 - 1.0 (slider value directly)
         public bool invertYAxis;
-        
+
+        // Display (continued) — brightness is stored alongside graphics conceptually
+        // but kept here for layout reasons. Range is normalized 0.0-1.0; mapped to
+        // [MIN_BRIGHTNESS_EXPOSURE, MAX_BRIGHTNESS_EXPOSURE] when applied.
+        public float brightness;
+
         // Gameplay
         public int difficultyIndex;       // 0=Easy, 1=Normal, 2=Hard
         public bool subtitlesEnabled;
@@ -97,9 +164,11 @@ public class GameSettingsManager : MonoBehaviour
         musicVolume = 0.8f,
         sfxVolume = 0.8f,
         
-        mouseSensitivity = 1.5f,
+        mouseSensitivity = 0.5f, // Center of slider (normalized) -> 1.0x multiplier with default range
         invertYAxis = false,
-        
+
+        brightness = 0.5f, // Center -> postExposure 0 (no change)
+
         difficultyIndex = 1, // Normal
         subtitlesEnabled = true
     };
@@ -190,23 +259,77 @@ public class GameSettingsManager : MonoBehaviour
     // --- Controls Properties ---
     
     /// <summary>
-    /// Mouse sensitivity (0.1 to 10.0).
-    /// Player scripts should multiply their base sensitivity by this value.
+    /// Mouse sensitivity as a NORMALIZED [0, 1] value.
+    /// This is the slider's value directly. Camera/player scripts should NOT
+    /// multiply this raw value; use <see cref="MouseSensitivityMultiplier"/> instead,
+    /// which maps 0..1 to a sensible camera multiplier range.
+    /// 
+    /// Setting this property fires <see cref="OnMouseSensitivityChanged"/> if the
+    /// value changes, allowing live updates in gameplay scripts.
     /// </summary>
     public float MouseSensitivity
     {
         get => _currentSettings.mouseSensitivity;
-        set { _currentSettings.mouseSensitivity = Mathf.Clamp(value, 0.1f, 10f); }
+        set
+        {
+            float clamped = Mathf.Clamp01(value);
+            if (Mathf.Approximately(_currentSettings.mouseSensitivity, clamped)) return;
+            _currentSettings.mouseSensitivity = clamped;
+            OnMouseSensitivityChanged?.Invoke(clamped);
+        }
     }
-    
+
+    /// <summary>
+    /// Effective camera-sensitivity multiplier derived from <see cref="MouseSensitivity"/>.
+    /// Maps the normalized 0..1 slider value to the
+    /// [<see cref="MIN_SENSITIVITY_MULTIPLIER"/>, <see cref="MAX_SENSITIVITY_MULTIPLIER"/>]
+    /// range. Camera scripts should multiply their baseSensitivity by this value.
+    /// </summary>
+    public float MouseSensitivityMultiplier =>
+        Mathf.Lerp(MIN_SENSITIVITY_MULTIPLIER, MAX_SENSITIVITY_MULTIPLIER, _currentSettings.mouseSensitivity);
+
     /// <summary>
     /// If true, Y-axis mouse input should be inverted.
+    /// Setting this fires <see cref="OnInvertYAxisChanged"/> when the value changes.
     /// </summary>
     public bool InvertYAxis
     {
         get => _currentSettings.invertYAxis;
-        set => _currentSettings.invertYAxis = value;
+        set
+        {
+            if (_currentSettings.invertYAxis == value) return;
+            _currentSettings.invertYAxis = value;
+            OnInvertYAxisChanged?.Invoke(value);
+        }
     }
+
+    // --- Display (Brightness) Properties ---
+
+    /// <summary>
+    /// Screen brightness as a NORMALIZED [0, 1] value (== slider value directly).
+    /// Setting this fires <see cref="OnBrightnessChanged"/> when the value changes,
+    /// allowing scene components (e.g. <c>BrightnessApplier</c>) to update the
+    /// URP Volume's ColorAdjustments postExposure live without polling.
+    /// </summary>
+    public float Brightness
+    {
+        get => _currentSettings.brightness;
+        set
+        {
+            float clamped = Mathf.Clamp01(value);
+            if (Mathf.Approximately(_currentSettings.brightness, clamped)) return;
+            _currentSettings.brightness = clamped;
+            OnBrightnessChanged?.Invoke(clamped);
+        }
+    }
+
+    /// <summary>
+    /// Convenience helper: the URP ColorAdjustments postExposure value derived
+    /// from <see cref="Brightness"/>. Maps 0..1 -> [MIN_BRIGHTNESS_EXPOSURE,
+    /// MAX_BRIGHTNESS_EXPOSURE].
+    /// </summary>
+    public float BrightnessExposure =>
+        Mathf.Lerp(MIN_BRIGHTNESS_EXPOSURE, MAX_BRIGHTNESS_EXPOSURE, _currentSettings.brightness);
 
     // --- Gameplay Properties ---
     
@@ -250,6 +373,33 @@ public class GameSettingsManager : MonoBehaviour
         // Apply all settings at startup
         ApplyAllSettings();
     }
+
+    /// <summary>
+    /// Auto-bootstrap: ensures a GameSettingsManager exists at runtime even if
+    /// no scene contains the prefab. Runs BEFORE the first scene's Awake calls,
+    /// so consumers in MonoBehaviour.Awake can safely use <see cref="Instance"/>.
+    /// 
+    /// If a manually-placed prefab exists in the scene with proper inspector
+    /// references (e.g. AudioMixer assigned), this auto-created instance will
+    /// be destroyed by the singleton check in Awake() — the manually placed one
+    /// wins. So sahnedeki prefab her zaman tercih edilir.
+    /// </summary>
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+//    private static void AutoBootstrap()
+//     {
+//         if (Instance != null) return;
+
+//         // Try to find an existing instance that may have been created in a
+//         // very early Awake (defensive — usually unnecessary).
+//         var existing = FindFirstObjectByType<GameSettingsManager>();
+//         if (existing != null) return;
+
+//         var go = new GameObject("GameSettingsManager (auto)");
+//         go.AddComponent<GameSettingsManager>();
+//         // No DontDestroyOnLoad here — the component's Awake handles it.
+//         Debug.Log("[GameSettingsManager] Auto-bootstrapped (no prefab in scene). " +
+//                   "Drop the prefab into your first scene to assign an AudioMixer.");
+//     } 
 
     // =========================================================================
     // PUBLIC API METHODS
@@ -330,14 +480,24 @@ public class GameSettingsManager : MonoBehaviour
         PlayerPrefs.SetFloat("masterVol", _currentSettings.masterVolume);
         PlayerPrefs.SetFloat("musicVol", _currentSettings.musicVolume);
         PlayerPrefs.SetFloat("sfxVol", _currentSettings.sfxVolume);
+
+        // Mouse sensitivity: single source of truth key (normalized 0-1).
+        // Also write the legacy key with the same normalized value so any
+        // not-yet-migrated reader still gets a consistent value.
+        PlayerPrefs.SetFloat(MOUSE_SENSITIVITY_KEY, _currentSettings.mouseSensitivity);
         PlayerPrefs.SetFloat("mouseSensitivity", _currentSettings.mouseSensitivity);
-        
-        PlayerPrefs.SetFloat("settings_mouseSensitivity", _currentSettings.mouseSensitivity);
+        PlayerPrefs.DeleteKey("settings_mouseSensitivity"); // remove stale [0.1..10] format
         PlayerPrefs.SetInt("settings_invertY", _currentSettings.invertYAxis ? 1 : 0);
         
         PlayerPrefs.SetInt("settings_difficulty", _currentSettings.difficultyIndex);
         PlayerPrefs.SetInt("settings_subtitles", _currentSettings.subtitlesEnabled ? 1 : 0);
-        
+
+        // Brightness: single source of truth key (normalized 0-1) plus legacy
+        // mirror so the old "brightness" key stays in sync if anything still
+        // reads it.
+        PlayerPrefs.SetFloat(BRIGHTNESS_KEY, _currentSettings.brightness);
+        PlayerPrefs.SetFloat("brightness", _currentSettings.brightness);
+
         PlayerPrefs.Save();
         
         Debug.Log("[GameSettingsManager] Settings saved to PlayerPrefs");
@@ -359,9 +519,11 @@ public class GameSettingsManager : MonoBehaviour
         _currentSettings = new SettingsData
         {
             fullscreen = PlayerPrefs.GetInt("settings_fullscreen", DefaultSettings.fullscreen ? 1 : 0) == 1,
-            displayModeIndex = PlayerPrefs.GetInt("settings_displayMode", DefaultSettings.displayModeIndex),
-            resolutionIndex = PlayerPrefs.GetInt("settings_resolutionIndex", currentResIndex),
-            qualityIndex = PlayerPrefs.GetInt("settings_qualityIndex", QualitySettings.GetQualityLevel()),
+            displayModeIndex = LoadDisplayModeFromPrefs(),
+            resolutionIndex = PlayerPrefs.GetInt("settings_resolutionIndex",
+                                PlayerPrefs.GetInt("resIndex", currentResIndex)),
+            qualityIndex = PlayerPrefs.GetInt("settings_qualityIndex",
+                                PlayerPrefs.GetInt("qualityIndex", QualitySettings.GetQualityLevel())),
             
             // Try new keys first, fall back to legacy keys
             masterVolume = PlayerPrefs.GetFloat("settings_masterVolume", 
@@ -371,10 +533,11 @@ public class GameSettingsManager : MonoBehaviour
             sfxVolume = PlayerPrefs.GetFloat("settings_sfxVolume", 
                 PlayerPrefs.GetFloat("sfxVol", DefaultSettings.sfxVolume)),
             
-            mouseSensitivity = PlayerPrefs.GetFloat("settings_mouseSensitivity", 
-                PlayerPrefs.GetFloat("mouseSensitivity", DefaultSettings.mouseSensitivity)),
+            mouseSensitivity = LoadMouseSensitivityFromPrefs(),
             invertYAxis = PlayerPrefs.GetInt("settings_invertY", DefaultSettings.invertYAxis ? 1 : 0) == 1,
-            
+
+            brightness = LoadBrightnessFromPrefs(),
+
             difficultyIndex = PlayerPrefs.GetInt("settings_difficulty", DefaultSettings.difficultyIndex),
             subtitlesEnabled = PlayerPrefs.GetInt("settings_subtitles", DefaultSettings.subtitlesEnabled ? 1 : 0) == 1
         };
@@ -382,6 +545,95 @@ public class GameSettingsManager : MonoBehaviour
         // Clamp values to valid ranges
         _currentSettings.resolutionIndex = Mathf.Clamp(_currentSettings.resolutionIndex, 0, Mathf.Max(0, _availableResolutions.Length - 1));
         _currentSettings.qualityIndex = Mathf.Clamp(_currentSettings.qualityIndex, 0, QualitySettings.names.Length - 1);
+        _currentSettings.mouseSensitivity = Mathf.Clamp01(_currentSettings.mouseSensitivity);
+        _currentSettings.brightness = Mathf.Clamp01(_currentSettings.brightness);
+    }
+
+    /// <summary>
+    /// Resolve display mode from PlayerPrefs with one-time legacy migration.
+    /// Old <c>SettingsMenu</c> used key "fullscreenMode" with a different index
+    /// scheme: 0=FullScreenWindow, 1=Windowed, 2=ExclusiveFullScreen.
+    /// We remap that to the manager's canonical scheme:
+    /// 0=Fullscreen(Exclusive), 1=Windowed, 2=Borderless(FullScreenWindow).
+    /// </summary>
+    private int LoadDisplayModeFromPrefs()
+    {
+        if (PlayerPrefs.HasKey("settings_displayMode"))
+            return PlayerPrefs.GetInt("settings_displayMode", DefaultSettings.displayModeIndex);
+
+        if (PlayerPrefs.HasKey("fullscreenMode"))
+        {
+            int legacy = PlayerPrefs.GetInt("fullscreenMode", 0);
+            // legacy: 0=FullScreenWindow(Borderless), 1=Windowed, 2=ExclusiveFullScreen
+            // canonical: 0=Exclusive, 1=Windowed, 2=Borderless
+            return legacy switch
+            {
+                0 => 2, // Borderless
+                1 => 1, // Windowed
+                2 => 0, // Exclusive Fullscreen
+                _ => DefaultSettings.displayModeIndex
+            };
+        }
+
+        return DefaultSettings.displayModeIndex;
+    }
+
+    /// <summary>
+    /// Resolve brightness from PlayerPrefs. Prefers the new "Brightness" key,
+    /// falls back to the legacy lowercase "brightness" used by old SettingsMenu,
+    /// otherwise uses the default. Always returns a clamped 0..1 value.
+    /// </summary>
+    private float LoadBrightnessFromPrefs()
+    {
+        if (PlayerPrefs.HasKey(BRIGHTNESS_KEY))
+            return Mathf.Clamp01(PlayerPrefs.GetFloat(BRIGHTNESS_KEY, DefaultSettings.brightness));
+        if (PlayerPrefs.HasKey("brightness"))
+            return Mathf.Clamp01(PlayerPrefs.GetFloat("brightness", DefaultSettings.brightness));
+        return DefaultSettings.brightness;
+    }
+
+    /// <summary>
+    /// Resolve the mouse sensitivity from PlayerPrefs. Handles migration from
+    /// older formats so the loaded value is ALWAYS a normalized [0, 1] float:
+    ///   1) Preferred new key "MouseSensitivity" (normalized 0-1)
+    ///   2) Legacy "settings_mouseSensitivity" (was 0.1..10) -> remap to 0..1
+    ///   3) Legacy "mouseSensitivity":
+    ///        - <= 1.0 : already normalized (legacy SettingsMenu wrote slider value)
+    ///        - >  1.0 : came from 0.1..10 sensitivity range -> remap to 0..1
+    ///   4) Default value
+    /// </summary>
+    private float LoadMouseSensitivityFromPrefs()
+    {
+        if (PlayerPrefs.HasKey(MOUSE_SENSITIVITY_KEY))
+            return Mathf.Clamp01(PlayerPrefs.GetFloat(MOUSE_SENSITIVITY_KEY, DefaultSettings.mouseSensitivity));
+
+        if (PlayerPrefs.HasKey("settings_mouseSensitivity"))
+        {
+            float legacy = PlayerPrefs.GetFloat("settings_mouseSensitivity", 1.5f);
+            return Mathf.Clamp01(Mathf.InverseLerp(0.1f, 10f, legacy));
+        }
+
+        if (PlayerPrefs.HasKey("mouseSensitivity"))
+        {
+            float legacy = PlayerPrefs.GetFloat("mouseSensitivity", DefaultSettings.mouseSensitivity);
+            if (legacy <= 1.0f) return Mathf.Clamp01(legacy);
+            return Mathf.Clamp01(Mathf.InverseLerp(0.1f, 10f, legacy));
+        }
+
+        return DefaultSettings.mouseSensitivity;
+    }
+
+    /// <summary>
+    /// Persist ONLY the mouse sensitivity to PlayerPrefs.
+    /// Use this when a script (e.g. the legacy main-menu SettingsMenu) wants to
+    /// save just sensitivity without overwriting other settings the manager owns.
+    /// </summary>
+    public void SaveMouseSensitivity()
+    {
+        PlayerPrefs.SetFloat(MOUSE_SENSITIVITY_KEY, _currentSettings.mouseSensitivity);
+        PlayerPrefs.SetFloat("mouseSensitivity", _currentSettings.mouseSensitivity);
+        PlayerPrefs.DeleteKey("settings_mouseSensitivity");
+        PlayerPrefs.Save();
     }
     
     /// <summary>
@@ -390,11 +642,14 @@ public class GameSettingsManager : MonoBehaviour
     public void ResetToDefaults()
     {
         int defaultResIndex = Mathf.Max(0, _availableResolutions.Length - 1);
-        
-        _currentSettings = DefaultSettings;
-        _currentSettings.resolutionIndex = defaultResIndex;
-        _currentSettings.qualityIndex = Mathf.Min(DefaultSettings.qualityIndex, QualitySettings.names.Length - 1);
-        
+
+        var fresh = DefaultSettings;
+        fresh.resolutionIndex = defaultResIndex;
+        fresh.qualityIndex = Mathf.Min(DefaultSettings.qualityIndex, QualitySettings.names.Length - 1);
+
+        // Use SetSettings so change events fire and consumers refresh.
+        SetSettings(fresh);
+
         ApplyAllSettings();
         SaveSettings();
         
@@ -407,6 +662,10 @@ public class GameSettingsManager : MonoBehaviour
     /// </summary>
     public void SetSettings(SettingsData newSettings)
     {
+        float prevSensitivity = _currentSettings.mouseSensitivity;
+        bool prevInvertY = _currentSettings.invertYAxis;
+        float prevBrightness = _currentSettings.brightness;
+
         _currentSettings = newSettings;
         
         // Clamp values
@@ -414,10 +673,20 @@ public class GameSettingsManager : MonoBehaviour
         _currentSettings.qualityIndex = Mathf.Clamp(_currentSettings.qualityIndex, 0, QualitySettings.names.Length - 1);
         _currentSettings.displayModeIndex = Mathf.Clamp(_currentSettings.displayModeIndex, 0, 2);
         _currentSettings.difficultyIndex = Mathf.Clamp(_currentSettings.difficultyIndex, 0, 2);
-        _currentSettings.mouseSensitivity = Mathf.Clamp(_currentSettings.mouseSensitivity, 0.1f, 10f);
+        _currentSettings.mouseSensitivity = Mathf.Clamp01(_currentSettings.mouseSensitivity);
         _currentSettings.masterVolume = Mathf.Clamp01(_currentSettings.masterVolume);
         _currentSettings.musicVolume = Mathf.Clamp01(_currentSettings.musicVolume);
         _currentSettings.sfxVolume = Mathf.Clamp01(_currentSettings.sfxVolume);
+        _currentSettings.brightness = Mathf.Clamp01(_currentSettings.brightness);
+
+        // Fire change events so live consumers (camera, brightness applier, etc.)
+        // react immediately.
+        if (!Mathf.Approximately(prevSensitivity, _currentSettings.mouseSensitivity))
+            OnMouseSensitivityChanged?.Invoke(_currentSettings.mouseSensitivity);
+        if (prevInvertY != _currentSettings.invertYAxis)
+            OnInvertYAxisChanged?.Invoke(_currentSettings.invertYAxis);
+        if (!Mathf.Approximately(prevBrightness, _currentSettings.brightness))
+            OnBrightnessChanged?.Invoke(_currentSettings.brightness);
     }
 
     // =========================================================================
