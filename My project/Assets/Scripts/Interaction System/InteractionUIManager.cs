@@ -56,6 +56,12 @@ public class InteractionUIManager : MonoBehaviour
     {
         if (cameraTransform == null) return;
 
+        if (PlayerControlGate.IsInputBlocked)
+        {
+            ClearDetection(true);
+            return;
+        }
+
         if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, 
             out RaycastHit hit, detectionRange, interactLayer))
         {

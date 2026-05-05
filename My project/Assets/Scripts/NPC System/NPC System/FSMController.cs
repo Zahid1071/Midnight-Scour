@@ -205,11 +205,11 @@ public class FSMController
         var interactor = npc.perception.PlayerTransform.GetComponent<PlayerInteractor>();
         interactor.GetComponent<PlayerFootstepRhythm>().enabled = false;
 
-        if (interactor.isCaptured) return;
+        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured)) return;
 
         SoundManager.Instance.PlaySFX(SoundManager.Instance.tensionSFXBank[0], 0.5f);
         SoundManager.Instance.PlaySFXAt(SoundManager.Instance.tensionSFXBank[0], npc.transform.position);
-        interactor.isCaptured = true;
+        PlayerControlGate.Acquire(PlayerControlGate.ReasonCaptured);
 
         Debug.Log("Player Caught!");
         animator.SetTrigger("Jumpscare");

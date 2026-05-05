@@ -200,7 +200,11 @@ namespace FS_Atmo
                     if (next < route.Count)
                         yield return MoveTo(route[next].position);
 
-                    // 4) Continue from whatever follows the far prepoint
+                    // 4) Close door after crossing (RequestOpen is only used here for AI; keeps rooms sealed)
+                    if (edge.door != null && !edge.door.isLocked)
+                        edge.door.RequestClose();
+
+                    // 5) Continue from whatever follows the far prepoint
                     idx = next;
                     isDoorTransit = false;
                     continue;

@@ -34,76 +34,53 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
     public void Interact()
     {
+        // 1. İşlem devam ediyorsa yeni girdi alma
         if (isToggling)
         {
             HudManager.Instance?.ShowSubtitle("Wait a moment.", 2f);
             return;
         }
 
+        // 2. Referans kontrolleri
         GameObject player = GameObject.FindWithTag("Player");
-        if (player == null)
-            return;
+        if (player == null) return;
 
         PlayerHider hider = player.GetComponent<PlayerHider>();
-        if (hider == null)
-            return;
+        if (hider == null) return;
 
+        // 3. Oyuncu zaten saklanıyorsa sadece uyarı ver ve çık
         if (hider.isHidden)
         {
-            // --- MESAFE KONTROLÜ ---
-            // If there is no right side assigned (like a locker), default to the left side.
-            if (rightPivot == null)
-            {
-                activePivot = leftPivot;
-                activeAnimator = leftAnimator;
-                Debug.Log("Single entry point used (e.g. Locker).");
-            }
-            else
-            {
-                // Two sides exist (like a bed). Compare distances.
-                float distToLeft = Vector3.Distance(player.transform.position, leftPivot.parent.parent.position);
-                float distToRight = Vector3.Distance(player.transform.position, rightPivot.parent.parent.position);
-
-                if (distToLeft < distToRight)
-                {
-                    activePivot = leftPivot;
-                    activeAnimator = leftAnimator;
-                    Debug.Log("left");
-                }
-                else
-                {
-                    activePivot = rightPivot;
-                    activeAnimator = rightAnimator;
-                    Debug.Log("right");
-                }
-            }
-
-            StartCoroutine(EnterHidingRoutine(player, hider));
             HudManager.Instance?.ShowSubtitle("You are already hiding.", 2.5f);
             return;
         }
 
-        // --- MESAFE KONTROLÜ (BEYİN BURASI) ---
-        float distToLeft = Vector3.Distance(player.transform.position, leftPivot.parent.parent.position);
-        float distToRight = Vector3.Distance(player.transform.position, rightPivot.parent.parent.position);
-
-
-
-        if (distToLeft < distToRight)
+        // 4. Pivot Belirleme (Locker mı yoksa Bed mi?)
+        if (rightPivot == null)
         {
-            // Sol taraf daha yakın
+            // Tek girişli (Dolap vb.)
             activePivot = leftPivot;
             activeAnimator = leftAnimator;
-            Debug.Log("left");
         }
         else
         {
-            // Sağ taraf daha yakın
-            activePivot = rightPivot;
-            activeAnimator = rightAnimator;
-            Debug.Log("right");
+            // Çift girişli (Yatak vb.) - Mesafe Karşılaştırması
+            float distToLeft = Vector3.Distance(player.transform.position, leftPivot.parent.parent.position);
+            float distToRight = Vector3.Distance(player.transform.position, rightPivot.parent.parent.position);
+
+            if (distToLeft < distToRight)
+            {
+                activePivot = leftPivot;
+                activeAnimator = leftAnimator;
+            }
+            else
+            {
+                activePivot = rightPivot;
+                activeAnimator = rightAnimator;
+            }
         }
 
+        // 5. Rutini başlat
         StartCoroutine(EnterHidingRoutine(player, hider));
     }
 
