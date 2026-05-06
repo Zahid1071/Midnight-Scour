@@ -44,7 +44,7 @@ public class SuspicionSystem : MonoBehaviour
 
     public void AddFootstepSuspicion(float amount)
     {
-        Debug.Log(footstepSuspicion);
+        //Debug.Log(footstepSuspicion);
         footstepSuspicion += amount;
     }
 

@@ -182,10 +182,11 @@ namespace FS_Atmo
                     yield return MoveTo(waypoint.position);
 
                     // 2) Open and wait until actually open (avoids race with carve delay)
-                    if (!edge.door.IsOpen && !edge.door.isLocked)
+                    if (!edge.door.IsOpen)
                     {
                         bool opened = false;
-                        edge.door.RequestOpen(ok => opened = ok);
+                        // NPC should ignore locks: play Open/Close instead of Locked
+                        edge.door.RequestOpen(bypassLock: true, onDone: ok => opened = ok);
 
                         float wait = 0f;
                         while (!opened && wait < 0.2f) // safety cap
@@ -201,8 +202,8 @@ namespace FS_Atmo
                         yield return MoveTo(route[next].position);
 
                     // 4) Close door after crossing (RequestOpen is only used here for AI; keeps rooms sealed)
-                    if (edge.door != null && !edge.door.isLocked)
-                        edge.door.RequestClose();
+                    if (edge.door != null && edge.door.AICloseAfterPassing)
+                        edge.door.RequestClose(bypassLock: true);
 
                     // 5) Continue from whatever follows the far prepoint
                     idx = next;
@@ -280,7 +281,7 @@ namespace FS_Atmo
                 string roomName = room?.roomID ?? room?.name ?? "null";
                 //Debug.Log($"[Navigator] FindCurrentRoom: {roomName}");
             }
-
+            //Debug.Log("NPC is in room: " + room);
             return room; // No fallback - system must work correctly
         }
 
