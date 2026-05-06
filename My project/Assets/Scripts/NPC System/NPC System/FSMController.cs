@@ -397,7 +397,7 @@ public class FSMController
                 if (spot.isOccupied)
                 {
                     Debug.Log($"🎯 Player Caught in: {spot.name}");
-                    // optional: SetState(Capture);
+                    SetState(NPCController.AIState.Capture);
                 }
             }
 
