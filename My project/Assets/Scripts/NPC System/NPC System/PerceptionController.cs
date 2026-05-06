@@ -31,6 +31,11 @@ public class PerceptionController : MonoBehaviour
 
     LayerMask ignoreLayer;
 
+    // Expose read-only view config for simple external checks (hiding/cage).
+    public float MaxViewDistance => maxViewDistance;
+    public float MaxViewHalfAngle => maxViewHalfAngle;
+    public LayerMask IgnoreLayer => ignoreLayer;
+
     void Awake()
     {
         npc = GetComponent<NPCController>();
@@ -73,6 +78,32 @@ public class PerceptionController : MonoBehaviour
         UpdateVisionMeters();
         HandleVisionLoss();
         CageCheckVision();
+    }
+
+    /// <summary>
+    /// Raw sight check that ignores gameplay "hidden" layers.
+    /// Use this BEFORE the player changes layers to decide if hiding/cage should be allowed.
+    /// </summary>
+    public bool HasDirectLineOfSightToPlayer()
+    {
+        if (!player) return false;
+
+        var playerCol = player.GetComponentInChildren<Collider>();
+        if (!playerCol) return false;
+
+        Vector3 eye = transform.position + Vector3.up * 1.7f;
+        Vector3 aim = playerCol.bounds.center;
+        Vector3 dirToTarget = (aim - eye).normalized;
+
+        float angleToTarget = Vector3.Angle(transform.forward, dirToTarget);
+        if (angleToTarget > maxViewHalfAngle) return false;
+
+        if (Physics.Raycast(eye, dirToTarget, out RaycastHit hit, maxViewDistance, ~ignoreLayer, QueryTriggerInteraction.Ignore))
+        {
+            return hit.collider != null && hit.collider.transform.root == player.root;
+        }
+
+        return false;
     }
 
     private void PlayerCheckVision()
@@ -164,6 +195,9 @@ public class PerceptionController : MonoBehaviour
     public void HearPlayerFootstep(Transform soundSource, float suspicionAmount)
     {
         if (!soundSource) return;
+
+        // If the player is in the cage/captive layer, ignore player-made noise.
+        if (soundSource.gameObject.layer == 12) return;
 
         if (npc.currentState == NPCController.AIState.Ambush)
             suspicionAmount *= ambushAudioMul;

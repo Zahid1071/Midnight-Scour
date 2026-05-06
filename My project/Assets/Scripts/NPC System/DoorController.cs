@@ -32,6 +32,11 @@ namespace FS_Atmo
         [SerializeField] private bool disableObstacleWhenOpen = true;
         [SerializeField] private float obstacleFailsafeDelay = 0.10f;
 
+        [Header("AI")]
+        [Tooltip("If enabled, NPCs close this door after passing through it.")]
+        [SerializeField] private bool aiCloseAfterPassing = true;
+        public bool AICloseAfterPassing => aiCloseAfterPassing;
+
         [Header("State")]
         public bool isLocked = false;
         public bool IsOpen { get; private set; }
@@ -85,9 +90,9 @@ namespace FS_Atmo
 
                 StopAllCoroutines();
                 if (lastOpenFlag)
-                    StartCoroutine(OpenRoutine(null, triggerAnim: false));
+                    StartCoroutine(OpenRoutine(null, triggerAnim: false, bypassLock: false));
                 else
-                    StartCoroutine(CloseRoutine(null, triggerAnim: false));
+                    StartCoroutine(CloseRoutine(null, triggerAnim: false, bypassLock: false));
             }
         }
 
@@ -95,21 +100,27 @@ namespace FS_Atmo
 
         public void SetLocked(bool locked) => isLocked = locked;
 
-        public void RequestOpen(Action<bool> onDone = null)
+        // Backwards-compatible API (player/normal usage)
+        public void RequestOpen(Action<bool> onDone = null) => RequestOpen(bypassLock: false, onDone);
+
+        // AI/NPC can bypass lock so door still plays Open/Close (not Locked)
+        public void RequestOpen(bool bypassLock, Action<bool> onDone = null)
         {
-            if (isLocked) { onDone?.Invoke(false); return; }
+            if (isLocked && !bypassLock) { onDone?.Invoke(false); return; }
             if (state == DoorState.Open || state == DoorState.Opening) { onDone?.Invoke(true); return; }
 
             StopAllCoroutines();
-            StartCoroutine(OpenRoutine(onDone, triggerAnim: true));
+            StartCoroutine(OpenRoutine(onDone, triggerAnim: true, bypassLock: bypassLock));
         }
 
-        public void RequestClose(Action onDone = null)
+        public void RequestClose(Action onDone = null) => RequestClose(bypassLock: false, onDone);
+
+        public void RequestClose(bool bypassLock, Action onDone = null)
         {
             if (state == DoorState.Closed || state == DoorState.Closing) { onDone?.Invoke(); return; }
 
             StopAllCoroutines();
-            StartCoroutine(CloseRoutine(onDone, triggerAnim: true));
+            StartCoroutine(CloseRoutine(onDone, triggerAnim: true, bypassLock: bypassLock));
         }
 
         public void ForceOpenInstant()
@@ -142,12 +153,12 @@ namespace FS_Atmo
 
         // ========= Internals =========
 
-        private IEnumerator OpenRoutine(Action<bool> onDone, bool triggerAnim)
+        private IEnumerator OpenRoutine(Action<bool> onDone, bool triggerAnim, bool bypassLock)
         {
             state = DoorState.Opening;
 
             if (triggerAnim && simpleOpenClose && !simpleOpenClose.objectOpen)
-                simpleOpenClose.ObjectClicked();
+                simpleOpenClose.ObjectClicked(bypassLock: bypassLock);
 
             yield return new WaitForSeconds(openCarveDelay);
 
@@ -166,14 +177,14 @@ namespace FS_Atmo
             onDone?.Invoke(true);
         }
 
-        private IEnumerator CloseRoutine(Action onDone, bool triggerAnim)
+        private IEnumerator CloseRoutine(Action onDone, bool triggerAnim, bool bypassLock)
         {
             state = DoorState.Closing;
 
             if (carveObstacle) carveObstacle.enabled = true;
 
             if (triggerAnim && simpleOpenClose && simpleOpenClose.objectOpen)
-                simpleOpenClose.ObjectClicked();
+                simpleOpenClose.ObjectClicked(bypassLock: bypassLock);
 
             yield return new WaitForSeconds(closeCarveDelay);
 

@@ -1742,6 +1742,7 @@ MonoBehaviour:
   closeCarveDelay: 0.35
   disableObstacleWhenOpen: 1
   obstacleFailsafeDelay: 0.1
+  aiCloseAfterPassing: 1
   isLocked: 0
   state: 0
 --- !u!208 &326753970
@@ -2714,7 +2715,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 496484862}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.2005509, y: -0.25796685, z: 0.05483254, w: 0.94351786}
+  m_LocalRotation: {x: 0.31886116, y: -0.19093114, z: 0.06574284, w: 0.9260404}
   m_LocalPosition: {x: 8.514, y: -1.4625001, z: -21.486}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3569,7 +3570,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 673281706}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.2005509, y: -0.25796685, z: 0.05483254, w: 0.94351786}
+  m_LocalRotation: {x: 0.31886116, y: -0.19093114, z: 0.06574284, w: 0.9260404}
   m_LocalPosition: {x: 8.514, y: -1.4625001, z: -21.486}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4348,6 +4349,7 @@ MonoBehaviour:
   closeCarveDelay: 0.35
   disableObstacleWhenOpen: 1
   obstacleFailsafeDelay: 0.1
+  aiCloseAfterPassing: 1
   isLocked: 0
   state: 0
 --- !u!1 &940819203
@@ -5933,11 +5935,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4135013735270702856, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9781476
+      value: 0.9455186
       objectReference: {fileID: 0}
     - target: {fileID: 4135013735270702856, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.20791169
+      value: 0.32556805
       objectReference: {fileID: 0}
     - target: {fileID: 4135013735270702856, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
       propertyPath: m_LocalRotation.y
@@ -5949,7 +5951,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4135013735270702856, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 24
+      value: 38
       objectReference: {fileID: 0}
     - target: {fileID: 4135013735270702856, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -6061,7 +6063,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8997996947095583982, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.96459657
+      value: 0.97939944
       objectReference: {fileID: 0}
     - target: {fileID: 8997996947095583982, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
       propertyPath: m_LocalRotation.x
@@ -6069,7 +6071,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8997996947095583982, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.26372996
+      value: -0.20193271
       objectReference: {fileID: 0}
     - target: {fileID: 8997996947095583982, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
       propertyPath: m_LocalRotation.z
@@ -6081,7 +6083,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8997996947095583982, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: -30.583
+      value: -23.3
       objectReference: {fileID: 0}
     - target: {fileID: 8997996947095583982, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -6625,6 +6627,7 @@ MonoBehaviour:
   closeCarveDelay: 0.35
   disableObstacleWhenOpen: 1
   obstacleFailsafeDelay: 0.1
+  aiCloseAfterPassing: 1
   isLocked: 0
   state: 0
 --- !u!208 &1540762342
@@ -7435,6 +7438,7 @@ MonoBehaviour:
   closeCarveDelay: 0.35
   disableObstacleWhenOpen: 1
   obstacleFailsafeDelay: 0.1
+  aiCloseAfterPassing: 0
   isLocked: 0
   state: 0
 --- !u!208 &1689512661
@@ -10232,6 +10236,7 @@ MonoBehaviour:
   closeCarveDelay: 0.35
   disableObstacleWhenOpen: 1
   obstacleFailsafeDelay: 0.1
+  aiCloseAfterPassing: 1
   isLocked: 0
   state: 0
 --- !u!208 &1906716962

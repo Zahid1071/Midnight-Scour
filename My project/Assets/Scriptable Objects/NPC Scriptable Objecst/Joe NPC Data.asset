@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   npcName: Joe
   npcPrefab: {fileID: 4884186263421869, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
-  homeID: House_001
-  searchChance: 0
+  homeID: House
+  searchChance: 0.25
   weightedRoutinePlans:
   - zoneID: House_001
     weight: 0.247

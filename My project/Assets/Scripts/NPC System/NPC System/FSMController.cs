@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
+using System;
 using FS_Atmo;
 
 public class FSMController
@@ -375,6 +376,23 @@ public class FSMController
 
         var hidingSpots = roomAnchor.GetComponentsInChildren<HidingSpot>();
 
+        // Prefer closer hiding spots first, but keep some randomness so the order changes each search.
+        // Score = distance + random jitter (in meters), then sort by score.
+        {
+            Vector3 origin = npc.transform.position;
+            const float jitterMeters = 1.5f; // higher = more random, lower = more "closest-first"
+
+            float[] scores = new float[hidingSpots.Length];
+            for (int i = 0; i < hidingSpots.Length; i++)
+            {
+                Transform pivot = hidingSpots[i].PivotForNPCSearchRoutine;
+                Vector3 pos = pivot != null ? pivot.position : hidingSpots[i].transform.position;
+                scores[i] = Vector3.Distance(origin, pos) + UnityEngine.Random.value * jitterMeters;
+            }
+
+            Array.Sort(scores, hidingSpots);
+        }
+
         foreach (var spot in hidingSpots)
         {
             if (npc.perception.CanSeePlayer)
@@ -388,8 +406,10 @@ public class FSMController
 
             yield return new WaitUntil(() =>
                 !npc.GetComponent<NavMeshAgent>().pathPending &&
-                npc.GetComponent<NavMeshAgent>().remainingDistance < 2f);
+                npc.GetComponent<NavMeshAgent>().remainingDistance < 0.5f);
 
+
+            yield return new WaitForSeconds(UnityEngine.Random.Range(1f, 2f));
             bool willSearch = UnityEngine.Random.value < npc.interaction.data.searchChance;
 
             if (willSearch)
@@ -397,7 +417,8 @@ public class FSMController
                 if (spot.isOccupied)
                 {
                     Debug.Log($"🎯 Player Caught in: {spot.name}");
-                    // optional: SetState(Capture);
+                    SetState(NPCController.AIState.Capture);
+                    yield break;
                 }
             }
 

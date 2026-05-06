@@ -140,7 +140,7 @@ public class InteractionController : MonoBehaviour
             StopCoroutine(interactionRoutine);
 
         interactionRoutine = StartCoroutine(WaitForArrival(hotspotTransform));
-        Debug.Log(hotspotTransform);
+        //Debug.Log(hotspotTransform);
     }
 
     private IEnumerator RetryPickNextRoutineDelayed()
