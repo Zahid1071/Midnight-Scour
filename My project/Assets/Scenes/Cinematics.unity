@@ -1337,6 +1337,8 @@ PlayableDirector:
     value: {fileID: 0}
   - key: {fileID: 1262222710906346529, guid: cce99c1d720c78f47b8afda039b4c094, type: 2}
     value: {fileID: 333009685}
+  - key: {fileID: -91341881573331225, guid: cce99c1d720c78f47b8afda039b4c094, type: 2}
+    value: {fileID: 1924843670}
   m_ExposedReferences:
     m_References:
     - 04794c8e3330e3b42b8a759aea16e495: {fileID: 1282302874}
@@ -1536,6 +1538,83 @@ Transform:
   m_Children: []
   m_Father: {fileID: 771508586}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1924843668
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1924843671}
+  - component: {fileID: 1924843670}
+  - component: {fileID: 1924843669}
+  m_Layer: 0
+  m_Name: SignalManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1924843669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1924843668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c47ca2bdac5374b36a2939ab8345a79f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainSceneName: Main Scene
+  useLoadingScreen: 1
+--- !u!114 &1924843670
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1924843668}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e52de21a22b6dd44c9cc19f810c65059, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Events:
+    m_Signals:
+    - {fileID: 11400000, guid: a59fa6a61e313462a955a1601d51b761, type: 2}
+    m_Events:
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1924843669}
+          m_TargetAssemblyTypeName: SignalManager, Assembly-CSharp
+          m_MethodName: LoadMainScene
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+--- !u!4 &1924843671
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1924843668}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 8.019688, y: -1.8672273, z: -20.709103}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -1547,3 +1626,4 @@ SceneRoots:
   - {fileID: 961739753}
   - {fileID: 333009683}
   - {fileID: 202664531}
+  - {fileID: 1924843671}

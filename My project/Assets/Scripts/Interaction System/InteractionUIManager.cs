@@ -23,12 +23,12 @@ public class InteractionUIManager : MonoBehaviour
     [Tooltip("Tuşun resmi (Örn: E harfi sprite'ı)")]
     [SerializeField] private Sprite buttonPromptSprite;
 
-    [Header("Outline Settings")]
-    [SerializeField] private Color outlineColor = Color.yellow;
-    [SerializeField, Range(0f, 10f)] private float outlineWidth = 3f;
+    // [Header("Outline Settings")]
+    // [SerializeField] private Color outlineColor = Color.yellow;
+    // [SerializeField, Range(0f, 10f)] private float outlineWidth = 3f;
 
     private GameObject lastDetectedObject;
-    private Outline lastOutline;
+    // private Outline lastOutline;
 
     private void Start()
     {
@@ -90,17 +90,17 @@ public class InteractionUIManager : MonoBehaviour
     private void HighlightObject(GameObject obj)
     {
         lastDetectedObject = obj;
-        lastOutline = obj.GetComponent<Outline>();
-
-        if (lastOutline == null)
-        {
-            lastOutline = obj.AddComponent<Outline>();
-            lastOutline.OutlineMode = Outline.Mode.OutlineVisible;
-        }
-
-        lastOutline.OutlineColor = outlineColor;
-        lastOutline.OutlineWidth = outlineWidth;
-        lastOutline.enabled = true;
+        // lastOutline = obj.GetComponent<Outline>();
+        //
+        // if (lastOutline == null)
+        // {
+        //     lastOutline = obj.AddComponent<Outline>();
+        //     lastOutline.OutlineMode = Outline.Mode.OutlineVisible;
+        // }
+        //
+        // lastOutline.OutlineColor = outlineColor;
+        // lastOutline.OutlineWidth = outlineWidth;
+        // lastOutline.enabled = true;
     }
 
     private void ShowInteractionUI()
@@ -139,11 +139,11 @@ public class InteractionUIManager : MonoBehaviour
         }
 
         // 3. Outline temizle
-        if (lastOutline != null)
-        {
-            lastOutline.enabled = false;
-            lastOutline = null;
-        }
+        // if (lastOutline != null)
+        // {
+        //     lastOutline.enabled = false;
+        //     lastOutline = null;
+        // }
 
         lastDetectedObject = null;
     }
