@@ -1,4 +1,4 @@
-using System.Collections; // Coroutine (IEnumerator) kullanmak için bu şart
+using System.Collections;
 using UnityEngine;
 
 public class HidingSpot : MonoBehaviour, IInteractable
@@ -6,9 +6,9 @@ public class HidingSpot : MonoBehaviour, IInteractable
     public bool isOccupied { get; private set; }
 
     [Header("Setup - Sides")]
-    public Transform leftPivot; 
+    public Transform leftPivot;
     public Animator leftAnimator;
-    
+
     public Transform rightPivot;
     public Animator rightAnimator;
 
@@ -16,55 +16,137 @@ public class HidingSpot : MonoBehaviour, IInteractable
     public float blendDuration = 1.0f;
     public float animationDelay = 0.2f;
 
-    // O an hangi tarafı kullanıyoruz? (Kod karar verecek)
     private Transform activePivot;
     private Animator activeAnimator;
 
-    private int defaultLayer;
     private int hiddenLayer = 7;
+    private const float MinDistanceForHiddenLayerMeters = 2f;
     private bool isToggling = false;
 
-    public Transform PivotForNPCSearchRoutine;    
+    private int originalLayerIndex;
+    private GameObject playerRef;
+    private bool hideLayerEvaluationActive;
 
-    void Start()
+    public Transform PivotForNPCSearchRoutine;
+
+    private void Update()
     {
-        GameObject player = GameObject.FindWithTag("Player");
-        if (player != null) defaultLayer = player.layer;
+        if (!isOccupied || playerRef == null || !hideLayerEvaluationActive) return;
+
+        int targetLayer = originalLayerIndex;
+        if (!IsHidingSpotVisibleToAnyNPC()
+            && !IsAnyNPCHasDirectLineOfSightToPlayer()
+            && !IsAnyNPCTooCloseForHiddenLayer())
+            targetLayer = hiddenLayer;
+
+        if (playerRef.layer != targetLayer)
+            playerRef.layer = targetLayer;
+    }
+
+    /// <summary>Cage ile aynı: NPC bu hiding spot collider merkezine LOS ile bakıyorsa true.</summary>
+    private bool IsHidingSpotVisibleToAnyNPC()
+    {
+#if UNITY_2023_1_OR_NEWER
+        var perceivers = Object.FindObjectsByType<PerceptionController>(FindObjectsSortMode.None);
+#else
+        var perceivers = Object.FindObjectsOfType<PerceptionController>();
+#endif
+        Vector3 spotCenter = transform.position + Vector3.up * 1.5f;
+        Collider myCol = GetComponent<Collider>();
+        if (myCol != null) spotCenter = myCol.bounds.center;
+
+        foreach (var p in perceivers)
+        {
+            if (p == null) continue;
+
+            Vector3 eye = p.transform.position + Vector3.up * 1.7f;
+            Vector3 dir = (spotCenter - eye).normalized;
+            float dist = Vector3.Distance(eye, spotCenter);
+
+            if (dist > p.MaxViewDistance) continue;
+
+            float angle = Vector3.Angle(p.transform.forward, dir);
+            if (angle > p.MaxViewHalfAngle) continue;
+
+            if (Physics.Raycast(eye, dir, out RaycastHit hit, p.MaxViewDistance, ~p.IgnoreLayer, QueryTriggerInteraction.Ignore))
+            {
+                if (hit.collider != null && hit.collider.GetComponentInParent<HidingSpot>() == this)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// PerceptionController.HasDirectLineOfSightToPlayer — layer 7/captive’tan bağımsız ham LOS (oyuncu collider).
+    /// NPC oyuncuyu görebiliyorken hidden layer uygulanmaz.
+    /// </summary>
+    private bool IsAnyNPCHasDirectLineOfSightToPlayer()
+    {
+#if UNITY_2023_1_OR_NEWER
+        var perceivers = Object.FindObjectsByType<PerceptionController>(FindObjectsSortMode.None);
+#else
+        var perceivers = Object.FindObjectsOfType<PerceptionController>();
+#endif
+        foreach (var p in perceivers)
+        {
+            if (p != null && p.HasDirectLineOfSightToPlayer())
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Any NPC within this distance keeps the player on the normal layer (even with no LOS).
+    /// </summary>
+    private bool IsAnyNPCTooCloseForHiddenLayer()
+    {
+        if (playerRef == null) return true;
+#if UNITY_2023_1_OR_NEWER
+        var perceivers = Object.FindObjectsByType<PerceptionController>(FindObjectsSortMode.None);
+#else
+        var perceivers = Object.FindObjectsOfType<PerceptionController>();
+#endif
+        Vector3 playerPos = playerRef.transform.position;
+        foreach (var p in perceivers)
+        {
+            if (p == null) continue;
+            if (Vector3.Distance(playerPos, p.transform.position) < MinDistanceForHiddenLayerMeters)
+                return true;
+        }
+
+        return false;
     }
 
     public void Interact()
     {
-        // 1. İşlem devam ediyorsa yeni girdi alma
         if (isToggling)
         {
             HudManager.Instance?.ShowSubtitle("Wait a moment.", 2f);
             return;
         }
 
-        // 2. Referans kontrolleri
         GameObject player = GameObject.FindWithTag("Player");
         if (player == null) return;
 
         PlayerHider hider = player.GetComponent<PlayerHider>();
         if (hider == null) return;
 
-        // 3. Oyuncu zaten saklanıyorsa sadece uyarı ver ve çık
         if (hider.isHidden)
         {
             HudManager.Instance?.ShowSubtitle("You are already hiding.", 2.5f);
             return;
         }
 
-        // 4. Pivot Belirleme (Locker mı yoksa Bed mi?)
         if (rightPivot == null)
         {
-            // Tek girişli (Dolap vb.)
             activePivot = leftPivot;
             activeAnimator = leftAnimator;
         }
         else
         {
-            // Çift girişli (Yatak vb.) - Mesafe Karşılaştırması
             float distToLeft = Vector3.Distance(player.transform.position, leftPivot.parent.parent.position);
             float distToRight = Vector3.Distance(player.transform.position, rightPivot.parent.parent.position);
 
@@ -80,7 +162,6 @@ public class HidingSpot : MonoBehaviour, IInteractable
             }
         }
 
-        // 5. Rutini başlat
         StartCoroutine(EnterHidingRoutine(player, hider));
     }
 
@@ -88,24 +169,26 @@ public class HidingSpot : MonoBehaviour, IInteractable
     {
         isToggling = true;
         isOccupied = true;
+        originalLayerIndex = player.layer;
+        hideLayerEvaluationActive = false;
 
-        // Seçilen (Active) pivotu kullan
         HidingCameraSystem.Instance.AttachToPivot(activePivot);
-        
-        if(activeAnimator != null) activeAnimator.Play("Idle");
+
+        if (activeAnimator != null) activeAnimator.Play("Idle");
 
         HidingCameraSystem.Instance.SetActive(true);
-        hider.DisableControlsOnly(); 
+        hider.DisableControlsOnly();
 
         yield return new WaitForSeconds(blendDuration);
 
         hider.SetVisuals(false);
-        player.layer = hiddenLayer;
         hider.SetHiddenState(true, this);
+        playerRef = player;
+        hideLayerEvaluationActive = true;
 
         yield return new WaitForSeconds(animationDelay);
 
-        if(activeAnimator != null) activeAnimator.SetTrigger("Enter");
+        if (activeAnimator != null) activeAnimator.SetTrigger("Enter");
 
         isToggling = false;
     }
@@ -119,6 +202,8 @@ public class HidingSpot : MonoBehaviour, IInteractable
     private IEnumerator ExitHidingRoutine(GameObject player)
     {
         isToggling = true;
+        hideLayerEvaluationActive = false;
+        playerRef = null;
 
         if (activeAnimator != null)
         {
@@ -128,17 +213,14 @@ public class HidingSpot : MonoBehaviour, IInteractable
             if (stateInfo.IsName("Enter"))
             {
                 if (stateInfo.normalizedTime < 1.0f)
-                {
                     startOffset = 1.0f - stateInfo.normalizedTime;
-                }
             }
 
-            // Seçilen (Active) animatörü kullan
             activeAnimator.Play("Exit", 0, startOffset);
 
-            yield return null; 
+            yield return null;
 
-            yield return new WaitUntil(() => 
+            yield return new WaitUntil(() =>
                 activeAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f);
         }
         else
@@ -147,14 +229,14 @@ public class HidingSpot : MonoBehaviour, IInteractable
         }
 
         HidingCameraSystem.Instance.SetActive(false);
-        
+
         PlayerHider hider = player.GetComponent<PlayerHider>();
         if (hider != null)
         {
             hider.SetVisuals(true);
             hider.SetHiddenState(false, null);
         }
-        player.layer = defaultLayer;
+        player.layer = originalLayerIndex;
 
         yield return new WaitForSeconds(blendDuration);
 
@@ -163,8 +245,7 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
         isOccupied = false;
         isToggling = false;
-        
-        // Temizlik: Referansları boşaltabiliriz (opsiyonel)
+
         activePivot = null;
         activeAnimator = null;
     }

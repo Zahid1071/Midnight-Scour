@@ -9,6 +9,7 @@ public class Cage : MonoBehaviour
 
     // Hardcoded layer ID as requested
     private const int CAPTIVE_LAYER = 12;
+    private const float MinDistanceForCaptiveLayerMeters = 2f;
 
     // Variables to track player state
     private int originalLayerIndex;
@@ -26,9 +27,9 @@ public class Cage : MonoBehaviour
 
         if (!cageDoor.objectOpen)
         {
-            // Only allow "captive" layer if no NPC currently has direct line-of-sight to the cage.
-            // (Visibility is about the cage/door, not the player.)
-            if (!IsCageVisibleToAnyNPC())
+            // Captive layer only if no LOS to cage, every NPC is >= MinDistanceForCaptiveLayerMeters away,
+            // and door closed.
+            if (!IsCageVisibleToAnyNPC() && !IsAnyNPCTooCloseForCaptiveLayer())
                 targetLayer = CAPTIVE_LAYER;
         }
 
@@ -70,6 +71,28 @@ public class Cage : MonoBehaviour
                 if (hit.collider != null && hit.collider.GetComponentInParent<Cage>() == this)
                     return true;
             }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Any NPC within this distance keeps the player on the normal layer (even with no LOS).
+    /// </summary>
+    private bool IsAnyNPCTooCloseForCaptiveLayer()
+    {
+        if (playerRef == null) return true;
+#if UNITY_2023_1_OR_NEWER
+        var perceivers = Object.FindObjectsByType<PerceptionController>(FindObjectsSortMode.None);
+#else
+        var perceivers = Object.FindObjectsOfType<PerceptionController>();
+#endif
+        Vector3 playerPos = playerRef.transform.position;
+        foreach (var p in perceivers)
+        {
+            if (p == null) continue;
+            if (Vector3.Distance(playerPos, p.transform.position) < MinDistanceForCaptiveLayerMeters)
+                return true;
         }
 
         return false;

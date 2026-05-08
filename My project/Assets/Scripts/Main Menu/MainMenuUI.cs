@@ -13,7 +13,7 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField] private Button continueButton;
 
     [Header("Scenes")]
-    [SerializeField] private string gameSceneName = "Main Scene";
+    [SerializeField] private string gameSceneName = "Cinematics";
     [SerializeField] private string creditsSceneName = "CreditsScene";
 
     private void Start()
