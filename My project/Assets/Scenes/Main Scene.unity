@@ -13022,7 +13022,15 @@ PrefabInstance:
     - target: {fileID: 7146743772319749347, guid: 16e3dff79b452490a989645aa094bfe3, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 
-      objectReference: {fileID: 54052454}
+      objectReference: {fileID: 1712120100}
+    - target: {fileID: 7146743772319749347, guid: 16e3dff79b452490a989645aa094bfe3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: SaveGameFromPauseMenu
+      objectReference: {fileID: 0}
+    - target: {fileID: 7146743772319749347, guid: 16e3dff79b452490a989645aa094bfe3, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: PauseManager, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 7276952453701254763, guid: 16e3dff79b452490a989645aa094bfe3, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Target
       value: 

@@ -67,6 +67,15 @@ public class PauseManager : MonoBehaviour
         if (pauseRoot) pauseRoot.SetActive(true);
     }
 
+    /// <summary>
+    /// Pause menüsündeki Save Game butonu — <see cref="SaveManager.Instance"/> kullanır;
+    /// Main Menu'den gelindiğinde sahnedeki yedek <c>SaveManager</c> yok edildiği için doğrudan referans kırılır.
+    /// </summary>
+    public void SaveGameFromPauseMenu()
+    {
+        SaveManager.Instance?.SaveGame();
+    }
+
     public void OnQuitToMenu()
     {
         if (SaveManager.Instance != null && GameSettingsManager.IsAutoSavePersistenceEnabled())
