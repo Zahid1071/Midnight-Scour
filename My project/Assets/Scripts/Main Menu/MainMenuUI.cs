@@ -43,8 +43,9 @@ public class MainMenuUI : MonoBehaviour
 
         if (SaveManager.Instance != null)
             SaveManager.Instance.DeleteSave();
-        //if (InventoryManager.Instance != null)
-            //InventoryManager.Instance.ClearInventory();
+
+        if (InventoryManager.Instance != null)
+            InventoryManager.Instance.ClearInventory();
 
         SceneManager.LoadScene(gameSceneName);
 

@@ -43,6 +43,9 @@ public class SettingsMenu : MonoBehaviour
     [SerializeField] private SettingsSelector qualitySelector;
     [SerializeField] private SettingsSelector fullscreenSelector;
 
+    [Tooltip("Optional. If empty, resolved at runtime from a child named Row_AutoSave.")]
+    [SerializeField] private SettingsSelector autoSaveSelector;
+
     // =========================================================================
     // BACKWARD COMPATIBILITY
     // =========================================================================
@@ -79,6 +82,19 @@ public class SettingsMenu : MonoBehaviour
     // =========================================================================
     // UNITY LIFECYCLE
     // =========================================================================
+
+    private void Awake()
+    {
+        if (autoSaveSelector == null)
+        {
+            foreach (var tr in GetComponentsInChildren<Transform>(true))
+            {
+                if (tr.name != "Row_AutoSave") continue;
+                autoSaveSelector = tr.GetComponentInChildren<SettingsSelector>(true);
+                break;
+            }
+        }
+    }
 
     private void Start()
     {
@@ -316,6 +332,9 @@ public class SettingsMenu : MonoBehaviour
 
         if (fullscreenSelector)
             fullscreenSelector.SetIndex(Mathf.Clamp(s.displayModeIndex, 0, 2));
+
+        if (autoSaveSelector)
+            autoSaveSelector.SetIndex(s.autoSaveEnabled ? 0 : 1);
     }
 
     private void ReadUIInto(ref GameSettingsManager.SettingsData s)
@@ -329,6 +348,8 @@ public class SettingsMenu : MonoBehaviour
         if (resolutionSelector) s.resolutionIndex   = resolutionSelector.GetCurrentIndex();
         if (qualitySelector)    s.qualityIndex      = qualitySelector.GetCurrentIndex();
         if (fullscreenSelector) s.displayModeIndex  = fullscreenSelector.GetCurrentIndex();
+
+        if (autoSaveSelector) s.autoSaveEnabled = autoSaveSelector.GetCurrentIndex() == 0;
     }
 
     // =========================================================================

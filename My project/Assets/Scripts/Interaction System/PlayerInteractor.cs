@@ -7,6 +7,12 @@ public class PlayerInteractor : MonoBehaviour
     [SerializeField] private LayerMask interactLayer;
     [SerializeField] private Transform cameraTransform;
 
+    private void Awake()
+    {
+        if (!TryGetComponent<HeldItemDisplay>(out _))
+            gameObject.AddComponent<HeldItemDisplay>();
+    }
+
     private void Update()
     {
         if (PlayerControlGate.IsInputBlocked)

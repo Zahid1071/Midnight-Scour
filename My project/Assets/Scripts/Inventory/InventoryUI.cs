@@ -29,6 +29,12 @@ public class InventoryUI : MonoBehaviour
         RefreshUI();
     }
 
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
     private void Update()
     {
         if (PlayerControlGate.IsInputBlocked)
@@ -44,22 +50,25 @@ public class InventoryUI : MonoBehaviour
 
     public void RefreshUI()
     {
-        if (InventoryManager.Instance == null) return;
+        if (!this || InventoryManager.Instance == null) return;
+        if (slotImages == null || slotBackgrounds == null) return;
 
         var items = InventoryManager.Instance.GetInventory();
 
         for (int i = 0; i < slotImages.Length; i++)
         {
+            if (slotImages[i] == null)
+                continue;
+            if (i >= slotBackgrounds.Length)
+                break;
+
             bool hasItem = i < items.Count && items[i] != null && items[i].icon != null;
 
             slotImages[i].sprite = hasItem ? items[i].icon : null;
             slotImages[i].enabled = hasItem;
 
-            // Set selection color
             if (slotBackgrounds[i] != null)
-            {
                 slotBackgrounds[i].color = (i == selectedIndex) ? selectedColor : defaultColor;
-            }
         }
     }
 
@@ -68,6 +77,7 @@ public class InventoryUI : MonoBehaviour
     {
         selectedIndex = index;
         RefreshUI();
+        HeldItemDisplay.Instance?.RefreshHeldVisual();
     }
 
 

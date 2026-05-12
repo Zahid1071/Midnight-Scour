@@ -6,7 +6,8 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// Singleton that owns all save / load logic.
 /// Persists across scenes via DontDestroyOnLoad.
-/// Auto-saves on application quit and scene unload.
+/// Auto-saves on application quit and scene unload when
+/// <see cref="GameSettingsManager.IsAutoSavePersistenceEnabled"/> is true.
 /// </summary>
 public class SaveManager : MonoBehaviour
 {
@@ -41,18 +42,24 @@ public class SaveManager : MonoBehaviour
 
     void OnApplicationQuit()
     {
+        if (!ShouldRunAutoSaveHooks()) return;
         if (!IsMainMenu())
             SaveGame();
     }
 
     private void OnSceneUnloaded(Scene scene)
     {
+        if (!ShouldRunAutoSaveHooks()) return;
+
         // Don't save when leaving the main menu or credits
         if (scene.name == "Main Menu" || scene.name == "CreditsScene")
             return;
 
         SaveGame();
     }
+
+    private static bool ShouldRunAutoSaveHooks() =>
+        GameSettingsManager.IsAutoSavePersistenceEnabled();
 
     // ───── Public API ─────
 

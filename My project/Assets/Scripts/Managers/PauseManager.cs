@@ -69,8 +69,7 @@ public class PauseManager : MonoBehaviour
 
     public void OnQuitToMenu()
     {
-        // Persist progress before leaving the game scene
-        if (SaveManager.Instance != null)
+        if (SaveManager.Instance != null && GameSettingsManager.IsAutoSavePersistenceEnabled())
             SaveManager.Instance.SaveGame();
 
         PlayerControlGate.Clear();

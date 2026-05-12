@@ -20,6 +20,14 @@ public class InteractableItem : MonoBehaviour, IInteractable
                 : $"Picked up {itemData.itemName}.";
             HudManager.Instance?.ShowSubtitle(msg, 3f);
             SoundManager.Instance.PlaySFXAt(itemData.pickUpSFX, transform.position);
+
+            if (InventoryUI.Instance != null)
+            {
+                int idx = InventoryManager.Instance.GetInventory().Count - 1;
+                if (idx >= 0)
+                    InventoryUI.Instance.SelectSlot(idx);
+            }
+
             Destroy(gameObject);
         }
         else
