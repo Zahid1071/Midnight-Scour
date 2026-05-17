@@ -281,6 +281,7 @@ GameObject:
   - component: {fileID: 8782256225151303304}
   - component: {fileID: 694658246220161566}
   - component: {fileID: 6319191353915927965}
+  - component: {fileID: 7829341056284017392}
   m_Layer: 3
   m_Name: PlayerCapsule
   m_TagString: Player
@@ -696,3 +697,28 @@ MonoBehaviour:
   buttonPromptSprite: {fileID: 21300000, guid: 5c20b4d9fe053e14a9f8a30c304b1ed1, type: 3}
   outlineColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   outlineWidth: 3
+--- !u!114 &7829341056284017392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8616685848737228372}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f2a9c4e1b8d6f3a5e0c2d9b4a7e8f1c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controller: {fileID: 8616685848737228382}
+  bobTarget: {fileID: 4135013735270702856}
+  walkBobSpeed: 10
+  runBobSpeed: 14
+  sneakBobSpeed: 6
+  walkBobAmount: {x: 0.035, y: 0.05, z: 0}
+  runBobAmount: {x: 0.05, y: 0.08, z: 0}
+  sneakBobAmount: {x: 0.02, y: 0.03, z: 0}
+  minSpeed: 0.1
+  runThreshold: 4
+  walkThreshold: 2
+  strength: 1
+  resetSpeed: 10
