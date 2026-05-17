@@ -18,7 +18,7 @@ public class CinemachineMouseLook : MonoBehaviour
     [SerializeField] private float minPitch = -80f;
     [SerializeField] private float maxPitch =  80f;
 
-    private float pitch = 38f;
+    private float pitch = 16;
     private float _cachedMultiplier;
 
     /// <summary>
