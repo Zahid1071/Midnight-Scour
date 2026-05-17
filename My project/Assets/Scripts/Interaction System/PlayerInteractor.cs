@@ -7,20 +7,26 @@ public class PlayerInteractor : MonoBehaviour
     [SerializeField] private LayerMask interactLayer;
     [SerializeField] private Transform cameraTransform;
 
+    private PlayerHider _playerHider;
+
     private void Awake()
     {
         if (!TryGetComponent<HeldItemDisplay>(out _))
             gameObject.AddComponent<HeldItemDisplay>();
+
+        TryGetComponent(out _playerHider);
     }
 
     private void Update()
     {
         if (PlayerControlGate.IsInputBlocked)
             return;
+
+        if (_playerHider != null && _playerHider.isHidden)
+            return;
+
         if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
-        {
             TryInteract();
-        }
     }
 
     void TryInteract()

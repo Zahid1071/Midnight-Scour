@@ -38,7 +38,23 @@ public class InventoryManager : MonoBehaviour
     public void RemoveItem(InventoryItem item)
     {
         inventory.Remove(item);
-        InventoryUI.Instance?.RefreshUI(); // ✅ Also refresh on remove
+        RefreshAfterInventoryChange();
+    }
+
+    public bool RemoveItemAt(int index, bool refreshUI = true)
+    {
+        if (index < 0 || index >= inventory.Count)
+            return false;
+
+        inventory.RemoveAt(index);
+        if (refreshUI)
+            RefreshAfterInventoryChange();
+        return true;
+    }
+
+    private void RefreshAfterInventoryChange()
+    {
+        InventoryUI.Instance?.RefreshUI();
         HeldItemDisplay.Instance?.RefreshHeldVisual();
     }
 

@@ -48,3 +48,4 @@ MonoBehaviour:
   masterVolumeParam: Master
   musicVolumeParam: Music
   sfxVolumeParam: SFX
+  defaultProfile: {fileID: 11400000, guid: b2c3d4e5f6a7489012345678abcdef02, type: 2}

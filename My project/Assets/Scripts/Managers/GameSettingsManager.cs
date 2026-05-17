@@ -120,6 +120,10 @@ public class GameSettingsManager : MonoBehaviour
     [SerializeField] private string musicVolumeParam = "Music";
     [SerializeField] private string sfxVolumeParam = "SFX";
 
+    [Header("Defaults (Inspector / ScriptableObject)")]
+    [Tooltip("Assign a Game Settings Defaults asset. If empty, loads Resources/GameSettingsDefaults.")]
+    [SerializeField] private GameSettingsDefaults defaultProfile;
+
     // =========================================================================
     // SETTINGS DATA STRUCTURE
     // =========================================================================
@@ -159,30 +163,72 @@ public class GameSettingsManager : MonoBehaviour
     }
 
     // =========================================================================
-    // DEFAULT VALUES
+    // DEFAULT VALUES (ScriptableObject + code fallback)
     // =========================================================================
-    
-    public static readonly SettingsData DefaultSettings = new SettingsData
+
+    private const string DefaultProfileResourcesPath = "GameSettingsDefaults";
+
+    private static GameSettingsDefaults _cachedDefaultProfile;
+
+    /// <summary>
+    /// Default settings from the assigned <see cref="GameSettingsDefaults"/> asset
+    /// (Inspector or Resources). Edit via Assets → Create → Game → Settings Defaults.
+    /// </summary>
+    public static SettingsData DefaultSettings => GetDefaultSettings();
+
+    /// <summary>Same as <see cref="DefaultSettings"/>; explicit name for call sites.</summary>
+    public static SettingsData GetDefaultSettings() => ResolveDefaultProfile().defaults;
+
+    private static GameSettingsDefaults ResolveDefaultProfile()
     {
-        fullscreen = true,
-        displayModeIndex = 0,
-        resolutionIndex = -1, // Will be set to max resolution at runtime
-        qualityIndex = 2,     // High
-        
-        masterVolume = 0.8f,
-        musicVolume = 0.8f,
-        sfxVolume = 0.8f,
-        
-        mouseSensitivity = 0.5f, // Center of slider (normalized) -> 1.0x multiplier with default range
-        invertYAxis = false,
+        if (_cachedDefaultProfile != null)
+            return _cachedDefaultProfile;
 
-        brightness = 0.5f, // Center -> postExposure 0 (no change)
+        if (Instance != null && Instance.defaultProfile != null)
+            return _cachedDefaultProfile = Instance.defaultProfile;
 
-        difficultyIndex = 1, // Normal
-        subtitlesEnabled = true,
+        var fromResources = Resources.Load<GameSettingsDefaults>(DefaultProfileResourcesPath);
+        if (fromResources != null)
+            return _cachedDefaultProfile = fromResources;
 
-        autoSaveEnabled = true
-    };
+        Debug.LogWarning(
+            "[GameSettingsManager] No GameSettingsDefaults asset assigned or found in Resources. " +
+            "Using built-in fallback. Create one via Assets → Create → Game → Settings Defaults.");
+
+        return _cachedDefaultProfile = CreateBuiltInFallbackProfile();
+    }
+
+    private static GameSettingsDefaults CreateBuiltInFallbackProfile()
+    {
+        var fallback = ScriptableObject.CreateInstance<GameSettingsDefaults>();
+        fallback.defaults = new SettingsData
+        {
+            fullscreen = true,
+            displayModeIndex = 0,
+            resolutionIndex = -1,
+            qualityIndex = 2,
+            masterVolume = 0.8f,
+            musicVolume = 0.8f,
+            sfxVolume = 0.8f,
+            mouseSensitivity = 0.5f,
+            invertYAxis = false,
+            brightness = 0.5f,
+            difficultyIndex = 1,
+            subtitlesEnabled = true,
+            autoSaveEnabled = true
+        };
+        return fallback;
+    }
+
+    private void EnsureDefaultProfileAssigned()
+    {
+        if (defaultProfile != null)
+            return;
+
+        defaultProfile = Resources.Load<GameSettingsDefaults>(DefaultProfileResourcesPath);
+        if (defaultProfile != null)
+            _cachedDefaultProfile = defaultProfile;
+    }
 
     // =========================================================================
     // RUNTIME STATE
@@ -397,6 +443,10 @@ public class GameSettingsManager : MonoBehaviour
         
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        EnsureDefaultProfileAssigned();
+        if (defaultProfile != null)
+            _cachedDefaultProfile = defaultProfile;
         
         // Initialize resolutions
         CacheAvailableResolutions();

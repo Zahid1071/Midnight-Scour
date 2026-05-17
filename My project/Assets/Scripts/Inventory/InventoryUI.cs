@@ -9,6 +9,14 @@ public class InventoryUI : MonoBehaviour
     [SerializeField] private Image[] slotImages;
     [SerializeField] private Image[] slotBackgrounds; // These are the background images
     [SerializeField] private Color selectedColor = Color.red;
+
+    [Header("Drop throw")]
+    [SerializeField] private float dropSpawnForward = 0.55f;
+    [SerializeField] private float dropSpawnDown = 0.25f;
+    [SerializeField] private float dropThrowForce = 2.2f;
+    [SerializeField] private float dropThrowUpward = 0.6f;
+    [SerializeField] private float dropItemMass = 1f;
+
     private Color defaultColor = Color.white;
 
     private int selectedIndex = -1;
@@ -46,6 +54,7 @@ public class InventoryUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha4)) SelectSlot(3);
 
         if (Input.GetKeyDown(KeyCode.E)) TryUseSelectedItem();
+        if (Input.GetKeyDown(KeyCode.G)) TryDropSelectedItem();
     }
 
     public void RefreshUI()
@@ -123,6 +132,90 @@ public class InventoryUI : MonoBehaviour
         {
             HudManager.Instance?.ShowSubtitle("Nothing in reach.", 2.5f);
         }
+    }
+
+    private void TryDropSelectedItem()
+    {
+        if (InventoryManager.Instance == null)
+            return;
+
+        InventoryItem selected = GetSelectedItem();
+        if (selected == null)
+            return;
+
+        if (!selected.canDrop)
+        {
+            HudManager.Instance?.ShowSubtitle("You cannot drop that item.", 2.5f);
+            return;
+        }
+
+        GameObject dropPrefab = selected.GetDropPrefab();
+        if (dropPrefab == null)
+        {
+            HudManager.Instance?.ShowSubtitle("You cannot drop that item.", 2.5f);
+            return;
+        }
+
+        if (Camera.main == null)
+            return;
+
+        Transform cam = Camera.main.transform;
+        int dropIndex = selectedIndex;
+
+        if (!InventoryManager.Instance.RemoveItemAt(dropIndex, refreshUI: false))
+            return;
+
+        AdjustSelectionAfterRemove();
+        RefreshUI();
+        HeldItemDisplay.Instance?.RefreshHeldVisual();
+
+        Vector3 spawnPos = GetDropThrowSpawnPosition(cam);
+        Quaternion spawnRot = GetDropSpawnRotation(cam);
+        Vector3 throwDir = cam.forward;
+
+        GameObject dropped = ItemDropHelper.SpawnAndThrow(
+            dropPrefab,
+            spawnPos,
+            spawnRot,
+            throwDir,
+            dropThrowForce,
+            dropThrowUpward,
+            dropItemMass);
+
+        if (selected.pickUpSFX != null && SoundManager.Instance != null)
+            SoundManager.Instance.PlaySFXAt(selected.pickUpSFX, dropped.transform.position);
+
+        string msg = $"Dropped {selected.itemName}.";
+        HudManager.Instance?.ShowSubtitle(msg, 2f);
+    }
+
+    private Vector3 GetDropThrowSpawnPosition(Transform cam)
+    {
+        return cam.position + cam.forward * dropSpawnForward - cam.up * dropSpawnDown;
+    }
+
+    private static Quaternion GetDropSpawnRotation(Transform cam)
+    {
+        Vector3 forward = cam.forward;
+        forward.y = 0f;
+        if (forward.sqrMagnitude < 0.001f)
+            forward = cam.forward;
+
+        forward.Normalize();
+        return Quaternion.LookRotation(forward, Vector3.up);
+    }
+
+    private void AdjustSelectionAfterRemove()
+    {
+        var items = InventoryManager.Instance.GetInventory();
+        if (items.Count == 0)
+        {
+            selectedIndex = -1;
+            return;
+        }
+
+        if (selectedIndex >= items.Count)
+            selectedIndex = items.Count - 1;
     }
 
 }

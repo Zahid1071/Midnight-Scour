@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 4790156807488358378}
   - component: {fileID: 7322564326581318432}
   - component: {fileID: 8241425503189282726}
-  m_Layer: 0
+  - component: {fileID: 3684632658938311608}
+  m_Layer: 6
   m_Name: China_vase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -108,3 +109,16 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.14, y: 0.29047492, z: 0.14}
   m_Center: {x: 0, y: 0.1445428, z: 0.0000000037252903}
+--- !u!114 &3684632658938311608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9123735415952249589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef522ec4ff79e6a42b719502c5b1c6aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemData: {fileID: 11400000, guid: 844bb3609a95d1c43b5016bdfd55e19a, type: 2}

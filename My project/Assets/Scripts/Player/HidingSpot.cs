@@ -136,7 +136,10 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
         if (hider.isHidden)
         {
-            HudManager.Instance?.ShowSubtitle("You are already hiding.", 2.5f);
+            if (hider.IsHidingIn(this))
+                RevealPlayer(player);
+            else
+                HudManager.Instance?.ShowSubtitle("You are already hiding.", 2.5f);
             return;
         }
 

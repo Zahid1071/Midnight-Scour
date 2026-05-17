@@ -15,6 +15,9 @@ public class InteractionUIManager : MonoBehaviour
     [SerializeField] private Sprite defaultCrosshair;
     [Tooltip("Dolu ikon (El/Göz)")]
     [SerializeField] private Sprite interactCrosshair;
+
+    [Tooltip("Default nişangah boyutu = etkileşim boyutunun bu kadarı (1/5 = 5 kat küçük).")]
+    [SerializeField, Range(0.05f, 1f)] private float defaultCrosshairScaleFactor = 0.2f;
     
     [Header("Button Prompt (Tuş İpucu) Ayarları")]
     [Tooltip("Sağ alttaki 'E' harfinin görüneceği Image")]
@@ -30,13 +33,25 @@ public class InteractionUIManager : MonoBehaviour
     private GameObject lastDetectedObject;
     // private Outline lastOutline;
 
+    private RectTransform _crosshairRect;
+    private Vector3 _interactCrosshairScale;
+    private bool _interactScaleCaptured;
+    private PlayerHider _cachedPlayerHider;
+
+    private void Awake()
+    {
+        if (crosshairImage != null)
+            _crosshairRect = crosshairImage.rectTransform;
+    }
+
     private void Start()
     {
+        CaptureInteractCrosshairScale();
+
         // 1. Crosshair'i varsayılan hale getir
         if (crosshairImage && defaultCrosshair)
         {
-            crosshairImage.sprite = defaultCrosshair;
-            crosshairImage.enabled = true; // Görünür yap
+            ApplyDefaultCrosshairVisual();
         }
 
         // 2. Buton ipucunu başlangıçta GİZLE
@@ -49,7 +64,29 @@ public class InteractionUIManager : MonoBehaviour
 
     private void Update()
     {
+        if (TryShowHiddenExitPrompt())
+            return;
+
         DetectInteractable();
+    }
+
+    private bool TryShowHiddenExitPrompt()
+    {
+        if (PlayerControlGate.IsInputBlocked)
+            return false;
+
+        if (_cachedPlayerHider == null)
+        {
+            GameObject player = GameObject.FindWithTag("Player");
+            if (player != null)
+                _cachedPlayerHider = player.GetComponent<PlayerHider>();
+        }
+
+        if (_cachedPlayerHider == null || !_cachedPlayerHider.isHidden)
+            return false;
+
+        ShowInteractionUI();
+        return true;
     }
 
     private void DetectInteractable()
@@ -110,6 +147,8 @@ public class InteractionUIManager : MonoBehaviour
         {
             if (crosshairImage.sprite != interactCrosshair)
                 crosshairImage.sprite = interactCrosshair;
+
+            ApplyInteractCrosshairScale(); // tam boyut (prefab ölçeği)
         }
 
         // B. Button Prompt'u göster ve resmini ata
@@ -130,6 +169,8 @@ public class InteractionUIManager : MonoBehaviour
         {
             if (crosshairImage.sprite != defaultCrosshair)
                 crosshairImage.sprite = defaultCrosshair;
+
+            ApplyDefaultCrosshairScale();
         }
 
         // 2. Button Prompt resmini kapat (Görünmez yap)
@@ -151,6 +192,40 @@ public class InteractionUIManager : MonoBehaviour
     private void OnDisable()
     {
         ClearDetection(true);
+    }
+
+    private void CaptureInteractCrosshairScale()
+    {
+        if (_crosshairRect == null || _interactScaleCaptured)
+            return;
+
+        _interactCrosshairScale = _crosshairRect.localScale;
+        _interactScaleCaptured = true;
+    }
+
+    private void ApplyDefaultCrosshairVisual()
+    {
+        crosshairImage.sprite = defaultCrosshair;
+        crosshairImage.enabled = true;
+        ApplyDefaultCrosshairScale();
+    }
+
+    private void ApplyDefaultCrosshairScale()
+    {
+        CaptureInteractCrosshairScale();
+        if (_crosshairRect == null)
+            return;
+
+        _crosshairRect.localScale = _interactCrosshairScale * defaultCrosshairScaleFactor;
+    }
+
+    private void ApplyInteractCrosshairScale()
+    {
+        CaptureInteractCrosshairScale();
+        if (_crosshairRect == null)
+            return;
+
+        _crosshairRect.localScale = _interactCrosshairScale;
     }
 
     private void OnDrawGizmosSelected()

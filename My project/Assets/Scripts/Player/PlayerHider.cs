@@ -4,6 +4,8 @@ using UnityEngine.InputSystem;
 public class PlayerHider : MonoBehaviour
 {
     public bool isHidden { get; private set; }
+    public HidingSpot CurrentHidingSpot => currentHidingSpot;
+
     private HidingSpot currentHidingSpot;
     
     [Header("Visuals")]
@@ -14,16 +16,14 @@ public class PlayerHider : MonoBehaviour
 
     private void Update()
     {
-        // Space tuşu ile çıkış
-        if (isHidden && currentHidingSpot != null)
-        {
-            if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
-            {
-                currentHidingSpot.RevealPlayer(gameObject);
-                // currentHidingSpot = null; // Bunu RevealPlayer içindeki mantık halledecek
-            }
-        }
+        if (!isHidden || currentHidingSpot == null || PlayerControlGate.IsInputBlocked)
+            return;
+
+        if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+            currentHidingSpot.RevealPlayer(gameObject);
     }
+
+    public bool IsHidingIn(HidingSpot spot) => isHidden && currentHidingSpot == spot;
 
     // Sadece Input/Hareket scriptlerini kapatır
     public void DisableControlsOnly()
