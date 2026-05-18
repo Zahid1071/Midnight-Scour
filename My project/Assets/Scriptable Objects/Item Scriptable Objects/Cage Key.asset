@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b3fb6c1c8058a749b2a30a3514c38f4, type: 3}
   m_Name: Cage Key
   m_EditorClassIdentifier: 
-  itemName: Cage Key
+  itemName: Basement Key
   icon: {fileID: 21300000, guid: 3d07e0f9f611764489fdc84e6ddb9711, type: 3}
   worldPrefab: {fileID: 382293426490946623, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
   canDrop: 1

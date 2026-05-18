@@ -11,6 +11,8 @@ public class CinematicSignalFunctions : MonoBehaviour
     public Transform destination;
     public Transform key;
     NavMeshAgent agent;
+    [SerializeField] private Collider keyCollider;
+    [SerializeField] private Collider grateCollider;
     
     // Flag to track when the cinematic move is active
     private bool isMoving = false;
@@ -20,6 +22,7 @@ public class CinematicSignalFunctions : MonoBehaviour
         navigator = GetComponent<Navigator>();
         npc = GetComponent<NPCController>();
         agent = GetComponent<NavMeshAgent>();
+        Physics.IgnoreCollision(keyCollider, grateCollider, true);
     }
 
     void Update()
