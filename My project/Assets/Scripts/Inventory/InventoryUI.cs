@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using System.Collections.Generic;
 
 public class InventoryUI : MonoBehaviour
@@ -53,7 +54,8 @@ public class InventoryUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha3)) SelectSlot(2);
         if (Input.GetKeyDown(KeyCode.Alpha4)) SelectSlot(3);
 
-        if (Input.GetKeyDown(KeyCode.E)) TryUseSelectedItem();
+        if (WasUseItemPressedThisFrame())
+            TryUseSelectedItem();
         if (Input.GetKeyDown(KeyCode.G)) TryDropSelectedItem();
     }
 
@@ -81,6 +83,13 @@ public class InventoryUI : MonoBehaviour
         }
     }
 
+
+    static bool WasUseItemPressedThisFrame()
+    {
+        if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+            return true;
+        return Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+    }
 
     public void SelectSlot(int index)
     {

@@ -19,7 +19,12 @@ public class PlayerHider : MonoBehaviour
         if (!isHidden || currentHidingSpot == null || PlayerControlGate.IsInputBlocked)
             return;
 
-        if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+        if (Keyboard.current == null)
+            return;
+
+        bool exitHide = Keyboard.current.eKey.wasPressedThisFrame
+            || Keyboard.current.spaceKey.wasPressedThisFrame;
+        if (exitHide)
             currentHidingSpot.RevealPlayer(gameObject);
     }
 

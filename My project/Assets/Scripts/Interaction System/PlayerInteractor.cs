@@ -25,8 +25,15 @@ public class PlayerInteractor : MonoBehaviour
         if (_playerHider != null && _playerHider.isHidden)
             return;
 
-        if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+        if (WasInteractPressedThisFrame())
             TryInteract();
+    }
+
+    static bool WasInteractPressedThisFrame()
+    {
+        if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+            return true;
+        return Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
     }
 
     void TryInteract()

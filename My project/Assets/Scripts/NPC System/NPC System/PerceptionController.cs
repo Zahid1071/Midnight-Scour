@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using UnityEditor.Rendering;
 
 public class PerceptionController : MonoBehaviour
 {
@@ -110,7 +111,6 @@ public class PerceptionController : MonoBehaviour
     {
         if (!player) { CanSeePlayer = false; return; }
 
-        // 1. GİZLİLİK KONTROLÜ (Önceki düzeltmemiz)
         if (player.gameObject.layer == 7)
         {
             CanSeePlayer = false;

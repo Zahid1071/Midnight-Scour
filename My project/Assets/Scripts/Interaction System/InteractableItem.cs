@@ -3,9 +3,17 @@ using UnityEngine;
 public class InteractableItem : MonoBehaviour, IInteractable
 {
     public InventoryItem itemData;
+    [SerializeField] GrateSystem grateGate;
+    [SerializeField] string blockedMessage = "I can't reach that.";
 
     public void Interact()
     {
+        if (grateGate != null && !grateGate.IsRemoved)
+        {
+            HudManager.Instance?.ShowSubtitle(blockedMessage, 3f);
+            return;
+        }
+
         if (itemData == null)
         {
             Debug.LogWarning("No item assigned.");
