@@ -377,7 +377,7 @@ public class FSMController
 
         foreach (var spot in hidingSpots)
         {
-            if (npc.perception.CanSeePlayer)
+            if (!IsPlayerStealthHidden() && npc.perception.CanSeePlayer)
             {
                 SetState(NPCController.AIState.Chase);
                 yield break;
@@ -414,6 +414,19 @@ public class FSMController
             
     }
 
+    static bool IsPlayerStealthHidden(Transform playerTransform)
+    {
+        if (playerTransform == null) return false;
+        if (playerTransform.gameObject.layer == 7) return true;
+        var hider = playerTransform.GetComponent<PlayerHider>();
+        return hider != null && hider.isHidden;
+    }
+
+    bool IsPlayerStealthHidden()
+    {
+        return IsPlayerStealthHidden(npc.perception?.PlayerTransform);
+    }
+
    // ========== Chase tick (no coroutines) ==========
 
     public void TickChase()
@@ -421,9 +434,9 @@ public class FSMController
         var agent = npc.interaction.agent;
         if (npc.perception == null || nav == null || agent == null) return;
 
-        // 1. Durum Tespiti
-        bool isHidden = (npc.perception.PlayerTransform != null && npc.perception.PlayerTransform.gameObject.layer == 7);
-        bool canSee   = !isHidden && npc.perception.CanSeePlayer; // Gizliyse göremez, değilse Perception'a sor
+        // 1. Durum Tespiti — locker hide stays valid even if NPC walks up later
+        bool isHidden = IsPlayerStealthHidden();
+        bool canSee   = !isHidden && npc.perception.CanSeePlayer;
 
         // 2. Yakalama Kontrolü (Sadece Görüyor ve Yakınsa)
         if (canSee && npc.perception.PlayerTransform != null)

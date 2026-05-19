@@ -26,6 +26,8 @@ namespace StarterAssets
 
 		private bool _isSneaking = false;
 
+		public bool IsSneaking => _isSneaking;
+
 		[Space(10)]
 		[Tooltip("The height the player can jump")]
 		public float JumpHeight = 1.2f;
@@ -161,25 +163,11 @@ namespace StarterAssets
 
 		private void Move()
 		{
-			// Detect sneak
+			// Sneak while holding Ctrl; sprint overrides sneak
 #if ENABLE_INPUT_SYSTEM
-    if (Keyboard.current.leftCtrlKey.wasPressedThisFrame)
-    {
-        _isSneaking = !_isSneaking;
-    }
-    if (Keyboard.current.leftShiftKey.isPressed)
-    {
-        _isSneaking = false; // Disable sneak if running
-    }
+			_isSneaking = Keyboard.current.leftCtrlKey.isPressed && !Keyboard.current.leftShiftKey.isPressed;
 #else
-    if (Input.GetKeyDown(KeyCode.LeftControl))
-    {
-        _isSneaking = !_isSneaking;
-    }
-    if (Input.GetKey(KeyCode.LeftShift))
-    {
-        _isSneaking = false; // Disable sneak if running
-    }
+			_isSneaking = Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift);
 #endif
 
 			// set target speed based on move speed, sprint speed and if sprint is pressed

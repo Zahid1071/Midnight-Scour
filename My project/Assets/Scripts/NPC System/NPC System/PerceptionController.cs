@@ -117,6 +117,13 @@ public class PerceptionController : MonoBehaviour
             return;
         }
 
+        var hider = player.GetComponent<PlayerHider>();
+        if (hider != null && hider.isHidden)
+        {
+            CanSeePlayer = false;
+            return;
+        }
+
         var playerCol = player.GetComponentInChildren<Collider>();
         if (!playerCol) { CanSeePlayer = false; return; }
 

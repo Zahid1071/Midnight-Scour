@@ -117,7 +117,7 @@ public class PlayerFootstepRhythm : MonoBehaviour
             {
                 if (Random.value > sneakingLuck)
                 {
-                    float creakValue = 120f * distanceMultiplier;
+                    float creakValue = 300 * distanceMultiplier;
                     SoundManager.Instance.PlaySFXAt(SoundManager.Instance.footstepClips[0], transform.position);    
                     npc.HearPlayerFootstep(transform, creakValue);
                 }

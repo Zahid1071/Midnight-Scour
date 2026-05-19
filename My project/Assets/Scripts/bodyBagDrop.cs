@@ -10,8 +10,6 @@ public class BodyBagDrop : MonoBehaviour
     [Header("Drop Thresholds")]
     [Tooltip("How far (in meters) the bottom must swing horizontally to break.")]
     public float breakDistanceThreshold = 1.0f;
-    [Tooltip("How fast the bottom bone must be moving to break from a hard hit.")]
-    public float breakVelocityThreshold = 4.0f; 
     
     [Header("Audio")]
     public AudioClip snapSound;
@@ -46,13 +44,6 @@ public class BodyBagDrop : MonoBehaviour
         {
             DropBag();
             return;
-        }
-
-        // Check 2: Was it hit too hard? 
-        // (If using a Unity version older than 6, change .linearVelocity to .velocity)
-        if (bottomRb != null && bottomRb.linearVelocity.magnitude > breakVelocityThreshold)
-        {
-            DropBag();
         }
     }
 

@@ -25,23 +25,8 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
     private int originalLayerIndex;
     private GameObject playerRef;
-    private bool hideLayerEvaluationActive;
 
     public Transform PivotForNPCSearchRoutine;
-
-    private void Update()
-    {
-        if (!isOccupied || playerRef == null || !hideLayerEvaluationActive) return;
-
-        int targetLayer = originalLayerIndex;
-        if (!IsHidingSpotVisibleToAnyNPC()
-            && !IsAnyNPCHasDirectLineOfSightToPlayer()
-            && !IsAnyNPCTooCloseForHiddenLayer())
-            targetLayer = hiddenLayer;
-
-        if (playerRef.layer != targetLayer)
-            playerRef.layer = targetLayer;
-    }
 
     /// <summary>Cage ile aynı: NPC bu hiding spot collider merkezine LOS ile bakıyorsa true.</summary>
     private bool IsHidingSpotVisibleToAnyNPC()
@@ -99,17 +84,15 @@ public class HidingSpot : MonoBehaviour, IInteractable
     }
 
     /// <summary>
-    /// Any NPC within this distance keeps the player on the normal layer (even with no LOS).
+    /// Checked only when entering a hide spot — blocks stealth if an NPC is on top of you.
     /// </summary>
-    private bool IsAnyNPCTooCloseForHiddenLayer()
+    private bool IsAnyNPCTooCloseForHiddenLayer(Vector3 playerPos)
     {
-        if (playerRef == null) return true;
 #if UNITY_2023_1_OR_NEWER
         var perceivers = Object.FindObjectsByType<PerceptionController>(FindObjectsSortMode.None);
 #else
         var perceivers = Object.FindObjectsOfType<PerceptionController>();
 #endif
-        Vector3 playerPos = playerRef.transform.position;
         foreach (var p in perceivers)
         {
             if (p == null) continue;
@@ -118,6 +101,76 @@ public class HidingSpot : MonoBehaviour, IInteractable
         }
 
         return false;
+    }
+
+    /// <summary>Stealth is granted once at hide entry; it is not stripped when NPCs approach later.</summary>
+    private bool CanGrantStealthAtEntry(GameObject player)
+    {
+        Vector3 playerPos = player.transform.position;
+        return !IsHidingSpotVisibleToAnyNPC()
+            && !IsAnyNPCHasDirectLineOfSightToPlayer()
+            && !IsAnyNPCTooCloseForHiddenLayer(playerPos);
+    }
+
+    private void TryCaptureOnFailedHide(GameObject player)
+    {
+#if UNITY_2023_1_OR_NEWER
+        var npcs = Object.FindObjectsByType<NPCController>(FindObjectsSortMode.None);
+#else
+        var npcs = Object.FindObjectsOfType<NPCController>();
+#endif
+
+        NPCController best = null;
+        float bestDist = float.MaxValue;
+
+        foreach (var npc in npcs)
+        {
+            if (npc == null || npc.currentState != NPCController.AIState.Chase) continue;
+
+            float dist = Vector3.Distance(npc.transform.position, player.transform.position);
+            if (dist > npc.captureDistance || dist >= bestDist) continue;
+
+            var perception = npc.perception;
+            if (perception != null && !perception.CanSeePlayer) continue;
+
+            best = npc;
+            bestDist = dist;
+        }
+
+        if (best == null)
+        {
+            foreach (var npc in npcs)
+            {
+                if (npc == null || npc.currentState != NPCController.AIState.Chase) continue;
+
+                float dist = Vector3.Distance(npc.transform.position, player.transform.position);
+                if (dist >= MinDistanceForHiddenLayerMeters || dist >= bestDist) continue;
+
+                best = npc;
+                bestDist = dist;
+            }
+        }
+
+        if (best != null)
+            best.fsm.SetState(NPCController.AIState.Capture);
+    }
+
+    private void AbortFailedHide(GameObject player, PlayerHider hider, bool captured)
+    {
+        HidingCameraSystem.Instance.SetActive(false);
+        HidingCameraSystem.Instance.Detach();
+
+        hider.SetVisuals(true);
+        hider.SetHiddenState(false, null);
+        if (!captured)
+            hider.EnableControls();
+
+        player.layer = originalLayerIndex;
+        playerRef = null;
+        isOccupied = false;
+        isToggling = false;
+        activePivot = null;
+        activeAnimator = null;
     }
 
     public void Interact()
@@ -173,7 +226,6 @@ public class HidingSpot : MonoBehaviour, IInteractable
         isToggling = true;
         isOccupied = true;
         originalLayerIndex = player.layer;
-        hideLayerEvaluationActive = false;
 
         HidingCameraSystem.Instance.AttachToPivot(activePivot);
 
@@ -184,10 +236,19 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
         yield return new WaitForSeconds(blendDuration);
 
+        playerRef = player;
+
+        if (!CanGrantStealthAtEntry(player))
+        {
+            TryCaptureOnFailedHide(player);
+            bool captured = PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured);
+            AbortFailedHide(player, hider, captured);
+            yield break;
+        }
+
+        player.layer = hiddenLayer;
         hider.SetVisuals(false);
         hider.SetHiddenState(true, this);
-        playerRef = player;
-        hideLayerEvaluationActive = true;
 
         yield return new WaitForSeconds(animationDelay);
 
@@ -205,7 +266,6 @@ public class HidingSpot : MonoBehaviour, IInteractable
     private IEnumerator ExitHidingRoutine(GameObject player)
     {
         isToggling = true;
-        hideLayerEvaluationActive = false;
         playerRef = null;
 
         if (activeAnimator != null)
