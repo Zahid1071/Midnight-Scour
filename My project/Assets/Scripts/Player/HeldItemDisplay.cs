@@ -69,7 +69,6 @@ public class HeldItemDisplay : MonoBehaviour
         handGo.transform.SetParent(root, false);
         handGo.transform.localPosition = defaultHandLocalPosition;
         handGo.transform.localRotation = Quaternion.Euler(defaultHandLocalEulerAngles);
-        handGo.transform.localScale = Vector3.one;
         handAnchor = handGo.transform;
     }
 
@@ -96,7 +95,6 @@ public class HeldItemDisplay : MonoBehaviour
     {
         t.localPosition = item.heldLocalPosition;
         t.localRotation = Quaternion.Euler(item.heldLocalEulerAngles);
-        t.localScale = item.heldLocalScale;
     }
 
     private static void StripPhysicsFromHeld(GameObject root)
