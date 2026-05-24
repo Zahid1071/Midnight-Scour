@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &7437241885159874727
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 5.667
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.654
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -22.301
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.99274653
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.06108317
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.101657405
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.01972621
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -7.198
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 11.596
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 1.545
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
+      propertyPath: m_Name
+      value: Screwdriver
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 812760518577972258}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3062981395498247149}
+  m_SourcePrefab: {fileID: 100100000, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
+--- !u!1 &7779702028675145206 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
+  m_PrefabInstance: {fileID: 7437241885159874727}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &812760518577972258
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7779702028675145206}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 555016202480650758, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
+--- !u!114 &3062981395498247149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7779702028675145206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef522ec4ff79e6a42b719502c5b1c6aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemData: {fileID: 11400000, guid: 2771dad0276634d4ab27043760a0bc9e, type: 2}
+  grateGate: {fileID: 0}
+  blockedMessage: I can't reach that.

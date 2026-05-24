@@ -282,7 +282,6 @@ GameObject:
   - component: {fileID: 4385367944622275737}
   - component: {fileID: 4452460983465209085}
   - component: {fileID: 8782256225151303304}
-  - component: {fileID: 694658246220161566}
   - component: {fileID: 6319191353915927965}
   - component: {fileID: 7829341056284017392}
   - component: {fileID: 1976816125616372318}
@@ -611,10 +610,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f4c56f73f26c3d4d8ec6621637cd655, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactRange: 2
+  interactRange: 3
   interactLayer:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 576
   cameraTransform: {fileID: 0}
 --- !u!114 &4452460983465209085
 MonoBehaviour:
@@ -663,22 +662,6 @@ MonoBehaviour:
   runThreshold: 3
   walkThreshold: 2
   sneakThreshold: 0.1
---- !u!114 &694658246220161566
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8616685848737228372}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9aa1671037aac84a80ac1cb6bd01d31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mainCamera: {fileID: 0}
-  flashlight: {fileID: 0}
-  OpenClose: 101
-  Flashlight: 0
 --- !u!114 &6319191353915927965
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -695,7 +678,7 @@ MonoBehaviour:
   detectionRange: 3
   interactLayer:
     serializedVersion: 2
-    m_Bits: 2112
+    m_Bits: 2624
   crosshairImage: {fileID: 0}
   defaultCrosshair: {fileID: 21300000, guid: fc92f5598822aa645bdaf445b51ab3b3, type: 3}
   interactCrosshair: {fileID: 21300000, guid: b57c96590583a954297e5187f7923c4b, type: 3}

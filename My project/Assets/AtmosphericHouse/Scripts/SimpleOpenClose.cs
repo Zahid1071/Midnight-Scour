@@ -61,22 +61,22 @@ namespace FS_Atmo
         }
 
 
-        public void Interact()
-        {
-            
-        }
+        public void Interact() => ObjectClicked(bypassLock: false);
 
         public void ObjectClicked() => ObjectClicked(bypassLock: false);
 
         public void ObjectClicked(bool bypassLock)
         {
+            if (!bypassLock && Time.time < nextInteractTime)
+                return;
+
             // --- KİLİTLİ DURUM KONTROLÜ (Burası aynı kalıyor) ---
             if (!bypassLock && !objectOpen && isLocked)
             {
                 InventoryItem selectedItem = InventoryUI.Instance?.GetSelectedItem();
                 if (selectedItem != null && requiredKey != null && selectedItem == requiredKey) return; 
                 if (Time.time < nextInteractTime) return;
-                HudManager.Instance?.ShowSubtitle("The door is locked.", 2.5f);
+                HudManager.Instance?.ShowSubtitle("The lock seems easy to break.", 2.5f);
 
                 Debug.Log("❌ Kapı kilitli! (Animasyon Tetikleniyor)");
                 myAnimator.SetTrigger(lockedHash);
@@ -150,6 +150,7 @@ namespace FS_Atmo
 
             // ✅ KİLİT AÇILDI
             isLocked = false;
+            nextInteractTime = Time.time + lockedAnimationDuration;
             HudManager.Instance?.ShowSubtitle($"{item.itemName} unlocked it.", 2.5f);
             Debug.Log($"✅ {item.itemName} ile kilit açıldı.");
 

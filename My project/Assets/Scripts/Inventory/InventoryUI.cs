@@ -55,7 +55,11 @@ public class InventoryUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha4)) SelectSlot(3);
 
         if (WasUseItemPressedThisFrame())
-            TryUseSelectedItem();
+            HandlePrimaryClick();
+
+        if (WasUseItemOnInteractKeyThisFrame())
+            TryUseSelectedItemOnInteractKey();
+
         if (Input.GetKeyDown(KeyCode.G)) TryDropSelectedItem();
     }
 
@@ -86,9 +90,33 @@ public class InventoryUI : MonoBehaviour
 
     static bool WasUseItemPressedThisFrame()
     {
-        if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
-            return true;
         return Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+    }
+
+    static bool WasUseItemOnInteractKeyThisFrame()
+    {
+        return Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame;
+    }
+
+    void HandlePrimaryClick()
+    {
+        if (GetSelectedItem() != null)
+            TryUseSelectedItem();
+        else
+            PlayerInteractor.Instance?.TryInteract();
+    }
+
+    void TryUseSelectedItemOnInteractKey()
+    {
+        if (GetSelectedItem() == null)
+            return;
+
+        if (PlayerInteractor.Instance != null &&
+            PlayerInteractor.Instance.TryGetFocusedInteractable(out IInteractable interactable) &&
+            interactable is not IItemReceiver)
+            return;
+
+        TryUseSelectedItem();
     }
 
     public void SelectSlot(int index)
@@ -116,8 +144,15 @@ public class InventoryUI : MonoBehaviour
         if (Camera.main == null)
             return;
 
-        // Raycast to detect interactable
-        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, 3f))
+        float range = 3f;
+        LayerMask mask = Physics.DefaultRaycastLayers;
+        if (PlayerInteractor.Instance != null)
+        {
+            range = PlayerInteractor.Instance.InteractRange;
+            mask = PlayerInteractor.Instance.InteractLayer;
+        }
+
+        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, range, mask))
         {
             IInteractable target = hit.collider.GetComponent<IInteractable>();
             if (target == null)
@@ -126,10 +161,12 @@ public class InventoryUI : MonoBehaviour
             if (target is IItemReceiver receiver)
             {
                 receiver.ReceiveItem(selected);
+                return;
             }
-            else if (target != null)
+
+            if (target != null)
             {
-                // ConditionalInteractible, InteractableItem, etc. — resolved via PlayerInteractor.Interact(), not item-on-receiver
+                // Pickups, etc. — use E or left click with empty hand via PlayerInteractor
                 return;
             }
             else

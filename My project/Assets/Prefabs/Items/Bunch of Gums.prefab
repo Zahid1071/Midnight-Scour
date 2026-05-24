@@ -1,0 +1,552 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2681985182716248536
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 2992790029063242984, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+  m_PrefabInstance: {fileID: 25223269284136475}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6911465894372239562}
+  - component: {fileID: 2309644708956611448}
+  - component: {fileID: 4499929621822461850}
+  m_Layer: 0
+  m_Name: Chewing Gum (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6911465894372239562
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+  m_PrefabInstance: {fileID: 25223269284136475}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2681985182716248536}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.39114952, z: -0, w: 0.9203271}
+  m_LocalPosition: {x: 0.053299904, y: -0.008000016, z: 0.0009508133}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 6164960888620142626}
+  m_LocalEulerAnglesHint: {x: 0, y: -46.052, z: 0}
+--- !u!33 &2309644708956611448
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 1543764443724911095, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+  m_PrefabInstance: {fileID: 25223269284136475}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2681985182716248536}
+  m_Mesh: {fileID: 2958759963634443364, guid: 466235fb00e5c4444b432dc75cc926ba, type: 3}
+--- !u!23 &4499929621822461850
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 3641295388319343933, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+  m_PrefabInstance: {fileID: 25223269284136475}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2681985182716248536}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: f6a50f72299b37d47aa486e610092690, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &6422133802292862967
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 2992790029063242984, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+  m_PrefabInstance: {fileID: 8264335545830776745}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8548604831194153083}
+  - component: {fileID: 7599951440855516974}
+  - component: {fileID: 6187616001321436896}
+  m_Layer: 0
+  m_Name: Chewing Gum
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8548604831194153083
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+  m_PrefabInstance: {fileID: 8264335545830776745}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6422133802292862967}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 6164960888620142626}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &7599951440855516974
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 1543764443724911095, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+  m_PrefabInstance: {fileID: 8264335545830776745}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6422133802292862967}
+  m_Mesh: {fileID: 2958759963634443364, guid: 466235fb00e5c4444b432dc75cc926ba, type: 3}
+--- !u!23 &6187616001321436896
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 3641295388319343933, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+  m_PrefabInstance: {fileID: 8264335545830776745}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6422133802292862967}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: f6a50f72299b37d47aa486e610092690, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &7228877739947593310
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7914265980299592300}
+  - component: {fileID: 5188197286766376529}
+  - component: {fileID: 7763378576625140887}
+  m_Layer: 0
+  m_Name: Chewing Gum (3)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7914265980299592300
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7228877739947593310}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.076787315, z: -0, w: 0.99704754}
+  m_LocalPosition: {x: 0.040149927, y: -0.008000016, z: -0.040899277}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 6164960888620142626}
+  m_LocalEulerAnglesHint: {x: 0, y: -8.808, z: 0}
+--- !u!33 &5188197286766376529
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7228877739947593310}
+  m_Mesh: {fileID: 2958759963634443364, guid: 466235fb00e5c4444b432dc75cc926ba, type: 3}
+--- !u!23 &7763378576625140887
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7228877739947593310}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: f6a50f72299b37d47aa486e610092690, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &8036551642044955594
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 2992790029063242984, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+  m_PrefabInstance: {fileID: 2885270748356040809}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3515546885840323899}
+  - component: {fileID: 7702217107288266395}
+  - component: {fileID: 6607918231559084879}
+  m_Layer: 0
+  m_Name: Chewing Gum (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3515546885840323899
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+  m_PrefabInstance: {fileID: 2885270748356040809}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8036551642044955594}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.39114952, z: -0, w: 0.9203271}
+  m_LocalPosition: {x: 0.0018999577, y: -0.008000016, z: -0.033999443}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 6164960888620142626}
+  m_LocalEulerAnglesHint: {x: 0, y: -46.052, z: 0}
+--- !u!33 &7702217107288266395
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 1543764443724911095, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+  m_PrefabInstance: {fileID: 2885270748356040809}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8036551642044955594}
+  m_Mesh: {fileID: 2958759963634443364, guid: 466235fb00e5c4444b432dc75cc926ba, type: 3}
+--- !u!23 &6607918231559084879
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 3641295388319343933, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+  m_PrefabInstance: {fileID: 2885270748356040809}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8036551642044955594}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: f6a50f72299b37d47aa486e610092690, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &8357789314183101732
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6164960888620142626}
+  m_Layer: 0
+  m_Name: Bunch of Gums
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6164960888620142626
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8357789314183101732}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 7.132, y: -2.675, z: -20.349}
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8548604831194153083}
+  - {fileID: 3515546885840323899}
+  - {fileID: 7914265980299592300}
+  - {fileID: 6911465894372239562}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &25223269284136475
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 6164960888620142626}
+    m_Modifications:
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 7.2386
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.691
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -20.3471
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9203271
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.39114952
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -46.052
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2992790029063242984, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_Name
+      value: Chewing Gum (2)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+--- !u!1001 &2885270748356040809
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 6164960888620142626}
+    m_Modifications:
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 7.1358
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.691
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -20.417
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9203271
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.39114952
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -46.052
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2992790029063242984, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_Name
+      value: Chewing Gum (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+--- !u!1001 &8264335545830776745
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 6164960888620142626}
+    m_Modifications:
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 7.132
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -2.675
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -20.349
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2504940377142009426, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2992790029063242984, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}
+      propertyPath: m_Name
+      value: Chewing Gum
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3ac219f88dee6a14f98e1c61028cc096, type: 3}

@@ -74,7 +74,7 @@ public class GameSettingsManager : MonoBehaviour
     /// against the camera's baseSensitivity.
     /// </summary>
     public const float MIN_SENSITIVITY_MULTIPLIER = 0.25f;
-    public const float MAX_SENSITIVITY_MULTIPLIER = 20f;
+    public const float MAX_SENSITIVITY_MULTIPLIER = 5f;
 
     /// <summary>
     /// URP ColorAdjustments postExposure range that <see cref="Brightness"/>
