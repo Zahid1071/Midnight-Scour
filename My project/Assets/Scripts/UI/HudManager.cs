@@ -13,6 +13,7 @@ public class HudManager : MonoBehaviour
     [SerializeField] private Color defaultSubtitleColor = Color.white;
     [SerializeField] private Color warningSubtitleColor = new Color(1f, 0.92f, 0.35f, 1f);
     [SerializeField] private Color successSubtitleColor = new Color(0.45f, 0.95f, 0.5f, 1f);
+    [SerializeField] private Color errorSubtitleColor = new Color(0.95f, 0.3f, 0.3f, 1f);
 
     [Header("Subtitle shake")]
     [SerializeField] private float shakeDuration = 0.22f;
@@ -21,6 +22,7 @@ public class HudManager : MonoBehaviour
     public Color DefaultColor => defaultSubtitleColor;
     public Color WarningColor => warningSubtitleColor;
     public Color SuccessColor => successSubtitleColor;
+    public Color ErrorColor => errorSubtitleColor;
 
     private Coroutine hideRoutine;
     private Coroutine shakeRoutine;

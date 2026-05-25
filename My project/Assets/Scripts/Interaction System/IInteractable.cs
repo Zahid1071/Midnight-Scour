@@ -5,6 +5,7 @@ public interface IInteractable
 
 public interface IItemReceiver
 {
-    void ReceiveItem(InventoryItem item);
+    /// <returns>True if the item was accepted and used.</returns>
+    bool ReceiveItem(InventoryItem item);
 }
 

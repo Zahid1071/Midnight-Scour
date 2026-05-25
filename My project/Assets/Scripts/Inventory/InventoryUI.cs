@@ -163,14 +163,20 @@ public class InventoryUI : MonoBehaviour
             return;
         }
 
-        if (target is IItemReceiver receiver)
+        IItemReceiver receiver = target as IItemReceiver;
+        if (receiver == null)
+            receiver = hit.collider.GetComponent<IItemReceiver>();
+        if (receiver == null)
+            receiver = hit.collider.GetComponentInParent<IItemReceiver>();
+
+        if (receiver != null)
         {
             if (interactor.IsDuplicateInteractThisFrame(hit.collider))
                 return;
 
             interactor.RegisterInteractForFrame(hit.collider);
-            receiver.ReceiveItem(selected);
-            InteractionUIManager.Instance?.PlaySuccessShake();
+            if (receiver.ReceiveItem(selected))
+                InteractionUIManager.Instance?.PlaySuccessShake();
             return;
         }
 

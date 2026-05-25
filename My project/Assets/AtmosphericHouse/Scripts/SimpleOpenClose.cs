@@ -130,27 +130,34 @@ namespace FS_Atmo
             ToggleAdditional(tAdd);
         }
 
-        public void ReceiveItem(InventoryItem item)
+        public bool ReceiveItem(InventoryItem item)
         {
-            if (objectOpen) return;
-            if (!isLocked) return;
+            if (objectOpen) return false;
+            if (!isLocked) return false;
 
             if (item == null || requiredKey == null || item != requiredKey)
             {
-                // Yanlış anahtarda da spam koruması yapalım
-                if (Time.time < nextInteractTime) return;
+                if (Time.time < nextInteractTime) return false;
+
+                if (item != null && item.TryBreakOnWrongUse(transform.position))
+                {
+                    InteractionUIManager.Instance?.PlayFailShake();
+                    myAnimator.SetTrigger(lockedHash);
+                    nextInteractTime = Time.time + lockedAnimationDuration;
+                    return false;
+                }
 
                 HudManager.Instance?.ShowSubtitle("This item cannot be used here.", 2.5f);
                 myAnimator.SetTrigger(lockedHash);
                 nextInteractTime = Time.time + lockedAnimationDuration;
-                return;
+                return false;
             }
 
             var inventory = InventoryManager.Instance.GetInventory();
             if (!inventory.Contains(item))
             {
                 HudManager.Instance?.ShowSubtitle("You do not have that item.", 2.5f);
-                return;
+                return false;
             }
 
             // ✅ KİLİT AÇILDI
@@ -166,6 +173,7 @@ namespace FS_Atmo
             }
 
             PlaySound(unlockSound);
+            return true;
         }
 
         // --- Helper Methods ---

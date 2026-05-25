@@ -6046,6 +6046,10 @@ PrefabInstance:
       propertyPath: cameraTransform
       value: 
       objectReference: {fileID: 496484867}
+    - target: {fileID: 4452460983465209085, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
+      propertyPath: listenerTransform
+      value: 
+      objectReference: {fileID: 496484867}
     - target: {fileID: 6319191353915927965, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
       propertyPath: crosshairRoot
       value: 

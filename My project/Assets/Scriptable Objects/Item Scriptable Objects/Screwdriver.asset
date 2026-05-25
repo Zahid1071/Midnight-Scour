@@ -23,5 +23,8 @@ MonoBehaviour:
   pickUpSFX: {fileID: 8300000, guid: a20a83f2d98682a4986d107d16f19d2a, type: 3}
   consumeOnUse: 0
   interactionReachBonus: 0
+  breaksOnWrongUse: 1
+  breakOnWrongUseSound: {fileID: 8300000, guid: 14703ce226e238f43a4662e941bfc9f1, type: 3}
+  breakOnWrongUseMessage: The screwdriver snapped.
   pickUpText: Picked up Screwdriver
   description: 
