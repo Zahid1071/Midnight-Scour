@@ -1,0 +1,159 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Gameplay_zh
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: zh
+  m_SharedData: {fileID: 11400000, guid: a1b2c3d4e5f6478990a1b2c3d4e5f678, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 191681225664082
+    m_Localized: "请稍候。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 775374556467803
+    m_Localized: "你已经在躲藏了。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 957259476134756
+    m_Localized: "无法在这里使用。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 535720050874891
+    m_Localized: "范围内没有可互动物体。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 323125971988007
+    m_Localized: "无法丢弃该物品。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 418810216866866
+    m_Localized: "已丢弃 {item}。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 658091193514898
+    m_Localized: "背包已满。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 376259017358712
+    m_Localized: "拾取了 {item}。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 536023578518095
+    m_Localized: "没有可存放的物品。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 686622359119908
+    m_Localized: "已存放：{names}。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 152585157520631
+    m_Localized: "此交互未配置。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 648086864232191
+    m_Localized: "已使用 {item}。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 196689379907868
+    m_Localized: "需要 {item}。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 746496736312203
+    m_Localized: "此槽位未配置。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 822985230101255
+    m_Localized: "{item} 已安装。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 248276586766930
+    m_Localized: "请先从背包选择汽车零件。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 778497760464299
+    m_Localized: "{selected} 无法安装在这里。需要 {required}。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837956236827754
+    m_Localized: "你没有 {item}。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 423834490733102
+    m_Localized: "已安装 {item}。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 249022359268307
+    m_Localized: "逃脱流程未配置。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 467151235288966
+    m_Localized: "所有零件已安装。你逃出来了！"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 475193675483248
+    m_Localized: "仍缺少：{list}。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 495521611443387
+    m_Localized: "门已锁上。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 899966540740152
+    m_Localized: "此物品无法在这里使用。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 106318970123188
+    m_Localized: "你没有该物品。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 432872100951902
+    m_Localized: "{item} 打开了锁。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 103287948525158
+    m_Localized: "提示：利用藏身点躲避敌人。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 851272291309295
+    m_Localized: "提示：仔细探索，可能发现重要线索。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 201926414634091
+    m_Localized: "提示：保持安静，敌人会听到你。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 604982533353802
+    m_Localized: "提示：手电筒电量有限，请谨慎使用。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 103287948611352
+    m_Localized: "提示：有些门需要特殊钥匙。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 100106062865639
+    m_Localized: "提示：奔跑可能引起敌人注意。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 201926410015261
+    m_Localized: "提示：阅读笔记和文件以了解剧情。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 103287948398746
+    m_Localized: "提示：躲在暗处有助于隐蔽。"
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

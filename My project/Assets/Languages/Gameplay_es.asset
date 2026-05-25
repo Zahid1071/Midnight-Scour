@@ -1,0 +1,159 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Gameplay_es
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: es
+  m_SharedData: {fileID: 11400000, guid: a1b2c3d4e5f6478990a1b2c3d4e5f678, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 191681225664082
+    m_Localized: "Espera un momento."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 775374556467803
+    m_Localized: "Ya te estás escondiendo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 957259476134756
+    m_Localized: "No puedes usar eso aquí."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 535720050874891
+    m_Localized: "Nada al alcance."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 323125971988007
+    m_Localized: "No puedes soltar ese objeto."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 418810216866866
+    m_Localized: "Soltaste {item}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 658091193514898
+    m_Localized: "El inventario está lleno."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 376259017358712
+    m_Localized: "Recogiste {item}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 536023578518095
+    m_Localized: "No tienes nada que guardar."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 686622359119908
+    m_Localized: "Guardado: {names}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 152585157520631
+    m_Localized: "Esta interacción no está configurada."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 648086864232191
+    m_Localized: "Se usó {item}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 196689379907868
+    m_Localized: "Necesitas {item}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 746496736312203
+    m_Localized: "Esta ranura no está configurada."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 822985230101255
+    m_Localized: "{item} ya está instalada."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 248276586766930
+    m_Localized: "Primero elige una pieza del coche en el inventario."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 778497760464299
+    m_Localized: "{selected} no encaja aquí. Necesitas {required}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837956236827754
+    m_Localized: "No tienes {item}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 423834490733102
+    m_Localized: "{item} instalada."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 249022359268307
+    m_Localized: "La secuencia de escape no está configurada."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 467151235288966
+    m_Localized: "¡Todas las piezas instaladas. Escapaste!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 475193675483248
+    m_Localized: "Faltan: {list}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 495521611443387
+    m_Localized: "La puerta está cerrada."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 899966540740152
+    m_Localized: "Este objeto no se puede usar aquí."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 106318970123188
+    m_Localized: "No tienes ese objeto."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 432872100951902
+    m_Localized: "{item} abrió la cerradura."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 103287948525158
+    m_Localized: "CONSEJO: Usa escondites para escapar de los enemigos."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 851272291309295
+    m_Localized: "CONSEJO: Explora con cuidado; puedes encontrar pistas importantes."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 201926414634091
+    m_Localized: "CONSEJO: Mantente en silencio; los enemigos te oyen."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 604982533353802
+    m_Localized: "CONSEJO: La linterna tiene poca batería; úsala con cuidado."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 103287948611352
+    m_Localized: "CONSEJO: Algunas puertas necesitan llaves especiales."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 100106062865639
+    m_Localized: "CONSEJO: Correr puede atraer enemigos."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 201926410015261
+    m_Localized: "CONSEJO: Lee notas y documentos para descubrir la historia."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 103287948398746
+    m_Localized: "CONSEJO: Las esquinas oscuras ayudan a permanecer oculto."
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

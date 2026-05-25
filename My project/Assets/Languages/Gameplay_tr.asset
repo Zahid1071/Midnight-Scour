@@ -1,0 +1,159 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Gameplay_tr
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: tr
+  m_SharedData: {fileID: 11400000, guid: a1b2c3d4e5f6478990a1b2c3d4e5f678, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 191681225664082
+    m_Localized: "Biraz bekleyin."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 775374556467803
+    m_Localized: "Zaten saklanıyorsunuz."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 957259476134756
+    m_Localized: "Bunu burada kullanamazsınız."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 535720050874891
+    m_Localized: "Erişilebilir bir şey yok."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 323125971988007
+    m_Localized: "Bu eşyayı bırakamazsınız."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 418810216866866
+    m_Localized: "{item} bırakıldı."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 658091193514898
+    m_Localized: "Envanteriniz dolu."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 376259017358712
+    m_Localized: "{item} alındı."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 536023578518095
+    m_Localized: "Depolanacak bir şeyiniz yok."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 686622359119908
+    m_Localized: "Depolandı: {names}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 152585157520631
+    m_Localized: "Bu etkileşim yapılandırılmamış."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 648086864232191
+    m_Localized: "{item} kullanıldı."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 196689379907868
+    m_Localized: "{item} gerekiyor."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 746496736312203
+    m_Localized: "Bu yuva yapılandırılmamış."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 822985230101255
+    m_Localized: "{item} zaten takılı."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 248276586766930
+    m_Localized: "Önce envanterden bir araba parçası seçin."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 778497760464299
+    m_Localized: "{selected} buraya uymuyor. {required} gerekiyor."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837956236827754
+    m_Localized: "{item} yok."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 423834490733102
+    m_Localized: "{item} takıldı."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 249022359268307
+    m_Localized: "Kaçış sekansı ayarlanmamış."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 467151235288966
+    m_Localized: "Tüm parçalar takıldı. Kaçtınız!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 475193675483248
+    m_Localized: "Eksik: {list}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 495521611443387
+    m_Localized: "Kapı kilitli."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 899966540740152
+    m_Localized: "Bu eşya burada kullanılamaz."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 106318970123188
+    m_Localized: "Bu eşyaya sahip değilsiniz."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 432872100951902
+    m_Localized: "{item} kilidi açtı."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 103287948525158
+    m_Localized: "İPUCU: Saklanma noktalarını kullanarak düşmanlardan kaçabilirsiniz."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 851272291309295
+    m_Localized: "İPUCU: Etrafı dikkatli araştırın, önemli ipuçları bulabilirsiniz."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 201926414634091
+    m_Localized: "İPUCU: Sesinizi kısık tutun, düşmanlar sizi duyabilir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 604982533353802
+    m_Localized: "İPUCU: El feneriniz sınırlı pile sahip, dikkatli kullanın."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 103287948611352
+    m_Localized: "İPUCU: Bazı kapılar özel anahtarlar gerektirir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 100106062865639
+    m_Localized: "İPUCU: Koşmak düşmanların dikkatini çekebilir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 201926410015261
+    m_Localized: "İPUCU: Notları ve dökümanları okuyarak hikayeyi keşfedin."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 103287948398746
+    m_Localized: "İPUCU: Karanlık köşelerde saklanmak düşmanlardan korunmanıza yardımcı olur."
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

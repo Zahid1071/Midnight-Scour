@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using UnityEngine;
 using TMPro;
@@ -13,7 +14,8 @@ public class SettingsSelector : MonoBehaviour
         Resolution,
         Quality,
         Fullscreen,
-        Custom
+        Custom,
+        Language
     }
 
     [Header("UI References")]
@@ -28,8 +30,20 @@ public class SettingsSelector : MonoBehaviour
     private int currentIndex;
     private Resolution[] resolutions;
 
+    /// <summary>Fired after the user changes the index (arrows). Does not apply settings.</summary>
+    public event Action<int> OnIndexChanged;
+
     private void Awake()
     {
+        InitializeOptions();
+        ClampIndex();
+        RefreshOptionText();
+    }
+
+    /// <summary>Configures this selector for the project's supported UI languages.</summary>
+    public void ConfigureAsLanguageSelector()
+    {
+        settingType = SettingType.Language;
         InitializeOptions();
         ClampIndex();
         RefreshOptionText();
@@ -42,6 +56,7 @@ public class SettingsSelector : MonoBehaviour
             currentIndex = 0;
         ClampIndex();
         RefreshOptionText();
+        NotifyIndexChanged();
         Debug.Log($"[SettingsSelector] {settingType} NextOption -> index: {currentIndex} ({GetCurrentOptionString()})");
     }
 
@@ -52,6 +67,7 @@ public class SettingsSelector : MonoBehaviour
             currentIndex = GetOptionCount() - 1;
         ClampIndex();
         RefreshOptionText();
+        NotifyIndexChanged();
         Debug.Log($"[SettingsSelector] {settingType} PreviousOption -> index: {currentIndex} ({GetCurrentOptionString()})");
     }
 
@@ -68,6 +84,9 @@ public class SettingsSelector : MonoBehaviour
     }
 
     public int GetCurrentIndex() => currentIndex;
+
+    /// <summary>True if this TMP is the selector's dynamic value (resolution, language name, etc.).</summary>
+    public bool IsOptionValueText(TextMeshProUGUI tmp) => optionText != null && optionText == tmp;
 
     public string GetCurrentOptionString()
     {
@@ -88,6 +107,7 @@ public class SettingsSelector : MonoBehaviour
 
             case SettingType.Fullscreen:
             case SettingType.Custom:
+            case SettingType.Language:
                 if (options != null && currentIndex >= 0 && currentIndex < options.Length)
                     return options[currentIndex];
                 break;
@@ -124,6 +144,10 @@ public class SettingsSelector : MonoBehaviour
                 if (options == null || options.Length == 0)
                     options = new[] { "Option 1" };
                 break;
+
+            case SettingType.Language:
+                options = LocalizationTables.LanguageDisplayNames;
+                break;
         }
     }
 
@@ -137,11 +161,14 @@ public class SettingsSelector : MonoBehaviour
                 return QualitySettings.names.Length;
             case SettingType.Fullscreen:
             case SettingType.Custom:
+            case SettingType.Language:
                 return options != null ? options.Length : 0;
             default:
                 return 0;
         }
     }
+
+    private void NotifyIndexChanged() => OnIndexChanged?.Invoke(currentIndex);
 
     private void ClampIndex()
     {

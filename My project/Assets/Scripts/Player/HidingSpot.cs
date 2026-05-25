@@ -124,7 +124,7 @@ public class HidingSpot : MonoBehaviour, IInteractable
     {
         if (isToggling)
         {
-            HudManager.Instance?.ShowSubtitle("Wait a moment.", 2f);
+            HudManager.Instance?.ShowGameplaySubtitle(LocalizationTables.GameplayKeys.HideWait, 2f);
             return;
         }
 
@@ -139,7 +139,7 @@ public class HidingSpot : MonoBehaviour, IInteractable
             if (hider.IsHidingIn(this))
                 RevealPlayer(player);
             else
-                HudManager.Instance?.ShowSubtitle("You are already hiding.", 2.5f);
+                HudManager.Instance?.ShowGameplaySubtitle(LocalizationTables.GameplayKeys.HideAlready, 2.5f);
             return;
         }
 

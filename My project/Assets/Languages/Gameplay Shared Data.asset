@@ -1,0 +1,164 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: Gameplay Shared Data
+  m_EditorClassIdentifier: 
+  m_TableCollectionName: Gameplay
+  m_TableCollectionNameGuidString: a1b2c3d4e5f6478990a1b2c3d4e5f678
+  m_Entries:
+  - m_Id: 191681225664082
+    m_Key: hide_wait
+    m_Metadata:
+      m_Items: []
+  - m_Id: 775374556467803
+    m_Key: hide_already
+    m_Metadata:
+      m_Items: []
+  - m_Id: 957259476134756
+    m_Key: cannot_use_here
+    m_Metadata:
+      m_Items: []
+  - m_Id: 535720050874891
+    m_Key: nothing_in_reach
+    m_Metadata:
+      m_Items: []
+  - m_Id: 323125971988007
+    m_Key: cannot_drop_item
+    m_Metadata:
+      m_Items: []
+  - m_Id: 418810216866866
+    m_Key: dropped_item
+    m_Metadata:
+      m_Items: []
+  - m_Id: 658091193514898
+    m_Key: inventory_full
+    m_Metadata:
+      m_Items: []
+  - m_Id: 376259017358712
+    m_Key: picked_up_item
+    m_Metadata:
+      m_Items: []
+  - m_Id: 536023578518095
+    m_Key: nothing_to_store
+    m_Metadata:
+      m_Items: []
+  - m_Id: 686622359119908
+    m_Key: stored_items
+    m_Metadata:
+      m_Items: []
+  - m_Id: 152585157520631
+    m_Key: interaction_not_configured
+    m_Metadata:
+      m_Items: []
+  - m_Id: 648086864232191
+    m_Key: item_was_used
+    m_Metadata:
+      m_Items: []
+  - m_Id: 196689379907868
+    m_Key: need_item
+    m_Metadata:
+      m_Items: []
+  - m_Id: 746496736312203
+    m_Key: slot_not_configured
+    m_Metadata:
+      m_Items: []
+  - m_Id: 822985230101255
+    m_Key: part_already_installed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 248276586766930
+    m_Key: select_car_part_first
+    m_Metadata:
+      m_Items: []
+  - m_Id: 778497760464299
+    m_Key: part_does_not_fit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 837956236827754
+    m_Key: do_not_have_item
+    m_Metadata:
+      m_Items: []
+  - m_Id: 423834490733102
+    m_Key: part_installed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 249022359268307
+    m_Key: escape_not_setup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 467151235288966
+    m_Key: all_parts_escaped
+    m_Metadata:
+      m_Items: []
+  - m_Id: 475193675483248
+    m_Key: still_missing_parts
+    m_Metadata:
+      m_Items: []
+  - m_Id: 495521611443387
+    m_Key: door_locked
+    m_Metadata:
+      m_Items: []
+  - m_Id: 899966540740152
+    m_Key: item_cannot_use_here
+    m_Metadata:
+      m_Items: []
+  - m_Id: 106318970123188
+    m_Key: do_not_have_that_item
+    m_Metadata:
+      m_Items: []
+  - m_Id: 432872100951902
+    m_Key: item_unlocked_door
+    m_Metadata:
+      m_Items: []
+  - m_Id: 103287948525158
+    m_Key: tip_hide
+    m_Metadata:
+      m_Items: []
+  - m_Id: 851272291309295
+    m_Key: tip_explore
+    m_Metadata:
+      m_Items: []
+  - m_Id: 201926414634091
+    m_Key: tip_sound
+    m_Metadata:
+      m_Items: []
+  - m_Id: 604982533353802
+    m_Key: tip_flashlight
+    m_Metadata:
+      m_Items: []
+  - m_Id: 103287948611352
+    m_Key: tip_keys
+    m_Metadata:
+      m_Items: []
+  - m_Id: 100106062865639
+    m_Key: tip_run
+    m_Metadata:
+      m_Items: []
+  - m_Id: 201926410015261
+    m_Key: tip_notes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 103287948398746
+    m_Key: tip_dark
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 1491214261936455969
+  references:
+    version: 2
+    RefIds:
+    - rid: 1491214261936455969
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1779482999953

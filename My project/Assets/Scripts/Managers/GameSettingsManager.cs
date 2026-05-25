@@ -68,6 +68,9 @@ public class GameSettingsManager : MonoBehaviour
     /// <summary>PlayerPrefs key: 1 = auto-save hooks enabled, 0 = disabled.</summary>
     public const string AUTO_SAVE_PREFS_KEY = "settings_autoSave";
 
+    /// <summary>PlayerPrefs key for UI language (locale code, e.g. en, tr, de).</summary>
+    public const string LanguagePrefsKey = "settings_language";
+
     /// <summary>
     /// Effective sensitivity multiplier range applied by camera scripts.
     /// MouseSensitivity (0..1) is mapped to [MIN, MAX] before being multiplied
@@ -160,6 +163,9 @@ public class GameSettingsManager : MonoBehaviour
         /// Manual saves (e.g. pause flow) are unchanged.
         /// </summary>
         public bool autoSaveEnabled;
+
+        /// <summary>Index into <see cref="LocalizationTables.SupportedLocaleCodes"/>.</summary>
+        public int languageIndex;
     }
 
     // =========================================================================
@@ -215,7 +221,8 @@ public class GameSettingsManager : MonoBehaviour
             brightness = 0.5f,
             difficultyIndex = 1,
             subtitlesEnabled = true,
-            autoSaveEnabled = true
+            autoSaveEnabled = true,
+            languageIndex = 0
         };
         return fallback;
     }
@@ -428,6 +435,30 @@ public class GameSettingsManager : MonoBehaviour
         return PlayerPrefs.GetInt(AUTO_SAVE_PREFS_KEY, fallbackDefault) == 1;
     }
 
+    public int LanguageIndex
+    {
+        get => _currentSettings.languageIndex;
+        set => SetLanguageByIndex(value);
+    }
+
+    public string LanguageLocaleCode =>
+        LocalizationService.GetLocaleCodeFromIndex(_currentSettings.languageIndex);
+
+    public void SetLanguageByIndex(int index)
+    {
+        index = Mathf.Clamp(index, 0, LocalizationTables.SupportedLocaleCodes.Length - 1);
+        if (_currentSettings.languageIndex == index)
+            return;
+
+        _currentSettings.languageIndex = index;
+        ApplyLanguageSettings();
+    }
+
+    public void ApplyLanguageSettings()
+    {
+        LocalizationService.TrySetLocale(LanguageLocaleCode, forceNotify: true);
+    }
+
     // =========================================================================
     // UNITY LIFECYCLE
     // =========================================================================
@@ -456,6 +487,7 @@ public class GameSettingsManager : MonoBehaviour
         
         // Apply all settings at startup
         ApplyAllSettings();
+        LocalizationService.EnsureInitialized(ApplyLanguageSettings);
     }
 
     /// <summary>
@@ -544,6 +576,7 @@ public class GameSettingsManager : MonoBehaviour
     {
         ApplyGraphicsSettings();
         ApplyAudioSettings();
+        ApplyLanguageSettings();
     }
     
     /// <summary>
@@ -576,6 +609,8 @@ public class GameSettingsManager : MonoBehaviour
         PlayerPrefs.SetInt("settings_difficulty", _currentSettings.difficultyIndex);
         PlayerPrefs.SetInt("settings_subtitles", _currentSettings.subtitlesEnabled ? 1 : 0);
         PlayerPrefs.SetInt(AUTO_SAVE_PREFS_KEY, _currentSettings.autoSaveEnabled ? 1 : 0);
+        PlayerPrefs.SetString(LanguagePrefsKey, LanguageLocaleCode);
+        PlayerPrefs.SetInt("settings_languageIndex", _currentSettings.languageIndex);
 
         // Brightness: single source of truth key (normalized 0-1) plus legacy
         // mirror so the old "brightness" key stays in sync if anything still
@@ -625,7 +660,8 @@ public class GameSettingsManager : MonoBehaviour
 
             difficultyIndex = PlayerPrefs.GetInt("settings_difficulty", DefaultSettings.difficultyIndex),
             subtitlesEnabled = PlayerPrefs.GetInt("settings_subtitles", DefaultSettings.subtitlesEnabled ? 1 : 0) == 1,
-            autoSaveEnabled = PlayerPrefs.GetInt(AUTO_SAVE_PREFS_KEY, DefaultSettings.autoSaveEnabled ? 1 : 0) == 1
+            autoSaveEnabled = PlayerPrefs.GetInt(AUTO_SAVE_PREFS_KEY, DefaultSettings.autoSaveEnabled ? 1 : 0) == 1,
+            languageIndex = LoadLanguageIndexFromPrefs()
         };
         
         // Clamp values to valid ranges
@@ -633,6 +669,22 @@ public class GameSettingsManager : MonoBehaviour
         _currentSettings.qualityIndex = Mathf.Clamp(_currentSettings.qualityIndex, 0, QualitySettings.names.Length - 1);
         _currentSettings.mouseSensitivity = Mathf.Clamp01(_currentSettings.mouseSensitivity);
         _currentSettings.brightness = Mathf.Clamp01(_currentSettings.brightness);
+        _currentSettings.languageIndex = Mathf.Clamp(
+            _currentSettings.languageIndex, 0, LocalizationTables.SupportedLocaleCodes.Length - 1);
+    }
+
+    private int LoadLanguageIndexFromPrefs()
+    {
+        if (PlayerPrefs.HasKey("settings_languageIndex"))
+        {
+            int idx = PlayerPrefs.GetInt("settings_languageIndex", DefaultSettings.languageIndex);
+            return Mathf.Clamp(idx, 0, LocalizationTables.SupportedLocaleCodes.Length - 1);
+        }
+
+        string code = PlayerPrefs.GetString(LanguagePrefsKey, DefaultSettings.languageIndex >= 0
+            ? LocalizationService.GetLocaleCodeFromIndex(DefaultSettings.languageIndex)
+            : "en");
+        return LocalizationService.GetLocaleIndex(code);
     }
 
     /// <summary>
@@ -764,6 +816,8 @@ public class GameSettingsManager : MonoBehaviour
         _currentSettings.musicVolume = Mathf.Clamp01(_currentSettings.musicVolume);
         _currentSettings.sfxVolume = Mathf.Clamp01(_currentSettings.sfxVolume);
         _currentSettings.brightness = Mathf.Clamp01(_currentSettings.brightness);
+        _currentSettings.languageIndex = Mathf.Clamp(
+            _currentSettings.languageIndex, 0, LocalizationTables.SupportedLocaleCodes.Length - 1);
 
         // Fire change events so live consumers (camera, brightness applier, etc.)
         // react immediately.

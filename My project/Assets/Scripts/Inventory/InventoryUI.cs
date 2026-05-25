@@ -125,12 +125,12 @@ public class InventoryUI : MonoBehaviour
             }
             else
             {
-                HudManager.Instance?.ShowSubtitle("You cannot use that here.", 3f);
+                HudManager.Instance?.ShowGameplaySubtitle(LocalizationTables.GameplayKeys.CannotUseHere, 3f);
             }
         }
         else
         {
-            HudManager.Instance?.ShowSubtitle("Nothing in reach.", 2.5f);
+            HudManager.Instance?.ShowGameplaySubtitle(LocalizationTables.GameplayKeys.NothingInReach, 2.5f);
         }
     }
 
@@ -145,14 +145,14 @@ public class InventoryUI : MonoBehaviour
 
         if (!selected.canDrop)
         {
-            HudManager.Instance?.ShowSubtitle("You cannot drop that item.", 2.5f);
+            HudManager.Instance?.ShowGameplaySubtitle(LocalizationTables.GameplayKeys.CannotDropItem, 2.5f);
             return;
         }
 
         GameObject dropPrefab = selected.GetDropPrefab();
         if (dropPrefab == null)
         {
-            HudManager.Instance?.ShowSubtitle("You cannot drop that item.", 2.5f);
+            HudManager.Instance?.ShowGameplaySubtitle(LocalizationTables.GameplayKeys.CannotDropItem, 2.5f);
             return;
         }
 
@@ -185,8 +185,9 @@ public class InventoryUI : MonoBehaviour
         if (selected.pickUpSFX != null && SoundManager.Instance != null)
             SoundManager.Instance.PlaySFXAt(selected.pickUpSFX, dropped.transform.position);
 
-        string msg = $"Dropped {selected.itemName}.";
-        HudManager.Instance?.ShowSubtitle(msg, 2f);
+        HudManager.Instance?.ShowGameplaySubtitle(
+            LocalizationTables.GameplayKeys.DroppedItem, 2f,
+            ("item", selected.itemName));
     }
 
     private Vector3 GetDropThrowSpawnPosition(Transform cam)

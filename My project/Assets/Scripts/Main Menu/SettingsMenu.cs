@@ -46,6 +46,9 @@ public class SettingsMenu : MonoBehaviour
     [Tooltip("Optional. If empty, resolved at runtime from a child named Row_AutoSave.")]
     [SerializeField] private SettingsSelector autoSaveSelector;
 
+    [Tooltip("Optional. If empty, resolved at runtime from a child named Row_Language.")]
+    [SerializeField] private SettingsSelector languageSelector;
+
     // =========================================================================
     // BACKWARD COMPATIBILITY
     // =========================================================================
@@ -86,25 +89,46 @@ public class SettingsMenu : MonoBehaviour
     private void Awake()
     {
         if (autoSaveSelector == null)
+            autoSaveSelector = FindSelectorOnRow("Row_AutoSave");
+
+        if (languageSelector == null)
+            languageSelector = FindSelectorOnRow("Row_Language");
+    }
+
+    private SettingsSelector FindSelectorOnRow(string rowName)
+    {
+        foreach (var tr in GetComponentsInChildren<Transform>(true))
         {
-            foreach (var tr in GetComponentsInChildren<Transform>(true))
-            {
-                if (tr.name != "Row_AutoSave") continue;
-                autoSaveSelector = tr.GetComponentInChildren<SettingsSelector>(true);
-                break;
-            }
+            if (tr.name != rowName) continue;
+            return tr.GetComponentInChildren<SettingsSelector>(true);
         }
+        return null;
     }
 
     private void Start()
     {
+        ConfigureLanguageSelector();
         LoadSettings();
         HideAllPanels();
         if (displayPanel) displayPanel.SetActive(true);
     }
 
-    private void OnEnable()  => RegisterListeners();
-    private void OnDisable() => UnregisterListeners();
+    private void OnEnable()
+    {
+        RegisterListeners();
+        LocalizationService.LocaleChanged += OnLocaleChanged;
+    }
+
+    private void OnDisable()
+    {
+        UnregisterListeners();
+        LocalizationService.LocaleChanged -= OnLocaleChanged;
+
+        if (languageSelector != null)
+            languageSelector.OnIndexChanged -= OnLanguageIndexChanged;
+    }
+
+    private void OnLocaleChanged() => MainMenuTextLocalizer.RefreshAllInstances();
 
     // =========================================================================
     // PUBLIC API (called by UI buttons in Canvas.prefab and by MainMenuUI)
@@ -118,9 +142,12 @@ public class SettingsMenu : MonoBehaviour
     {
         if (!EnsureManager()) return;
 
+        ConfigureLanguageSelector();
+
         _appliedSnapshot = GameSettingsManager.Instance.CurrentSettings;
         _pending = _appliedSnapshot;
         SyncUIFrom(_pending);
+        MainMenuTextLocalizer.EnsureOnCanvas(this)?.RebuildAndRefresh();
         Debug.Log("[Settings] BeginEditing — snapshot taken.");
     }
 
@@ -152,6 +179,7 @@ public class SettingsMenu : MonoBehaviour
         GameSettingsManager.Instance.ApplyAllSettings();
         GameSettingsManager.Instance.SaveSettings();
         _appliedSnapshot = GameSettingsManager.Instance.CurrentSettings;
+        MainMenuTextLocalizer.RefreshAllInstances();
         Debug.Log("[Settings] ApplyAndSave — settings persisted.");
     }
 
@@ -335,6 +363,9 @@ public class SettingsMenu : MonoBehaviour
 
         if (autoSaveSelector)
             autoSaveSelector.SetIndex(s.autoSaveEnabled ? 0 : 1);
+
+        if (languageSelector)
+            languageSelector.SetIndex(Mathf.Clamp(s.languageIndex, 0, LocalizationTables.SupportedLocaleCodes.Length - 1));
     }
 
     private void ReadUIInto(ref GameSettingsManager.SettingsData s)
@@ -350,6 +381,31 @@ public class SettingsMenu : MonoBehaviour
         if (fullscreenSelector) s.displayModeIndex  = fullscreenSelector.GetCurrentIndex();
 
         if (autoSaveSelector) s.autoSaveEnabled = autoSaveSelector.GetCurrentIndex() == 0;
+
+        if (languageSelector)
+            s.languageIndex = languageSelector.GetCurrentIndex();
+    }
+
+    private void ConfigureLanguageSelector()
+    {
+        if (languageSelector == null)
+            languageSelector = FindSelectorOnRow("Row_Language");
+
+        if (languageSelector != null)
+        {
+            languageSelector.OnIndexChanged -= OnLanguageIndexChanged;
+            languageSelector.ConfigureAsLanguageSelector();
+            languageSelector.OnIndexChanged += OnLanguageIndexChanged;
+        }
+
+        foreach (var langUi in GetComponentsInChildren<LanguageSettingsUI>(true))
+            langUi.Configure();
+    }
+
+    private void OnLanguageIndexChanged(int index)
+    {
+        _pending.languageIndex = Mathf.Clamp(
+            index, 0, LocalizationTables.SupportedLocaleCodes.Length - 1);
     }
 
     // =========================================================================

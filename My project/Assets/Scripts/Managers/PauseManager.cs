@@ -31,6 +31,12 @@ public class PauseManager : MonoBehaviour
     {
         if (pauseRoot) pauseRoot.SetActive(false);
         if (settingsPanel) settingsPanel.SetActive(false);
+
+        if (pauseRoot != null)
+            MainMenuTextLocalizer.EnsureOnCanvas(pauseRoot.transform)?.RebuildAndRefresh();
+        else if (settingsPanel != null)
+            MainMenuTextLocalizer.EnsureOnCanvas(settingsPanel.transform)?.RebuildAndRefresh();
+
         Resume_Internal(); // ensure correct timescale & cursor on scene load
     }
 
@@ -65,6 +71,9 @@ public class PauseManager : MonoBehaviour
         settingsMenu?.CancelEditing();
         if (settingsPanel) settingsPanel.SetActive(false);
         if (pauseRoot) pauseRoot.SetActive(true);
+
+        if (pauseRoot != null)
+            MainMenuTextLocalizer.EnsureOnCanvas(pauseRoot.transform)?.RefreshLocalizedText();
     }
 
     /// <summary>

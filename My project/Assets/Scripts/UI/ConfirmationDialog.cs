@@ -127,8 +127,13 @@ public class ConfirmationDialog : MonoBehaviour
     /// </summary>
     public static void ShowQuitConfirmation(Action onConfirm)
     {
-        Show("Oyundan çıkmak istediğinize emin misiniz?\nKaydedilmemiş ilerleme kaybolacak.", 
-             onConfirm, null, "Çıkış", "Çık", "İptal");
+        Show(
+            LocalizationService.GetMainMenu(LocalizationTables.MainMenuKeys.DialogQuitMessage),
+            onConfirm,
+            null,
+            LocalizationService.GetMainMenu(LocalizationTables.MainMenuKeys.DialogQuitTitle),
+            LocalizationService.GetMainMenu(LocalizationTables.MainMenuKeys.DialogQuitConfirm),
+            LocalizationService.GetMainMenu(LocalizationTables.MainMenuKeys.DialogNo));
     }
     
     /// <summary>
@@ -136,8 +141,13 @@ public class ConfirmationDialog : MonoBehaviour
     /// </summary>
     public static void ShowReturnToMenuConfirmation(Action onConfirm)
     {
-        Show("Ana menüye dönmek istediğinize emin misiniz?\nKaydedilmemiş ilerleme kaybolacak.", 
-             onConfirm, null, "Ana Menü", "Dön", "İptal");
+        Show(
+            LocalizationService.GetMainMenu(LocalizationTables.MainMenuKeys.DialogReturnMenuMessage),
+            onConfirm,
+            null,
+            LocalizationService.GetMainMenu(LocalizationTables.MainMenuKeys.DialogReturnMenuTitle),
+            LocalizationService.GetMainMenu(LocalizationTables.MainMenuKeys.DialogReturnMenuConfirm),
+            LocalizationService.GetMainMenu(LocalizationTables.MainMenuKeys.DialogNo));
     }
     
     /// <summary>
@@ -164,13 +174,13 @@ public class ConfirmationDialog : MonoBehaviour
         
         // Set texts
         if (titleText != null)
-            titleText.text = title ?? defaultTitle;
+            titleText.text = title ?? LocalizationService.GetMainMenu(LocalizationTables.MainMenuKeys.DialogDefaultTitle);
         if (messageText != null)
             messageText.text = message;
         if (confirmButtonText != null)
-            confirmButtonText.text = confirmText ?? defaultConfirmText;
+            confirmButtonText.text = confirmText ?? LocalizationService.GetMainMenu(LocalizationTables.MainMenuKeys.DialogYes);
         if (cancelButtonText != null)
-            cancelButtonText.text = cancelText ?? defaultCancelText;
+            cancelButtonText.text = cancelText ?? LocalizationService.GetMainMenu(LocalizationTables.MainMenuKeys.DialogNo);
         
         // Show panel
         if (dialogPanel != null)

@@ -21,6 +21,8 @@ public class MainMenuUI : MonoBehaviour
         mainMenuPanel.SetActive(true);
         if (settingsPanel) settingsPanel.SetActive(false);
 
+        MainMenuTextLocalizer.EnsureOnCanvas(this);
+
         // Grey-out Continue when there is nothing to resume
         bool hasSave = SaveManager.Instance != null && SaveManager.Instance.HasSave();
         if (continueButton != null)
@@ -63,6 +65,7 @@ public class MainMenuUI : MonoBehaviour
         mainMenuPanel.SetActive(false);
         settingsPanel.SetActive(true);
         settingsMenu.BeginEditing();
+        MainMenuTextLocalizer.EnsureOnCanvas(this)?.RebuildAndRefresh();
     }
 
     public void CloseSettingsWithoutApply()

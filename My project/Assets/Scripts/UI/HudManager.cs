@@ -36,6 +36,9 @@ public class HudManager : MonoBehaviour
         if (subtitleText == null || string.IsNullOrEmpty(message))
             return;
 
+        if (GameSettingsManager.Instance != null && !GameSettingsManager.Instance.SubtitlesEnabled)
+            return;
+
         float d = durationSeconds ?? defaultDuration;
         subtitleText.text = message;
         subtitleText.gameObject.SetActive(true);
@@ -43,6 +46,16 @@ public class HudManager : MonoBehaviour
         if (hideRoutine != null)
             StopCoroutine(hideRoutine);
         hideRoutine = StartCoroutine(HideAfter(d));
+    }
+
+    public void ShowGameplaySubtitle(string key, float? durationSeconds = null)
+    {
+        ShowSubtitle(LocalizationService.GetGameplay(key), durationSeconds);
+    }
+
+    public void ShowGameplaySubtitle(string key, float? durationSeconds, params (string name, object value)[] args)
+    {
+        ShowSubtitle(LocalizationService.FormatGameplay(key, args), durationSeconds);
     }
 
     public void ClearSubtitle()

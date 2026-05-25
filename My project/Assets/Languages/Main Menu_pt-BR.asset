@@ -1,0 +1,183 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Main Menu_pt-BR
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: pt-BR
+  m_SharedData: {fileID: 11400000, guid: fb191b04a216d438ea6cb7b142ddd4ef, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 699825744955178
+    m_Localized: "Continuar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 700119746869684
+    m_Localized: "Novo jogo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 700257243518630
+    m_Localized: "Configurações"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 787091230162359
+    m_Localized: "Créditos"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 102802427033170
+    m_Localized: "Sair do jogo"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 498722428469660
+    m_Localized: "Modo de exibição"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 646019361219053
+    m_Localized: "Brilho"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 711951310896251
+    m_Localized: "Volume principal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 720869823163625
+    m_Localized: "Sensibilidade do mouse"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 222988441561333
+    m_Localized: "VSync"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 297546951253064
+    m_Localized: "Salvamento automático"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 264201280240613
+    m_Localized: "Escolher valor"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 297831660830708
+    m_Localized: "Idioma"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 328839575836707
+    m_Localized: "Confirmar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 136283624872816
+    m_Localized: "Sim"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 188267213705240
+    m_Localized: "Não"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 810208864258990
+    m_Localized: "Sair do jogo?\nO progresso não salvo será perdido."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 234777858550719
+    m_Localized: "Sair"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 810200270516839
+    m_Localized: "Sair"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 784486965976671
+    m_Localized: "Voltar ao menu principal?\nO progresso não salvo será perdido."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 130789105923760
+    m_Localized: "Menu principal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 784478372234520
+    m_Localized: "Voltar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 248276794462293
+    m_Localized: "Carregando..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890001
+    m_Localized: Configurações
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890002
+    m_Localized: Resolução
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890003
+    m_Localized: Qualidade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890004
+    m_Localized: Volume da música
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890005
+    m_Localized: Volume de efeitos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890006
+    m_Localized: Tela
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890007
+    m_Localized: Áudio
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890008
+    m_Localized: Controles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890009
+    m_Localized: Jogabilidade
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890010
+    m_Localized: Som
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890011
+    m_Localized: Geral
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890012
+    m_Localized: Aplicar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890013
+    m_Localized: Voltar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890014
+    m_Localized: Padrão
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890015
+    m_Localized: Continuar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890016
+    m_Localized: Pausar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890017
+    m_Localized: "Salvar jogo"
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

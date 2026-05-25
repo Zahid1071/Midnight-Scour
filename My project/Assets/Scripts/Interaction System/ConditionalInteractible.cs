@@ -9,19 +9,23 @@ public class ConditionalInteractible : MonoBehaviour, IInteractable
     {
         if (requiredItem == null)
         {
-            HudManager.Instance?.ShowSubtitle("This interaction is not configured.", 3f);
+            HudManager.Instance?.ShowGameplaySubtitle(LocalizationTables.GameplayKeys.InteractionNotConfigured, 3f);
             return;
         }
 
         var inventory = InventoryManager.Instance.GetInventory();
         if (inventory.Contains(requiredItem))
         {
-            HudManager.Instance?.ShowSubtitle($"{requiredItem.itemName} was used.", 2.5f);
+            HudManager.Instance?.ShowGameplaySubtitle(
+                LocalizationTables.GameplayKeys.ItemWasUsed, 2.5f,
+                ("item", requiredItem.itemName));
             (targetScript as IInteractable)?.Interact();
         }
         else
         {
-            HudManager.Instance?.ShowSubtitle($"You need {requiredItem.itemName}.", 3f);
+            HudManager.Instance?.ShowGameplaySubtitle(
+                LocalizationTables.GameplayKeys.NeedItem, 3f,
+                ("item", requiredItem.itemName));
         }
     }
 }

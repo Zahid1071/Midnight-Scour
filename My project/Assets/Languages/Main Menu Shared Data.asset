@@ -1,0 +1,188 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: Main Menu Shared Data
+  m_EditorClassIdentifier: 
+  m_TableCollectionName: Main Menu
+  m_TableCollectionNameGuidString: fb191b04a216d438ea6cb7b142ddd4ef
+  m_Entries:
+  - m_Id: 699825744955178
+    m_Key: btn_continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 700119746869684
+    m_Key: btn_new_game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 700257243518630
+    m_Key: btn_settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 787091230162359
+    m_Key: btn_credits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 102802427033170
+    m_Key: btn_quit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 498722428469660
+    m_Key: settings_display_mode
+    m_Metadata:
+      m_Items: []
+  - m_Id: 646019361219053
+    m_Key: settings_brightness
+    m_Metadata:
+      m_Items: []
+  - m_Id: 711951310896251
+    m_Key: settings_master_volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 720869823163625
+    m_Key: settings_mouse_sensitivity
+    m_Metadata:
+      m_Items: []
+  - m_Id: 222988441561333
+    m_Key: settings_vsync
+    m_Metadata:
+      m_Items: []
+  - m_Id: 297546951253064
+    m_Key: settings_autosave
+    m_Metadata:
+      m_Items: []
+  - m_Id: 264201280240613
+    m_Key: settings_choose_value
+    m_Metadata:
+      m_Items: []
+  - m_Id: 297831660830708
+    m_Key: settings_language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 328839575836707
+    m_Key: dialog_default_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 136283624872816
+    m_Key: dialog_yes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 188267213705240
+    m_Key: dialog_no
+    m_Metadata:
+      m_Items: []
+  - m_Id: 810208864258990
+    m_Key: dialog_quit_message
+    m_Metadata:
+      m_Items: []
+  - m_Id: 234777858550719
+    m_Key: dialog_quit_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 810200270516839
+    m_Key: dialog_quit_confirm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 784486965976671
+    m_Key: dialog_return_menu_message
+    m_Metadata:
+      m_Items: []
+  - m_Id: 130789105923760
+    m_Key: dialog_return_menu_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 784478372234520
+    m_Key: dialog_return_menu_confirm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 248276794462293
+    m_Key: loading_status
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890001
+    m_Key: settings_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890002
+    m_Key: settings_resolution
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890003
+    m_Key: settings_quality
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890004
+    m_Key: settings_music_volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890005
+    m_Key: settings_sfx_volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890006
+    m_Key: tab_display
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890007
+    m_Key: tab_audio
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890008
+    m_Key: tab_controls
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890009
+    m_Key: tab_gameplay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890010
+    m_Key: tab_sound
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890011
+    m_Key: tab_general
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890012
+    m_Key: btn_apply
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890013
+    m_Key: btn_back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890014
+    m_Key: btn_default
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890015
+    m_Key: btn_resume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890016
+    m_Key: pause_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 901234567890017
+    m_Key: btn_save_game
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 1491214261936455969
+  references:
+    version: 2
+    RefIds:
+    - rid: 1491214261936455969
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1779482999953

@@ -64,17 +64,16 @@ public class LoadingScreenController : MonoBehaviour
     [SerializeField] private float fadeOutDuration = 0.5f;
     [SerializeField] private float minimumLoadTime = 1.5f; // Minimum time to show tips
     
-    [Header("Gameplay Tips (Turkish)")]
-    [SerializeField] private string[] gameplayTips = new string[]
+    private static readonly string[] GameplayTipKeys =
     {
-        "İPUCU: Saklanma noktalarını kullanarak düşmanlardan kaçabilirsiniz.",
-        "İPUCU: Etrafı dikkatli araştırın, önemli ipuçları bulabilirsiniz.",
-        "İPUCU: Sesinizi kısık tutun, düşmanlar sizi duyabilir.",
-        "İPUCU: El feneriniz sınırlı pile sahip, dikkatli kullanın.",
-        "İPUCU: Bazı kapılar özel anahtarlar gerektirir.",
-        "İPUCU: Koşmak düşmanların dikkatini çekebilir.",
-        "İPUCU: Notları ve dökümanları okuyarak hikayeyi keşfedin.",
-        "İPUCU: Karanlık köşelerde saklanmak düşmanlardan korunmanıza yardımcı olur."
+        LocalizationTables.GameplayKeys.TipHide,
+        LocalizationTables.GameplayKeys.TipExplore,
+        LocalizationTables.GameplayKeys.TipSound,
+        LocalizationTables.GameplayKeys.TipFlashlight,
+        LocalizationTables.GameplayKeys.TipKeys,
+        LocalizationTables.GameplayKeys.TipRun,
+        LocalizationTables.GameplayKeys.TipNotes,
+        LocalizationTables.GameplayKeys.TipDark
     };
 
     // =========================================================================
@@ -245,14 +244,15 @@ public class LoadingScreenController : MonoBehaviour
         }
         
         // Set random tip
-        if (tipText != null && gameplayTips != null && gameplayTips.Length > 0)
+        if (tipText != null && GameplayTipKeys.Length > 0)
         {
-            tipText.text = gameplayTips[Random.Range(0, gameplayTips.Length)];
+            string tipKey = GameplayTipKeys[Random.Range(0, GameplayTipKeys.Length)];
+            tipText.text = LocalizationService.GetGameplay(tipKey);
         }
         
         // Set loading status
         if (loadingStatusText != null)
-            loadingStatusText.text = "Yükleniyor...";
+            loadingStatusText.text = LocalizationService.GetMainMenu(LocalizationTables.MainMenuKeys.LoadingStatus);
     }
     
     private void UpdateProgress(float progress)

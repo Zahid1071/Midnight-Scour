@@ -76,7 +76,7 @@ namespace FS_Atmo
                 InventoryItem selectedItem = InventoryUI.Instance?.GetSelectedItem();
                 if (selectedItem != null && requiredKey != null && selectedItem == requiredKey) return; 
                 if (Time.time < nextInteractTime) return;
-                HudManager.Instance?.ShowSubtitle("The door is locked.", 2.5f);
+                HudManager.Instance?.ShowGameplaySubtitle(LocalizationTables.GameplayKeys.DoorLocked, 2.5f);
 
                 Debug.Log("❌ Kapı kilitli! (Animasyon Tetikleniyor)");
                 myAnimator.SetTrigger(lockedHash);
@@ -135,7 +135,7 @@ namespace FS_Atmo
                 // Yanlış anahtarda da spam koruması yapalım
                 if (Time.time < nextInteractTime) return;
 
-                HudManager.Instance?.ShowSubtitle("This item cannot be used here.", 2.5f);
+                HudManager.Instance?.ShowGameplaySubtitle(LocalizationTables.GameplayKeys.ItemCannotUseHere, 2.5f);
                 myAnimator.SetTrigger(lockedHash);
                 nextInteractTime = Time.time + lockedAnimationDuration;
                 return;
@@ -144,13 +144,15 @@ namespace FS_Atmo
             var inventory = InventoryManager.Instance.GetInventory();
             if (!inventory.Contains(item))
             {
-                HudManager.Instance?.ShowSubtitle("You do not have that item.", 2.5f);
+                HudManager.Instance?.ShowGameplaySubtitle(LocalizationTables.GameplayKeys.DoNotHaveThatItem, 2.5f);
                 return;
             }
 
             // ✅ KİLİT AÇILDI
             isLocked = false;
-            HudManager.Instance?.ShowSubtitle($"{item.itemName} unlocked it.", 2.5f);
+            HudManager.Instance?.ShowGameplaySubtitle(
+                LocalizationTables.GameplayKeys.ItemUnlockedDoor, 2.5f,
+                ("item", item.itemName));
             Debug.Log($"✅ {item.itemName} ile kilit açıldı.");
 
             if (item.consumeOnUse)
