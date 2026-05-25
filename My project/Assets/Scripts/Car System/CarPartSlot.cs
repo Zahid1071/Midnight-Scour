@@ -52,7 +52,7 @@ public class CarPartSlot : MonoBehaviour, IInteractable
         isInstalled = true;
         InventoryManager.Instance.RemoveItem(selectedItem);
         InventoryUI.Instance?.RefreshUI();
-        HudManager.Instance?.ShowSubtitle($"{requiredItem.itemName} installed.", 3f);
+        HudManager.Instance?.ShowSubtitle($"{requiredItem.itemName} installed.", 3f, HudManager.Instance.SuccessColor);
         PlaySound(installSuccessSFX,transform);
         
         gameObject.SetActive(false);

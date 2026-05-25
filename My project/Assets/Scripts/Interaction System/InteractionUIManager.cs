@@ -1,65 +1,128 @@
+using System.Collections;
+using FS_Atmo;
 using UnityEngine;
-using UnityEngine.UI; // Image ve Sprite işlemleri için şart
+using UnityEngine.UI;
 
 public class InteractionUIManager : MonoBehaviour
 {
+    public static InteractionUIManager Instance { get; private set; }
+
+    private enum CrosshairState
+    {
+        Default,
+        Interact,
+        Door,
+        OutOfReach
+    }
+
     [Header("Detection Settings")]
     [SerializeField] private Transform cameraTransform;
-    [SerializeField] private float detectionRange = 3f;
-    [SerializeField] private LayerMask interactLayer;
 
-    [Header("Crosshair (Nişangah) Ayarları")]
-    [Tooltip("Canvas ortasındaki Image")]
-    [SerializeField] private Image crosshairImage; 
-    [Tooltip("Boş ikon (Nokta)")]
-    [SerializeField] private Sprite defaultCrosshair;
-    [Tooltip("Dolu ikon (El/Göz)")]
-    [SerializeField] private Sprite interactCrosshair;
+    [Header("Crosshair")]
+    [Tooltip("Parent under HUD (e.g. Crosshair). Children are resolved by name if images are unset.")]
+    [SerializeField] private RectTransform crosshairRoot;
+    [SerializeField] private Image defaultCrosshairImage;
+    [SerializeField] private Image interactCrosshairImage;
+    [SerializeField] private Image doorCrosshairImage;
+    [SerializeField] private Image outOfReachCrosshairImage;
 
-    [Tooltip("Default nişangah boyutu = etkileşim boyutunun bu kadarı (1/5 = 5 kat küçük).")]
-    [SerializeField, Range(0.05f, 1f)] private float defaultCrosshairScaleFactor = 0.2f;
-    
-    [Header("Button Prompt (Tuş İpucu) Ayarları")]
-    [Tooltip("Sağ alttaki 'E' harfinin görüneceği Image")]
-    [SerializeField] private Image buttonPromptImage; 
-    
-    [Tooltip("Tuşun resmi (Örn: E harfi sprite'ı)")]
+    [Header("Button Prompt")]
+    [SerializeField] private Image buttonPromptImage;
     [SerializeField] private Sprite buttonPromptSprite;
 
-    // [Header("Outline Settings")]
-    // [SerializeField] private Color outlineColor = Color.yellow;
-    // [SerializeField, Range(0f, 10f)] private float outlineWidth = 3f;
+    [Header("Interact feedback")]
+    [SerializeField] private float shakeDuration = 0.22f;
+    [SerializeField] private float failShakeStrength = 6f;
+    [SerializeField] private float successScalePeak = 1.22f;
 
     private GameObject lastDetectedObject;
-    // private Outline lastOutline;
-
-    private RectTransform _crosshairRect;
-    private Vector3 _interactCrosshairScale;
-    private bool _interactScaleCaptured;
     private PlayerHider _cachedPlayerHider;
+    private CrosshairState _crosshairState = CrosshairState.Default;
+    private Coroutine shakeRoutine;
+    private Vector2 crosshairRestPos;
+    private Vector3 crosshairRestScale = Vector3.one;
+    private static int doorLayer = -1;
 
     private void Awake()
     {
-        if (crosshairImage != null)
-            _crosshairRect = crosshairImage.rectTransform;
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        ResolveCrosshairReferences();
+
+        if (crosshairRoot != null)
+        {
+            crosshairRestPos = crosshairRoot.anchoredPosition;
+            crosshairRestScale = crosshairRoot.localScale;
+        }
+
+        if (doorLayer < 0)
+            doorLayer = LayerMask.NameToLayer("Door");
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
+
+    public void PlayFailShake()
+    {
+        if (crosshairRoot == null)
+            return;
+
+        if (shakeRoutine != null)
+            StopCoroutine(shakeRoutine);
+        shakeRoutine = StartCoroutine(FailShakeRoutine());
+    }
+
+    public void PlaySuccessShake()
+    {
+        if (crosshairRoot == null)
+            return;
+
+        if (shakeRoutine != null)
+            StopCoroutine(shakeRoutine);
+        shakeRoutine = StartCoroutine(SuccessScaleShakeRoutine());
     }
 
     private void Start()
     {
-        CaptureInteractCrosshairScale();
+        ApplyCrosshairState(CrosshairState.Default);
 
-        // 1. Crosshair'i varsayılan hale getir
-        if (crosshairImage && defaultCrosshair)
+        if (buttonPromptImage)
+            buttonPromptImage.enabled = false;
+    }
+
+    private void ResolveCrosshairReferences()
+    {
+        if (crosshairRoot == null)
         {
-            ApplyDefaultCrosshairVisual();
+            if (defaultCrosshairImage != null)
+                crosshairRoot = defaultCrosshairImage.transform.parent as RectTransform;
+            else
+            {
+                var crosshairGo = GameObject.Find("Crosshair");
+                if (crosshairGo != null)
+                    crosshairRoot = crosshairGo.GetComponent<RectTransform>();
+            }
         }
 
-        // 2. Buton ipucunu başlangıçta GİZLE
-        // GameObject'i değil, sadece resim bileşenini kapatıyoruz.
-        if (buttonPromptImage) 
-        {
-            buttonPromptImage.enabled = false; 
-        }
+        if (crosshairRoot == null)
+            return;
+
+        if (defaultCrosshairImage == null)
+            defaultCrosshairImage = crosshairRoot.Find("CrosshairDefault")?.GetComponent<Image>();
+        if (interactCrosshairImage == null)
+            interactCrosshairImage = crosshairRoot.Find("CrosshairInteract")?.GetComponent<Image>();
+        if (doorCrosshairImage == null)
+            doorCrosshairImage = crosshairRoot.Find("CrosshairDoor")?.GetComponent<Image>();
+        if (outOfReachCrosshairImage == null)
+            outOfReachCrosshairImage = crosshairRoot.Find("CrosshairOutOfReach")?.GetComponent<Image>();
     }
 
     private void Update()
@@ -85,13 +148,18 @@ public class InteractionUIManager : MonoBehaviour
         if (_cachedPlayerHider == null || !_cachedPlayerHider.isHidden)
             return false;
 
-        ShowInteractionUI();
+        ShowInRangeUI(null, null);
         return true;
     }
 
     private void DetectInteractable()
     {
-        if (cameraTransform == null) return;
+        var interactor = PlayerInteractor.Instance;
+        if (interactor == null)
+        {
+            ClearDetection(true);
+            return;
+        }
 
         if (PlayerControlGate.IsInputBlocked)
         {
@@ -99,139 +167,164 @@ public class InteractionUIManager : MonoBehaviour
             return;
         }
 
-        if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, 
-            out RaycastHit hit, detectionRange, interactLayer))
+        if (!interactor.TryRaycastForHint(out RaycastHit hit, out IInteractable interactable))
         {
-            IInteractable interactable = hit.collider.GetComponent<IInteractable>();
-            
-            if (interactable != null)
-            {
-                GameObject hitObject = hit.collider.gameObject;
-
-                if (hitObject != lastDetectedObject)
-                {
-                    ClearDetection(false); 
-                    HighlightObject(hitObject);
-                }
-
-                // UI GÖSTER
-                ShowInteractionUI();
-                return;
-            }
+            ClearDetection(true);
+            return;
         }
 
-        // UI GİZLE / TEMİZLE
-        ClearDetection(true); 
-    }
+        GameObject hitObject = hit.collider.gameObject;
 
-    private void HighlightObject(GameObject obj)
-    {
-        lastDetectedObject = obj;
-        // lastOutline = obj.GetComponent<Outline>();
-        //
-        // if (lastOutline == null)
-        // {
-        //     lastOutline = obj.AddComponent<Outline>();
-        //     lastOutline.OutlineMode = Outline.Mode.OutlineVisible;
-        // }
-        //
-        // lastOutline.OutlineColor = outlineColor;
-        // lastOutline.OutlineWidth = outlineWidth;
-        // lastOutline.enabled = true;
-    }
-
-    private void ShowInteractionUI()
-    {
-        // A. Crosshair'i değiştir
-        if (crosshairImage && interactCrosshair)
+        if (hitObject != lastDetectedObject)
         {
-            if (crosshairImage.sprite != interactCrosshair)
-                crosshairImage.sprite = interactCrosshair;
-
-            ApplyInteractCrosshairScale(); // tam boyut (prefab ölçeği)
+            ClearDetection(false);
+            lastDetectedObject = hitObject;
         }
 
-        // B. Button Prompt'u göster ve resmini ata
-        if (buttonPromptImage && buttonPromptSprite) 
+        float actionRange = interactor.GetActionRangeForHeldItem();
+        if (interactor.IsWithinActionRange(hit, actionRange))
+            ShowInRangeUI(interactable, hit.collider);
+        else
+            ShowOutOfReachUI();
+    }
+
+    private void ShowInRangeUI(IInteractable interactable, Collider collider)
+    {
+        bool isDoor = IsDoorTarget(interactable, collider);
+        ApplyCrosshairState(isDoor ? CrosshairState.Door : CrosshairState.Interact);
+
+        if (buttonPromptImage && buttonPromptSprite)
         {
-            // Resmi ata (Belki ileride farklı tuşlar istersin diye her seferinde atıyoruz)
             buttonPromptImage.sprite = buttonPromptSprite;
-            
-            // Resmi görünür yap
             buttonPromptImage.enabled = true;
         }
     }
 
+    private void ShowOutOfReachUI()
+    {
+        ApplyCrosshairState(CrosshairState.OutOfReach);
+
+        if (buttonPromptImage)
+            buttonPromptImage.enabled = false;
+    }
+
     private void ClearDetection(bool resetUI)
     {
-        // 1. Crosshair'i varsayılana döndür
-        if (resetUI && crosshairImage && defaultCrosshair)
-        {
-            if (crosshairImage.sprite != defaultCrosshair)
-                crosshairImage.sprite = defaultCrosshair;
+        if (resetUI)
+            ApplyCrosshairState(CrosshairState.Default);
 
-            ApplyDefaultCrosshairScale();
-        }
-
-        // 2. Button Prompt resmini kapat (Görünmez yap)
-        if (buttonPromptImage) 
-        {
-            buttonPromptImage.enabled = false; 
-        }
-
-        // 3. Outline temizle
-        // if (lastOutline != null)
-        // {
-        //     lastOutline.enabled = false;
-        //     lastOutline = null;
-        // }
+        if (buttonPromptImage)
+            buttonPromptImage.enabled = false;
 
         lastDetectedObject = null;
     }
 
+    private void ApplyCrosshairState(CrosshairState state)
+    {
+        _crosshairState = state;
+
+        SetCrosshairActive(defaultCrosshairImage, state == CrosshairState.Default);
+        SetCrosshairActive(interactCrosshairImage, state == CrosshairState.Interact);
+        SetCrosshairActive(doorCrosshairImage, state == CrosshairState.Door);
+        SetCrosshairActive(outOfReachCrosshairImage, state == CrosshairState.OutOfReach);
+    }
+
+    private static bool IsDoorTarget(IInteractable interactable, Collider collider)
+    {
+        if (interactable is SimpleOpenClose)
+            return true;
+
+        return collider != null && doorLayer >= 0 && collider.gameObject.layer == doorLayer;
+    }
+
+    private static void SetCrosshairActive(Image image, bool active)
+    {
+        if (image == null)
+            return;
+
+        image.gameObject.SetActive(active);
+    }
+
     private void OnDisable()
     {
+        StopCrosshairShake();
         ClearDetection(true);
     }
 
-    private void CaptureInteractCrosshairScale()
+    private void StopCrosshairShake()
     {
-        if (_crosshairRect == null || _interactScaleCaptured)
+        if (shakeRoutine != null)
+        {
+            StopCoroutine(shakeRoutine);
+            shakeRoutine = null;
+        }
+
+        if (crosshairRoot == null)
             return;
 
-        _interactCrosshairScale = _crosshairRect.localScale;
-        _interactScaleCaptured = true;
+        crosshairRoot.anchoredPosition = crosshairRestPos;
+        crosshairRoot.localScale = crosshairRestScale;
     }
 
-    private void ApplyDefaultCrosshairVisual()
+    private IEnumerator FailShakeRoutine()
     {
-        crosshairImage.sprite = defaultCrosshair;
-        crosshairImage.enabled = true;
-        ApplyDefaultCrosshairScale();
+        crosshairRoot.anchoredPosition = crosshairRestPos;
+        crosshairRoot.localScale = crosshairRestScale;
+
+        float elapsed = 0f;
+        while (elapsed < shakeDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = 1f - (elapsed / shakeDuration);
+            float offset = failShakeStrength * t;
+            float x = Random.Range(-offset, offset);
+            float y = Random.Range(-offset, offset);
+            crosshairRoot.anchoredPosition = crosshairRestPos + new Vector2(x, y);
+            yield return null;
+        }
+
+        crosshairRoot.anchoredPosition = crosshairRestPos;
+        shakeRoutine = null;
     }
 
-    private void ApplyDefaultCrosshairScale()
+    private IEnumerator SuccessScaleShakeRoutine()
     {
-        CaptureInteractCrosshairScale();
-        if (_crosshairRect == null)
-            return;
+        crosshairRoot.anchoredPosition = crosshairRestPos;
 
-        _crosshairRect.localScale = _interactCrosshairScale * defaultCrosshairScaleFactor;
-    }
+        float elapsed = 0f;
+        while (elapsed < shakeDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / shakeDuration;
+            float pulse = Mathf.Sin(t * Mathf.PI);
+            float scale = Mathf.Lerp(1f, successScalePeak, pulse);
+            crosshairRoot.localScale = crosshairRestScale * scale;
+            yield return null;
+        }
 
-    private void ApplyInteractCrosshairScale()
-    {
-        CaptureInteractCrosshairScale();
-        if (_crosshairRect == null)
-            return;
-
-        _crosshairRect.localScale = _interactCrosshairScale;
+        crosshairRoot.localScale = crosshairRestScale;
+        shakeRoutine = null;
     }
 
     private void OnDrawGizmosSelected()
     {
-        if (cameraTransform == null) return;
+        Transform rayOrigin = GetRayOrigin();
+        if (rayOrigin == null || PlayerInteractor.Instance == null)
+            return;
+
+        var interactor = PlayerInteractor.Instance;
+
         Gizmos.color = Color.cyan;
-        Gizmos.DrawRay(cameraTransform.position, cameraTransform.forward * detectionRange);
+        Gizmos.DrawRay(rayOrigin.position, rayOrigin.forward * interactor.HintRange);
+
+        Gizmos.color = Color.green;
+        Gizmos.DrawRay(rayOrigin.position, rayOrigin.forward * interactor.GetActionRangeForHeldItem());
+    }
+
+    private Transform GetRayOrigin()
+    {
+        if (PlayerInteractor.Instance != null && PlayerInteractor.Instance.CameraTransform != null)
+            return PlayerInteractor.Instance.CameraTransform;
+        return cameraTransform;
     }
 }

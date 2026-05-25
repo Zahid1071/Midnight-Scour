@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Screwdriver
   m_EditorClassIdentifier: 
   itemName: Screwdriver
-  icon: {fileID: 21300000, guid: 4272ca2e710606c48a91c02e8294c9c5, type: 3}
+  icon: {fileID: 21300000, guid: 85cac97d05e6fde439cbb4dfd45d35f3, type: 3}
   worldPrefab: {fileID: 7779702028675145206, guid: b3ed9fa3f33dfe644a67e7011bfab457, type: 3}
   canDrop: 1
   heldPrefab: {fileID: 7779702028675145206, guid: b3ed9fa3f33dfe644a67e7011bfab457, type: 3}
@@ -22,5 +22,6 @@ MonoBehaviour:
   heldLocalScale: {x: 1, y: 1, z: 1}
   pickUpSFX: {fileID: 8300000, guid: a20a83f2d98682a4986d107d16f19d2a, type: 3}
   consumeOnUse: 0
+  interactionReachBonus: 0
   pickUpText: Picked up Screwdriver
   description: 

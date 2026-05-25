@@ -22,5 +22,6 @@ MonoBehaviour:
   heldLocalScale: {x: 1, y: 1, z: 1}
   pickUpSFX: {fileID: 8300000, guid: a20a83f2d98682a4986d107d16f19d2a, type: 3}
   consumeOnUse: 1
+  interactionReachBonus: 1.5
   pickUpText: Bone added to inventory
   description: 

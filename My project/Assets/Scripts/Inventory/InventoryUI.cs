@@ -1,3 +1,4 @@
+using FS_Atmo;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
@@ -58,7 +59,7 @@ public class InventoryUI : MonoBehaviour
             HandlePrimaryClick();
 
         if (WasUseItemOnInteractKeyThisFrame())
-            TryUseSelectedItemOnInteractKey();
+            HandleInteractKeyWithItem();
 
         if (Input.GetKeyDown(KeyCode.G)) TryDropSelectedItem();
     }
@@ -106,17 +107,13 @@ public class InventoryUI : MonoBehaviour
             PlayerInteractor.Instance?.TryInteract();
     }
 
-    void TryUseSelectedItemOnInteractKey()
+    void HandleInteractKeyWithItem()
     {
         if (GetSelectedItem() == null)
             return;
 
-        if (PlayerInteractor.Instance != null &&
-            PlayerInteractor.Instance.TryGetFocusedInteractable(out IInteractable interactable) &&
-            interactable is not IItemReceiver)
-            return;
-
-        TryUseSelectedItem();
+        // E with item selected: world interact (door open, pickup), not item-on-target.
+        PlayerInteractor.Instance?.TryInteract();
     }
 
     public void SelectSlot(int index)
@@ -141,43 +138,53 @@ public class InventoryUI : MonoBehaviour
         if (selected == null)
             return;
 
-        if (Camera.main == null)
+        var interactor = PlayerInteractor.Instance;
+        if (interactor == null)
             return;
 
-        float range = 3f;
-        LayerMask mask = Physics.DefaultRaycastLayers;
-        if (PlayerInteractor.Instance != null)
+        float actionRange = interactor.GetActionRangeForHeldItem();
+
+        if (!interactor.TryRaycastForHint(out RaycastHit hit, out IInteractable target))
         {
-            range = PlayerInteractor.Instance.InteractRange;
-            mask = PlayerInteractor.Instance.InteractLayer;
+            ShowWarning("Nothing in reach.", 2.5f);
+            return;
         }
 
-        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, range, mask))
+        if (!interactor.IsWithinActionRange(hit, actionRange))
         {
-            IInteractable target = hit.collider.GetComponent<IInteractable>();
-            if (target == null)
-                target = hit.collider.GetComponentInParent<IInteractable>();
+            interactor.ShowOutOfReach();
+            return;
+        }
 
-            if (target is IItemReceiver receiver)
-            {
-                receiver.ReceiveItem(selected);
+        // LMB + item on unlocked door: item cannot be used; E opens the door instead.
+        if (target is SimpleOpenClose door && !door.isLocked)
+        {
+            ShowWarning("You can't use that here.", 2.5f);
+            return;
+        }
+
+        if (target is IItemReceiver receiver)
+        {
+            if (interactor.IsDuplicateInteractThisFrame(hit.collider))
                 return;
-            }
 
-            if (target != null)
-            {
-                // Pickups, etc. — use E or left click with empty hand via PlayerInteractor
-                return;
-            }
-            else
-            {
-                HudManager.Instance?.ShowSubtitle("You cannot use that here.", 3f);
-            }
+            interactor.RegisterInteractForFrame(hit.collider);
+            receiver.ReceiveItem(selected);
+            InteractionUIManager.Instance?.PlaySuccessShake();
+            return;
         }
-        else
-        {
-            HudManager.Instance?.ShowSubtitle("Nothing in reach.", 2.5f);
-        }
+
+        // Pickups, bolts, etc. — interact at extended reach (e.g. bone through grate).
+        interactor.PerformInteract(target, hit);
+    }
+
+    void ShowWarning(string message, float duration)
+    {
+        var hud = HudManager.Instance;
+        if (hud != null)
+            hud.ShowSubtitle(message, duration, hud.WarningColor);
+
+        InteractionUIManager.Instance?.PlayFailShake();
     }
 
     private void TryDropSelectedItem()
@@ -191,14 +198,14 @@ public class InventoryUI : MonoBehaviour
 
         if (!selected.canDrop)
         {
-            HudManager.Instance?.ShowSubtitle("You cannot drop that item.", 2.5f);
+            ShowWarning("You cannot drop that item.", 2.5f);
             return;
         }
 
         GameObject dropPrefab = selected.GetDropPrefab();
         if (dropPrefab == null)
         {
-            HudManager.Instance?.ShowSubtitle("You cannot drop that item.", 2.5f);
+            ShowWarning("You cannot drop that item.", 2.5f);
             return;
         }
 

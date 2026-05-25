@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Wrench
   m_EditorClassIdentifier: 
   itemName: Wrench
-  icon: {fileID: 21300000, guid: 4272ca2e710606c48a91c02e8294c9c5, type: 3}
+  icon: {fileID: 21300000, guid: d2a232ed2cbc3c1489730812e26c670c, type: 3}
   worldPrefab: {fileID: 7566773249222662892, guid: f0ca25ecd7536224694147645fe12ef1, type: 3}
   canDrop: 1
   heldPrefab: {fileID: 7566773249222662892, guid: f0ca25ecd7536224694147645fe12ef1, type: 3}
@@ -22,5 +22,6 @@ MonoBehaviour:
   heldLocalScale: {x: 1, y: 1, z: 1}
   pickUpSFX: {fileID: 8300000, guid: a20a83f2d98682a4986d107d16f19d2a, type: 3}
   consumeOnUse: 0
+  interactionReachBonus: 0
   pickUpText: Picked up Wrench
   description: 

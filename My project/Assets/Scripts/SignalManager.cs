@@ -22,7 +22,15 @@ public class SignalManager : MonoBehaviour
 
     public void OnCinematicFinished() => LoadMainScene();
 
-    public void LockPlayer() => PlayerControlGate.Acquire(PlayerControlGate.ReasonCinematic);
+    public void LockPlayer()
+    {
+        PlayerControlGate.Acquire(PlayerControlGate.ReasonCinematic);
+        GameplayHudVisibility.Instance?.HideGameplayHud();
+    }
 
-    public void UnlockPlayer() => PlayerControlGate.Release(PlayerControlGate.ReasonCinematic);
+    public void UnlockPlayer()
+    {
+        PlayerControlGate.Release(PlayerControlGate.ReasonCinematic);
+        GameplayHudVisibility.Instance?.ShowGameplayHud();
+    }
 }

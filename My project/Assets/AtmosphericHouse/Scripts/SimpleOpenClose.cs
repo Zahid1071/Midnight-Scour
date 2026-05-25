@@ -76,7 +76,12 @@ namespace FS_Atmo
                 InventoryItem selectedItem = InventoryUI.Instance?.GetSelectedItem();
                 if (selectedItem != null && requiredKey != null && selectedItem == requiredKey) return; 
                 if (Time.time < nextInteractTime) return;
-                HudManager.Instance?.ShowSubtitle("The lock seems easy to break.", 2.5f);
+
+                var hud = HudManager.Instance;
+                if (hud != null)
+                    hud.ShowSubtitle("The door is locked.", 2.5f, hud.WarningColor);
+
+                InteractionUIManager.Instance?.PlayFailShake();
 
                 Debug.Log("❌ Kapı kilitli! (Animasyon Tetikleniyor)");
                 myAnimator.SetTrigger(lockedHash);
@@ -151,7 +156,7 @@ namespace FS_Atmo
             // ✅ KİLİT AÇILDI
             isLocked = false;
             nextInteractTime = Time.time + lockedAnimationDuration;
-            HudManager.Instance?.ShowSubtitle($"{item.itemName} unlocked it.", 2.5f);
+            HudManager.Instance?.ShowSubtitle($"{item.itemName} unlocked it.", 2.5f, HudManager.Instance.SuccessColor);
             Debug.Log($"✅ {item.itemName} ile kilit açıldı.");
 
             if (item.consumeOnUse)

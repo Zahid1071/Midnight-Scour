@@ -24,6 +24,7 @@ public class GrateBolt : MonoBehaviour, IInteractable
 
         _removed = true;
         grate.NotifyBoltRemoved();
+        HudManager.Instance?.ShowSubtitle("Bolt removed.", 2.5f, HudManager.Instance.SuccessColor);
         gameObject.SetActive(false);
     }
 }

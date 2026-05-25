@@ -16,7 +16,7 @@ public class ConditionalInteractible : MonoBehaviour, IInteractable
         var inventory = InventoryManager.Instance.GetInventory();
         if (inventory.Contains(requiredItem))
         {
-            HudManager.Instance?.ShowSubtitle($"{requiredItem.itemName} was used.", 2.5f);
+            HudManager.Instance?.ShowSubtitle($"{requiredItem.itemName} was used.", 2.5f, HudManager.Instance.SuccessColor);
             (targetScript as IInteractable)?.Interact();
         }
         else

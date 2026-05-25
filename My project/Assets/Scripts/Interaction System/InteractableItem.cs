@@ -6,11 +6,16 @@ public class InteractableItem : MonoBehaviour, IInteractable
     [SerializeField] GrateSystem grateGate;
     [SerializeField] string blockedMessage = "I can't reach that.";
 
+    bool _consumed;
+
     public void Interact()
     {
+        if (_consumed)
+            return;
+
         if (grateGate != null && !grateGate.IsRemoved)
         {
-            HudManager.Instance?.ShowSubtitle(blockedMessage, 3f);
+            HudManager.Instance?.ShowSubtitle(blockedMessage, 3f, HudManager.Instance.WarningColor);
             return;
         }
 
@@ -23,6 +28,7 @@ public class InteractableItem : MonoBehaviour, IInteractable
         bool added = InventoryManager.Instance.AddItem(itemData);
         if (added)
         {
+            _consumed = true;
             string msg = !string.IsNullOrWhiteSpace(itemData.pickUpText)
                 ? itemData.pickUpText
                 : $"Picked up {itemData.itemName}.";

@@ -20,7 +20,7 @@ public class StorageObject : MonoBehaviour, IInteractable
         }
 
         string names = string.Join(", ", storedItems.ConvertAll(i => i.itemName));
-        HudManager.Instance?.ShowSubtitle($"Stored: {names}.", 4f);
+        HudManager.Instance?.ShowSubtitle($"Stored: {names}.", 4f, HudManager.Instance.SuccessColor);
 
         InventoryManager.Instance.ClearInventory();
         Object.FindFirstObjectByType<InventoryUI>()?.RefreshUI();

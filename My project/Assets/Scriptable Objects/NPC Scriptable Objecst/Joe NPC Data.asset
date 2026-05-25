@@ -55,7 +55,7 @@ MonoBehaviour:
         actionType: 10
         requiresVisualOffset: 0
     - roomAnchorID: Livingroom_Room
-      weight: 0
+      weight: 0.369
       hotspots:
       - hotspotID: Hotspot_Sofa
         weight: 0.062

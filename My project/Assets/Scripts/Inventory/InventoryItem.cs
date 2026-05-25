@@ -25,6 +25,10 @@ public class InventoryItem : ScriptableObject
 
     public bool consumeOnUse = true;
 
+    [Header("Interaction")]
+    [Tooltip("Added to the player's interact range while this item is selected (e.g. bone to reach through a grate).")]
+    public float interactionReachBonus;
+
     [TextArea] public string pickUpText;
     [TextArea] public string description;
 

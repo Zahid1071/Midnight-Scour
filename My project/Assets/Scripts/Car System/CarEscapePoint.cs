@@ -25,7 +25,7 @@ public class CarEscapePoint : MonoBehaviour, IInteractable
             if (!SoundManager.Instance.IsClipPlayingAt(clip, transform.position))
                 SoundManager.Instance.PlaySFXAt(clip, transform.position, 0.7f);
 
-            HudManager.Instance?.ShowSubtitle("All parts installed. You escaped!", 4f);
+            HudManager.Instance?.ShowSubtitle("All parts installed. You escaped!", 4f, HudManager.Instance.SuccessColor);
             Debug.Log("✅ All parts installed! You escaped!");
 
             // TODO: trigger win screen, fade, load scene etc.

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6911465894372239562}
   - component: {fileID: 2309644708956611448}
   - component: {fileID: 4499929621822461850}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Chewing Gum (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28,7 +28,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.39114952, z: -0, w: 0.9203271}
   m_LocalPosition: {x: 0.053299904, y: -0.008000016, z: 0.0009508133}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 6164960888620142626}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 8548604831194153083}
   - component: {fileID: 7599951440855516974}
   - component: {fileID: 6187616001321436896}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Chewing Gum
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -114,7 +114,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 6164960888620142626}
@@ -183,7 +183,7 @@ GameObject:
   - component: {fileID: 7914265980299592300}
   - component: {fileID: 5188197286766376529}
   - component: {fileID: 7763378576625140887}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Chewing Gum (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -200,7 +200,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.076787315, z: -0, w: 0.99704754}
   m_LocalPosition: {x: 0.040149927, y: -0.008000016, z: -0.040899277}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 6164960888620142626}
@@ -269,7 +269,7 @@ GameObject:
   - component: {fileID: 3515546885840323899}
   - component: {fileID: 7702217107288266395}
   - component: {fileID: 6607918231559084879}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Chewing Gum (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -286,7 +286,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.39114952, z: -0, w: 0.9203271}
   m_LocalPosition: {x: 0.0018999577, y: -0.008000016, z: -0.033999443}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 6164960888620142626}
@@ -353,7 +353,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6164960888620142626}
-  m_Layer: 0
+  - component: {fileID: 3937522030697723410}
+  - component: {fileID: 631171219930925530}
+  m_Layer: 6
   m_Name: Bunch of Gums
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -368,7 +370,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8357789314183101732}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 7.132, y: -2.675, z: -20.349}
   m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
@@ -379,6 +381,42 @@ Transform:
   - {fileID: 6911465894372239562}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &3937522030697723410
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8357789314183101732}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.1, y: 0.05, z: 0.1}
+  m_Center: {x: 0.02, y: 0, z: -0.01}
+--- !u!114 &631171219930925530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8357789314183101732}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef522ec4ff79e6a42b719502c5b1c6aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemData: {fileID: 11400000, guid: 1293d34a2e68cf94bb95f41fd1ac18cd, type: 2}
+  grateGate: {fileID: 0}
+  blockedMessage: I can't reach that.
 --- !u!1001 &25223269284136475
 PrefabInstance:
   m_ObjectHideFlags: 0

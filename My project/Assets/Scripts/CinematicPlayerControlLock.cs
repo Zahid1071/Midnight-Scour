@@ -6,7 +6,15 @@ using UnityEngine;
 /// </summary>
 public class CinematicPlayerControlLock : MonoBehaviour
 {
-    public void LockCinematic() => PlayerControlGate.Acquire(PlayerControlGate.ReasonCinematic);
+    public void LockCinematic()
+    {
+        PlayerControlGate.Acquire(PlayerControlGate.ReasonCinematic);
+        GameplayHudVisibility.Instance?.HideGameplayHud();
+    }
 
-    public void UnlockCinematic() => PlayerControlGate.Release(PlayerControlGate.ReasonCinematic);
+    public void UnlockCinematic()
+    {
+        PlayerControlGate.Release(PlayerControlGate.ReasonCinematic);
+        GameplayHudVisibility.Instance?.ShowGameplayHud();
+    }
 }
