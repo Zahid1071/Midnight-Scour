@@ -31,6 +31,8 @@ public class SoundManager : MonoBehaviour
     [Header("UI Clips")]
     public AudioClip uiClickClip;
     public AudioClip uiHoverClip; // optional
+    [Tooltip("Played on failed interact (wrong item, out of reach, empty click, etc.).")]
+    public AudioClip actionFailClip;
 
     [Header("Optional banks")]
     public AudioClip[] musicBank;
@@ -204,6 +206,12 @@ public class SoundManager : MonoBehaviour
     {
         if (uiHoverClip != null)
             sfxSource.PlayOneShot(uiHoverClip);
+    }
+
+    public void PlayActionFail(float volume = .25f)
+    {
+        if (actionFailClip != null && sfxSource != null)
+            sfxSource.PlayOneShot(actionFailClip, volume);
     }
 
     /// <summary>

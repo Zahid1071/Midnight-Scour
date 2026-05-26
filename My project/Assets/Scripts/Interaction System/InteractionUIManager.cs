@@ -72,6 +72,8 @@ public class InteractionUIManager : MonoBehaviour
 
     public void PlayFailShake()
     {
+        SoundManager.Instance?.PlayActionFail();
+
         if (crosshairRoot == null)
             return;
 

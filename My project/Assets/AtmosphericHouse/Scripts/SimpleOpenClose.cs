@@ -77,11 +77,7 @@ namespace FS_Atmo
                 if (selectedItem != null && requiredKey != null && selectedItem == requiredKey) return; 
                 if (Time.time < nextInteractTime) return;
 
-                var hud = HudManager.Instance;
-                if (hud != null)
-                    hud.ShowSubtitle("The door is locked.", 2.5f, hud.WarningColor);
-
-                InteractionUIManager.Instance?.PlayFailShake();
+                InteractionFeedback.Fail("The door is locked.", 2.5f);
 
                 Debug.Log("❌ Kapı kilitli! (Animasyon Tetikleniyor)");
                 myAnimator.SetTrigger(lockedHash);
@@ -141,13 +137,13 @@ namespace FS_Atmo
 
                 if (item != null && item.TryBreakOnWrongUse(transform.position))
                 {
-                    InteractionUIManager.Instance?.PlayFailShake();
+                    InteractionFeedback.Fail();
                     myAnimator.SetTrigger(lockedHash);
                     nextInteractTime = Time.time + lockedAnimationDuration;
                     return false;
                 }
 
-                HudManager.Instance?.ShowSubtitle("This item cannot be used here.", 2.5f);
+                InteractionFeedback.Fail("This item cannot be used here.", 2.5f);
                 myAnimator.SetTrigger(lockedHash);
                 nextInteractTime = Time.time + lockedAnimationDuration;
                 return false;
@@ -156,7 +152,7 @@ namespace FS_Atmo
             var inventory = InventoryManager.Instance.GetInventory();
             if (!inventory.Contains(item))
             {
-                HudManager.Instance?.ShowSubtitle("You do not have that item.", 2.5f);
+                InteractionFeedback.Fail("You do not have that item.", 2.5f);
                 return false;
             }
 
@@ -172,7 +168,8 @@ namespace FS_Atmo
                 InventoryUI.Instance?.RefreshUI();
             }
 
-            PlaySound(unlockSound);
+            AudioClip unlockSfx = unlockSound != null ? unlockSound : item.useSuccessSound;
+            PlaySound(unlockSfx);
             return true;
         }
 

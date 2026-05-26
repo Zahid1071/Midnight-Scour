@@ -63,6 +63,7 @@ MonoBehaviour:
   defaultAmbience: {fileID: 8300000, guid: b3e6a73d0a0b27c468ba4f217b5621e5, type: 3}
   uiClickClip: {fileID: 8300000, guid: 29c9b7f66b2ae3f47882d7d526ecd150, type: 3}
   uiHoverClip: {fileID: 8300000, guid: 438f6a52fe6be9641b074b55236b9ef6, type: 3}
+  actionFailClip: {fileID: 0}
   musicBank:
   - {fileID: 8300000, guid: dc1d6b96e081b4befbd033dee4730596, type: 3}
   - {fileID: 8300000, guid: 9dc520664b2fd3747838f1c251c34285, type: 3}

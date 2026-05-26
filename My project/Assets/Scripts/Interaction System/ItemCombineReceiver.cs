@@ -9,6 +9,8 @@ public class ItemCombineReceiver : MonoBehaviour, IItemReceiver
     [SerializeField] private GameObject replacementPrefab;
     [SerializeField] private string wrongItemMessage = "That won't work here.";
     [SerializeField] private string successMessage = "Stuck the gum on the bone.";
+    [Tooltip("Optional. If unset, uses the accepted item's Use Success Sound.")]
+    [SerializeField] private AudioClip successSound;
 
     public bool ReceiveItem(InventoryItem item)
     {
@@ -35,23 +37,12 @@ public class ItemCombineReceiver : MonoBehaviour, IItemReceiver
         Quaternion rotation = transform.rotation;
         Instantiate(replacementPrefab, position, rotation);
 
-        ShowSuccess(successMessage);
+        AudioClip sfx = successSound != null ? successSound : item.useSuccessSound;
+        InteractionFeedback.Success(successMessage, sfx, position);
 
         Destroy(gameObject);
         return true;
     }
 
-    static void ShowSuccess(string message)
-    {
-        if (string.IsNullOrWhiteSpace(message) || HudManager.Instance == null)
-            return;
-        HudManager.Instance.ShowSubtitle(message, 3f, HudManager.Instance.SuccessColor);
-    }
-
-    static void ShowMessage(string message)
-    {
-        if (string.IsNullOrWhiteSpace(message))
-            return;
-        HudManager.Instance?.ShowSubtitle(message, 2.5f, HudManager.Instance.WarningColor);
-    }
+    static void ShowMessage(string message) => InteractionFeedback.Fail(message, 2.5f);
 }

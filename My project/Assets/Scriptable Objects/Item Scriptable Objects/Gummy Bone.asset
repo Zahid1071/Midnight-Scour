@@ -20,7 +20,7 @@ MonoBehaviour:
   heldLocalPosition: {x: 0, y: 0, z: 0}
   heldLocalEulerAngles: {x: 0, y: 0, z: 0}
   heldLocalScale: {x: 1, y: 1, z: 1}
-  pickUpSFX: {fileID: 8300000, guid: a20a83f2d98682a4986d107d16f19d2a, type: 3}
+  pickUpSFX: {fileID: 8300000, guid: 20c77007c5a6e8e4fa30fe999cca7f71, type: 3}
   consumeOnUse: 1
   interactionReachBonus: 1.5
   breaksOnWrongUse: 0

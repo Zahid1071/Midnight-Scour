@@ -22,6 +22,8 @@ public class InventoryItem : ScriptableObject
     public Vector3 heldLocalScale = Vector3.one;
 
     public AudioClip pickUpSFX;
+    [Tooltip("Played when this item is successfully used on a target (combine, unlock, etc.). Assign per item.")]
+    public AudioClip useSuccessSound;
 
     public bool consumeOnUse = true;
 

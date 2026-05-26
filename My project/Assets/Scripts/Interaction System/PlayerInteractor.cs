@@ -141,7 +141,10 @@ public class PlayerInteractor : MonoBehaviour
     public bool TryInteract()
     {
         if (!TryRaycastForHint(out RaycastHit hit, out IInteractable interactable))
+        {
+            InteractionFeedback.Fail("Nothing here.");
             return false;
+        }
 
         if (!IsWithinActionRange(hit, GetInteractActionRange()))
         {
@@ -172,14 +175,7 @@ public class PlayerInteractor : MonoBehaviour
         return true;
     }
 
-    public void ShowOutOfReach()
-    {
-        var hud = HudManager.Instance;
-        if (hud != null)
-            hud.ShowSubtitle(outOfReachMessage, 3f, hud.WarningColor);
-
-        InteractionUIManager.Instance?.PlayFailShake();
-    }
+    public void ShowOutOfReach() => InteractionFeedback.Fail(outOfReachMessage, 3f);
 
     Vector3 GetFeetPosition()
     {

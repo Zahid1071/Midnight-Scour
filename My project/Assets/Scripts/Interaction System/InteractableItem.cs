@@ -15,7 +15,7 @@ public class InteractableItem : MonoBehaviour, IInteractable
 
         if (grateGate != null && !grateGate.IsRemoved)
         {
-            HudManager.Instance?.ShowSubtitle(blockedMessage, 3f, HudManager.Instance.WarningColor);
+            InteractionFeedback.Fail(blockedMessage, 3f);
             return;
         }
 
@@ -46,7 +46,7 @@ public class InteractableItem : MonoBehaviour, IInteractable
         }
         else
         {
-            HudManager.Instance?.ShowSubtitle("Your inventory is full.", 3f);
+            InteractionFeedback.Fail("Your inventory is full.", 3f);
         }
     }
 }

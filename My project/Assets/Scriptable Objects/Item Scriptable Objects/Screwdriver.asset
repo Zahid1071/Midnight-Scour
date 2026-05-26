@@ -20,7 +20,8 @@ MonoBehaviour:
   heldLocalPosition: {x: 0, y: 0, z: 0}
   heldLocalEulerAngles: {x: 0, y: 0, z: 0}
   heldLocalScale: {x: 1, y: 1, z: 1}
-  pickUpSFX: {fileID: 8300000, guid: a20a83f2d98682a4986d107d16f19d2a, type: 3}
+  pickUpSFX: {fileID: 8300000, guid: 14703ce226e238f43a4662e941bfc9f1, type: 3}
+  useSuccessSound: {fileID: 8300000, guid: b256899b6c04b9b40a1c6970d540a728, type: 3}
   consumeOnUse: 0
   interactionReachBonus: 0
   breaksOnWrongUse: 1

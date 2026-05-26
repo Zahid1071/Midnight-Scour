@@ -176,7 +176,23 @@ public class InventoryUI : MonoBehaviour
 
             interactor.RegisterInteractForFrame(hit.collider);
             if (receiver.ReceiveItem(selected))
-                InteractionUIManager.Instance?.PlaySuccessShake();
+            {
+                if (receiver is ItemCombineReceiver)
+                {
+                    // Subtitle, SFX, and shake handled inside ItemCombineReceiver.
+                }
+                else if (receiver is SimpleOpenClose)
+                {
+                    InteractionUIManager.Instance?.PlaySuccessShake();
+                }
+                else
+                {
+                    InteractionFeedback.PlaySound(selected.useSuccessSound, hit.point);
+                    InteractionUIManager.Instance?.PlaySuccessShake();
+                }
+            }
+            else
+                InteractionFeedback.Fail();
             return;
         }
 
@@ -184,14 +200,7 @@ public class InventoryUI : MonoBehaviour
         interactor.PerformInteract(target, hit);
     }
 
-    void ShowWarning(string message, float duration)
-    {
-        var hud = HudManager.Instance;
-        if (hud != null)
-            hud.ShowSubtitle(message, duration, hud.WarningColor);
-
-        InteractionUIManager.Instance?.PlayFailShake();
-    }
+    void ShowWarning(string message, float duration) => InteractionFeedback.Fail(message, duration);
 
     private void TryDropSelectedItem()
     {

@@ -10,18 +10,21 @@ public class GrateSystem : MonoBehaviour, IInteractable
     [Tooltip("Object whose layer is toggled (grate mesh/collider). Defaults to this GameObject. Does not change child bolt layers.")]
     [SerializeField] GameObject layerTarget;
 
-    static int _interactableLayer = -1;
-    static int InteractableLayer
+    [Header("Audio")]
+    [SerializeField] AudioClip boltRemoveSound;
+
+    static int _doorLayer = -1;
+    static int DoorLayer
     {
         get
         {
-            if (_interactableLayer < 0)
+            if (_doorLayer < 0)
             {
-                _interactableLayer = LayerMask.NameToLayer("Interactable ");
-                if (_interactableLayer < 0)
-                    _interactableLayer = 6;
+                _doorLayer = LayerMask.NameToLayer("Door");
+                if (_doorLayer < 0)
+                    _doorLayer = 9;
             }
-            return _interactableLayer;
+            return _doorLayer;
         }
     }
 
@@ -38,13 +41,17 @@ public class GrateSystem : MonoBehaviour, IInteractable
         SetGrateLayer(DefaultLayer);
     }
 
-    public void NotifyBoltRemoved()
+    public void NotifyBoltRemoved(Vector3 boltWorldPosition)
     {
         if (_isRemoved)
             return;
+
+        if (boltRemoveSound != null && SoundManager.Instance != null)
+            SoundManager.Instance.PlaySFXAt(boltRemoveSound, boltWorldPosition);
+
         _removedCount++;
         if (AllBoltsRemoved)
-            SetGrateLayer(InteractableLayer);
+            SetGrateLayer(DoorLayer);
     }
 
     void SetGrateLayer(int layer)
@@ -60,7 +67,7 @@ public class GrateSystem : MonoBehaviour, IInteractable
 
         if (!AllBoltsRemoved)
         {
-            HudManager.Instance?.ShowSubtitle("The grate is still bolted down.", 3f);
+            InteractionFeedback.Fail("The grate is still bolted down.", 3f);
             return;
         }
 
