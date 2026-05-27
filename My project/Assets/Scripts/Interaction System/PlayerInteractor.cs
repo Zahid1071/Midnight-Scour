@@ -33,9 +33,6 @@ public class PlayerInteractor : MonoBehaviour
         Instance = this;
         _characterController = GetComponent<CharacterController>();
 
-        if (!TryGetComponent<HeldItemDisplay>(out _))
-            gameObject.AddComponent<HeldItemDisplay>();
-
         TryGetComponent(out _playerHider);
     }
 

@@ -31,7 +31,6 @@ public class InventoryManager : MonoBehaviour
         Debug.Log("👜 Added to inventory: " + item.itemName);
 
         InventoryUI.Instance?.RefreshUI(); // ✅ Updates slotImages with icons
-        HeldItemDisplay.Instance?.RefreshHeldVisual();
         return true;
     }
 
@@ -55,14 +54,12 @@ public class InventoryManager : MonoBehaviour
     private void RefreshAfterInventoryChange()
     {
         InventoryUI.Instance?.RefreshUI();
-        HeldItemDisplay.Instance?.RefreshHeldVisual();
     }
 
     public void ClearInventory()
     {
         inventory.Clear();
         InventoryUI.Instance?.RefreshUI(); // ✅ Refresh cleared state
-        HeldItemDisplay.Instance?.RefreshHeldVisual();
     }
 
     public List<InventoryItem> GetInventory() => inventory;

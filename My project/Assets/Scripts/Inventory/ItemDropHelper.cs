@@ -12,10 +12,11 @@ public static class ItemDropHelper
         Vector3 throwDirection,
         float throwForce,
         float upwardForce,
-        float mass = 1f)
+        float mass = 1f,
+        AudioClip landClipOverride = null)
     {
         GameObject instance = Object.Instantiate(prefab, position, rotation);
-        Rigidbody rb = PreparePhysics(instance, mass);
+        Rigidbody rb = PreparePhysics(instance, mass, landClipOverride);
 
         Vector3 dir = throwDirection.sqrMagnitude > 0.0001f ? throwDirection.normalized : Vector3.forward;
         Vector3 impulse = dir * throwForce + Vector3.up * upwardForce;
@@ -24,7 +25,7 @@ public static class ItemDropHelper
         return instance;
     }
 
-    private static Rigidbody PreparePhysics(GameObject root, float mass)
+    private static Rigidbody PreparePhysics(GameObject root, float mass, AudioClip landClipOverride)
     {
         EnsureColliders(root);
 
@@ -37,7 +38,38 @@ public static class ItemDropHelper
         rb.useGravity = true;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
 
+        EnsureDropFeedback(root, landClipOverride);
+
         return rb;
+    }
+
+    private static void EnsureDropFeedback(GameObject root, AudioClip landClipOverride)
+    {
+        if (root == null) return;
+
+        var fragile = root.GetComponent<FragileDropReplaceOnImpact>();
+        if (fragile != null)
+        {
+            AudioClip clip = landClipOverride != null
+                ? landClipOverride
+                : (SoundManager.Instance != null ? SoundManager.Instance.itemDropLandClip : null);
+            fragile.Init(null, clip);
+            return;
+        }
+
+        EnsureLandSfx(root, landClipOverride);
+    }
+
+    private static void EnsureLandSfx(GameObject root, AudioClip landClipOverride)
+    {
+        if (root == null) return;
+
+        var sfx = root.GetComponent<DroppedItemLandSfx>();
+        if (sfx == null)
+            sfx = root.AddComponent<DroppedItemLandSfx>();
+
+        AudioClip clip = landClipOverride != null ? landClipOverride : (SoundManager.Instance != null ? SoundManager.Instance.itemDropLandClip : null);
+        sfx.Init(clip);
     }
 
     private static void EnsureColliders(GameObject root)

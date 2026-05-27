@@ -51,6 +51,7 @@ public class PlayerFootstepRhythm : MonoBehaviour
 
         float stepDistance = GetStepDistanceForSpeed(speed);
         float volume = GetVolumeForSpeed(speed);
+        bool useRunClips = speed > runThreshold;
 
         // Accumulate true distance traveled, not net displacement
         float delta = Vector3.Distance(transform.position, lastFramePosition);
@@ -58,7 +59,7 @@ public class PlayerFootstepRhythm : MonoBehaviour
         lastFramePosition = transform.position;
         while (distanceAccumulator >= stepDistance)
         {
-            footstepController.PlayFootstep(volume);
+            footstepController.PlayFootstep(volume, useRunClips);
 
             float suspicionValue = 0f;
             float sneakingLuck = 1f;

@@ -13,7 +13,16 @@ MonoBehaviour:
   m_Name: Vase
   m_EditorClassIdentifier: 
   itemName: Vase
-  icon: {fileID: 21300000, guid: 4272ca2e710606c48a91c02e8294c9c5, type: 3}
+  icon: {fileID: 21300000, guid: 7c65cbfae74c31544b40d429ffd01ae8, type: 3}
+  worldPrefab: {fileID: 9123735415952249589, guid: c1e476fd4482afb42abfdcc3e6b4f365, type: 3}
+  dropLandSFX: {fileID: 8300000, guid: a53460a7a8976c5498a99e59f7a6cbbe, type: 3}
+  canDrop: 1
   pickUpSFX: {fileID: 8300000, guid: a20a83f2d98682a4986d107d16f19d2a, type: 3}
+  useSuccessSound: {fileID: 0}
   consumeOnUse: 1
+  interactionReachBonus: 0
+  breaksOnWrongUse: 0
+  breakOnWrongUseSound: {fileID: 0}
+  breakOnWrongUseMessage: The screwdriver snapped.
+  pickUpText: 
   description: 

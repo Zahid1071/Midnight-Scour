@@ -611,7 +611,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hintRange: 2
-  interactRange: 0.75
+  interactRange: 1.5
   interactLayer:
     serializedVersion: 2
     m_Bits: 576
@@ -645,6 +645,13 @@ MonoBehaviour:
   walkVolume: 1
   runVolume: 1.3
   sneakVolume: 0.4
+  occlusionLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  occludedVolumeMultiplier: 0.4
+  occludedLowpassCutoff: 1400
+  clearLowpassCutoff: 22000
+  listenerTransform: {fileID: 0}
 --- !u!114 &8782256225151303304
 MonoBehaviour:
   m_ObjectHideFlags: 0

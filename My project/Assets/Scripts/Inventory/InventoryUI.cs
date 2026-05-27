@@ -120,7 +120,6 @@ public class InventoryUI : MonoBehaviour
     {
         selectedIndex = index;
         RefreshUI();
-        HeldItemDisplay.Instance?.RefreshHeldVisual();
     }
 
 
@@ -220,7 +219,7 @@ public class InventoryUI : MonoBehaviour
         GameObject dropPrefab = selected.GetDropPrefab();
         if (dropPrefab == null)
         {
-            ShowWarning("You cannot drop that item.", 2.5f);
+            ShowWarning("This item has no drop prefab assigned.", 2.5f);
             return;
         }
 
@@ -235,7 +234,6 @@ public class InventoryUI : MonoBehaviour
 
         AdjustSelectionAfterRemove();
         RefreshUI();
-        HeldItemDisplay.Instance?.RefreshHeldVisual();
 
         Vector3 spawnPos = GetDropThrowSpawnPosition(cam);
         Quaternion spawnRot = GetDropSpawnRotation(cam);
@@ -248,7 +246,8 @@ public class InventoryUI : MonoBehaviour
             throwDir,
             dropThrowForce,
             dropThrowUpward,
-            dropItemMass);
+            dropItemMass,
+            selected.dropLandSFX);
 
         if (selected.pickUpSFX != null && SoundManager.Instance != null)
             SoundManager.Instance.PlaySFXAt(selected.pickUpSFX, dropped.transform.position);

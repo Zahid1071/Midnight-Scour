@@ -7,19 +7,14 @@ public class InventoryItem : ScriptableObject
     public Sprite icon;
 
     [Header("World / drop")]
-    [Tooltip("Prefab spawned when the player drops this item (InteractableItem + collider). Falls back to heldPrefab if unset.")]
+    [Tooltip("Prefab spawned when the player drops this item (InteractableItem + collider).")]
     public GameObject worldPrefab;
+
+    [Tooltip("Played once when this dropped item first lands (collision-based). If null, falls back to SoundManager's default.")]
+    public AudioClip dropLandSFX;
 
     [Tooltip("If false, the player cannot drop this item with G.")]
     public bool canDrop = true;
-
-    [Header("First-person held view")]
-    [Tooltip("Optional mesh shown in the player's hand when this stack is selected. Colliders are disabled at runtime.")]
-    public GameObject heldPrefab;
-
-    public Vector3 heldLocalPosition;
-    public Vector3 heldLocalEulerAngles;
-    public Vector3 heldLocalScale = Vector3.one;
 
     public AudioClip pickUpSFX;
     [Tooltip("Played when this item is successfully used on a target (combine, unlock, etc.). Assign per item.")]
@@ -40,7 +35,7 @@ public class InventoryItem : ScriptableObject
     [TextArea] public string pickUpText;
     [TextArea] public string description;
 
-    public GameObject GetDropPrefab() => worldPrefab != null ? worldPrefab : heldPrefab;
+    public GameObject GetDropPrefab() => worldPrefab;
 
     /// <summary>Used when this item is offered to a locked door that expects a different key.</summary>
     public bool TryBreakOnWrongUse(Vector3 soundPosition)
@@ -57,8 +52,6 @@ public class InventoryItem : ScriptableObject
 
         if (!string.IsNullOrWhiteSpace(breakOnWrongUseMessage) && HudManager.Instance != null)
             HudManager.Instance.ShowSubtitle(breakOnWrongUseMessage, 3f, HudManager.Instance.ErrorColor);
-
-        HeldItemDisplay.Instance?.RefreshHeldVisual();
         return true;
     }
 }

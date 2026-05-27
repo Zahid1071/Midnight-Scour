@@ -12,7 +12,7 @@ TagManager:
   - Player
   - Water
   - UI
-  - 'Interactable '
+  - Interactable_Item
   - HiddenPlayer
   - Obstacles
   - Door
@@ -20,7 +20,7 @@ TagManager:
   - Transparent Interactible
   - Captive
   - NPC
-  - 
+  - Interactable_Static
   - 
   - 
   - 

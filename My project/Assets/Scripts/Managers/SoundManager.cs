@@ -41,6 +41,10 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] tensionSFXBank;
     public AudioClip[] footstepClips;
 
+    [Header("World item SFX")]
+    [Tooltip("Played once when a dropped item hits the ground (collision-based).")]
+    public AudioClip itemDropLandClip;
+
     [Header("Runtime AudioSources (auto-created if null)")]
     [SerializeField] private AudioSource musicSourceA;
     [SerializeField] private AudioSource musicSourceB; // for crossfades
@@ -48,8 +52,18 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioSource sfxSource;    // 2D one-shots
 
     [Header("3D SFX Pool")]
-    [SerializeField] private int poolSize = 8;
-    [SerializeField] private float threeDSpatialBlend = 1f; // full 3D
+    [SerializeField] private int poolSize = 12;
+    [SerializeField] private float threeDSpatialBlend = 1f;
+    [SerializeField] private float sfxMinDistance = 1f;
+    [SerializeField] private float sfxMaxDistance = 18f;
+
+    [Header("3D World SFX Occlusion")]
+    [SerializeField] private LayerMask occlusionLayers = ~0;
+    [Range(0f, 1f)]
+    [SerializeField] private float occludedVolumeMultiplier = 0.4f;
+    [SerializeField] private float occludedLowpassCutoff = 1400f;
+    [SerializeField] private float clearLowpassCutoff = 22000f;
+
     private readonly Queue<AudioSource> threeDPool = new();
 
     private Coroutine musicFadeRoutine;
@@ -114,8 +128,14 @@ public class SoundManager : MonoBehaviour
             src.playOnAwake = false;
             src.loop = false;
             src.outputAudioMixerGroup = sfxGroup;
-            src.spatialBlend = threeDSpatialBlend; // full 3D
+            src.spatialBlend = threeDSpatialBlend;
             src.rolloffMode = AudioRolloffMode.Linear;
+            src.minDistance = sfxMinDistance;
+            src.maxDistance = sfxMaxDistance;
+
+            if (src.GetComponent<AudioLowPassFilter>() == null)
+                src.gameObject.AddComponent<AudioLowPassFilter>();
+
             go.SetActive(false);
             threeDPool.Enqueue(src);
         }
@@ -157,15 +177,37 @@ public class SoundManager : MonoBehaviour
 
     public void PlaySFXAt(AudioClip clip, Vector3 position, float volume = 1f, float pitch = 1f)
     {
+        PlaySFXAt(clip, position, volume, pitch, reverbZoneMix: -1f, ignoreOcclusionRoot: null);
+    }
+
+    public void PlaySFXAt(
+        AudioClip clip,
+        Vector3 position,
+        float volume,
+        float pitch,
+        float reverbZoneMix,
+        Transform ignoreOcclusionRoot)
+    {
         if (!clip || threeDPool.Count == 0) return;
+
+        WorldSfxOcclusion.Result occlusion = WorldSfxOcclusion.Evaluate(
+            position,
+            occlusionLayers,
+            occludedVolumeMultiplier,
+            occludedLowpassCutoff,
+            clearLowpassCutoff,
+            ignoreOcclusionRoot);
+
         var src = threeDPool.Dequeue();
         var go = src.gameObject;
         go.transform.position = position;
         go.SetActive(true);
 
+        ApplyOcclusionToSource(src, occlusion, reverbZoneMix);
+
         src.pitch = pitch;
         src.clip = clip;
-        src.volume = volume;
+        src.volume = Mathf.Clamp01(volume * occlusion.VolumeMultiplier);
         src.Play();
         StartCoroutine(Return3DWhenDone(src, clip.length / Mathf.Abs(pitch)));
     }
@@ -174,11 +216,34 @@ public class SoundManager : MonoBehaviour
     {
         if (clip == null) return;
 
-        // Eğer bu ses, bu pozisyonda zaten çalıyorsa tekrar çalma (Anti-Spam)
         if (!IsClipPlayingAt(clip, position))
-        {
             PlaySFXAt(clip, position, volume, pitch);
+    }
+
+    void ApplyOcclusionToSource(AudioSource src, WorldSfxOcclusion.Result occlusion, float reverbZoneMix)
+    {
+        if (reverbZoneMix >= 0f)
+            src.reverbZoneMix = reverbZoneMix;
+
+        var lowPass = src.GetComponent<AudioLowPassFilter>();
+        if (lowPass == null)
+            return;
+
+        lowPass.enabled = occlusion.IsOccluded;
+        lowPass.cutoffFrequency = occlusion.LowpassCutoff;
+    }
+
+    void ResetPooledSource(AudioSource src)
+    {
+        var lowPass = src.GetComponent<AudioLowPassFilter>();
+        if (lowPass != null)
+        {
+            lowPass.enabled = false;
+            lowPass.cutoffFrequency = clearLowpassCutoff;
         }
+
+        src.reverbZoneMix = 1f;
+        src.pitch = 1f;
     }
 
     public void ApplyMixerFromPrefs()
@@ -231,6 +296,7 @@ public class SoundManager : MonoBehaviour
         yield return new WaitForSeconds(seconds);
         src.Stop();
         src.clip = null;
+        ResetPooledSource(src);
         src.gameObject.SetActive(false);
         threeDPool.Enqueue(src);
     }
