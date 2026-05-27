@@ -27,6 +27,9 @@ namespace FS_Atmo
         [Header("Audio SFX")]
         [SerializeField] private AudioClip openSound;
         [SerializeField] private AudioClip closeSound;
+        [Tooltip("Optional: plays first when opening; open sound follows after a short delay.")]
+        [SerializeField] private AudioClip handleOpenSound;
+        [SerializeField] private float openSoundDelayAfterHandle = 0.1f;
         [SerializeField] private AudioClip unlockSound; 
         [SerializeField] private AudioClip lockedSound; 
 
@@ -42,6 +45,7 @@ namespace FS_Atmo
         
         // YENİ: Spam koruması için zamanlayıcı
         private float nextInteractTime = 0f;
+        private Coroutine _openSfxRoutine;
 
         void Awake()
         {
@@ -198,14 +202,14 @@ namespace FS_Atmo
                 float mapped = 1f - currentT;
                 myAnimator.CrossFade(closeHash, crossFadeDuration, 0, mapped);
                 objectOpen = false;
-                PlaySound(closeSound);
+                PlayCloseSfx(transform.position);
             }
             else
             {
                 float mapped = 1f - currentT;
                 myAnimator.CrossFade(openHash, crossFadeDuration, 0, mapped);
                 objectOpen = true;
-                PlaySound(openSound);
+                PlayOpenSfxSequence(transform.position, includeAdditionalLeaf: hasAdditional);
             }
         }
 
@@ -221,9 +225,8 @@ namespace FS_Atmo
                 objectOpenAdditional = false;
                 other.objectOpen = false;
                 other.objectOpenAdditional = false;
-                
-                if (SoundManager.Instance != null)
-                    SoundManager.Instance.PlaySFXSafe(closeSound, animateAdditional.transform.position);
+
+                PlayCloseSfx(animateAdditional.transform.position);
             }
             else
             {
@@ -232,10 +235,48 @@ namespace FS_Atmo
                 objectOpenAdditional = true;
                 other.objectOpen = true;
                 other.objectOpenAdditional = true;
-                
-                if (SoundManager.Instance != null)
-                    SoundManager.Instance.PlaySFXSafe(openSound, animateAdditional.transform.position);
+                // Open SFX (handle → open) is played once from ToggleSelf for double doors.
             }
+        }
+
+        void PlayCloseSfx(Vector3 position)
+        {
+            if (SoundManager.Instance != null && closeSound != null)
+                SoundManager.Instance.PlaySFXSafe(closeSound, position);
+        }
+
+        void PlayOpenSfxSequence(Vector3 primaryPosition, bool includeAdditionalLeaf)
+        {
+            if (_openSfxRoutine != null)
+                StopCoroutine(_openSfxRoutine);
+
+            Vector3? additionalPosition = includeAdditionalLeaf && animateAdditional != null
+                ? animateAdditional.transform.position
+                : null;
+
+            _openSfxRoutine = StartCoroutine(OpenSfxSequenceRoutine(primaryPosition, additionalPosition));
+        }
+
+        IEnumerator OpenSfxSequenceRoutine(Vector3 primaryPosition, Vector3? additionalPosition)
+        {
+            if (SoundManager.Instance == null)
+                yield break;
+
+            if (handleOpenSound != null)
+                SoundManager.Instance.PlaySFXAt(handleOpenSound, primaryPosition);
+
+            if (openSound != null)
+            {
+                if (handleOpenSound != null)
+                    yield return new WaitForSeconds(openSoundDelayAfterHandle);
+
+                SoundManager.Instance.PlaySFXSafe(openSound, primaryPosition);
+
+                if (additionalPosition.HasValue)
+                    SoundManager.Instance.PlaySFXSafe(openSound, additionalPosition.Value);
+            }
+
+            _openSfxRoutine = null;
         }
 
         private static float GetClampedProgress(AnimatorStateInfo info)

@@ -9901,11 +9901,11 @@ PrefabInstance:
     - target: {fileID: 5455817935211510943, guid: 6f7f20b04bbae0c40a16fb1ee57273da, type: 3}
       propertyPath: openSound
       value: 
-      objectReference: {fileID: 8300000, guid: 280d73d44e93fdb48b69448c10fce921, type: 3}
+      objectReference: {fileID: 8300000, guid: b374e04e05dca674e907debcbe35893f, type: 3}
     - target: {fileID: 5455817935211510943, guid: 6f7f20b04bbae0c40a16fb1ee57273da, type: 3}
       propertyPath: closeSound
       value: 
-      objectReference: {fileID: 8300000, guid: 4577cd653c33d304a897c567f942f975, type: 3}
+      objectReference: {fileID: 8300000, guid: 36b5174363d8cbe42b39636953f21982, type: 3}
     - target: {fileID: 5455817935211510943, guid: 6f7f20b04bbae0c40a16fb1ee57273da, type: 3}
       propertyPath: lockedSound
       value: 
@@ -9918,6 +9918,10 @@ PrefabInstance:
       propertyPath: unlockSound
       value: 
       objectReference: {fileID: 8300000, guid: b256899b6c04b9b40a1c6970d540a728, type: 3}
+    - target: {fileID: 5455817935211510943, guid: 6f7f20b04bbae0c40a16fb1ee57273da, type: 3}
+      propertyPath: handleOpenSound
+      value: 
+      objectReference: {fileID: 8300000, guid: cadcad0814d4866448f13fe108edbe10, type: 3}
     - target: {fileID: 5455817935211510943, guid: 6f7f20b04bbae0c40a16fb1ee57273da, type: 3}
       propertyPath: lockedAnimationDuration
       value: 0.5
