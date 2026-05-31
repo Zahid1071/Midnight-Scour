@@ -300,14 +300,15 @@ public class PerceptionController : MonoBehaviour
                 if (isEmpty || isOpen)
                 {
                     Debug.Log($"⚠️ NPC: Player Escaped! (isEmpty: {isEmpty}, isOpen: {isOpen})");
-                    
-                    npc.fsm.SetState(NPCController.AIState.Search);
-                    
-                    string homeID = npc.interaction.data.homeID;
-                    // var anchor = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(cageCenter, homeID);
-                    // if (anchor) npc.perception.searchTarget = anchor;
 
-                    cageAlertTriggered = true; // Tekrar spamlamasın
+                    // Already chasing (or capturing) — remember escape, do not interrupt with Search.
+                    if (npc.currentState != NPCController.AIState.Chase
+                        && npc.currentState != NPCController.AIState.Capture)
+                    {
+                        npc.fsm.SetState(NPCController.AIState.Search);
+                    }
+
+                    cageAlertTriggered = true;
                 }
             }
         }

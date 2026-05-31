@@ -8735,7 +8735,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.083333336
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 174e37a3ad950df4e9416738089d529c, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: b7a696278948a51429f6614295b6ed34, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &1859007287
 Transform:
@@ -14544,6 +14544,18 @@ PrefabInstance:
       propertyPath: targetCage
       value: 
       objectReference: {fileID: 1735021118}
+    - target: {fileID: 1007146295468474448, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: chaseSweetenerClips.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1007146295468474448, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: 'chaseSweetenerClips.Array.data[0]'
+      value: 
+      objectReference: {fileID: 8300000, guid: 06dfd2aeff582994ab720aa5debc9bd4, type: 3}
+    - target: {fileID: 1007146295468474448, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: 'chaseSweetenerClips.Array.data[1]'
+      value: 
+      objectReference: {fileID: 8300000, guid: ea945d9bc35a6d54cba29305b11d51bc, type: 3}
     - target: {fileID: 1990555951114326687, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
       propertyPath: grateGate
       value: 
