@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 72fed3d9c3d235b4cb3741157e7b5846
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 117382
+  packageName: Brutal Butcher
+  packageVersion: 2.1
+  assetPath: Assets/Zectorlab/Brutal Butcher/Art/Pipelines/URP/URP_Materials/M_BrutalButcher_URP_Pants.mat
+  uploadId: 689326

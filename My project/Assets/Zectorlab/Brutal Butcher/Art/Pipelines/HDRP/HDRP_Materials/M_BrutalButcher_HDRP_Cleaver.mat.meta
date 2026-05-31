@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 56e425c06b27de44fa2c4c514281e7d3
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 117382
+  packageName: Brutal Butcher
+  packageVersion: 2.1
+  assetPath: Assets/Zectorlab/Brutal Butcher/Art/Pipelines/HDRP/HDRP_Materials/M_BrutalButcher_HDRP_Cleaver.mat
+  uploadId: 689326

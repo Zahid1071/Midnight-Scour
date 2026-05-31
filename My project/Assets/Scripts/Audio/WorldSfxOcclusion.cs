@@ -38,7 +38,7 @@ public static class WorldSfxOcclusion
         Vector3 origin = listener.position;
         Vector3 delta = soundPosition - origin;
         float distance = delta.magnitude;
-        if (distance < 0.05f)
+        if (distance < 2f)
             return false;
 
         RaycastHit[] hits = Physics.RaycastAll(

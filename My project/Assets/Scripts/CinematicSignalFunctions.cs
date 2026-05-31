@@ -58,7 +58,7 @@ public class CinematicSignalFunctions : MonoBehaviour
         
         // İlk hedefe ulaşıldı, şimdi ikinci fonksiyonu tetikle
         LeaveBasement();
-        UnaprentKey();
+        Unparent();
     }
 
     public void LeaveBasement()
@@ -67,10 +67,9 @@ public class CinematicSignalFunctions : MonoBehaviour
         isMoving = true; 
         
         navigator.GoToPoint(destination.position);
-
     }
     
-    void UnaprentKey()
+    void Unparent()
     {
         key.transform.SetParent(null);
         key.transform.GetComponent<Rigidbody>().useGravity = true;

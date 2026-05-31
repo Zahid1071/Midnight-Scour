@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: fcbde66d590258c48a6859b7b092294a
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 117382
+  packageName: Brutal Butcher
+  packageVersion: 2.1
+  assetPath: Assets/Zectorlab/Brutal Butcher/Art/Pipelines/URP/URP_Materials/M_BrutalButcher_URP_Shoes.mat
+  uploadId: 689326

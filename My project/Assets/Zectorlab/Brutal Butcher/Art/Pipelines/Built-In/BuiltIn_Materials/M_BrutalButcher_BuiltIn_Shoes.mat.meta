@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c0dba2e1f48e74146a3dd82564709e77
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 117382
+  packageName: Brutal Butcher
+  packageVersion: 2.1
+  assetPath: Assets/Zectorlab/Brutal Butcher/Art/Pipelines/Built-In/BuiltIn_Materials/M_BrutalButcher_BuiltIn_Shoes.mat
+  uploadId: 689326

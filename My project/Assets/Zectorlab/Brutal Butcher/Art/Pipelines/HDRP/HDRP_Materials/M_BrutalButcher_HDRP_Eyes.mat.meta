@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: cc2c3152737896749b6e4b92e46a24a9
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 117382
+  packageName: Brutal Butcher
+  packageVersion: 2.1
+  assetPath: Assets/Zectorlab/Brutal Butcher/Art/Pipelines/HDRP/HDRP_Materials/M_BrutalButcher_HDRP_Eyes.mat
+  uploadId: 689326

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 8e82b63b7be0f3147abb2ad3730023c9
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 117382
+  packageName: Brutal Butcher
+  packageVersion: 2.1
+  assetPath: Assets/Zectorlab/Brutal Butcher/Art/Pipelines/URP/URP_Materials/M_BrutalButcher_URP_Apron_Mask.mat
+  uploadId: 689326
