@@ -444,7 +444,7 @@ public class FSMController
             float dist = Vector3.Distance(npc.transform.position, npc.perception.PlayerTransform.position);
             if (dist <= npc.captureDistance)
             {
-                SetState(NPCController.AIState.Capture);
+                SetState(NPCController.AIState.Capture); 
                 agent.ResetPath();
                 return;
             }
