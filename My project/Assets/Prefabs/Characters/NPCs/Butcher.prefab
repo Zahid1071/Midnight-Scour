@@ -238,7 +238,9 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 598a469419ee51c449c28e6cb3b5f210, type: 3}
   - {fileID: 8300000, guid: fc1a5417388406f429b35815222fdfa5, type: 3}
   - {fileID: 8300000, guid: 81c2595457881634f9bd941b5b8c5e95, type: 3}
-  chaseSweetenerClips: []
+  chaseSweetenerClips:
+  - {fileID: 8300000, guid: 06dfd2aeff582994ab720aa5debc9bd4, type: 3}
+  - {fileID: 8300000, guid: ea945d9bc35a6d54cba29305b11d51bc, type: 3}
   chaseSweetenerChance: 0.35
   chaseSweetenerVolume: 0.55
   mixerGroup: {fileID: 5656172210110584295, guid: d0494497af355c44f913d2de9798dce5, type: 2}
