@@ -1479,7 +1479,7 @@ Cloth:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1484867580350852060}
-  m_Enabled: 1
+  m_Enabled: 0
   m_StretchingStiffness: 1
   m_BendingStiffness: 0
   m_UseTethers: 1
@@ -4416,111 +4416,6 @@ CharacterJoint:
   m_EnablePreprocessing: 1
   m_MassScale: 1
   m_ConnectedMassScale: 1
---- !u!1 &2730260695873344268
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1055414746586381069}
-  - component: {fileID: 9189842413532375474}
-  m_Layer: 0
-  m_Name: Belt
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1055414746586381069
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2730260695873344268}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.000000076293944, y: -0.0013199437, z: 0.017931452}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8588224306138732227}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!137 &9189842413532375474
-SkinnedMeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2730260695873344268}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 3
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 8e82b63b7be0f3147abb2ad3730023c9, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  serializedVersion: 2
-  m_Quality: 0
-  m_UpdateWhenOffscreen: 0
-  m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 7497134608830541777, guid: c4e48f9ff270b3445a6f6dd70a4f38b0, type: 3}
-  m_Bones:
-  - {fileID: 6342111083462764627}
-  - {fileID: 3423792884756146849}
-  - {fileID: 6932957103988362668}
-  - {fileID: 2882722118951291778}
-  - {fileID: 4352349600095958269}
-  - {fileID: 3355109649277850430}
-  - {fileID: 1193376563489390634}
-  - {fileID: 8519580137687050593}
-  - {fileID: 7686879857245013959}
-  - {fileID: 6444424307747904214}
-  - {fileID: 4568451847180773776}
-  - {fileID: 1123428332235040435}
-  - {fileID: 8806521733736325648}
-  - {fileID: 5805582083173711159}
-  - {fileID: 1022545295157461555}
-  - {fileID: 6171532589783792300}
-  - {fileID: 360723864488871924}
-  m_BlendShapeWeights: []
-  m_RootBone: {fileID: 6342111083462764627}
-  m_AABB:
-    m_Center: {x: -0.3262469, y: 0.074807376, z: -0.0035432577}
-    m_Extent: {x: 0.4730247, y: 0.37666798, z: 0.35237485}
-  m_DirtyAABB: 0
 --- !u!1 &2759639917709671494
 GameObject:
   m_ObjectHideFlags: 0
@@ -8491,7 +8386,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2288840673838058343}
   - component: {fileID: 4292282699666735817}
-  m_Layer: 13
+  m_Layer: 2
   m_Name: poiBounds
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -8528,7 +8423,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -8629,7 +8524,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8281776653326542636}
-  - {fileID: 1055414746586381069}
   - {fileID: 963948187304619555}
   - {fileID: 8086559109887660898}
   - {fileID: 718220227908865348}

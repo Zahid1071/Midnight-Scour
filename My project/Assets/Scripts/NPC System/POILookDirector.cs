@@ -5,12 +5,10 @@ using UnityEngine.Animations.Rigging;
 public class POILookDirector : MonoBehaviour
 {
     [Header("References (assign in inspector)")]
-    [SerializeField] Transform butcher;
+    [SerializeField] Transform npc;
     [SerializeField] Transform poi;
+    [SerializeField] Transform playerPoi;
     [SerializeField] BoxCollider poiBounds;
-
-    [Header("POI Movement")]
-    [SerializeField] float poiMoveIntervalSeconds = 3f;
 
     [Header("Look Chance")]
     [SerializeField, Range(0f, 1f)] float triggerChance = 0.30f;
@@ -18,19 +16,26 @@ public class POILookDirector : MonoBehaviour
     [SerializeField] float holdSeconds = 2f;
     [SerializeField] float rampSeconds = 0.6f;
 
+    NPCController _npc;
     Rig _lookRig;
+    MultiAimConstraint[] _aimConstraints;
     Coroutine _holdRoutine;
+    bool _chaseLookActive;
 
     void Awake()
     {
         if (poiBounds == null)
             poiBounds = GetComponent<BoxCollider>();
 
-        if (butcher == null || poi == null || poiBounds == null) return;
+        if (npc != null)
+        {
+            _npc = npc.GetComponent<NPCController>();
+            _lookRig = npc.GetComponentInChildren<Rig>(true);
+            _aimConstraints = npc.GetComponentsInChildren<MultiAimConstraint>(true);
+        }
 
-        _lookRig = butcher.GetComponentInChildren<Rig>(true);
-
-        EnsureConstraintsTargetPOI();
+        if (poi != null)
+            SetConstraintTargets(poi);
 
         if (_lookRig != null)
             _lookRig.weight = 0f;
@@ -38,33 +43,76 @@ public class POILookDirector : MonoBehaviour
 
     void OnEnable()
     {
-        StartCoroutine(POIMoveLoop());
-        StartCoroutine(LookChanceLoop());
+        StartCoroutine(LookLoop());
     }
 
-    IEnumerator POIMoveLoop()
+    IEnumerator LookLoop()
     {
         while (true)
         {
-            if (butcher != null && poi != null && poiBounds != null)
-                MovePOIInsideBounds();
+            if (_lookRig == null && npc != null)
+                _lookRig = npc.GetComponentInChildren<Rig>(true);
 
-            yield return new WaitForSeconds(poiMoveIntervalSeconds);
-        }
-    }
-
-    IEnumerator LookChanceLoop()
-    {
-        while (true)
-        {
-            if (butcher != null)
+            if (IsChaseLookState())
             {
-                if (_lookRig == null) _lookRig = butcher.GetComponentInChildren<Rig>(true);
-                if (_lookRig != null && Random.value < triggerChance)
+                if (!_chaseLookActive)
+                    EnterChaseLook();
+
+                if (_lookRig != null)
+                    _lookRig.weight = 1f;
+                if (poi != null && playerPoi != null)
+                    poi.position = playerPoi.position;
+
+                yield return null;
+                continue;
+            }
+
+            if (_chaseLookActive)
+                ExitChaseLook();
+
+            if (npc != null && poi != null && poiBounds != null && _lookRig != null)
+            {
+                MovePOIInsideBounds();
+                yield return null;
+
+                if (Random.value < triggerChance)
                     TriggerLookHold();
             }
 
             yield return new WaitForSeconds(chanceCheckIntervalSeconds);
+        }
+    }
+
+    bool IsChaseLookState()
+    {
+        if (_npc == null || playerPoi == null) return false;
+        return _npc.currentState == NPCController.AIState.Chase
+            || _npc.currentState == NPCController.AIState.Capture;
+    }
+
+    void EnterChaseLook()
+    {
+        _chaseLookActive = true;
+        StopAmbientHold();
+        if (poi != null)
+            SetConstraintTargets(poi);
+    }
+
+    void ExitChaseLook()
+    {
+        _chaseLookActive = false;
+        if (poi != null)
+            SetConstraintTargets(poi);
+        if (_lookRig != null)
+            _lookRig.weight = 0f;
+    }
+
+    void StopAmbientHold()
+    {
+        if (_holdRoutine != null)
+        {
+            StopCoroutine(_holdRoutine);
+            _holdRoutine = null;
         }
     }
 
@@ -117,25 +165,21 @@ public class POILookDirector : MonoBehaviour
         _lookRig.weight = to;
     }
 
-    void EnsureConstraintsTargetPOI()
+    void SetConstraintTargets(Transform target)
     {
-        if (butcher == null || poi == null) return;
+        if (target == null || _aimConstraints == null) return;
 
-        MultiAimConstraint[] aims = butcher.GetComponentsInChildren<MultiAimConstraint>(true);
-        for (int i = 0; i < aims.Length; i++)
+        for (int i = 0; i < _aimConstraints.Length; i++)
         {
-            MultiAimConstraint c = aims[i];
+            MultiAimConstraint c = _aimConstraints[i];
             var data = c.data;
             var sources = data.sourceObjects;
             if (sources.Count <= 0) continue;
 
             var first = sources[0];
-            if (first.transform != null) continue;
-
-            sources[0] = new WeightedTransform(poi, first.weight);
+            sources[0] = new WeightedTransform(target, first.weight);
             data.sourceObjects = sources;
             c.data = data;
         }
     }
 }
-
