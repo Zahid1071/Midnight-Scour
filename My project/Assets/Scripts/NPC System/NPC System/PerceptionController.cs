@@ -1,10 +1,22 @@
 using UnityEngine;
 using System;
-using UnityEditor.Rendering;
 
 public class PerceptionController : MonoBehaviour
 {
+    private enum FaceAxis
+    {
+        Forward,
+        Back,
+        Up,
+        Down,
+        Right,
+        Left
+    }
+
     [SerializeField] private Transform player;   // assign once in Inspector
+    [SerializeField] private Transform face;     // ray origin + forward for vision/FOV
+    [SerializeField] private FaceAxis faceForwardAxis = FaceAxis.Forward;
+    [SerializeField] private Vector3 faceForwardEulerOffset;
     public Transform searchTarget;               // used by Suspicious/Search/Ambush
 
     // Events (both names for backward compatibility)
@@ -81,6 +93,73 @@ public class PerceptionController : MonoBehaviour
         CageCheckVision();
     }
 
+    private static Vector3 AxisVector(FaceAxis axis)
+    {
+        return axis switch
+        {
+            FaceAxis.Forward => Vector3.forward,
+            FaceAxis.Back => Vector3.back,
+            FaceAxis.Up => Vector3.up,
+            FaceAxis.Down => Vector3.down,
+            FaceAxis.Right => Vector3.right,
+            FaceAxis.Left => Vector3.left,
+            _ => Vector3.forward
+        };
+    }
+
+    private void GetViewBasis(out Vector3 origin, out Vector3 forward, out Vector3 upAxis)
+    {
+        Transform view = face ? face : transform;
+
+        // Treat "forward" as an arbitrary local axis of the face bone,
+        // optionally rotated by an offset (useful for rigs with odd bone orientation).
+        Quaternion basisRot = view.rotation * Quaternion.Euler(faceForwardEulerOffset);
+        origin = view.position;
+        forward = (basisRot * AxisVector(faceForwardAxis)).normalized;
+        Vector3 candidateUp = (basisRot * Vector3.up).normalized;
+
+        // If forward is (nearly) parallel to up, rotating around up collapses the cone.
+        // Pick a stable axis that is perpendicular to forward.
+        if (Mathf.Abs(Vector3.Dot(candidateUp, forward)) > 0.95f)
+            upAxis = (basisRot * Vector3.right).normalized;
+        else
+            upAxis = candidateUp;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        float dist = maxViewDistance > 0f ? maxViewDistance : 10f;
+        float half = maxViewHalfAngle > 0f ? maxViewHalfAngle : 90f;
+
+        GetViewBasis(out Vector3 origin, out Vector3 forward, out Vector3 upAxis);
+
+        Vector3 leftDir = Quaternion.AngleAxis(-half, upAxis) * forward;
+        Vector3 rightDir = Quaternion.AngleAxis(half, upAxis) * forward;
+
+        // Center ray (blue)
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(origin, origin + forward * dist);
+
+        // Extreme edges (yellow)
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(origin, origin + leftDir * dist);
+        Gizmos.DrawLine(origin, origin + rightDir * dist);
+
+        // Arc at max distance
+        Gizmos.color = Color.blue;
+        const int segments = 24;
+        Vector3 prev = origin + leftDir * dist;
+        for (int i = 1; i <= segments; i++)
+        {
+            float t = i / (float)segments;
+            float angle = Mathf.Lerp(-half, half, t);
+            Vector3 dir = Quaternion.AngleAxis(angle, upAxis) * forward;
+            Vector3 next = origin + dir * dist;
+            Gizmos.DrawLine(prev, next);
+            prev = next;
+        }
+    }
+
     /// <summary>
     /// Raw sight check that ignores gameplay "hidden" layers.
     /// Use this BEFORE the player changes layers to decide if hiding/cage should be allowed.
@@ -92,11 +171,11 @@ public class PerceptionController : MonoBehaviour
         var playerCol = player.GetComponentInChildren<Collider>();
         if (!playerCol) return false;
 
-        Vector3 eye = transform.position + Vector3.up * 1.7f;
+        GetViewBasis(out Vector3 eye, out Vector3 viewForward, out _);
         Vector3 aim = playerCol.bounds.center;
         Vector3 dirToTarget = (aim - eye).normalized;
 
-        float angleToTarget = Vector3.Angle(transform.forward, dirToTarget);
+        float angleToTarget = Vector3.Angle(viewForward, dirToTarget);
         if (angleToTarget > maxViewHalfAngle) return false;
 
         if (Physics.Raycast(eye, dirToTarget, out RaycastHit hit, maxViewDistance, ~ignoreLayer, QueryTriggerInteraction.Ignore))
@@ -128,14 +207,14 @@ public class PerceptionController : MonoBehaviour
         if (!playerCol) { CanSeePlayer = false; return; }
 
         // Vektör Hesaplamaları
-        Vector3 eye = transform.position + Vector3.up * 1.7f; // Göz hizası
+        GetViewBasis(out Vector3 eye, out Vector3 viewForward, out _);
         Vector3 aim = playerCol.bounds.center;                // Hedef (Oyuncu göğsü)
         Vector3 dirToTarget = (aim - eye).normalized;         // Hedefe giden yön vektörü
 
         // --- EKLENEN KISIM: AÇI KONTROLÜ (FOV) ---
         
         // NPC'nin yüzü (transform.forward) ile Hedef arasındaki açıyı bul
-        float angleToTarget = Vector3.Angle(transform.forward, dirToTarget);
+        float angleToTarget = Vector3.Angle(viewForward, dirToTarget);
 
         // Eğer açı, izin verilen yarı-açıdan (maxViewHalfAngle) büyükse
         // (Örneğin 60 dereceden büyükse, yani oyuncu çok yandaysa veya arkadaysa)

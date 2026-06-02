@@ -12,6 +12,7 @@ public class POILookDirector : MonoBehaviour
 
     [Header("Look Chance")]
     [SerializeField, Range(0f, 1f)] float triggerChance = 0.30f;
+    [SerializeField, Range(0f, 1f)] float lookAtPlayerChance = 0.08f;
     [SerializeField] float chanceCheckIntervalSeconds = 5f;
     [SerializeField] float holdSeconds = 2f;
     [SerializeField] float rampSeconds = 0.6f;
@@ -21,6 +22,8 @@ public class POILookDirector : MonoBehaviour
     MultiAimConstraint[] _aimConstraints;
     Coroutine _holdRoutine;
     bool _chaseLookActive;
+    Transform _overrideLookTarget;
+    float _overrideWeight;
 
     void Awake()
     {
@@ -52,6 +55,15 @@ public class POILookDirector : MonoBehaviour
         {
             if (_lookRig == null && npc != null)
                 _lookRig = npc.GetComponentInChildren<Rig>(true);
+
+            if (_overrideLookTarget != null && _lookRig != null && poi != null)
+            {
+                StopAmbientHold();
+                _lookRig.weight = _overrideWeight;
+                poi.position = _overrideLookTarget.position;
+                yield return null;
+                continue;
+            }
 
             if (IsChaseLookState())
             {
@@ -118,6 +130,12 @@ public class POILookDirector : MonoBehaviour
 
     void MovePOIInsideBounds()
     {
+        if (playerPoi != null && Random.value < lookAtPlayerChance)
+        {
+            poi.position = playerPoi.position;
+            return;
+        }
+
         Transform bt = poiBounds.transform;
         Vector3 c = poiBounds.center;
         Vector3 half = poiBounds.size * 0.5f;
@@ -181,5 +199,20 @@ public class POILookDirector : MonoBehaviour
             data.sourceObjects = sources;
             c.data = data;
         }
+    }
+
+    public void OverrideLookAt(Transform target, float weight)
+    {
+        _overrideLookTarget = target;
+        _overrideWeight = Mathf.Clamp01(weight);
+        if (poi != null)
+            SetConstraintTargets(poi);
+    }
+
+    public void ClearOverrideLook()
+    {
+        _overrideLookTarget = null;
+        if (_lookRig != null)
+            _lookRig.weight = 0f;
     }
 }

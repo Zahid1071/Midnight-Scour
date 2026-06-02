@@ -21,7 +21,7 @@ MonoBehaviour:
     weight: 0.247
     roomPlans:
     - roomAnchorID: Basement_Room
-      weight: 0
+      weight: 0.843
       hotspots:
       - hotspotID: Hotspot_Idle2
         weight: 1
@@ -66,14 +66,14 @@ MonoBehaviour:
   patrolDuration: 20
   ambushChance: 0.51
   ambushWaitRange: {x: 5, y: 20}
-  footstepVolume: 0.5
+  footstepVolume: 1
   vision:
     maxViewDistance: 10
-    maxViewAngle: 90
+    maxViewAngle: 75
     ignoreLayer:
       serializedVersion: 2
-      m_Bits: 13440
-    confirmSeconds: 0.1
+      m_Bits: 13444
+    confirmSeconds: 0.5
     preAlertSeconds: 0.1
     buildRate: 1
     decayRate: 0.1

@@ -374,6 +374,7 @@ public class FSMController
             npc.GetComponent<NavMeshAgent>().remainingDistance <2f);
 
         var hidingSpots = roomAnchor.GetComponentsInChildren<HidingSpot>();
+        var lookDirector = npc.GetComponentInChildren<POILookDirector>(true);
 
         foreach (var spot in hidingSpots)
         {
@@ -401,7 +402,27 @@ public class FSMController
                 }
             }
 
+            // Look at this hiding spot's POI during the wait window
+            Transform hidingPoi = null;
+            var tfs = spot.GetComponentsInChildren<Transform>(true);
+            for (int i = 0; i < tfs.Length; i++)
+            {
+                if (tfs[i] != null && (tfs[i].name == "HidingPOI" || tfs[i].name == "hidingPOI"))
+                {
+                    hidingPoi = tfs[i];
+                    break;
+                }
+            }
+            if (hidingPoi == null)
+                hidingPoi = spot.PivotForNPCSearchRoutine;
+
+            if (lookDirector != null)
+                lookDirector.OverrideLookAt(hidingPoi, 1f);
+
             yield return new WaitForSeconds(4f);
+
+            if (lookDirector != null)
+                lookDirector.ClearOverrideLook();
         }
         if(npc.currentState !=NPCController.AIState.Capture)        
             SetState(NPCController.AIState.Natural);
