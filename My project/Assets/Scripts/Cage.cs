@@ -1,6 +1,5 @@
 using UnityEngine;
 using FS_Atmo;
-using System.Diagnostics;
 
 public class Cage : MonoBehaviour
 {
@@ -38,12 +37,6 @@ public class Cage : MonoBehaviour
         // Only assign if different to avoid overhead
         if (playerRef.layer != targetLayer)
         {
-#if UNITY_EDITOR
-            var st = new StackTrace(1, true);
-            UnityEngine.Debug.Log(
-                $"[Cage] Player layer {playerRef.layer} -> {targetLayer} | doorOpen={cageDoor.objectOpen} cageVisible={cageVisible} original={originalLayerIndex}\n{st}",
-                this);
-#endif
             playerRef.layer = targetLayer;
         }
     }
@@ -106,10 +99,6 @@ public class Cage : MonoBehaviour
             // Restore the player to their original layer upon exit
             if (playerRef != null)
             {
-#if UNITY_EDITOR
-                var st = new StackTrace(1, true);
-                UnityEngine.Debug.Log($"[Cage] OnTriggerExit restore layer {playerRef.layer} -> {originalLayerIndex}\n{st}", this);
-#endif
                 playerRef.layer = originalLayerIndex;
             }
 

@@ -14672,6 +14672,10 @@ PrefabInstance:
       propertyPath: poiLookDirector
       value: 
       objectReference: {fileID: 824396281}
+    - target: {fileID: 1469066018935350255, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: hideExitSecondsBeforeCapture
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 2588451862027541027, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
       propertyPath: m_LocalPosition.x
       value: 7.812

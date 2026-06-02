@@ -21,6 +21,8 @@ public class NPCController : MonoBehaviour
     [Header("Capture")]
     [Tooltip("Distance at which the NPC instantly captures the player while chasing.")]
     public float captureDistance = 1.8f;
+    [Tooltip("Seconds to wait after starting hide exit before jumpscare (when captured while hiding).")]
+    public float hideExitSecondsBeforeCapture = 1.5f;
 
     [Header("Chase Replan")]
     [Tooltip("Seconds between destination replans during chase.")]
@@ -38,6 +40,21 @@ public class NPCController : MonoBehaviour
 
     // optional: expose for debug
     public Transform jumpscarePoint;
+
+    Coroutine _captureRoutine;
+
+    public void BeginCapture()
+    {
+        if (_captureRoutine != null) return;
+        if (currentState == AIState.Capture && PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured))
+            return;
+        _captureRoutine = StartCoroutine(fsm.CapturePlayerRoutine());
+    }
+
+    internal void OnCaptureRoutineFinished()
+    {
+        _captureRoutine = null;
+    }
 
     void Awake()
     {

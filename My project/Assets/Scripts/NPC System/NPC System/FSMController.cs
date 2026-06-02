@@ -87,7 +87,7 @@ public class FSMController
 
             case NPCController.AIState.Capture:
                 Debug.Log("State: CAPTURE");
-                CapturePlayer();
+                npc.BeginCapture();
                 break;
         }
     }
@@ -215,11 +215,47 @@ public class FSMController
 
     
     
-    private void CapturePlayer()
+    public IEnumerator CapturePlayerRoutine()
     {
+        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured))
+        {
+            npc.OnCaptureRoutineFinished();
+            yield break;
+        }
+
+        var playerT = npc.perception != null ? npc.perception.PlayerTransform : null;
+        if (playerT != null)
+        {
+            var hider = playerT.GetComponent<PlayerHider>();
+            if (hider != null && hider.isHidden && hider.CurrentHidingSpot != null)
+            {
+                hider.CurrentHidingSpot.RevealPlayerForCapture(playerT.gameObject);
+                float wait = Mathf.Max(0f, npc.hideExitSecondsBeforeCapture);
+                if (wait > 0f)
+                    yield return new WaitForSeconds(wait);
+            }
+        }
+
+        DoCaptureNow();
+        npc.OnCaptureRoutineFinished();
+    }
+
+    void DoCaptureNow()
+    {
+        HidingSpot.EndHidingCameraForCapture();
+
         nav.ClearRoute();
-        var interactor = npc.perception.PlayerTransform.GetComponent<PlayerInteractor>();
-        interactor.GetComponent<PlayerFootstepRhythm>().enabled = false;
+
+        var playerT = npc.perception != null ? npc.perception.PlayerTransform : null;
+        if (playerT != null)
+        {
+            var interactor = playerT.GetComponent<PlayerInteractor>();
+            if (interactor != null)
+            {
+                var rhythm = interactor.GetComponent<PlayerFootstepRhythm>();
+                if (rhythm != null) rhythm.enabled = false;
+            }
+        }
 
         if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured)) return;
 
@@ -230,8 +266,7 @@ public class FSMController
         Debug.Log("Player Caught!");
         animator.SetTrigger("Jumpscare");
 
-        var npcController = npc.GetComponent<NPCController>();
-        JumpscareManager.Instance.TriggerJumpscare(npcController.jumpscarePoint, npcController.transform);
+        JumpscareManager.Instance.TriggerJumpscare(npc.jumpscarePoint, npc.transform);
         npc.SetState(NPCController.AIState.Capture);
     }
     
@@ -407,17 +442,6 @@ public class FSMController
                 !npc.GetComponent<NavMeshAgent>().pathPending &&
                 npc.GetComponent<NavMeshAgent>().remainingDistance < 2f);
 
-            bool willSearch = UnityEngine.Random.value < npc.interaction.data.searchChance;
-
-            if (willSearch)
-            {
-                if (spot.isOccupied)
-                {
-                    Debug.Log($"🎯 Player Caught in: {spot.name}");
-                    SetState(NPCController.AIState.Capture);
-                }
-            }
-
             // Look at this hiding spot's POI during the wait window
             Transform hidingPoi = null;
             var tfs = spot.GetComponentsInChildren<Transform>(true);
@@ -459,6 +483,14 @@ public class FSMController
             else
             {
                 yield return new WaitForSeconds(4f);
+            }
+
+            bool willSearch = UnityEngine.Random.value < npc.interaction.data.searchChance;
+            if (willSearch && spot.isOccupied)
+            {
+                Debug.Log($"🎯 Player Caught in: {spot.name}");
+                SetState(NPCController.AIState.Capture);
+                yield break;
             }
         }
         if(npc.currentState !=NPCController.AIState.Capture)        

@@ -260,10 +260,21 @@ public class HidingSpot : MonoBehaviour, IInteractable
     public void RevealPlayer(GameObject player)
     {
         if (!isOccupied || isToggling) return;
-        StartCoroutine(ExitHidingRoutine(player));
+        StartCoroutine(ExitHidingRoutine(player, forCapture: false));
     }
 
-    private IEnumerator ExitHidingRoutine(GameObject player)
+    /// <summary>Starts exit anim for capture; caller waits before jumpscare. Keeps hiding camera at pivot.</summary>
+    public void RevealPlayerForCapture(GameObject player)
+    {
+        if (player == null) return;
+
+        var hider = player.GetComponent<PlayerHider>();
+        if (hider == null || !hider.IsHidingIn(this)) return;
+
+        StartCoroutine(ExitHidingRoutine(player, forCapture: true));
+    }
+
+    private IEnumerator ExitHidingRoutine(GameObject player, bool forCapture)
     {
         isToggling = true;
         playerRef = null;
@@ -283,15 +294,16 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
             yield return null;
 
-            yield return new WaitUntil(() =>
-                activeAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f);
+            if (!forCapture)
+            {
+                yield return new WaitUntil(() =>
+                    activeAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f);
+            }
         }
-        else
+        else if (!forCapture)
         {
             yield return new WaitForSeconds(0.5f);
         }
-
-        HidingCameraSystem.Instance.SetActive(false);
 
         PlayerHider hider = player.GetComponent<PlayerHider>();
         if (hider != null)
@@ -300,6 +312,16 @@ public class HidingSpot : MonoBehaviour, IInteractable
             hider.SetHiddenState(false, null);
         }
         player.layer = originalLayerIndex;
+
+        if (forCapture)
+        {
+            // Keep hiding camera at pivot until capture/jumpscare finishes cleanup.
+            isOccupied = false;
+            isToggling = false;
+            yield break;
+        }
+
+        HidingCameraSystem.Instance.SetActive(false);
 
         yield return new WaitForSeconds(blendDuration);
 
@@ -311,5 +333,12 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
         activePivot = null;
         activeAnimator = null;
+    }
+
+    public static void EndHidingCameraForCapture()
+    {
+        if (HidingCameraSystem.Instance == null) return;
+        HidingCameraSystem.Instance.SetActive(false);
+        HidingCameraSystem.Instance.Detach();
     }
 }
