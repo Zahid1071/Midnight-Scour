@@ -17,6 +17,9 @@ public class InteractionController : MonoBehaviour
     private WeightedHotspot currentHotspot;
     private string lastZoneID = null;
     private string lastHotspotID = null;
+    private bool isFirstRoutinePick = true;
+
+    const string FirstPickExcludedRoom = "Basement_Room";
 
     public float remainHomeFactor = 1f;
 
@@ -109,7 +112,19 @@ public class InteractionController : MonoBehaviour
         }
 
         currentZonePlan = WeightedPicker.Pick(boostedZones, z => z.weight);
-        currentRoomPlan = WeightedPicker.Pick(currentZonePlan.roomPlans, r => r.weight);
+
+        List<WeightedRoomPlan> roomOptions = currentZonePlan.roomPlans;
+        if (isFirstRoutinePick)
+        {
+            isFirstRoutinePick = false;
+            var withoutBasement = roomOptions
+                .Where(r => r.roomAnchorID != FirstPickExcludedRoom)
+                .ToList();
+            if (withoutBasement.Count > 0)
+                roomOptions = withoutBasement;
+        }
+
+        currentRoomPlan = WeightedPicker.Pick(roomOptions, r => r.weight);
 
         // Avoid repeating the last hotspot if possible
         List<WeightedHotspot> possibleHotspots = currentRoomPlan.hotspots

@@ -58,7 +58,9 @@ MonoBehaviour:
   currentState: 0
   interaction: {fileID: 3090453657295839001}
   perception: {fileID: 72859471452438870}
+  poiLookDirector: {fileID: 0}
   captureDistance: 1
+  hideExitSecondsBeforeCapture: 0.5
   chaseReplanCooldown: 0.25
   chaseReplanDist: 0.75
   walkSpeed: 0.2
@@ -198,6 +200,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
+  face: {fileID: 8806521733736325648}
+  faceForwardAxis: 3
+  faceForwardEulerOffset: {x: 0, y: 0, z: 0}
   searchTarget: {fileID: 0}
   targetCage: {fileID: 0}
 --- !u!114 &1394322090321949160
@@ -242,7 +247,7 @@ MonoBehaviour:
   chaseSweetenerClips:
   - {fileID: 8300000, guid: 06dfd2aeff582994ab720aa5debc9bd4, type: 3}
   - {fileID: 8300000, guid: ea945d9bc35a6d54cba29305b11d51bc, type: 3}
-  chaseSweetenerChance: 0.35
+  chaseSweetenerChance: 0.7
   chaseSweetenerVolume: 0.55
   mixerGroup: {fileID: 5656172210110584295, guid: d0494497af355c44f913d2de9798dce5, type: 2}
   walkReverbZoneMix: 0

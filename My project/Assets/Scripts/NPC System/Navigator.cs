@@ -363,7 +363,7 @@ namespace FS_Atmo
             }
 
             summary.Append("</color>");
-            Debug.Log(summary.ToString());
+            //Debug.Log(summary.ToString());
         }
 
         public void ClearRoute()
