@@ -29,7 +29,7 @@ MonoBehaviour:
         actionType: 10
         requiresVisualOffset: 0
     - roomAnchorID: Corridor-Kitchen_Room
-      weight: 1
+      weight: 0.405
       hotspots:
       - hotspotID: Hotspot_Idle
         weight: 0.266
@@ -90,3 +90,6 @@ MonoBehaviour:
   chaseRetention:
     gracePeriod: 3
     keepChasingDistance: 5
+  poiLook:
+    naturalPoiIntervalSeconds: 2
+    naturalLookHoldChance: 0.3

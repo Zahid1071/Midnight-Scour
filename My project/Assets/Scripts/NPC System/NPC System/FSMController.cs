@@ -95,6 +95,9 @@ public class FSMController
     public void Update()
     {
         EnsureLocomotion();
+
+        // Explicitly drive look during chase/capture (no autonomous look loop).
+        var lookDirector = npc != null ? npc.poiLookDirector : null;
         
         switch (npc.currentState)
         {
@@ -118,11 +121,24 @@ public class FSMController
 
             case NPCController.AIState.Chase:
                 agent.speed = runningSpeed;
+                if (lookDirector != null)
+                {
+                    lookDirector.SetLookWeight(1f);
+                    lookDirector.SnapPOIToPlayer();
+                }
                 TickChase();
                 break;
 
             case NPCController.AIState.Patrol:
                 agent.speed = walkingSpeed;
+                break;
+
+            case NPCController.AIState.Capture:
+                if (lookDirector != null)
+                {
+                    lookDirector.SetLookWeight(1f);
+                    lookDirector.SnapPOIToPlayer();
+                }
                 break;
         }
     }
@@ -374,7 +390,7 @@ public class FSMController
             npc.GetComponent<NavMeshAgent>().remainingDistance <2f);
 
         var hidingSpots = roomAnchor.GetComponentsInChildren<HidingSpot>();
-        var lookDirector = npc.GetComponentInChildren<POILookDirector>(true);
+        var lookDirector = npc.poiLookDirector;
 
         foreach (var spot in hidingSpots)
         {
@@ -417,12 +433,33 @@ public class FSMController
                 hidingPoi = spot.PivotForNPCSearchRoutine;
 
             if (lookDirector != null)
-                lookDirector.OverrideLookAt(hidingPoi, 1f);
+            {
+                // One-shot "look at this hiding spot" (do not pin for the whole wait).
+                lookDirector.SnapPOITo(hidingPoi);
 
-            yield return new WaitForSeconds(4f);
+                // Optional: briefly engage look rig (keeps it routine-driven).
+                lookDirector.TriggerLookHold();
 
-            if (lookDirector != null)
-                lookDirector.ClearOverrideLook();
+                // During the search wait, allow occasional scary snaps to the player.
+                float t = 0f;
+                const float window = 4f;
+                const float checkEvery = 0.25f;
+                while (t < window)
+                {
+                    // Keep baseline target as the hiding spot unless the random roll snaps elsewhere.
+                    lookDirector.SnapPOITo(hidingPoi);
+                    lookDirector.SnapPOIToRandomOrPlayer();
+
+                    yield return new WaitForSeconds(checkEvery);
+                    t += checkEvery;
+                }
+
+                lookDirector.CancelHoldAndClearLook();
+            }
+            else
+            {
+                yield return new WaitForSeconds(4f);
+            }
         }
         if(npc.currentState !=NPCController.AIState.Capture)        
             SetState(NPCController.AIState.Natural);

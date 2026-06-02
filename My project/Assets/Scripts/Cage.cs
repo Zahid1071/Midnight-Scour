@@ -1,5 +1,6 @@
 using UnityEngine;
 using FS_Atmo;
+using System.Diagnostics;
 
 public class Cage : MonoBehaviour
 {
@@ -9,7 +10,6 @@ public class Cage : MonoBehaviour
 
     // Hardcoded layer ID as requested
     private const int CAPTIVE_LAYER = 12;
-    private const float MinDistanceForCaptiveLayerMeters = 2f;
 
     // Variables to track player state
     private int originalLayerIndex;
@@ -25,17 +25,25 @@ public class Cage : MonoBehaviour
         // Door CLOSED -> Use Captive Layer (Hidden/ID 12)
         int targetLayer = originalLayerIndex;
 
+        bool cageVisible = false;
+
         if (!cageDoor.objectOpen)
         {
-            // Captive layer only if no LOS to cage, every NPC is >= MinDistanceForCaptiveLayerMeters away,
-            // and door closed.
-            if (!IsCageVisibleToAnyNPC() && !IsAnyNPCTooCloseForCaptiveLayer())
+            // Captive layer only if no LOS to cage and door closed.
+            cageVisible = IsCageVisibleToAnyNPC();
+            if (!cageVisible)
                 targetLayer = CAPTIVE_LAYER;
         }
 
         // Only assign if different to avoid overhead
         if (playerRef.layer != targetLayer)
         {
+#if UNITY_EDITOR
+            var st = new StackTrace(1, true);
+            UnityEngine.Debug.Log(
+                $"[Cage] Player layer {playerRef.layer} -> {targetLayer} | doorOpen={cageDoor.objectOpen} cageVisible={cageVisible} original={originalLayerIndex}\n{st}",
+                this);
+#endif
             playerRef.layer = targetLayer;
         }
     }
@@ -76,36 +84,15 @@ public class Cage : MonoBehaviour
         return false;
     }
 
-    /// <summary>
-    /// Any NPC within this distance keeps the player on the normal layer (even with no LOS).
-    /// </summary>
-    private bool IsAnyNPCTooCloseForCaptiveLayer()
-    {
-        if (playerRef == null) return true;
-#if UNITY_2023_1_OR_NEWER
-        var perceivers = Object.FindObjectsByType<PerceptionController>(FindObjectsSortMode.None);
-#else
-        var perceivers = Object.FindObjectsOfType<PerceptionController>();
-#endif
-        Vector3 playerPos = playerRef.transform.position;
-        foreach (var p in perceivers)
-        {
-            if (p == null) continue;
-            if (Vector3.Distance(playerPos, p.transform.position) < MinDistanceForCaptiveLayerMeters)
-                return true;
-        }
-
-        return false;
-    }
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
             // Capture the layer the player had when they walked in
             originalLayerIndex = other.gameObject.layer;
-            
-            playerRef = other.gameObject;
+
+            // Track the root so we don't accidentally toggle only a child collider.
+            playerRef = other.transform.root != null ? other.transform.root.gameObject : other.gameObject;
             isOccupied = true;
         }
     }
@@ -119,6 +106,10 @@ public class Cage : MonoBehaviour
             // Restore the player to their original layer upon exit
             if (playerRef != null)
             {
+#if UNITY_EDITOR
+                var st = new StackTrace(1, true);
+                UnityEngine.Debug.Log($"[Cage] OnTriggerExit restore layer {playerRef.layer} -> {originalLayerIndex}\n{st}", this);
+#endif
                 playerRef.layer = originalLayerIndex;
             }
 

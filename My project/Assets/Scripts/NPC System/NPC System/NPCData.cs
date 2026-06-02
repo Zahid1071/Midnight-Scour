@@ -57,6 +57,14 @@ public struct ChaseRetentionSettings
     [Min(0f)] public float keepChasingDistance;
 }
 
+[System.Serializable]
+public struct POILookSettings
+{
+    [Header("Natural")]
+    [Min(0.01f)] public float naturalPoiIntervalSeconds;
+    [Range(0f, 1f)] public float naturalLookHoldChance;
+}
+
 [CreateAssetMenu(fileName = "NPCData", menuName = "NPC/NPC Data")]
 public class NPCData : ScriptableObject
 {
@@ -112,5 +120,11 @@ public class NPCData : ScriptableObject
     public ChaseRetentionSettings chaseRetention = new ChaseRetentionSettings {
         gracePeriod         = 2f,
         keepChasingDistance = 3f
+    };
+
+    [Header("POI Look")]
+    public POILookSettings poiLook = new POILookSettings {
+        naturalPoiIntervalSeconds = 5f,
+        naturalLookHoldChance     = 0.30f
     };
 }

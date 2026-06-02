@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections;
 
 public class NPCController : MonoBehaviour
 {
@@ -13,6 +14,10 @@ public class NPCController : MonoBehaviour
     private FS_Atmo.Navigator navigator;
     private NavMeshAgent agent;
 
+    [Header("Look / POI")]
+    [Tooltip("Optional. Assign the scene's POI look director (can live anywhere; does NOT need to be a child).")]
+    public POILookDirector poiLookDirector;
+
     [Header("Capture")]
     [Tooltip("Distance at which the NPC instantly captures the player while chasing.")]
     public float captureDistance = 1.8f;
@@ -24,8 +29,8 @@ public class NPCController : MonoBehaviour
     public float chaseReplanDist = 0.75f;
 
     [Header("Speeds (override from NPCData if present)")]
-    public float walkSpeed = 2.5f;
-    public float runSpeed  = 6.0f;
+    [HideInInspector] public float walkSpeed = 2.5f;
+    [HideInInspector] public float runSpeed  = 6.0f;
 
     // internal chase guards
     public Vector3 _lastChaseTarget = new Vector3(float.PositiveInfinity, 0f, 0f);
@@ -72,6 +77,64 @@ public class NPCController : MonoBehaviour
     void Update()
     {
         fsm?.Update();
+
+        TickNaturalPoiLook();
+    }
+
+    private Coroutine _naturalPoiRoutine;
+
+    void TickNaturalPoiLook()
+    {
+        float interval = GetNaturalPoiIntervalSeconds();
+        bool shouldRun =
+            currentState == AIState.Natural &&
+            poiLookDirector != null &&
+            interval > 0f;
+
+        if (shouldRun)
+        {
+            if (_naturalPoiRoutine == null)
+                _naturalPoiRoutine = StartCoroutine(NaturalPoiLookRoutine());
+        }
+        else
+        {
+            if (_naturalPoiRoutine != null)
+            {
+                StopCoroutine(_naturalPoiRoutine);
+                _naturalPoiRoutine = null;
+            }
+
+            // Ensure we don't leave the rig weight up when leaving Natural.
+            if (poiLookDirector != null && currentState != AIState.Chase && currentState != AIState.Capture)
+                poiLookDirector.CancelHoldAndClearLook();
+        }
+    }
+
+    IEnumerator NaturalPoiLookRoutine()
+    {
+        while (currentState == AIState.Natural && poiLookDirector != null)
+        {
+            poiLookDirector.SnapPOIToRandomOrPlayer();
+
+            if (Random.value < GetNaturalLookHoldChance())
+                poiLookDirector.TriggerLookHold();
+
+            yield return new WaitForSeconds(GetNaturalPoiIntervalSeconds());
+        }
+
+        _naturalPoiRoutine = null;
+    }
+
+    float GetNaturalPoiIntervalSeconds()
+    {
+        var data = interaction != null ? interaction.data : null;
+        return data != null ? Mathf.Max(0.01f, data.poiLook.naturalPoiIntervalSeconds) : 5f;
+    }
+
+    float GetNaturalLookHoldChance()
+    {
+        var data = interaction != null ? interaction.data : null;
+        return data != null ? Mathf.Clamp01(data.poiLook.naturalLookHoldChance) : 0.30f;
     }
 
     // ========== State helpers ==========

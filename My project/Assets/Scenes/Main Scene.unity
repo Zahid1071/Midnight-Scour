@@ -1618,6 +1618,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18657d0e6be75344291752f4db22809b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &296800257 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4948167340676021782, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+  m_PrefabInstance: {fileID: 8236328092443100426}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70b342d8ce5c2fd48b8fa3147d48d1d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &297924775
 GameObject:
   m_ObjectHideFlags: 0
@@ -4439,13 +4450,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53f0a2e0e4de3a740a680f4e5c1b9a3a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  npc: {fileID: 8236328092443100427}
+  lookRig: {fileID: 296800257}
   poi: {fileID: 824396280}
   playerPoi: {fileID: 115141181}
   poiBounds: {fileID: 8236328092443100428}
-  triggerChance: 0.5
-  lookAtPlayerChance: 0.25
-  chanceCheckIntervalSeconds: 3
+  lookAtPlayerChance: 0.5
   holdSeconds: 2
   rampSeconds: 0.3
 --- !u!1001 &833957412
@@ -6237,6 +6246,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 8616685848737228372, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 8997996947095583982, guid: c5efc39a8aaf6e64ea40e9ad573e9b47, type: 3}
       propertyPath: m_LocalPosition.x
       value: 8.32
@@ -7984,8 +7997,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.23, y: 0.25, z: 2.11}
-  m_Center: {x: 0, y: 0.15, z: 0}
+  m_Size: {x: 2.3616128, y: 0.25, z: 2.3670883}
+  m_Center: {x: 0.0012032986, y: 0.15, z: -0.012268066}
 --- !u!4 &1735021120 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3872148759047075944, guid: ed043a00e1043044a9a19ad2e9b44aa2, type: 3}
@@ -14655,6 +14668,10 @@ PrefabInstance:
       propertyPath: m_Data.m_SourceObjects.m_Item0.transform
       value: 
       objectReference: {fileID: 824396280}
+    - target: {fileID: 1469066018935350255, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: poiLookDirector
+      value: 
+      objectReference: {fileID: 824396281}
     - target: {fileID: 2588451862027541027, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
       propertyPath: m_LocalPosition.x
       value: 7.812
@@ -14728,11 +14745,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
---- !u!4 &8236328092443100427 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2588451862027541027, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
-  m_PrefabInstance: {fileID: 8236328092443100426}
-  m_PrefabAsset: {fileID: 0}
 --- !u!65 &8236328092443100428 stripped
 BoxCollider:
   m_CorrespondingSourceObject: {fileID: 4292282699666735817, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}

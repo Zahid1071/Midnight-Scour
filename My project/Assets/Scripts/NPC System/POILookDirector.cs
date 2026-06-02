@@ -5,37 +5,28 @@ using UnityEngine.Animations.Rigging;
 public class POILookDirector : MonoBehaviour
 {
     [Header("References (assign in inspector)")]
-    [SerializeField] Transform npc;
+    [SerializeField] Rig lookRig;
     [SerializeField] Transform poi;
     [SerializeField] Transform playerPoi;
     [SerializeField] BoxCollider poiBounds;
 
     [Header("Look Chance")]
-    [SerializeField, Range(0f, 1f)] float triggerChance = 0.30f;
     [SerializeField, Range(0f, 1f)] float lookAtPlayerChance = 0.08f;
-    [SerializeField] float chanceCheckIntervalSeconds = 5f;
     [SerializeField] float holdSeconds = 2f;
     [SerializeField] float rampSeconds = 0.6f;
 
-    NPCController _npc;
     Rig _lookRig;
     MultiAimConstraint[] _aimConstraints;
     Coroutine _holdRoutine;
-    bool _chaseLookActive;
-    Transform _overrideLookTarget;
-    float _overrideWeight;
 
     void Awake()
     {
         if (poiBounds == null)
             poiBounds = GetComponent<BoxCollider>();
 
-        if (npc != null)
-        {
-            _npc = npc.GetComponent<NPCController>();
-            _lookRig = npc.GetComponentInChildren<Rig>(true);
-            _aimConstraints = npc.GetComponentsInChildren<MultiAimConstraint>(true);
-        }
+        _lookRig = lookRig;
+        if (_aimConstraints == null && _lookRig != null)
+            _aimConstraints = _lookRig.GetComponentsInChildren<MultiAimConstraint>(true);
 
         if (poi != null)
             SetConstraintTargets(poi);
@@ -44,82 +35,7 @@ public class POILookDirector : MonoBehaviour
             _lookRig.weight = 0f;
     }
 
-    void OnEnable()
-    {
-        StartCoroutine(LookLoop());
-    }
-
-    IEnumerator LookLoop()
-    {
-        while (true)
-        {
-            if (_lookRig == null && npc != null)
-                _lookRig = npc.GetComponentInChildren<Rig>(true);
-
-            if (_overrideLookTarget != null && _lookRig != null && poi != null)
-            {
-                StopAmbientHold();
-                _lookRig.weight = _overrideWeight;
-                poi.position = _overrideLookTarget.position;
-                yield return null;
-                continue;
-            }
-
-            if (IsChaseLookState())
-            {
-                if (!_chaseLookActive)
-                    EnterChaseLook();
-
-                if (_lookRig != null)
-                    _lookRig.weight = 1f;
-                if (poi != null && playerPoi != null)
-                    poi.position = playerPoi.position;
-
-                yield return null;
-                continue;
-            }
-
-            if (_chaseLookActive)
-                ExitChaseLook();
-
-            if (npc != null && poi != null && poiBounds != null && _lookRig != null)
-            {
-                MovePOIInsideBounds();
-                yield return null;
-
-                if (Random.value < triggerChance)
-                    TriggerLookHold();
-            }
-
-            yield return new WaitForSeconds(chanceCheckIntervalSeconds);
-        }
-    }
-
-    bool IsChaseLookState()
-    {
-        if (_npc == null || playerPoi == null) return false;
-        return _npc.currentState == NPCController.AIState.Chase
-            || _npc.currentState == NPCController.AIState.Capture;
-    }
-
-    void EnterChaseLook()
-    {
-        _chaseLookActive = true;
-        StopAmbientHold();
-        if (poi != null)
-            SetConstraintTargets(poi);
-    }
-
-    void ExitChaseLook()
-    {
-        _chaseLookActive = false;
-        if (poi != null)
-            SetConstraintTargets(poi);
-        if (_lookRig != null)
-            _lookRig.weight = 0f;
-    }
-
-    void StopAmbientHold()
+    void StopHold()
     {
         if (_holdRoutine != null)
         {
@@ -128,13 +44,44 @@ public class POILookDirector : MonoBehaviour
         }
     }
 
-    void MovePOIInsideBounds()
+    void EnsureRig()
     {
-        if (playerPoi != null && Random.value < lookAtPlayerChance)
-        {
-            poi.position = playerPoi.position;
-            return;
-        }
+        if (_lookRig == null)
+            _lookRig = lookRig;
+        if (_aimConstraints == null && _lookRig != null)
+            _aimConstraints = _lookRig.GetComponentsInChildren<MultiAimConstraint>(true);
+        if (poi != null)
+            SetConstraintTargets(poi);
+    }
+
+    public void SetLookWeight(float weight)
+    {
+        EnsureRig();
+        if (_lookRig == null) return;
+        _lookRig.weight = Mathf.Clamp01(weight);
+    }
+
+    public void SetPOIPosition(Vector3 worldPosition)
+    {
+        if (poi == null) return;
+        poi.position = worldPosition;
+    }
+
+    public void SnapPOITo(Transform target)
+    {
+        if (target == null) return;
+        SetPOIPosition(target.position);
+    }
+
+    public void SnapPOIToPlayer()
+    {
+        if (playerPoi == null) return;
+        SetPOIPosition(playerPoi.position);
+    }
+
+    public void SnapPOIToRandomInBounds()
+    {
+        if (poi == null || poiBounds == null) return;
 
         Transform bt = poiBounds.transform;
         Vector3 c = poiBounds.center;
@@ -149,8 +96,22 @@ public class POILookDirector : MonoBehaviour
         poi.position = bt.TransformPoint(localRandom);
     }
 
-    void TriggerLookHold()
+    public void SnapPOIToRandomOrPlayer()
     {
+        if (playerPoi != null && Random.value < lookAtPlayerChance)
+        {
+            SnapPOIToPlayer();
+            return;
+        }
+
+        SnapPOIToRandomInBounds();
+    }
+
+    public void TriggerLookHold()
+    {
+        EnsureRig();
+        if (_lookRig == null) return;
+
         if (_holdRoutine != null)
             StopCoroutine(_holdRoutine);
         _holdRoutine = StartCoroutine(LookHoldRoutine());
@@ -201,17 +162,9 @@ public class POILookDirector : MonoBehaviour
         }
     }
 
-    public void OverrideLookAt(Transform target, float weight)
+    public void CancelHoldAndClearLook()
     {
-        _overrideLookTarget = target;
-        _overrideWeight = Mathf.Clamp01(weight);
-        if (poi != null)
-            SetConstraintTargets(poi);
-    }
-
-    public void ClearOverrideLook()
-    {
-        _overrideLookTarget = null;
+        StopHold();
         if (_lookRig != null)
             _lookRig.weight = 0f;
     }
