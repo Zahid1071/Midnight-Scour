@@ -177,7 +177,7 @@ MonoBehaviour:
   baseSensitivity: 0.1
   fallbackSensitivity: 0.1
   minPitch: -80
-  maxPitch: 80
+  maxPitch: 90
 --- !u!1 &5393215578589016642
 GameObject:
   m_ObjectHideFlags: 0
@@ -287,6 +287,7 @@ GameObject:
   - component: {fileID: 1976816125616372318}
   - component: {fileID: 750681375347046963}
   - component: {fileID: 8847291056384729103}
+  - component: {fileID: 2242704982271436769}
   m_Layer: 3
   m_Name: PlayerCapsule
   m_TagString: Player
@@ -614,7 +615,7 @@ MonoBehaviour:
   interactRange: 1.5
   interactLayer:
     serializedVersion: 2
-    m_Bits: 576
+    m_Bits: 49728
   cameraTransform: {fileID: 0}
   outOfReachMessage: It is too far
 --- !u!114 &4452460983465209085
@@ -629,29 +630,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f000ae88209b16e4382cfd12c1a70ae0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  footstepSource: {fileID: 422331346628894323}
+  footAnchor: {fileID: 0}
   leftFootClips:
   - {fileID: 8300000, guid: f5dc1aebb3da41d46a8bece3122fd117, type: 3}
-  - {fileID: 8300000, guid: 60af8a75ea76ad44187be3f274d5e1b3, type: 3}
-  - {fileID: 8300000, guid: bb9b578f82879584ba3d66a3ec275454, type: 3}
-  - {fileID: 8300000, guid: 6638c21992479b54f961997082fe799d, type: 3}
-  rightFootClips:
-  - {fileID: 8300000, guid: 3b9479bee7ed87147b2eed1ac259dbe5, type: 3}
   - {fileID: 8300000, guid: 658c4a2923a799f42985303dec4a06bf, type: 3}
-  - {fileID: 8300000, guid: 2777782a2f95fef42bd3c880a84fccd0, type: 3}
-  - {fileID: 8300000, guid: e26a2aef280171b4ebeef3c5e9dae381, type: 3}
+  - {fileID: 8300000, guid: 60af8a75ea76ad44187be3f274d5e1b3, type: 3}
+  rightFootClips:
+  - {fileID: 8300000, guid: 8d3ac292e5809ff4fa4bcce1b53d7804, type: 3}
+  - {fileID: 8300000, guid: 3b9479bee7ed87147b2eed1ac259dbe5, type: 3}
+  - {fileID: 8300000, guid: f5dc1aebb3da41d46a8bece3122fd117, type: 3}
+  runLeftFootClips: []
+  runRightFootClips: []
+  chaseSweetenerClips: []
+  chaseSweetenerChance: 0.35
+  chaseSweetenerVolume: 0.55
   mixerGroup: {fileID: 5656172210110584295, guid: d0494497af355c44f913d2de9798dce5, type: 2}
-  reverbSendLevel: 1
+  walkReverbZoneMix: 0
+  runReverbZoneMix: 0.85
   walkVolume: 1
   runVolume: 1.3
   sneakVolume: 0.4
-  occlusionLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  occludedVolumeMultiplier: 0.4
-  occludedLowpassCutoff: 1400
-  clearLowpassCutoff: 22000
-  listenerTransform: {fileID: 0}
+  walkPitchRange: {x: 0.97, y: 1.03}
+  runPitchRange: {x: 0.9, y: 0.98}
 --- !u!114 &8782256225151303304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -693,7 +693,7 @@ MonoBehaviour:
   buttonPromptSprite: {fileID: 21300000, guid: 5c20b4d9fe053e14a9f8a30c304b1ed1, type: 3}
   shakeDuration: 0.22
   failShakeStrength: 6
-  successScalePeak: 1.22
+  successScalePeak: 1.5
 --- !u!114 &7829341056284017392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -776,3 +776,35 @@ MonoBehaviour:
   crouchHeightRatio: 0.6
   crouchStepOffset: 0.15
   transitionSpeed: 4
+--- !u!114 &2242704982271436769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8616685848737228372}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db3cc8266d01cc143880beb10bf2ea25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spotlight: {fileID: 0}
+  castSource: {fileID: 0}
+  facePalmDistance: 1
+  sideYawDegrees: 10
+  obstacleLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  triggerInteraction: 1
+  ignoreCage: 1
+  ignoreSelf: 1
+  normalIntensity: 1
+  minIntensity: 0.25
+  intensityDeadzone: 0.02
+  dimSpeed: 10
+  restoreSpeed: 6
+  dimDuringInputBlock: 1
+  blockedIntensity: 0.1
+  startBlockedUntilCinematicUnlock: 1
+  startBlockTimeoutSeconds: 2
+  dimWhileHidden: 1

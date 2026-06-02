@@ -7,6 +7,13 @@ using UnityEngine;
 [DefaultExecutionOrder(100)]
 public class BoneRotationSpeedCap : MonoBehaviour
 {
+    [Header("Small-angle slow down")]
+    [Tooltip("When the remaining rotation is at/below this angle, rotation is slowed the most.")]
+    public float smallAngleThresholdDegrees = 10f;
+
+    [Tooltip("At very small angles, rotate this many times slower than maxDegreesPerSecond.")]
+    public float smallAngleSlowFactor = 10f;
+
     [System.Serializable]
     public struct Entry
     {
@@ -30,12 +37,19 @@ public class BoneRotationSpeedCap : MonoBehaviour
 
     void LateUpdate()
     {
+        float threshold = Mathf.Max(0.001f, smallAngleThresholdDegrees);
+        float slowFactor = Mathf.Max(1f, smallAngleSlowFactor);
+
         for (int i = 0; i < bones.Length; i++)
         {
             Transform t = bones[i].bone;
             if (t == null) continue;
 
-            float maxStep = bones[i].maxDegreesPerSecond * Time.deltaTime;
+            float remainingAngle = Quaternion.Angle(_last[i], t.rotation);
+            float a = Mathf.Clamp01(remainingAngle / threshold);
+            float speedScale = Mathf.Lerp(1f / slowFactor, 1f, a);
+
+            float maxStep = bones[i].maxDegreesPerSecond * speedScale * Time.deltaTime;
             _last[i] = Quaternion.RotateTowards(_last[i], t.rotation, maxStep);
             t.rotation = _last[i];
         }
