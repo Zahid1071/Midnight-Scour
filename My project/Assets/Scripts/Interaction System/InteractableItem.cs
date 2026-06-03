@@ -4,6 +4,8 @@ public class InteractableItem : MonoBehaviour, IInteractable
 {
     public InventoryItem itemData;
     [SerializeField] GrateSystem grateGate;
+    [SerializeField] bool blockedUntilBenchViceReleased;
+    [SerializeField] string benchViceStuckMessage = "It is stuck.";
     [SerializeField] string blockedMessage = "I can't reach that.";
 
     bool _consumed;
@@ -17,6 +19,16 @@ public class InteractableItem : MonoBehaviour, IInteractable
         {
             InteractionFeedback.Fail(blockedMessage, 3f);
             return;
+        }
+
+        if (blockedUntilBenchViceReleased)
+        {
+            var vice = BenchVicePuzzle.Instance;
+            if (vice != null && !vice.IsWrenchReleased)
+            {
+                InteractionFeedback.Fail(benchViceStuckMessage, 3f);
+                return;
+            }
         }
 
         if (itemData == null)

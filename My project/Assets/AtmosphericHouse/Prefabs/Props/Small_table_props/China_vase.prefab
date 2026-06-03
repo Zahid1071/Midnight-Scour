@@ -124,6 +124,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: 844bb3609a95d1c43b5016bdfd55e19a, type: 2}
   grateGate: {fileID: 0}
+  blockedUntilBenchViceReleased: 0
+  benchViceStuckMessage: It is stuck.
   blockedMessage: I can't reach that.
 --- !u!114 &2847193056481928374
 MonoBehaviour:
@@ -138,8 +140,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   brokenPrefab: {fileID: 7059359022089829872, guid: e9e0fbbcdbfb46940a83c825a98412c6, type: 3}
+  contentPrefab: {fileID: 7437986296918079698, guid: 27ddbb3743994934986d30e24721d0f4, type: 3}
   minImpactSpeed: 2
-  breakSfxVolume: 3
+  breakSfxVolume: 4
   debrisDisappearMinSeconds: 2
   debrisDisappearMaxSeconds: 3
   npcSuspicionFromBreak: 300

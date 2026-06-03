@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Bar
   icon: {fileID: 21300000, guid: 9b3a967df97b82343885b97f2d3c3d2d, type: 3}
-  worldPrefab: {fileID: 7566773249222662892, guid: f0ca25ecd7536224694147645fe12ef1, type: 3}
+  worldPrefab: {fileID: 885129519109419628, guid: 79cea1a122fa53a43b4bfcba554f1a11, type: 3}
   dropLandSFX: {fileID: 0}
   canDrop: 1
   pickUpSFX: {fileID: 8300000, guid: 9c063062c4b98944fabbf9bc3cb175d7, type: 3}
   useSuccessSound: {fileID: 0}
-  consumeOnUse: 0
+  consumeOnUse: 1
   interactionReachBonus: 0
   breaksOnWrongUse: 0
   breakOnWrongUseSound: {fileID: 0}

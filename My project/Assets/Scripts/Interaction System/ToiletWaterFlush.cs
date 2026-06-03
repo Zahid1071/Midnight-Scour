@@ -14,6 +14,11 @@ public class ToiletWaterFlush : MonoBehaviour, IInteractable, IItemReceiver
     [SerializeField] private string alreadyFlushedMessage = "The water's already gone.";
     [SerializeField] private string successMessage = "";
     [SerializeField] AudioClip flush;
+    [Header("NPC Suspicion")]
+    [Tooltip("Footstep-suspicion added to NPCs when the toilet flushes.")]
+    [Min(0f)]
+    [SerializeField] float npcSuspicionOnFlush = 300f;
+    [SerializeField] float flushSfxVolume = 1f;
 
     bool _hasFlushed;
 
@@ -77,7 +82,12 @@ public class ToiletWaterFlush : MonoBehaviour, IInteractable, IItemReceiver
             animator.enabled = true;
 
         animator.SetTrigger(FlushTrigger);
-        SoundManager.Instance.PlaySFXAt(flush,transform.position);
+
+        Vector3 noisePos = transform.position;
+        if (flush != null && SoundManager.Instance != null)
+            SoundManager.Instance.PlaySFXAt(flush, noisePos, flushSfxVolume);
+        WorldNoiseAlert.Notify(noisePos, npcSuspicionOnFlush);
+
         _hasFlushed = true;
 
         if (item.consumeOnUse)

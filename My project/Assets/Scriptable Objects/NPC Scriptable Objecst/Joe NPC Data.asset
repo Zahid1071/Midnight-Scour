@@ -15,7 +15,7 @@ MonoBehaviour:
   npcName: Butcher
   npcPrefab: {fileID: 4884186263421869, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
   homeID: House_001
-  searchChance: 0.1
+  searchChance: 0.2
   weightedRoutinePlans:
   - zoneID: House_001
     weight: 0.247
@@ -73,7 +73,7 @@ MonoBehaviour:
     ignoreLayer:
       serializedVersion: 2
       m_Bits: 13444
-    confirmSeconds: 0.5
+    confirmSeconds: 1
     preAlertSeconds: 0.1
     buildRate: 1
     decayRate: 0.1
@@ -86,7 +86,7 @@ MonoBehaviour:
     footstepDecayPerSecond: 10
   locomotion:
     walkingSpeed: 2.5
-    runningSpeed: 5
+    runningSpeed: 3.8
   chaseRetention:
     gracePeriod: 3
     keepChasingDistance: 5

@@ -23,6 +23,6 @@ MonoBehaviour:
   interactionReachBonus: 0
   breaksOnWrongUse: 0
   breakOnWrongUseSound: {fileID: 0}
-  breakOnWrongUseMessage: The screwdriver snapped.
-  pickUpText: 
+  breakOnWrongUseMessage: 
+  pickUpText: There is something inside it
   description: 

@@ -62,17 +62,11 @@ public class PlayerFootstepRhythm : MonoBehaviour
             footstepController.PlayFootstep(volume, useRunClips);
 
             float suspicionValue = 0f;
-            float sneakingLuck = 1f;
+            if (speed > runThreshold) suspicionValue = 50;
+            else if (speed > walkThreshold) suspicionValue = 20;
 
-            if (speed > runThreshold)        suspicionValue = 50;
-            else if (speed > walkThreshold)  suspicionValue = 20;
-            else if (speed > sneakThreshold)
-            {
-                suspicionValue = 0f;
-                sneakingLuck = 0.9f;
-            }
-            //Debug.Log(suspicionValue);
-            NotifyNPCsOfFootstep(suspicionValue, sneakingLuck);
+            if (suspicionValue > 0f)
+                NotifyNPCsOfFootstep(suspicionValue);
 
 
             distanceAccumulator -= stepDistance; // keep remainder for smooth rhythm
@@ -101,30 +95,16 @@ public class PlayerFootstepRhythm : MonoBehaviour
     float minHearingDistance = 5f;
 
 
-    void NotifyNPCsOfFootstep(float suspicionAmount, float sneakingLuck = 1f)
+    void NotifyNPCsOfFootstep(float suspicionAmount)
     {
         foreach (var npc in Object.FindObjectsByType<PerceptionController>(FindObjectsSortMode.None))
         {
             float dist = Vector3.Distance(transform.position, npc.transform.position);
 
-            // Normalize distance to [0,1], then flip so closer = higher
             float t = Mathf.InverseLerp(maxHearingDistance, minHearingDistance, dist);
             t = Mathf.Clamp01(t);
 
-            // Exponential scaling (closer ramps suspicion much faster)
-            float distanceMultiplier = Mathf.Pow(t, 5f); // try 2f, 3f, etc. for steeper curve
-
-            if (suspicionAmount == 0)
-            {
-                if (Random.value > sneakingLuck)
-                {
-                    float creakValue = 300 * distanceMultiplier;
-                    SoundManager.Instance.PlaySFXAt(SoundManager.Instance.footstepClips[0], transform.position);    
-                    npc.HearPlayerFootstep(transform, creakValue);
-                }
-                continue;
-            }
-
+            float distanceMultiplier = Mathf.Pow(t, 5f);
             float addValue = suspicionAmount * distanceMultiplier;
             npc.HearPlayerFootstep(transform, addValue);
         }

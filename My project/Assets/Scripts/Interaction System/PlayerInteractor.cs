@@ -163,7 +163,9 @@ public class PlayerInteractor : MonoBehaviour
 
         RegisterInteractForFrame(hit.collider);
 
-        bool lockedDoorAttempt = interactable is SimpleOpenClose door && !door.objectOpen && door.isLocked;
+        bool lockedDoorAttempt =
+            (interactable is SimpleOpenClose door && !door.objectOpen && door.isLocked)
+            || LockedOpenClose.IsLockedShut(interactable);
         interactable.Interact();
 
         if (!lockedDoorAttempt)

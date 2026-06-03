@@ -121,7 +121,7 @@ GameObject:
   - component: {fileID: 7338529807508288952}
   - component: {fileID: 6059695026941462003}
   - component: {fileID: 2345306032079100597}
-  - component: {fileID: 3031941316295925627}
+  - component: {fileID: 2941587307430635338}
   m_Layer: 0
   m_Name: bench_vice_clamp
   m_TagString: Untagged
@@ -198,8 +198,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &3031941316295925627
-MeshCollider:
+--- !u!65 &2941587307430635338
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -216,10 +216,9 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -6225235896203813689, guid: 290951bdf5844b041ab805198c7b9536, type: 3}
+  serializedVersion: 3
+  m_Size: {x: 0.0013375006, y: 0.0036647231, z: 0.0015201179}
+  m_Center: {x: 0.0000011667437, y: -0.000020094749, z: 0.0011596573}
 --- !u!1 &2288804565079770691
 GameObject:
   m_ObjectHideFlags: 0
@@ -231,7 +230,9 @@ GameObject:
   - component: {fileID: 4671986992297625290}
   - component: {fileID: 819478082428468367}
   - component: {fileID: 1522663100209664381}
-  m_Layer: 0
+  - component: {fileID: 9123456789012345681}
+  - component: {fileID: 5957228972977827949}
+  m_Layer: 14
   m_Name: bench_vice_bar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -306,6 +307,41 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &9123456789012345681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2288804565079770691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8e4d3f92c5e6b7a8890a1b2c3d4e5f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  puzzle: {fileID: 9123456789012345679}
+  wontBudgeMessage: It won't budge.
+--- !u!65 &5957228972977827949
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2288804565079770691}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.00017920986, y: 0.00017783948, z: 0.0019929006}
+  m_Center: {x: -0.0000021196543, y: 0.000027289998, z: -0.0006304509}
 --- !u!1 &4705902071549565986
 GameObject:
   m_ObjectHideFlags: 0
@@ -424,7 +460,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6752616634467637737}
-  m_Layer: 0
+  - component: {fileID: 9123456789012345678}
+  - component: {fileID: 9123456789012345679}
+  m_Layer: 14
   m_Name: Bench Vice
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -448,3 +486,50 @@ Transform:
   - {fileID: 6049665629360018860}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!65 &9123456789012345678
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8108257533126852819}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.35, y: 0.25, z: 0.4}
+  m_Center: {x: 0, y: 0.05, z: 0}
+--- !u!114 &9123456789012345679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8108257533126852819}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7f3c2e81b4d5a6978e0f1d2c3b4a596, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  barItem: {fileID: 11400000, guid: 551a63c81f12afd439c600034837827e, type: 2}
+  hammerItem: {fileID: 11400000, guid: c4d5e6f7a8b901234567890abcedef01, type: 2}
+  barVisual: {fileID: 2288804565079770691}
+  dialTransform: {fileID: 5485528706186185224}
+  animator: {fileID: 0}
+  strikeAnimatorTrigger: Strike
+  dialStrikeDegrees: 45
+  dialStrikeDuration: 0.35
+  wrongItemMessage: That won't work here.
+  barWontBudgeMessage: It won't budge.
+  needBarMessage: I need a bar for this vise.
+  useBarOnViseMessage: Use the bar on the vise.
+  useHammerOnBarMessage: Use the hammer on the bar.
+  strikeSound: {fileID: 0}

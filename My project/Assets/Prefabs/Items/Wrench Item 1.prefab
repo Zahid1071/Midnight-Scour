@@ -102,6 +102,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: 52a9d039e2f64e54c9af64efce91e72f, type: 2}
   grateGate: {fileID: 0}
+  blockedUntilBenchViceReleased: 1
+  benchViceStuckMessage: It is stuck.
   blockedMessage: I can't reach that.
 --- !u!64 &1546217469966049127
 MeshCollider:

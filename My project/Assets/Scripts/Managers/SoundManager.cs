@@ -39,7 +39,6 @@ public class SoundManager : MonoBehaviour
     public AudioClip[] ambienceBank;
     public AudioClip[] sfxBank;
     public AudioClip[] tensionSFXBank;
-    public AudioClip[] footstepClips;
 
     [Header("World item SFX")]
     [Tooltip("Played once when a dropped item hits the ground (collision-based).")]

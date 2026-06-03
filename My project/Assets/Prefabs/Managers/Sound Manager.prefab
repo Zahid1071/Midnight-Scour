@@ -75,8 +75,6 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 55bb594b195705346807f97f6fae9fc7, type: 3}
   tensionSFXBank:
   - {fileID: 8300000, guid: 5044f4d4737e3cb47b4ce02487db2729, type: 3}
-  footstepClips:
-  - {fileID: 8300000, guid: 316cbc57597747340a08a6332605e800, type: 3}
   musicSourceA: {fileID: 228075428072045804}
   musicSourceB: {fileID: 7535631578845724816}
   ambienceSource: {fileID: 8021086284184574946}

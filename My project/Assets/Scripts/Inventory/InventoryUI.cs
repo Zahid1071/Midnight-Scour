@@ -156,7 +156,7 @@ public class InventoryUI : MonoBehaviour
         }
 
         // LMB + item on unlocked door: item cannot be used; E opens the door instead.
-        if (target is SimpleOpenClose door && !door.isLocked)
+        if ((target is SimpleOpenClose door && !door.isLocked) || LockedOpenClose.IsUnlockedOpenable(target))
         {
             ShowWarning("You can't use that here.", 2.5f);
             return;
@@ -180,7 +180,7 @@ public class InventoryUI : MonoBehaviour
                 {
                     // Subtitle, SFX, and shake handled inside ItemCombineReceiver.
                 }
-                else if (receiver is SimpleOpenClose)
+                else if (receiver is SimpleOpenClose || receiver is LockedOpenClose)
                 {
                     InteractionUIManager.Instance?.PlaySuccessShake();
                 }

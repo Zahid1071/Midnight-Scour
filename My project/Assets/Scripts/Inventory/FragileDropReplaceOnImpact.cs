@@ -8,6 +8,7 @@ using UnityEngine;
 public sealed class FragileDropReplaceOnImpact : MonoBehaviour
 {
     [SerializeField] private GameObject brokenPrefab;
+    [SerializeField] private GameObject contentPrefab;
     [SerializeField] private float minImpactSpeed = 2f;
     [SerializeField] private float breakSfxVolume = 1f;
 
@@ -52,6 +53,7 @@ public sealed class FragileDropReplaceOnImpact : MonoBehaviour
             SoundManager.Instance.PlaySFXAt(_breakClip, impactPoint, breakSfxVolume);
 
         GameObject debris = Instantiate(brokenPrefab, pos, rot);
+        GameObject content = Instantiate(contentPrefab, pos, rot);
 
         var settle = debris.GetComponent<BrokenDebrisSettle>();
         if (settle == null)
