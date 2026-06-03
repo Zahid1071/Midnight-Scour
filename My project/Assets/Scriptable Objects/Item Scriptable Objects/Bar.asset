@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Bar
   m_EditorClassIdentifier: 
   itemName: Bar
-  icon: {fileID: 21300000, guid: d2a232ed2cbc3c1489730812e26c670c, type: 3}
+  icon: {fileID: 21300000, guid: 9b3a967df97b82343885b97f2d3c3d2d, type: 3}
   worldPrefab: {fileID: 7566773249222662892, guid: f0ca25ecd7536224694147645fe12ef1, type: 3}
   dropLandSFX: {fileID: 0}
   canDrop: 1
