@@ -368,8 +368,30 @@ namespace FS_Atmo
 
         public void ClearRoute()
         {
-            route.Clear(); // Stops the sequence of future points
-            agent.ResetPath(); // Stops the current physical movement immediately
+            if (followCo != null)
+            {
+                StopCoroutine(followCo);
+                followCo = null;
+            }
+
+            route.Clear();
+            idx = -1;
+            isDoorTransit = false;
+            agent.ResetPath();
+        }
+
+        /// <summary>
+        /// Chase / urgent pursuit: no room graph, no door prepoints.
+        /// </summary>
+        public void SetDestinationDirect(Vector3 worldPoint)
+        {
+            ClearRoute();
+
+            if (NavMesh.SamplePosition(worldPoint, out var hit, 1.5f, NavMesh.AllAreas))
+                worldPoint = hit.position;
+
+            agent.isStopped = false;
+            agent.SetDestination(worldPoint);
         }
 
     }

@@ -15,6 +15,14 @@ public class JumpscareManager : MonoBehaviour
 
     public void TriggerJumpscare(Transform jumpscarePoint, Transform npcFace)
     {
+        if (npcFace != null)
+        {
+            var lookDirector = npcFace.GetComponent<POILookDirector>()
+                ?? npcFace.GetComponentInChildren<POILookDirector>()
+                ?? npcFace.root.GetComponentInChildren<POILookDirector>();
+            lookDirector?.CancelHoldAndClearLook();
+        }
+
         // Position the camera at the jumpscare point
         jumpscareCam.transform.position = jumpscarePoint.position;
 

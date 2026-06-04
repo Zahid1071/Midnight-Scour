@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 24531184c746449478f100b14a7d09e5, type: 3}
-  m_Name: Joe NPC Data
+  m_Name: Butcher Data
   m_EditorClassIdentifier: 
   npcName: Butcher
   npcPrefab: {fileID: 4884186263421869, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
@@ -18,10 +18,10 @@ MonoBehaviour:
   searchChance: 0.2
   weightedRoutinePlans:
   - zoneID: House_001
-    weight: 0.247
+    weight: 0.426
     roomPlans:
     - roomAnchorID: Basement_Room
-      weight: 0.843
+      weight: 1
       hotspots:
       - hotspotID: Hotspot_Idle2
         weight: 1
@@ -44,7 +44,7 @@ MonoBehaviour:
     - roomAnchorID: Garden_Room
       weight: 0
       hotspots:
-      - hotspotID: Hotspot_JumpingJacks
+      - hotspotID: Hotspot_Sofa
         weight: 0.165
         duration: 3
         actionType: 11
@@ -54,7 +54,7 @@ MonoBehaviour:
         duration: 3
         actionType: 10
         requiresVisualOffset: 0
-    - roomAnchorID: Livingroom_Room
+    - roomAnchorID: Living_room
       weight: 0.369
       hotspots:
       - hotspotID: Hotspot_Sofa

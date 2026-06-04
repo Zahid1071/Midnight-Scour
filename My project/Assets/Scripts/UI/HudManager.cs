@@ -41,6 +41,7 @@ public class HudManager : MonoBehaviour
 
         if (subtitleText != null)
         {
+            subtitleText.raycastTarget = false;
             subtitleRect = subtitleText.rectTransform;
             subtitleRestPos = subtitleRect.anchoredPosition;
             defaultSubtitleColor = subtitleText.color;
@@ -132,7 +133,7 @@ public class HudManager : MonoBehaviour
 
     private IEnumerator HideAfter(float seconds)
     {
-        yield return new WaitForSeconds(seconds);
+        yield return new WaitForSecondsRealtime(seconds);
         hideRoutine = null;
         if (subtitleText != null)
         {

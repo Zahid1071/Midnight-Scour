@@ -95,6 +95,9 @@ public class NPCController : MonoBehaviour
     {
         fsm?.Update();
 
+        if (currentState == AIState.Natural && ShouldImmediatelyChasePlayer())
+            BeginChaseFromPerception();
+
         TickNaturalPoiLook();
     }
 
@@ -182,9 +185,52 @@ public class NPCController : MonoBehaviour
 
     // ========== Perception event handlers ==========
 
+    public bool ShouldImmediatelyChasePlayer()
+    {
+        if (perception == null || !perception.CanSeePlayer) return false;
+        return !IsPlayerStealthHidden(perception.PlayerTransform);
+    }
+
+    /// <summary>
+    /// Drop routine, door routes, and POI — run straight at the player.
+    /// </summary>
+    public void BeginChaseFromPerception()
+    {
+        if (currentState == AIState.Chase || currentState == AIState.Capture || currentState == AIState.Dead)
+            return;
+
+        navigator?.ClearRoute();
+        interaction?.CancelInteraction();
+
+        if (poiLookDirector != null)
+            poiLookDirector.CancelHoldAndClearLook();
+
+        _lastChaseTarget = new Vector3(float.PositiveInfinity, 0f, 0f);
+        _nextChaseReplanTime = 0f;
+
+        fsm.SetState(AIState.Chase);
+        ApplyLocomotionForState(AIState.Chase);
+        fsm.TickChase();
+    }
+
+    static bool IsPlayerStealthHidden(Transform playerTransform)
+    {
+        if (playerTransform == null) return false;
+        if (playerTransform.gameObject.layer == 7) return true;
+        var hider = playerTransform.GetComponent<PlayerHider>();
+        return hider != null && hider.isHidden;
+    }
+
     private void HandleVisionAlerted()
     {
         if (currentState == AIState.Chase || currentState == AIState.Capture || currentState == AIState.Dead) return;
+
+        if (currentState == AIState.Natural)
+        {
+            BeginChaseFromPerception();
+            return;
+        }
+
         interaction?.CancelAndExitGracefully(AIState.Chase);
     }
 
@@ -199,12 +245,15 @@ public class NPCController : MonoBehaviour
     {
         if (currentState == AIState.Capture || currentState == AIState.Dead || currentState == AIState.Scripted) return;
 
-        // Leave any current activity and switch to Chase
+        if (currentState == AIState.Natural)
+        {
+            BeginChaseFromPerception();
+            return;
+        }
+
+        navigator?.ClearRoute();
         interaction?.CancelAndExitGracefully(AIState.Chase);
-
-        // Ensure locomotion is correct for chase
         ApplyLocomotionForState(AIState.Chase);
-
         fsm.TickChase();
     }
 

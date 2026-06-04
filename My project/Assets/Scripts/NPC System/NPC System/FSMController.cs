@@ -75,17 +75,24 @@ public class FSMController
 
             case NPCController.AIState.Natural:
                 SoundManager.Instance.PlayMusic(SoundManager.Instance.musicBank[0]);
-                npc.interaction.StartNextRoutine();
-                Debug.Log("🌿 State: NATURAL");
+                if (npc.ShouldImmediatelyChasePlayer())
+                    npc.BeginChaseFromPerception();
+                else
+                {
+                    npc.interaction.StartNextRoutine();
+                    Debug.Log("🌿 State: NATURAL");
+                }
                 break;
 
             case NPCController.AIState.Chase:
+                nav?.ClearRoute();
                 Debug.Log("🏃 State: CHASE");
-                if (SoundManager.Instance.CurrentMusicClip != SoundManager.Instance.musicBank[1])
-                    SoundManager.Instance.PlayMusic(SoundManager.Instance.musicBank[1]);
+                // if (SoundManager.Instance.CurrentMusicClip != SoundManager.Instance.musicBank[1])
+                //     SoundManager.Instance.PlayMusic(SoundManager.Instance.musicBank[1]);
                 break;
 
             case NPCController.AIState.Capture:
+                npc.poiLookDirector?.CancelHoldAndClearLook();
                 Debug.Log("State: CAPTURE");
                 npc.BeginCapture();
                 break;
@@ -134,11 +141,7 @@ public class FSMController
                 break;
 
             case NPCController.AIState.Capture:
-                if (lookDirector != null)
-                {
-                    lookDirector.SetLookWeight(1f);
-                    lookDirector.SnapPOIToPlayer();
-                }
+                lookDirector?.CancelHoldAndClearLook();
                 break;
         }
     }
@@ -217,6 +220,8 @@ public class FSMController
     
     public IEnumerator CapturePlayerRoutine()
     {
+        npc.poiLookDirector?.CancelHoldAndClearLook();
+
         if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured))
         {
             npc.OnCaptureRoutineFinished();
@@ -264,6 +269,10 @@ public class FSMController
         PlayerControlGate.Acquire(PlayerControlGate.ReasonCaptured);
 
         Debug.Log("Player Caught!");
+
+        if (npc.poiLookDirector != null)
+            npc.poiLookDirector.CancelHoldAndClearLook();
+
         animator.SetTrigger("Jumpscare");
 
         JumpscareManager.Instance.TriggerJumpscare(npc.jumpscarePoint, npc.transform);
@@ -493,8 +502,13 @@ public class FSMController
                 yield break;
             }
         }
-        if(npc.currentState !=NPCController.AIState.Capture)        
-            SetState(NPCController.AIState.Natural);
+        if (npc.currentState != NPCController.AIState.Capture)
+        {
+            if (!IsPlayerStealthHidden() && npc.perception != null && npc.perception.CanSeePlayer)
+                npc.BeginChaseFromPerception();
+            else
+                SetState(NPCController.AIState.Natural);
+        }
             
 
         // if (UnityEngine.Random.value < npc.interaction.data.patrolChance)
@@ -581,7 +595,11 @@ public class FSMController
 
         if (targetMovedEnough || now >= npc._nextChaseReplanTime)
         {
-            nav.GoToPoint(targetPosition);
+            if (canSee)
+                nav.SetDestinationDirect(targetPosition);
+            else
+                nav.GoToPoint(targetPosition);
+
             npc._lastChaseTarget = targetPosition;
             npc._nextChaseReplanTime = now + npc.chaseReplanCooldown;
         }

@@ -6,58 +6,111 @@ using System.Linq;
 [CustomPropertyDrawer(typeof(RoutineIDAttribute))]
 public class RoutineIDDrawer : PropertyDrawer
 {
-    private Dictionary<string, Transform> idCache;
+    static Dictionary<RoutineIDAttribute.IDType, List<string>> _sceneIdsByType;
+    static bool _cacheHooksRegistered;
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
-        var attr = (RoutineIDAttribute)attribute;
-
-        if (idCache == null)
-            CacheIDs(attr.Type);
-
-        List<string> ids = idCache.Keys.ToList();
-
-        if (ids.Count == 0)
+        if (property.propertyType != SerializedPropertyType.String)
         {
-            EditorGUI.HelpBox(position, "No valid IDs found in scene.", MessageType.Warning);
+            EditorGUI.LabelField(position, label.text, "RoutineID requires a string field.");
             return;
         }
 
-        int currentIndex = Mathf.Max(0, ids.IndexOf(property.stringValue));
-        int newIndex = EditorGUI.Popup(position, property.displayName, currentIndex, ids.ToArray());
+        EnsureCacheHooks();
+        var attr = (RoutineIDAttribute)attribute;
+        var sceneIds = GetSceneIds(attr.Type);
 
-        property.stringValue = ids[newIndex];
+        string current = property.stringValue ?? string.Empty;
+
+        // No scene matches — plain text field only; never overwrite from code.
+        if (sceneIds.Count == 0)
+        {
+            EditorGUI.PropertyField(position, property, label);
+            return;
+        }
+
+        var options = BuildPopupOptions(current, sceneIds);
+        int selectedIndex = ResolvePopupIndex(current, options);
+
+        EditorGUI.BeginChangeCheck();
+        int newIndex = EditorGUI.Popup(position, label.text, selectedIndex, options.ToArray());
+        if (EditorGUI.EndChangeCheck() && newIndex >= 0 && newIndex < options.Count)
+            property.stringValue = options[newIndex];
     }
 
-    private void CacheIDs(RoutineIDAttribute.IDType type)
+    /// <summary>
+    /// Popup options for picking only. Preserves the current value even if it is not in the scene scan.
+    /// </summary>
+    static List<string> BuildPopupOptions(string current, List<string> sceneIds)
     {
-        idCache = new();
-        
-        Transform[] allTransforms = Resources.FindObjectsOfTypeAll<Transform>();
-        foreach (Transform t in allTransforms)
+        var options = new List<string>(sceneIds.Count + 1);
+
+        if (!string.IsNullOrEmpty(current) && !sceneIds.Contains(current))
+            options.Add(current);
+
+        options.AddRange(sceneIds);
+        return options;
+    }
+
+    static int ResolvePopupIndex(string current, List<string> options)
+    {
+        if (string.IsNullOrEmpty(current))
+            return 0;
+
+        int index = options.IndexOf(current);
+        return index >= 0 ? index : 0;
+    }
+
+    static void EnsureCacheHooks()
+    {
+        if (_cacheHooksRegistered)
+            return;
+
+        _cacheHooksRegistered = true;
+        void Invalidate() => _sceneIdsByType = null;
+
+        EditorApplication.hierarchyChanged += Invalidate;
+        EditorApplication.projectChanged += Invalidate;
+    }
+
+    static List<string> GetSceneIds(RoutineIDAttribute.IDType type)
+    {
+        _sceneIdsByType ??= new Dictionary<RoutineIDAttribute.IDType, List<string>>();
+
+        if (_sceneIdsByType.TryGetValue(type, out var cached))
+            return cached;
+
+        var ids = new HashSet<string>();
+
+        foreach (Transform t in Resources.FindObjectsOfTypeAll<Transform>())
         {
             if (!t.gameObject.scene.IsValid())
                 continue;
 
-            string name = t.name.ToLower();
+            string lower = t.name.ToLower();
 
             switch (type)
             {
                 case RoutineIDAttribute.IDType.Zone:
-                    if (name.Contains("house") || name.Contains("zone"))
-                        idCache[t.name] = t;
+                    if (lower.Contains("house") || lower.Contains("zone"))
+                        ids.Add(t.name);
                     break;
 
                 case RoutineIDAttribute.IDType.Room:
-                    if (name.Contains("room") || name.Contains("trigger"))
-                        idCache[t.name] = t;
+                    if (lower.Contains("room") || lower.Contains("trigger"))
+                        ids.Add(t.name);
                     break;
 
                 case RoutineIDAttribute.IDType.Hotspot:
-                    if (name.Contains("spot") || name.Contains("point")|| name.Contains("action"))
-                        idCache[t.name] = t;
+                    if (lower.Contains("spot") || lower.Contains("point") || lower.Contains("action"))
+                        ids.Add(t.name);
                     break;
             }
         }
+
+        cached = ids.OrderBy(id => id, System.StringComparer.OrdinalIgnoreCase).ToList();
+        _sceneIdsByType[type] = cached;
+        return cached;
     }
 }

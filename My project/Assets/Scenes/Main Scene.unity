@@ -3334,7 +3334,6 @@ GameObject:
   - component: {fileID: 545581659}
   - component: {fileID: 545581661}
   - component: {fileID: 545581662}
-  - component: {fileID: 545581663}
   m_Layer: 0
   m_Name: Jumpscare Virtual Camera
   m_TagString: Untagged
@@ -3432,23 +3431,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LookAtOffset: {x: 0, y: 0.01, z: 0}
---- !u!114 &545581663
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 545581658}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 68bb026fafb42b14791938953eaace77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  NoiseProfile: {fileID: 11400000, guid: 9eb9df8b5236c4440a1b4f301653241f, type: 2}
-  PivotOffset: {x: 0, y: 0, z: 0}
-  AmplitudeGain: 1
-  FrequencyGain: 1
-  m_NoiseOffsets: {x: 0, y: 0, z: 0}
 --- !u!1001 &562326292
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5710,7 +5692,7 @@ Transform:
   m_GameObject: {fileID: 1073419815}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.00453, y: 0, z: -0.0035}
+  m_LocalPosition: {x: 0.00475, y: 0, z: -0.00477}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -15167,10 +15149,6 @@ PrefabInstance:
     - target: {fileID: 4884186263421869, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
       propertyPath: m_Name
       value: Butcher
-      objectReference: {fileID: 0}
-    - target: {fileID: 4884186263421869, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 72859471452438870, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
       propertyPath: player

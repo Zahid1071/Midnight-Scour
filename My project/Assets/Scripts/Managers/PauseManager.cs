@@ -55,6 +55,7 @@ public class PauseManager : MonoBehaviour
     public void OnOpenSettings()
     {
         if (settingsPanel == null) return;
+        HudManager.Instance?.ClearSubtitle();
         if (pauseRoot) pauseRoot.SetActive(false);
         settingsPanel.SetActive(true);
         settingsMenu?.BeginEditing();
@@ -101,6 +102,8 @@ public class PauseManager : MonoBehaviour
         PlayerControlGate.Acquire(PlayerControlGate.ReasonPause);
         Time.timeScale = 0f;
         AudioListener.pause = true;
+
+        HudManager.Instance?.ClearSubtitle();
 
         if (pauseRoot) pauseRoot.SetActive(true);
 
