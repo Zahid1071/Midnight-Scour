@@ -1,8 +1,10 @@
 using FS_Atmo;
 using UnityEngine;
-using System.Collections;
-using UnityEngine.AI;
 
+/// <summary>
+/// Basement intro: wire three Timeline signals on the butcher Signal Receiver —
+/// MoveToGrate, DropKey, LeaveBasement (in that order).
+/// </summary>
 public class CinematicSignalFunctions : MonoBehaviour
 {
     NPCController npc;
@@ -10,69 +12,59 @@ public class CinematicSignalFunctions : MonoBehaviour
     public Transform gratePosition;
     public Transform destination;
     public Transform key;
-    NavMeshAgent agent;
     [SerializeField] private Collider keyCollider;
     [SerializeField] private Collider grateCollider;
-    
-    // Flag to track when the cinematic move is active
-    private bool isMoving = false;
+
+    bool isLeavingBasement;
 
     void Start()
     {
         navigator = GetComponent<Navigator>();
         npc = GetComponent<NPCController>();
-        agent = GetComponent<NavMeshAgent>();
-        Physics.IgnoreCollision(keyCollider, grateCollider, true);
+        if (keyCollider != null && grateCollider != null)
+            Physics.IgnoreCollision(keyCollider, grateCollider, true);
     }
 
     void Update()
     {
-        // Only check distance if the Timeline signal has started the movement
-        if (isMoving && (transform.position - destination.position).magnitude < 0.1f)
-        {
-            // Shut off the flag immediately to prevent Update from firing this again
-            isMoving = false; 
-            
-            npc.fsm.SetState(NPCController.AIState.Natural);
-        }
+        if (!isLeavingBasement || destination == null || npc == null)
+            return;
+
+        if ((transform.position - destination.position).sqrMagnitude > 0.01f)
+            return;
+
+        isLeavingBasement = false;
+        npc.fsm.SetState(NPCController.AIState.Natural);
     }
 
-    // Çağrıyı normal fonksiyon yerine bu şekilde başlatın
-    public void StartBasementSequence()
+    public void MoveToGrate()
     {
-        StartCoroutine(MovementSequenceCoroutine());
-    }
+        if (gratePosition == null || navigator == null)
+            return;
 
-    private IEnumerator MovementSequenceCoroutine()
-    {
-        isMoving = true;
         navigator.GoToPoint(gratePosition.position);
+    }
 
-        // NavMeshAgent'ın hedefe varıp varmadığını kontrol eden döngü
-        // 'navigator' altındaki NavMeshAgent referansına göre burayı uyarlayın:
-        while (agent.pathPending || agent.remainingDistance > agent.stoppingDistance)
-        {
-            // Hedefe varana kadar bir sonraki kareyi bekle
-            yield return null; 
-        }
-        
-        // İlk hedefe ulaşıldı, şimdi ikinci fonksiyonu tetikle
-        LeaveBasement();
-        Unparent();
+    public void DropKey()
+    {
+        if (key == null)
+            return;
+
+        key.SetParent(null);
+        var rb = key.GetComponent<Rigidbody>();
+        if (rb == null)
+            return;
+
+        rb.useGravity = true;
+        rb.isKinematic = false;
     }
 
     public void LeaveBasement()
     {
-        // Open the gate so Update starts looking for the destination
-        isMoving = true; 
-        
+        if (destination == null || navigator == null)
+            return;
+
+        isLeavingBasement = true;
         navigator.GoToPoint(destination.position);
-    }
-    
-    void Unparent()
-    {
-        key.transform.SetParent(null);
-        key.transform.GetComponent<Rigidbody>().useGravity = true;
-        key.transform.GetComponent<Rigidbody>().isKinematic = false;
     }
 }

@@ -1673,6 +1673,9 @@ MonoBehaviour:
     m_Signals:
     - {fileID: 11400000, guid: 94d19f00e168c4e8aa4d0f5f59ada6fc, type: 2}
     - {fileID: 11400000, guid: 6345a36672d5c4922ab23f3118ca6e4a, type: 2}
+    - {fileID: 11400000, guid: f150a41750bf854418afe32e6e9b6024, type: 2}
+    - {fileID: 11400000, guid: 1f6fb4df540a95344af1dfd6f9e01466, type: 2}
+    - {fileID: 11400000, guid: c9adcbab88c01b5469be5008011f48b0, type: 2}
     m_Events:
     - m_PersistentCalls:
         m_Calls:
@@ -1693,6 +1696,48 @@ MonoBehaviour:
         - m_Target: {fileID: 297924778}
           m_TargetAssemblyTypeName: CinematicPlayerControlLock, Assembly-CSharp
           m_MethodName: UnlockCinematic
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1938847757}
+          m_TargetAssemblyTypeName: CinematicSignalFunctions, Assembly-CSharp
+          m_MethodName: MoveToGrate
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1938847757}
+          m_TargetAssemblyTypeName: CinematicSignalFunctions, Assembly-CSharp
+          m_MethodName: DropKey
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1938847757}
+          m_TargetAssemblyTypeName: CinematicSignalFunctions, Assembly-CSharp
+          m_MethodName: LeaveBasement
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -11054,6 +11099,22 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6519826993326153818, guid: 7cfa19e0af3708d40beb037870860be6, type: 3}
   m_PrefabInstance: {fileID: 1920330000}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1938847755 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4884186263421869, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+  m_PrefabInstance: {fileID: 8236328092443100426}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1938847757 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6054754956762797053, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+  m_PrefabInstance: {fileID: 8236328092443100426}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1938847755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c178db7e4022ef48b31fb18c73ad6fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1963631531
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -15162,6 +15223,122 @@ PrefabInstance:
       propertyPath: m_Data.m_SourceObjects.m_Item0.transform
       value: 
       objectReference: {fileID: 824396280}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Signals.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: 'm_Events.m_Signals.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: f150a41750bf854418afe32e6e9b6024, type: 2}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: 'm_Events.m_Signals.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 1f6fb4df540a95344af1dfd6f9e01466, type: 2}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: 'm_Events.m_Signals.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: c9adcbab88c01b5469be5008011f48b0, type: 2}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[0].m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[1].m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[2].m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[0].m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[0].m_PersistentCalls.m_Calls.Array.data[2].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[1].m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[0].m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 1938847755}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[0].m_PersistentCalls.m_Calls.Array.data[2].m_Target
+      value: 
+      objectReference: {fileID: 1938847755}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[1].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1938847757}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1938847757}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[0].m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[0].m_PersistentCalls.m_Calls.Array.data[2].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[1].m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[0].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: MoveToGrate
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[1].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: DropKey
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: LeaveBasement
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[0].m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: CinematicSignalFunctions, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[0].m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
+      value: CinematicSignalFunctions, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[1].m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: CinematicSignalFunctions, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: CinematicSignalFunctions, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[1].m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 1056905571514928472, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_Events.m_Events.Array.data[2].m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 1469066018935350255, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
       propertyPath: poiLookDirector
       value: 
@@ -15205,6 +15382,10 @@ PrefabInstance:
     - target: {fileID: 2588451862027541027, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5790222739809095603, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: m_WarningMessage
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 6054754956762797053, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
       propertyPath: destination

@@ -9590,7 +9590,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -59.998
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 41554634748085264, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -9752,6 +9753,15 @@ PrefabInstance:
     - target: {fileID: 738673829363786966, guid: 2fd11e932fb152a4b961e5a72d453648, type: 3}
       propertyPath: m_UpdateMode
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 738673829363786966, guid: 2fd11e932fb152a4b961e5a72d453648, type: 3}
+      propertyPath: m_WarningMessage
+      value: "\nBinding warning: Some generic clip(s) animate transforms that are
+        already bound by a Humanoid avatar. These transforms can only be changed
+        by Humanoid clips.\n\tTransform 'neck_01'\n\tTransform 'spine_02'\n\tTransform
+        'pelvis'\n\tTransform 'spine_03'\n\tTransform 'spine_01'\n\tTransform 'head'\n\tTransform
+        'neck_01'\n\tTransform 'spine_02'\n\tTransform 'pelvis'\n\tTransform 'spine_03'\n\tand
+        more ..."
       objectReference: {fileID: 0}
     - target: {fileID: 738673829363786966, guid: 2fd11e932fb152a4b961e5a72d453648, type: 3}
       propertyPath: m_ApplyRootMotion
