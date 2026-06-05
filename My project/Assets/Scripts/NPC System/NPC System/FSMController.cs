@@ -585,7 +585,7 @@ public class FSMController
             // Eğer oyuncuyu göremiyorsam VE gitmem gereken yere (LSP) vardıysam:
             float distToLSP = Vector3.Distance(npc.transform.position, targetPosition);
 
-            if (distToLSP < 0.2f)
+            if (distToLSP < 0.5f)
             {
                 Debug.Log("Chase bitti: İzini kaybettim. Odayı aramaya başlıyorum.");
 
