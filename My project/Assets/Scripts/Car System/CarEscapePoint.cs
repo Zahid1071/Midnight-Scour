@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class CarEscapePoint : MonoBehaviour, IInteractable
 {
-    public void Interact()
+    public bool Interact()
     {
         var slots = transform.root.GetComponentsInChildren<CarPartSlot>(true);
         if (slots == null || slots.Length == 0)
         {
             HudManager.Instance?.ShowSubtitle("Escape sequence is not set up.", 3f);
             Debug.LogWarning("⚠️ No CarPartSlot components found under CarEscapePoint.");
-            return;
+            return false;
         }
 
         var missing = new System.Collections.Generic.List<string>();
@@ -29,16 +29,16 @@ public class CarEscapePoint : MonoBehaviour, IInteractable
             Debug.Log("✅ All parts installed! You escaped!");
 
             // TODO: trigger win screen, fade, load scene etc.
+            return true;
         }
-        else
-        {
-            var clip = SoundManager.Instance.sfxBank[1]; // fail / locked
-            if (!SoundManager.Instance.IsClipPlayingAt(clip, transform.position))
-                SoundManager.Instance.PlaySFXAt(clip, transform.position);
 
-            string list = string.Join(", ", missing);
-            HudManager.Instance?.ShowSubtitle($"Still missing: {list}.", 4f);
-            Debug.Log("❌ You still need some parts to escape.");
-        }
+        var failClip = SoundManager.Instance.sfxBank[1]; // fail / locked
+        if (!SoundManager.Instance.IsClipPlayingAt(failClip, transform.position))
+            SoundManager.Instance.PlaySFXAt(failClip, transform.position);
+
+        string list = string.Join(", ", missing);
+        HudManager.Instance?.ShowSubtitle($"Still missing: {list}.", 4f);
+        Debug.Log("❌ You still need some parts to escape.");
+        return false;
     }
 }

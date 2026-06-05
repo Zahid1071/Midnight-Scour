@@ -19,7 +19,7 @@ MonoBehaviour:
   canDrop: 1
   pickUpSFX: {fileID: 8300000, guid: 9c063062c4b98944fabbf9bc3cb175d7, type: 3}
   useSuccessSound: {fileID: 0}
-  consumeOnUse: 0
+  consumeOnUse: 1
   interactionReachBonus: 0
   breaksOnWrongUse: 0
   breakOnWrongUseSound: {fileID: 0}

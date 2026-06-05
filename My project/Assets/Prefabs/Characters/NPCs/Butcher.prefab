@@ -406,9 +406,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gratePosition: {fileID: 0}
   destination: {fileID: 0}
-  key: {fileID: 4086163487550484641}
-  keyCollider: {fileID: 1081683805419649807}
-  grateCollider: {fileID: 0}
 --- !u!1 &221845361311164115
 GameObject:
   m_ObjectHideFlags: 0
@@ -9095,7 +9092,6 @@ Transform:
   m_Children:
   - {fileID: 6932957103988362668}
   - {fileID: 7475893151938818446}
-  - {fileID: 4086163487550484641}
   m_Father: {fileID: 6342111083462764627}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &5674603256583880175
@@ -9526,86 +9522,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3499964067804864270}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &6124950282587468488
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 3423792884756146849}
-    m_Modifications:
-    - target: {fileID: 382293426490946623, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
-      propertyPath: m_Name
-      value: Basement Key
-      objectReference: {fileID: 0}
-    - target: {fileID: 7905165202420908649, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 2.4078758
-      objectReference: {fileID: 0}
-    - target: {fileID: 7905165202420908649, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 2.4078753
-      objectReference: {fileID: 0}
-    - target: {fileID: 7905165202420908649, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 2.407876
-      objectReference: {fileID: 0}
-    - target: {fileID: 7905165202420908649, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.01723297
-      objectReference: {fileID: 0}
-    - target: {fileID: 7905165202420908649, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -0.17485058
-      objectReference: {fileID: 0}
-    - target: {fileID: 7905165202420908649, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.046730697
-      objectReference: {fileID: 0}
-    - target: {fileID: 7905165202420908649, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.5564861
-      objectReference: {fileID: 0}
-    - target: {fileID: 7905165202420908649, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0.41638172
-      objectReference: {fileID: 0}
-    - target: {fileID: 7905165202420908649, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0.6261781
-      objectReference: {fileID: 0}
-    - target: {fileID: 7905165202420908649, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0.35334185
-      objectReference: {fileID: 0}
-    - target: {fileID: 7905165202420908649, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 90
-      objectReference: {fileID: 0}
-    - target: {fileID: 7905165202420908649, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7905165202420908649, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: -59.998
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 41554634748085264, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
---- !u!65 &1081683805419649807 stripped
-BoxCollider:
-  m_CorrespondingSourceObject: {fileID: 6485984337406282183, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
-  m_PrefabInstance: {fileID: 6124950282587468488}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &4086163487550484641 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7905165202420908649, guid: 9e82c22595e5dba44a4fc6f6292f4f1c, type: 3}
-  m_PrefabInstance: {fileID: 6124950282587468488}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6492865786803055461
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9756,12 +9672,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 738673829363786966, guid: 2fd11e932fb152a4b961e5a72d453648, type: 3}
       propertyPath: m_WarningMessage
-      value: "\nBinding warning: Some generic clip(s) animate transforms that are
-        already bound by a Humanoid avatar. These transforms can only be changed
-        by Humanoid clips.\n\tTransform 'neck_01'\n\tTransform 'spine_02'\n\tTransform
-        'pelvis'\n\tTransform 'spine_03'\n\tTransform 'spine_01'\n\tTransform 'head'\n\tTransform
-        'neck_01'\n\tTransform 'spine_02'\n\tTransform 'pelvis'\n\tTransform 'spine_03'\n\tand
-        more ..."
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 738673829363786966, guid: 2fd11e932fb152a4b961e5a72d453648, type: 3}
       propertyPath: m_ApplyRootMotion
@@ -11578,13 +11489,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Events:
     m_Signals:
+    - {fileID: 11400000, guid: f150a41750bf854418afe32e6e9b6024, type: 2}
     - {fileID: 11400000, guid: c9adcbab88c01b5469be5008011f48b0, type: 2}
     m_Events:
     - m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 6054754956762797053}
           m_TargetAssemblyTypeName: CinematicSignalFunctions, Assembly-CSharp
-          m_MethodName: StartBasementSequence
+          m_MethodName: MoveToGrate
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+    - m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 6054754956762797053}
+          m_TargetAssemblyTypeName: CinematicSignalFunctions, Assembly-CSharp
+          m_MethodName: LeaveBasement
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}

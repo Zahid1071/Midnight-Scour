@@ -5,13 +5,13 @@ public class StorageObject : MonoBehaviour, IInteractable
 {
     private List<InventoryItem> storedItems = new List<InventoryItem>();
 
-    public void Interact()
+    public bool Interact()
     {
         var inventory = InventoryManager.Instance.GetInventory();
         if (inventory.Count == 0)
         {
             HudManager.Instance?.ShowSubtitle("You have nothing to store.", 3f);
-            return;
+            return false;
         }
 
         foreach (var item in inventory)
@@ -24,7 +24,7 @@ public class StorageObject : MonoBehaviour, IInteractable
 
         InventoryManager.Instance.ClearInventory();
         Object.FindFirstObjectByType<InventoryUI>()?.RefreshUI();
-
+        return true;
     }
 
     public List<InventoryItem> GetStoredItems() => storedItems;

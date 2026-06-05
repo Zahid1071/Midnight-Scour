@@ -18,10 +18,10 @@ MonoBehaviour:
   searchChance: 0.2
   weightedRoutinePlans:
   - zoneID: House_001
-    weight: 0.426
+    weight: 1
     roomPlans:
     - roomAnchorID: Basement_Room
-      weight: 1
+      weight: 0.2
       hotspots:
       - hotspotID: Hotspot_Idle2
         weight: 1
@@ -29,7 +29,7 @@ MonoBehaviour:
         actionType: 10
         requiresVisualOffset: 0
     - roomAnchorID: Corridor-Kitchen_Room
-      weight: 0.405
+      weight: 0.4
       hotspots:
       - hotspotID: Hotspot_Idle
         weight: 0.266
@@ -41,6 +41,14 @@ MonoBehaviour:
         duration: 3
         actionType: 12
         requiresVisualOffset: 0
+    - roomAnchorID: Living_room
+      weight: 0.2
+      hotspots:
+      - hotspotID: Hotspot_Sofa
+        weight: 0.062
+        duration: 5
+        actionType: 0
+        requiresVisualOffset: 1
     - roomAnchorID: Garden_Room
       weight: 0
       hotspots:
@@ -54,14 +62,6 @@ MonoBehaviour:
         duration: 3
         actionType: 10
         requiresVisualOffset: 0
-    - roomAnchorID: Living_room
-      weight: 0.369
-      hotspots:
-      - hotspotID: Hotspot_Sofa
-        weight: 0.062
-        duration: 5
-        actionType: 0
-        requiresVisualOffset: 1
   patrolChance: 1
   patrolDuration: 20
   ambushChance: 0.51

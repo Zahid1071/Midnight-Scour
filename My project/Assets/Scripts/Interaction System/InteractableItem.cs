@@ -10,15 +10,15 @@ public class InteractableItem : MonoBehaviour, IInteractable
 
     bool _consumed;
 
-    public void Interact()
+    public bool Interact()
     {
         if (_consumed)
-            return;
+            return false;
 
         if (grateGate != null && !grateGate.IsRemoved)
         {
             InteractionFeedback.Fail(blockedMessage, 3f);
-            return;
+            return false;
         }
 
         if (blockedUntilBenchViceReleased)
@@ -27,20 +27,30 @@ public class InteractableItem : MonoBehaviour, IInteractable
             if (vice != null && !vice.IsWrenchReleased)
             {
                 InteractionFeedback.Fail(benchViceStuckMessage, 3f);
-                return;
+                return false;
             }
         }
 
         if (itemData == null)
         {
             Debug.LogWarning("No item assigned.");
-            return;
+            return false;
         }
+
+        InventoryItem heldTool = InventoryUI.Instance?.GetSelectedItem();
 
         bool added = InventoryManager.Instance.AddItem(itemData);
         if (added)
         {
             _consumed = true;
+
+            var interactor = PlayerInteractor.Instance;
+            if (interactor != null
+                && interactor.ShouldConsumeReachToolOnPickup(heldTool, GetPickupPoint()))
+            {
+                InventoryManager.Instance.RemoveItem(heldTool);
+            }
+
             string msg = !string.IsNullOrWhiteSpace(itemData.pickUpText)
                 ? itemData.pickUpText
                 : $"Picked up {itemData.itemName}.";
@@ -49,16 +59,23 @@ public class InteractableItem : MonoBehaviour, IInteractable
 
             if (InventoryUI.Instance != null)
             {
-                int idx = InventoryManager.Instance.GetInventory().Count - 1;
+                var inventory = InventoryManager.Instance.GetInventory();
+                int idx = inventory.IndexOf(itemData);
                 if (idx >= 0)
                     InventoryUI.Instance.SelectSlot(idx);
             }
 
             Destroy(gameObject);
+            return true;
         }
-        else
-        {
-            InteractionFeedback.Fail("Your inventory is full.", 3f);
-        }
+
+        InteractionFeedback.Fail("Your inventory is full.", 3f);
+        return false;
+    }
+
+    Vector3 GetPickupPoint()
+    {
+        var col = GetComponent<Collider>();
+        return col != null ? col.bounds.center : transform.position;
     }
 }

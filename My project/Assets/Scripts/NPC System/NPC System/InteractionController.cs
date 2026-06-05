@@ -17,9 +17,14 @@ public class InteractionController : MonoBehaviour
     private WeightedHotspot currentHotspot;
     private string lastZoneID = null;
     private string lastHotspotID = null;
-    private bool isFirstRoutinePick = true;
 
-    const string FirstPickExcludedRoom = "Basement_Room";
+    const string BasementExcludedRoom = "Basement_Room";
+
+    [Tooltip("NPC routine will not pick the basement room until this many seconds after the scene starts.")]
+    [SerializeField] float basementRoutineDelaySeconds = 30f;
+
+    static float s_basementRoutineUnlockTime = -1f;
+    static int s_basementDelaySceneHandle = -1;
 
     public float remainHomeFactor = 1f;
 
@@ -50,6 +55,13 @@ public class InteractionController : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
         npc = GetComponent<NPCController>();
         navigator = GetComponent<Navigator>();
+
+        int sceneHandle = gameObject.scene.handle;
+        if (s_basementDelaySceneHandle != sceneHandle)
+        {
+            s_basementDelaySceneHandle = sceneHandle;
+            s_basementRoutineUnlockTime = Time.time + basementRoutineDelaySeconds;
+        }
     }
 
     void Update()
@@ -114,11 +126,10 @@ public class InteractionController : MonoBehaviour
         currentZonePlan = WeightedPicker.Pick(boostedZones, z => z.weight);
 
         List<WeightedRoomPlan> roomOptions = currentZonePlan.roomPlans;
-        if (isFirstRoutinePick)
+        if (Time.time < s_basementRoutineUnlockTime)
         {
-            isFirstRoutinePick = false;
             var withoutBasement = roomOptions
-                .Where(r => r.roomAnchorID != FirstPickExcludedRoom)
+                .Where(r => r.roomAnchorID != BasementExcludedRoom)
                 .ToList();
             if (withoutBasement.Count > 0)
                 roomOptions = withoutBasement;

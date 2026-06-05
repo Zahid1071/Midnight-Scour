@@ -14,11 +14,12 @@ public class BenchViceBarInteract : MonoBehaviour, IInteractable
             puzzle = GetComponentInParent<BenchVicePuzzle>();
     }
 
-    public void Interact()
+    public bool Interact()
     {
         if (puzzle != null && puzzle.IsWrenchReleased)
-            return;
+            return false;
 
         InteractionFeedback.Fail(wontBudgeMessage, 3f);
+        return false;
     }
 }

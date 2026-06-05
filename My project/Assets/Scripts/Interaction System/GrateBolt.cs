@@ -7,10 +7,10 @@ public class GrateBolt : MonoBehaviour, IInteractable
 
     bool _removed;
 
-    public void Interact()
+    public bool Interact()
     {
         if (_removed || grate == null)
-            return;
+            return false;
 
         if (wrench != null)
         {
@@ -18,7 +18,7 @@ public class GrateBolt : MonoBehaviour, IInteractable
             if (selected != wrench)
             {
                 InteractionFeedback.Fail("It won't budge.", 3f);
-                return;
+                return false;
             }
         }
 
@@ -26,5 +26,6 @@ public class GrateBolt : MonoBehaviour, IInteractable
         grate.NotifyBoltRemoved(transform.position);
         HudManager.Instance?.ShowSubtitle("Bolt removed.", 2.5f, HudManager.Instance.SuccessColor);
         gameObject.SetActive(false);
+        return true;
     }
 }

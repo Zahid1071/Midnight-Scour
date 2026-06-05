@@ -53,8 +53,8 @@ public class PlayerInteractor : MonoBehaviour
         if (!WasInteractPressedThisFrame())
             return;
 
-        // E with a held item: world interact (open door, pickup, etc.) — handled in InventoryUI.
-        if (InventoryUI.Instance != null && InventoryUI.Instance.GetSelectedItem() != null)
+        // E is handled by InventoryUI (empty hand and held item).
+        if (InventoryUI.Instance != null)
             return;
 
         TryInteract();
@@ -113,6 +113,26 @@ public class PlayerInteractor : MonoBehaviour
 
     public bool IsWithinActionRange(RaycastHit hit, float actionRange) => IsWithinRange(hit, actionRange);
 
+    public bool IsBeyondWorldReach(Vector3 worldPoint)
+    {
+        if (cameraTransform == null)
+            return false;
+
+        float baseRange = GetWorldInteractRange();
+        float fromCamera = Vector3.Distance(cameraTransform.position, worldPoint);
+        float fromFeet = Vector3.Distance(GetFeetPosition(), worldPoint);
+        return fromCamera > baseRange && fromFeet > baseRange;
+    }
+
+    /// <summary>Reach tools (e.g. gummy bone) are consumed only when normal arm reach would not reach the target.</summary>
+    public bool ShouldConsumeReachToolOnPickup(InventoryItem heldTool, Vector3 pickupPoint)
+    {
+        if (heldTool == null || !heldTool.consumeOnUse || heldTool.interactionReachBonus <= 0f)
+            return false;
+
+        return IsBeyondWorldReach(pickupPoint);
+    }
+
     /// <summary>Ray length so a floor target within hint range from the feet can still be hit.</summary>
     float GetHintRaycastMaxDistance()
     {
@@ -166,7 +186,9 @@ public class PlayerInteractor : MonoBehaviour
         bool lockedDoorAttempt =
             (interactable is SimpleOpenClose door && !door.objectOpen && door.isLocked)
             || LockedOpenClose.IsLockedShut(interactable);
-        interactable.Interact();
+
+        if (!interactable.Interact())
+            return false;
 
         if (!lockedDoorAttempt)
             InteractionUIManager.Instance?.PlaySuccessShake();

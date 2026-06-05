@@ -1,6 +1,7 @@
 public interface IInteractable
 {
-    void Interact();
+    /// <returns>True if the interaction did something; false if blocked or ignored.</returns>
+    bool Interact();
 }
 
 public interface IItemReceiver

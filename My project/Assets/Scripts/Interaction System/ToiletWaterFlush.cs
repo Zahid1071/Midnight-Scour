@@ -28,22 +28,22 @@ public class ToiletWaterFlush : MonoBehaviour, IInteractable, IItemReceiver
             TryGetComponent(out animator);
     }
 
-    public void Interact()
+    public bool Interact()
     {
         InventoryItem selected = InventoryUI.Instance?.GetSelectedItem();
         if (selected == null)
         {
             InteractionFeedback.Fail(needPlungerMessage, 2.5f);
-            return;
+            return false;
         }
 
         if (selected != plungerItem)
         {
             InteractionFeedback.Fail(wrongItemMessage, 2.5f);
-            return;
+            return false;
         }
 
-        TryFlush(selected, playFeedback: true);
+        return TryFlush(selected, playFeedback: true);
     }
 
     public bool ReceiveItem(InventoryItem item)

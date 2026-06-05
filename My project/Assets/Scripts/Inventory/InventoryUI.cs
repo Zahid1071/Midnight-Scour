@@ -56,10 +56,10 @@ public class InventoryUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha4)) SelectSlot(3);
 
         if (WasUseItemPressedThisFrame())
-            HandlePrimaryClick();
+            HandleInteractPress(isPrimaryClick: true);
 
         if (WasUseItemOnInteractKeyThisFrame())
-            HandleInteractKeyWithItem();
+            HandleInteractPress(isPrimaryClick: false);
 
         if (Input.GetKeyDown(KeyCode.G)) TryDropSelectedItem();
     }
@@ -99,21 +99,12 @@ public class InventoryUI : MonoBehaviour
         return Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame;
     }
 
-    void HandlePrimaryClick()
+    void HandleInteractPress(bool isPrimaryClick)
     {
         if (GetSelectedItem() != null)
-            TryUseSelectedItem();
+            TryUseSelectedItem(isPrimaryClick);
         else
             PlayerInteractor.Instance?.TryInteract();
-    }
-
-    void HandleInteractKeyWithItem()
-    {
-        if (GetSelectedItem() == null)
-            return;
-
-        // E with item selected: world interact (door open, pickup), not item-on-target.
-        PlayerInteractor.Instance?.TryInteract();
     }
 
     public void SelectSlot(int index)
@@ -131,7 +122,7 @@ public class InventoryUI : MonoBehaviour
         return null;
     }
 
-    private void TryUseSelectedItem()
+    private void TryUseSelectedItem(bool isPrimaryClick)
     {
         InventoryItem selected = GetSelectedItem();
         if (selected == null)
@@ -155,10 +146,9 @@ public class InventoryUI : MonoBehaviour
             return;
         }
 
-        // LMB + item on unlocked door: item cannot be used; E opens the door instead.
-        if ((target is SimpleOpenClose door && !door.isLocked) || LockedOpenClose.IsUnlockedOpenable(target))
+        if (LockedOpenClose.IsUnlockedDoor(target))
         {
-            ShowWarning("You can't use that here.", 2.5f);
+            interactor.PerformInteract(target, hit);
             return;
         }
 
@@ -195,7 +185,13 @@ public class InventoryUI : MonoBehaviour
             return;
         }
 
-        // Pickups, bolts, etc. — interact at extended reach (e.g. bone through grate).
+        if (isPrimaryClick && target is InteractableItem && selected.interactionReachBonus <= 0f)
+        {
+            ShowWarning("You can't use that here.", 2.5f);
+            return;
+        }
+
+        // Pickups, bolts, etc. — extended reach tools (e.g. gummy bone through grate).
         interactor.PerformInteract(target, hit);
     }
 

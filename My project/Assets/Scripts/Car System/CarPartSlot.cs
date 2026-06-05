@@ -9,19 +9,19 @@ public class CarPartSlot : MonoBehaviour, IInteractable
 
     private bool isInstalled = false;
 
-    public void Interact()
+    public bool Interact()
     {
         if (requiredItem == null)
         {
             HudManager.Instance?.ShowSubtitle("This slot is not configured.", 3f);
-            return;
+            return false;
         }
 
         if (isInstalled)
         {
             HudManager.Instance?.ShowSubtitle($"{requiredItem.itemName} is already installed.", 3f);
             PlaySound(installFailSFX,transform);
-            return;
+            return false;
         }
 
         InventoryItem selectedItem = InventoryUI.Instance?.GetSelectedItem();
@@ -29,7 +29,7 @@ public class CarPartSlot : MonoBehaviour, IInteractable
         {
             HudManager.Instance?.ShowSubtitle("Select a car part from your inventory first.", 3f);
             PlaySound(installFailSFX,transform);
-            return;
+            return false;
         }
 
         if (selectedItem != requiredItem)
@@ -37,7 +37,7 @@ public class CarPartSlot : MonoBehaviour, IInteractable
             HudManager.Instance?.ShowSubtitle(
                 $"{selectedItem.itemName} does not fit here. You need {requiredItem.itemName}.", 4f);
             PlaySound(installFailSFX,transform);
-            return;
+            return false;
         }
 
         var inventory = InventoryManager.Instance.GetInventory();
@@ -45,17 +45,17 @@ public class CarPartSlot : MonoBehaviour, IInteractable
         {
             HudManager.Instance?.ShowSubtitle($"You do not have {selectedItem.itemName}.", 3f);
             PlaySound(installFailSFX,transform);
-            return;
+            return false;
         }
 
-        // ✅ Success
         isInstalled = true;
         InventoryManager.Instance.RemoveItem(selectedItem);
         InventoryUI.Instance?.RefreshUI();
         HudManager.Instance?.ShowSubtitle($"{requiredItem.itemName} installed.", 3f, HudManager.Instance.SuccessColor);
         PlaySound(installSuccessSFX,transform);
-        
+
         gameObject.SetActive(false);
+        return true;
     }
 
     private void PlaySound(AudioClip clip,Transform point)

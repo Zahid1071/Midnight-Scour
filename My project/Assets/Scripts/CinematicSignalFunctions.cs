@@ -2,8 +2,7 @@ using FS_Atmo;
 using UnityEngine;
 
 /// <summary>
-/// Basement intro: wire three Timeline signals on the butcher Signal Receiver —
-/// MoveToGrate, DropKey, LeaveBasement (in that order).
+/// Basement intro: wire MoveToGrate and LeaveBasement Timeline signals on the butcher Signal Receiver.
 /// </summary>
 public class CinematicSignalFunctions : MonoBehaviour
 {
@@ -11,9 +10,6 @@ public class CinematicSignalFunctions : MonoBehaviour
     Navigator navigator;
     public Transform gratePosition;
     public Transform destination;
-    public Transform key;
-    [SerializeField] private Collider keyCollider;
-    [SerializeField] private Collider grateCollider;
 
     bool isLeavingBasement;
 
@@ -21,8 +17,6 @@ public class CinematicSignalFunctions : MonoBehaviour
     {
         navigator = GetComponent<Navigator>();
         npc = GetComponent<NPCController>();
-        if (keyCollider != null && grateCollider != null)
-            Physics.IgnoreCollision(keyCollider, grateCollider, true);
     }
 
     void Update()
@@ -43,20 +37,6 @@ public class CinematicSignalFunctions : MonoBehaviour
             return;
 
         navigator.GoToPoint(gratePosition.position);
-    }
-
-    public void DropKey()
-    {
-        if (key == null)
-            return;
-
-        key.SetParent(null);
-        var rb = key.GetComponent<Rigidbody>();
-        if (rb == null)
-            return;
-
-        rb.useGravity = true;
-        rb.isKinematic = false;
     }
 
     public void LeaveBasement()

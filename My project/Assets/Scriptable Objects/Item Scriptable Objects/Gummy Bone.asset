@@ -15,12 +15,10 @@ MonoBehaviour:
   itemName: Bone
   icon: {fileID: 21300000, guid: 4272ca2e710606c48a91c02e8294c9c5, type: 3}
   worldPrefab: {fileID: 4463944515492736518, guid: 501ca2be895a1804a8da54f9959d7f34, type: 3}
+  dropLandSFX: {fileID: 0}
   canDrop: 1
-  heldPrefab: {fileID: 4463944515492736518, guid: 501ca2be895a1804a8da54f9959d7f34, type: 3}
-  heldLocalPosition: {x: 0, y: 0, z: 0}
-  heldLocalEulerAngles: {x: 0, y: 0, z: 0}
-  heldLocalScale: {x: 1, y: 1, z: 1}
   pickUpSFX: {fileID: 8300000, guid: 20c77007c5a6e8e4fa30fe999cca7f71, type: 3}
+  useSuccessSound: {fileID: 0}
   consumeOnUse: 1
   interactionReachBonus: 1.5
   breaksOnWrongUse: 0

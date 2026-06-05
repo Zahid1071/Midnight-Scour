@@ -1,4 +1,5 @@
 using System.Collections;
+using FS_Atmo;
 using UnityEngine;
 
 /// <summary>
@@ -56,25 +57,28 @@ public class LockedOpenClose : MonoBehaviour, IInteractable, IItemReceiver
         _lockedTriggerHash = Animator.StringToHash(lockedTrigger);
     }
 
-    public void Interact() => InteractInternal(bypassLock: false);
+    public bool Interact() => InteractInternal(bypassLock: false);
 
-    void InteractInternal(bool bypassLock)
+    bool InteractInternal(bool bypassLock)
     {
         if (!bypassLock && Time.time < _nextInteractTime)
-            return;
+        {
+            InteractionFeedback.Fail();
+            return false;
+        }
 
         if (!bypassLock && isLocked)
         {
             InventoryItem selected = InventoryUI.Instance?.GetSelectedItem();
             if (selected != null && requiredKey != null && selected == requiredKey)
-                return;
+                return false;
 
             InteractionFeedback.Fail(lockedMessage, 2.5f);
             PlayLockedFeedback();
-            return;
+            return false;
         }
 
-        ToggleOpenClose();
+        return ToggleOpenClose();
     }
 
     public bool ReceiveItem(InventoryItem item)
@@ -107,7 +111,6 @@ public class LockedOpenClose : MonoBehaviour, IInteractable, IItemReceiver
         }
 
         isLocked = false;
-        _nextInteractTime = Time.time + lockedFeedbackCooldown;
         HudManager.Instance?.ShowSubtitle($"{item.itemName} unlocked it.", 2.5f, HudManager.Instance.SuccessColor);
 
         if (item.consumeOnUse)
@@ -121,13 +124,13 @@ public class LockedOpenClose : MonoBehaviour, IInteractable, IItemReceiver
         return true;
     }
 
-    void ToggleOpenClose()
+    bool ToggleOpenClose()
     {
         if (animator == null)
         {
             Debug.LogWarning($"{nameof(LockedOpenClose)} on {name}: no Animator assigned.");
             objectOpen = !objectOpen;
-            return;
+            return true;
         }
 
         if (!animator.enabled)
@@ -148,29 +151,75 @@ public class LockedOpenClose : MonoBehaviour, IInteractable, IItemReceiver
                 PlayOpenSfx();
             }
 
-            return;
+            return true;
         }
 
-        var info = animator.GetCurrentAnimatorStateInfo(0);
-        float t = 1f;
-        if (info.shortNameHash == _openHash || info.shortNameHash == _closeHash)
-            t = GetClampedProgress(info);
-
-        if (t < minToggleProgress && !info.loop && t != 1f)
-            return;
+        float openAmount = GetOpenAmount();
+        if (!ShouldAllowToggle(openAmount))
+        {
+            InteractionFeedback.Fail();
+            return false;
+        }
 
         if (objectOpen)
         {
-            animator.CrossFade(_closeHash, crossFadeDuration, 0, 1f - t);
+            animator.CrossFade(_closeHash, crossFadeDuration, 0, openAmount);
             objectOpen = false;
             PlayCloseSfx();
         }
         else
         {
-            animator.CrossFade(_openHash, crossFadeDuration, 0, 1f - t);
+            animator.CrossFade(_openHash, crossFadeDuration, 0, 1f - openAmount);
             objectOpen = true;
             PlayOpenSfx();
         }
+
+        _nextInteractTime = Time.time + crossFadeDuration + 0.05f;
+        return true;
+    }
+
+    bool ShouldAllowToggle(float openAmount)
+    {
+        bool reversing =
+            (objectOpen && openAmount < 1f - minToggleProgress) ||
+            (!objectOpen && openAmount > minToggleProgress);
+
+        if (reversing)
+            return true;
+
+        if (animator != null && animator.IsInTransition(0))
+            return false;
+
+        var info = animator.GetCurrentAnimatorStateInfo(0);
+        if (info.loop)
+            return true;
+
+        return openAmount <= minToggleProgress || openAmount >= 1f - minToggleProgress;
+    }
+
+    float GetOpenAmount()
+    {
+        if (animator == null)
+            return objectOpen ? 1f : 0f;
+
+        if (animator.IsInTransition(0))
+        {
+            float current = StateToOpenAmount(animator.GetCurrentAnimatorStateInfo(0));
+            float next = StateToOpenAmount(animator.GetNextAnimatorStateInfo(0));
+            float blend = animator.GetAnimatorTransitionInfo(0).normalizedTime;
+            return Mathf.Lerp(current, next, blend);
+        }
+
+        return StateToOpenAmount(animator.GetCurrentAnimatorStateInfo(0));
+    }
+
+    float StateToOpenAmount(AnimatorStateInfo info)
+    {
+        if (info.shortNameHash == _openHash)
+            return GetClampedProgress(info);
+        if (info.shortNameHash == _closeHash)
+            return 1f - GetClampedProgress(info);
+        return objectOpen ? 1f : 0f;
     }
 
     void PlayLockedFeedback()
@@ -205,4 +254,11 @@ public class LockedOpenClose : MonoBehaviour, IInteractable, IItemReceiver
 
     public static bool IsUnlockedOpenable(IInteractable interactable) =>
         interactable is LockedOpenClose loc && !loc.isLocked;
+
+    public static bool IsUnlockedDoor(IInteractable interactable)
+    {
+        if (interactable is SimpleOpenClose door)
+            return !door.isLocked;
+        return IsUnlockedOpenable(interactable);
+    }
 }

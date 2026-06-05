@@ -82,15 +82,16 @@ public class GrateSystem : MonoBehaviour, IInteractable
             layerTarget.layer = layer;
     }
 
-    public void Interact()
+    public bool Interact()
     {
         if (!AllBoltsRemoved)
         {
             InteractionFeedback.Fail("The grate is still bolted down.", 3f);
-            return;
+            return false;
         }
 
         ToggleOpenClose();
+        return true;
     }
 
     void ToggleOpenClose()

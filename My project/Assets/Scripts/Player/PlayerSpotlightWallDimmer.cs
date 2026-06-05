@@ -50,21 +50,6 @@ public sealed class PlayerSpotlightWallDimmer : MonoBehaviour
     [Min(0f)]
     [SerializeField] private float restoreSpeed = 6f;
 
-    [Header("Cinematics")]
-    [Tooltip("If true, force dim while PlayerControlGate blocks input (pause/cinematic/capture).")]
-    [SerializeField] private bool dimDuringInputBlock = true;
-
-    [Tooltip("Intensity to force while input is blocked. Use 0 for fully off during cinematics.")]
-    [Min(0f)]
-    [SerializeField] private float blockedIntensity = 0f;
-
-    [Tooltip("Prevents a 1-frame flash at game start if the cinematic lock is applied slightly late (e.g. via Timeline signal).")]
-    [SerializeField] private bool startBlockedUntilCinematicUnlock = true;
-
-    [Tooltip("Safety fallback: if we never observe the cinematic lock, stop forcing blocked after this many seconds.")]
-    [Min(0f)]
-    [SerializeField] private float startBlockTimeoutSeconds = 2.0f;
-
     [Header("Hiding")]
     [Tooltip("If true, force the light to 0 while the player is hidden in a hide spot.")]
     [SerializeField] private bool dimWhileHidden = true;
@@ -72,16 +57,12 @@ public sealed class PlayerSpotlightWallDimmer : MonoBehaviour
     private float _currentIntensity;
     private Collider[] _selfColliders;
     private PlayerHider _playerHider;
-    private bool _sawCinematicLock;
-    private bool _sawCinematicUnlockAfterLock;
-    private float _startTime;
 
     private void Awake()
     {
         ResolveReferences();
         _selfColliders = ignoreSelf ? GetComponentsInChildren<Collider>(true) : null;
         TryGetComponent(out _playerHider);
-        _startTime = Time.time;
     }
 
     private void OnEnable()
@@ -116,22 +97,11 @@ public sealed class PlayerSpotlightWallDimmer : MonoBehaviour
         float normalI = Mathf.Max(0f, normalIntensity);
         float minI = Mathf.Clamp(minIntensity, 0f, normalI);
 
-        bool inputBlocked = PlayerControlGate.IsInputBlocked;
-        bool cinematicLocked = PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic);
-        if (cinematicLocked) _sawCinematicLock = true;
-        if (_sawCinematicLock && !cinematicLocked) _sawCinematicUnlockAfterLock = true;
-
-        bool startBlockActive =
-            startBlockedUntilCinematicUnlock &&
-            !_sawCinematicUnlockAfterLock &&
-            (startBlockTimeoutSeconds <= 0f || (Time.time - _startTime) < startBlockTimeoutSeconds);
-
-        bool shouldForceBlocked = (dimDuringInputBlock && inputBlocked) || startBlockActive;
         bool isHidden = dimWhileHidden && _playerHider != null && _playerHider.isHidden;
-        bool shouldDim = !shouldForceBlocked && !isHidden && IsWallFacePalm();
+        bool shouldDim = !isHidden && IsWallFacePalm();
 
-        float target = shouldForceBlocked ? blockedIntensity : (isHidden ? 0f : (shouldDim ? minI : normalI));
-        float speed = (shouldForceBlocked || isHidden) ? dimSpeed : (shouldDim ? dimSpeed : restoreSpeed);
+        float target = isHidden ? 0f : (shouldDim ? minI : normalI);
+        float speed = isHidden ? dimSpeed : (shouldDim ? dimSpeed : restoreSpeed);
 
         if (speed <= 0f)
         {
@@ -158,7 +128,7 @@ public sealed class PlayerSpotlightWallDimmer : MonoBehaviour
         Vector3 d1 = Quaternion.AngleAxis(sideYawDegrees, up) * fwd;
         Vector3 d2 = Quaternion.AngleAxis(-sideYawDegrees, up) * fwd;
 
-        return RayBlocked(d0, dist) && RayBlocked(d1, dist) && RayBlocked(d2, dist);
+        return RayBlocked(d0, dist) || RayBlocked(d1, dist) || RayBlocked(d2, dist);
     }
 
     private bool RayBlocked(Vector3 direction, float maxDistance)

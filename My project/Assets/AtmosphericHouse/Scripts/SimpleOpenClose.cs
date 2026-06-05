@@ -65,21 +65,29 @@ namespace FS_Atmo
         }
 
 
-        public void Interact() => ObjectClicked(bypassLock: false);
+        public bool Interact() => ObjectClicked(bypassLock: false);
 
-        public void ObjectClicked() => ObjectClicked(bypassLock: false);
+        public bool ObjectClicked() => ObjectClicked(bypassLock: false);
 
-        public void ObjectClicked(bool bypassLock)
+        public bool ObjectClicked(bool bypassLock)
         {
-            if (!bypassLock && Time.time < nextInteractTime)
-                return;
+            if (!bypassLock && Time.time < nextInteractTime && !IsReversingToggle(myAnimator))
+            {
+                InteractionFeedback.Fail();
+                return false;
+            }
 
             // --- KİLİTLİ DURUM KONTROLÜ (Burası aynı kalıyor) ---
             if (!bypassLock && !objectOpen && isLocked)
             {
                 InventoryItem selectedItem = InventoryUI.Instance?.GetSelectedItem();
-                if (selectedItem != null && requiredKey != null && selectedItem == requiredKey) return; 
-                if (Time.time < nextInteractTime) return;
+                if (selectedItem != null && requiredKey != null && selectedItem == requiredKey)
+                    return false;
+                if (Time.time < nextInteractTime)
+                {
+                    InteractionFeedback.Fail();
+                    return false;
+                }
 
                 InteractionFeedback.Fail("The door is locked.", 2.5f);
 
@@ -87,47 +95,28 @@ namespace FS_Atmo
                 myAnimator.SetTrigger(lockedHash);
                 if (hasAdditional) additionalAnimator.SetTrigger(lockedHash);
                 nextInteractTime = Time.time + lockedAnimationDuration;
-                return;
+                return false;
             }
 
-            // ============================================================
-            // 🔥 YENİ MANTIK: Sadece Open/Close ise Blending Yap 🔥
-            // ============================================================
-            
-            var info = myAnimator.GetCurrentAnimatorStateInfo(0);
-            
-            // Varsayılan değer: 1f 
-            // (ToggleSelf içinde 1-t yapıldığı için sonuç 0 olur, yani BAŞTAN başlar)
-            float t = 1f; 
-
-            // Eğer şu an oynayan şey AÇILMA veya KAPANMA ise, kaldığımız yeri hesapla
-            if (info.shortNameHash == openHash || info.shortNameHash == closeHash)
+            float openAmount = GetOpenAmount(myAnimator);
+            if (!ShouldAllowToggle(openAmount))
             {
-                t = GetClampedProgress(info);
+                InteractionFeedback.Fail();
+                return false;
             }
-
-            // Min toggle süresi kontrolü (Sadece loop olmayan ve hareket halindeki animasyonlar için)
-            if (t < minToggleProgress && !info.loop && t != 1f) return;
 
             // --- TEK KAPIYSA ---
             if (!hasAdditional)
             {
-                ToggleSelf(t);
-                return;
+                ToggleSelf(openAmount);
+                return true;
             }
 
             // --- ÇİFT KAPIYSA ---
-            var addInfo = additionalAnimator.GetCurrentAnimatorStateInfo(0);
-            float tAdd = 1f; // İkinci kapı için de varsayılan "Sıfırdan Başla"
-
-            // İkinci kapı hareket halindeyse hesapla
-            if (addInfo.shortNameHash == openHash || addInfo.shortNameHash == closeHash)
-            {
-                tAdd = GetClampedProgress(addInfo);
-            }
-
-            ToggleSelf(t);
-            ToggleAdditional(tAdd);
+            float openAmountAdd = GetOpenAmount(additionalAnimator);
+            ToggleSelf(openAmount);
+            ToggleAdditional(openAmountAdd);
+            return true;
         }
 
         public bool ReceiveItem(InventoryItem item)
@@ -162,7 +151,6 @@ namespace FS_Atmo
 
             // ✅ KİLİT AÇILDI
             isLocked = false;
-            nextInteractTime = Time.time + lockedAnimationDuration;
             HudManager.Instance?.ShowSubtitle($"{item.itemName} unlocked it.", 2.5f, HudManager.Instance.SuccessColor);
             Debug.Log($"✅ {item.itemName} ile kilit açıldı.");
 
@@ -195,33 +183,36 @@ namespace FS_Atmo
         public void SetLocked(bool locked) => isLocked = locked;
         public void SetRequiredKey(InventoryItem key) => requiredKey = key;
 
-        private void ToggleSelf(float currentT)
+        private void ToggleSelf(float openAmount)
         {
+            openAmount = Mathf.Clamp01(openAmount);
+
             if (objectOpen)
             {
-                float mapped = 1f - currentT;
-                myAnimator.CrossFade(closeHash, crossFadeDuration, 0, mapped);
+                myAnimator.CrossFade(closeHash, crossFadeDuration, 0, openAmount);
                 objectOpen = false;
                 PlayCloseSfx(transform.position);
             }
             else
             {
-                float mapped = 1f - currentT;
-                myAnimator.CrossFade(openHash, crossFadeDuration, 0, mapped);
+                myAnimator.CrossFade(openHash, crossFadeDuration, 0, 1f - openAmount);
                 objectOpen = true;
                 PlayOpenSfxSequence(transform.position, includeAdditionalLeaf: hasAdditional);
             }
+
+            nextInteractTime = Time.time + crossFadeDuration + 0.05f;
         }
 
-        private void ToggleAdditional(float currentT)
+        private void ToggleAdditional(float openAmount)
         {
             var other = animateAdditional.GetComponent<SimpleOpenClose>();
             if (other == null) return;
 
+            openAmount = Mathf.Clamp01(openAmount);
+
             if (objectOpenAdditional)
             {
-                float mapped = 1f - currentT;
-                additionalAnimator.CrossFade(closeHash, crossFadeDuration, 0, mapped);
+                additionalAnimator.CrossFade(closeHash, crossFadeDuration, 0, openAmount);
                 objectOpenAdditional = false;
                 other.objectOpen = false;
                 other.objectOpenAdditional = false;
@@ -230,13 +221,59 @@ namespace FS_Atmo
             }
             else
             {
-                float mapped = 1f - currentT;
-                additionalAnimator.CrossFade(openHash, crossFadeDuration, 0, mapped);
+                additionalAnimator.CrossFade(openHash, crossFadeDuration, 0, 1f - openAmount);
                 objectOpenAdditional = true;
                 other.objectOpen = true;
                 other.objectOpenAdditional = true;
                 // Open SFX (handle → open) is played once from ToggleSelf for double doors.
             }
+        }
+
+        bool IsReversingToggle(Animator animator)
+        {
+            float openAmount = GetOpenAmount(animator);
+            return (objectOpen && openAmount < 1f - minToggleProgress) ||
+                   (!objectOpen && openAmount > minToggleProgress);
+        }
+
+        bool ShouldAllowToggle(float openAmount)
+        {
+            if (IsReversingToggle(myAnimator))
+                return true;
+
+            if (myAnimator.IsInTransition(0))
+                return false;
+
+            var info = myAnimator.GetCurrentAnimatorStateInfo(0);
+            if (info.loop)
+                return true;
+
+            return openAmount <= minToggleProgress || openAmount >= 1f - minToggleProgress;
+        }
+
+        float GetOpenAmount(Animator animator)
+        {
+            if (animator == null)
+                return objectOpen ? 1f : 0f;
+
+            if (animator.IsInTransition(0))
+            {
+                float current = StateToOpenAmount(animator.GetCurrentAnimatorStateInfo(0));
+                float next = StateToOpenAmount(animator.GetNextAnimatorStateInfo(0));
+                float blend = animator.GetAnimatorTransitionInfo(0).normalizedTime;
+                return Mathf.Lerp(current, next, blend);
+            }
+
+            return StateToOpenAmount(animator.GetCurrentAnimatorStateInfo(0));
+        }
+
+        float StateToOpenAmount(AnimatorStateInfo info)
+        {
+            if (info.shortNameHash == openHash)
+                return GetClampedProgress(info);
+            if (info.shortNameHash == closeHash)
+                return 1f - GetClampedProgress(info);
+            return objectOpen ? 1f : 0f;
         }
 
         void PlayCloseSfx(Vector3 position)

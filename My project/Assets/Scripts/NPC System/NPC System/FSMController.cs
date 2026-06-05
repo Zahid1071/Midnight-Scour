@@ -37,6 +37,18 @@ public class FSMController
         }
     }
 
+    void StopAgentMovement()
+    {
+        nav?.ClearRoute();
+
+        if (agent == null)
+            return;
+
+        agent.ResetPath();
+        agent.isStopped = true;
+        agent.velocity = Vector3.zero;
+    }
+
     public void SetState(NPCController.AIState newState)
     {
 
@@ -92,6 +104,7 @@ public class FSMController
                 break;
 
             case NPCController.AIState.Capture:
+                StopAgentMovement();
                 npc.poiLookDirector?.CancelHoldAndClearLook();
                 Debug.Log("State: CAPTURE");
                 npc.BeginCapture();
@@ -142,6 +155,7 @@ public class FSMController
 
             case NPCController.AIState.Capture:
                 lookDirector?.CancelHoldAndClearLook();
+                StopAgentMovement();
                 break;
         }
     }
@@ -571,7 +585,7 @@ public class FSMController
             // Eğer oyuncuyu göremiyorsam VE gitmem gereken yere (LSP) vardıysam:
             float distToLSP = Vector3.Distance(npc.transform.position, targetPosition);
 
-            if (distToLSP < 1.5f)
+            if (distToLSP < 0.2f)
             {
                 Debug.Log("Chase bitti: İzini kaybettim. Odayı aramaya başlıyorum.");
 

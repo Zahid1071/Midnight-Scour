@@ -15,11 +15,8 @@ MonoBehaviour:
   itemName: Screwdriver
   icon: {fileID: 21300000, guid: 85cac97d05e6fde439cbb4dfd45d35f3, type: 3}
   worldPrefab: {fileID: 7779702028675145206, guid: b3ed9fa3f33dfe644a67e7011bfab457, type: 3}
+  dropLandSFX: {fileID: 0}
   canDrop: 1
-  heldPrefab: {fileID: 7779702028675145206, guid: b3ed9fa3f33dfe644a67e7011bfab457, type: 3}
-  heldLocalPosition: {x: 0, y: 0, z: 0}
-  heldLocalEulerAngles: {x: 0, y: 0, z: 0}
-  heldLocalScale: {x: 1, y: 1, z: 1}
   pickUpSFX: {fileID: 8300000, guid: 14703ce226e238f43a4662e941bfc9f1, type: 3}
   useSuccessSound: {fileID: 8300000, guid: b256899b6c04b9b40a1c6970d540a728, type: 3}
   consumeOnUse: 0

@@ -173,27 +173,30 @@ public class HidingSpot : MonoBehaviour, IInteractable
         activeAnimator = null;
     }
 
-    public void Interact()
+    public bool Interact()
     {
         if (isToggling)
         {
             HudManager.Instance?.ShowSubtitle("Wait a moment.", 2f);
-            return;
+            return false;
         }
 
         GameObject player = GameObject.FindWithTag("Player");
-        if (player == null) return;
+        if (player == null) return false;
 
         PlayerHider hider = player.GetComponent<PlayerHider>();
-        if (hider == null) return;
+        if (hider == null) return false;
 
         if (hider.isHidden)
         {
             if (hider.IsHidingIn(this))
+            {
                 RevealPlayer(player);
-            else
-                HudManager.Instance?.ShowSubtitle("You are already hiding.", 2.5f);
-            return;
+                return true;
+            }
+
+            HudManager.Instance?.ShowSubtitle("You are already hiding.", 2.5f);
+            return false;
         }
 
         if (rightPivot == null)
@@ -219,6 +222,7 @@ public class HidingSpot : MonoBehaviour, IInteractable
         }
 
         StartCoroutine(EnterHidingRoutine(player, hider));
+        return true;
     }
 
     private IEnumerator EnterHidingRoutine(GameObject player, PlayerHider hider)

@@ -5,23 +5,24 @@ public class ConditionalInteractible : MonoBehaviour, IInteractable
     [SerializeField] private InventoryItem requiredItem;
     [SerializeField] private MonoBehaviour targetScript; // The actual logic (e.g., door open script)
 
-    public void Interact()
+    public bool Interact()
     {
         if (requiredItem == null)
         {
             HudManager.Instance?.ShowSubtitle("This interaction is not configured.", 3f);
-            return;
+            return false;
         }
 
         var inventory = InventoryManager.Instance.GetInventory();
         if (inventory.Contains(requiredItem))
         {
             HudManager.Instance?.ShowSubtitle($"{requiredItem.itemName} was used.", 2.5f, HudManager.Instance.SuccessColor);
-            (targetScript as IInteractable)?.Interact();
+            if (targetScript is IInteractable interactable)
+                return interactable.Interact();
+            return true;
         }
-        else
-        {
-            HudManager.Instance?.ShowSubtitle($"You need {requiredItem.itemName}.", 3f);
-        }
+
+        HudManager.Instance?.ShowSubtitle($"You need {requiredItem.itemName}.", 3f);
+        return false;
     }
 }

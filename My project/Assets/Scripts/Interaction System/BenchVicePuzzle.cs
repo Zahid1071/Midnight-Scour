@@ -50,10 +50,10 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
             Instance = null;
     }
 
-    public void Interact()
+    public bool Interact()
     {
         if (_wrenchReleased)
-            return;
+            return false;
 
         if (!_barInserted)
         {
@@ -62,17 +62,18 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
                 InteractionFeedback.Fail(useBarOnViseMessage, 3f);
             else
                 InteractionFeedback.Fail(needBarMessage, 3f);
-            return;
+            return false;
         }
 
         InventoryItem held = InventoryUI.Instance?.GetSelectedItem();
         if (held == hammerItem)
         {
             InteractionFeedback.Fail(useHammerOnBarMessage, 3f);
-            return;
+            return false;
         }
 
         InteractionFeedback.Fail(barWontBudgeMessage, 3f);
+        return false;
     }
 
     public bool ReceiveItem(InventoryItem item)
