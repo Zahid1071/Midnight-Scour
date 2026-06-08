@@ -59,12 +59,6 @@ public class FSMController
 
         switch (newState)
         {
-            case NPCController.AIState.Alerted:
-                Debug.Log("⚠️ State: ALERTED");
-                npc.StartCoroutine(AlertedRoutine());
-                if (prev != NPCController.AIState.Alerted)  // play once on entry
-                    SoundManager.Instance.PlaySFX(SoundManager.Instance.sfxBank[3]);
-                break;
             case NPCController.AIState.Suspicious:
                 Debug.Log("🤔 State: Suspicous");
                 npc.StartCoroutine(SearchRoutine());
@@ -87,13 +81,8 @@ public class FSMController
 
             case NPCController.AIState.Natural:
                 SoundManager.Instance.PlayMusic(SoundManager.Instance.musicBank[0]);
-                if (npc.ShouldImmediatelyChasePlayer())
-                    npc.BeginChaseFromPerception();
-                else
-                {
-                    npc.interaction.StartNextRoutine();
-                    Debug.Log("🌿 State: NATURAL");
-                }
+                npc.interaction.StartNextRoutine();
+                Debug.Log("🌿 State: NATURAL");
                 break;
 
             case NPCController.AIState.Chase:
@@ -123,10 +112,6 @@ public class FSMController
         {
             case NPCController.AIState.Natural:
                 
-                agent.speed = walkingSpeed;
-                break;
-
-            case NPCController.AIState.Alerted:
                 agent.speed = walkingSpeed;
                 break;
 
@@ -160,78 +145,6 @@ public class FSMController
         }
     }
 
-    // === ALERTED ===
-    private IEnumerator AlertedRoutine()
-    {
-        var agent = npc.interaction.agent;
-
-        if (agent != null)
-        {
-            agent.ResetPath();
-            agent.isStopped = true;
-            agent.velocity = Vector3.zero;
-            // keep updateRotation untouched; we rotate manually
-        }
-
-        const float losLostToSuspicious = 0.75f; // tolerance before downgrade
-        float losLostTimer = 0f;
-
-        try
-        {
-            while (npc.currentState == NPCController.AIState.Alerted)
-            {
-                if (npc.perception.CanSeePlayer)
-                {
-                    losLostTimer = 0f;
-
-                    Vector3 lookTarget = (npc.perception.PlayerTransform != null)
-                        ? npc.perception.PlayerTransform.position
-                        : npc.perception.LastKnownPlayerPosition;
-
-                    Vector3 dir = lookTarget - npc.transform.position;
-                    dir.y = 0f;
-
-                    if (dir.sqrMagnitude > 0.0001f)
-                    {
-                        Quaternion look = Quaternion.LookRotation(dir);
-                        npc.transform.rotation = Quaternion.Slerp(
-                            npc.transform.rotation, look, Time.deltaTime * 5f);
-                    }
-                }
-                else
-                {
-                    losLostTimer += Time.deltaTime;
-
-                    if (losLostTimer >= losLostToSuspicious &&
-                        npc.currentState == NPCController.AIState.Alerted)
-                    {
-                        float roll = UnityEngine.Random.value;
-                        npc.fsm.SetState(
-                            roll < npc.interaction.data.ambushChance
-                                ? NPCController.AIState.Ambush
-                                : NPCController.AIState.Suspicious
-                        );
-                        yield break;
-                    }
-                }
-
-                yield return null;
-            }
-        }
-        finally
-        {
-            if (agent != null)
-            {
-                agent.isStopped = false;
-                agent.updateRotation = true; // safety
-            }
-        }
-    }
-
-
-
-    
-    
     public IEnumerator CapturePlayerRoutine()
     {
         npc.poiLookDirector?.CancelHoldAndClearLook();
@@ -585,7 +498,7 @@ public class FSMController
             // Eğer oyuncuyu göremiyorsam VE gitmem gereken yere (LSP) vardıysam:
             float distToLSP = Vector3.Distance(npc.transform.position, targetPosition);
 
-            if (distToLSP < 0.5f)
+            if (distToLSP < 1.5f)
             {
                 Debug.Log("Chase bitti: İzini kaybettim. Odayı aramaya başlıyorum.");
 

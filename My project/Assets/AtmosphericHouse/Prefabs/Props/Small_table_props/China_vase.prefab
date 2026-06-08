@@ -146,3 +146,5 @@ MonoBehaviour:
   debrisDisappearMinSeconds: 2
   debrisDisappearMaxSeconds: 3
   npcSuspicionFromBreak: 300
+  npcMaxHearDistance: 20
+  npcMinHearDistance: 5

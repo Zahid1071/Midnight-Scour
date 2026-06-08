@@ -8,11 +8,8 @@ public struct VisionSettings
     [Range(0f, 180f)] public float maxViewAngle;     // degrees (half-angle)
     public LayerMask ignoreLayer;
 
-    [Tooltip("Seconds of continuous LoS required to confirm CHASE.")]
+    [Tooltip("Seconds of continuous line-of-sight required before the NPC starts chasing.")]
     [Min(0f)] public float confirmSeconds;
-
-    [Tooltip("Seconds of continuous LoS required to leave Natural and become ALERTED.")]
-    [Min(0f)] public float preAlertSeconds;  // <-- NEW
 
     [Tooltip("Vision meter fill per second while seeing the player.")]
     [Min(0f)] public float buildRate;
@@ -93,7 +90,6 @@ public class NPCData : ScriptableObject
         maxViewDistance = 10f,
         maxViewAngle    = 90f,
         confirmSeconds  = 1.5f,
-        preAlertSeconds = 0.45f,   // <-- NEW default
         buildRate       = 1.0f,
         decayRate       = 1.5f
     };

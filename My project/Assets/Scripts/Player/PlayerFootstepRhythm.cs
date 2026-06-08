@@ -91,21 +91,22 @@ public class PlayerFootstepRhythm : MonoBehaviour
 
 
 
-    float maxHearingDistance = 15f;
-    float minHearingDistance = 5f;
-
+    [SerializeField] float maxHearingDistance = PerceptionController.DefaultMaxHearingDistance;
+    [SerializeField] float minHearingDistance = PerceptionController.DefaultMinHearingDistance;
 
     void NotifyNPCsOfFootstep(float suspicionAmount)
     {
         foreach (var npc in Object.FindObjectsByType<PerceptionController>(FindObjectsSortMode.None))
         {
-            float dist = Vector3.Distance(transform.position, npc.transform.position);
+            float addValue = suspicionAmount * PerceptionController.DistanceHearingMultiplier(
+                transform.position,
+                npc.transform.position,
+                maxHearingDistance,
+                minHearingDistance);
 
-            float t = Mathf.InverseLerp(maxHearingDistance, minHearingDistance, dist);
-            t = Mathf.Clamp01(t);
+            if (addValue <= 0f)
+                continue;
 
-            float distanceMultiplier = Mathf.Pow(t, 5f);
-            float addValue = suspicionAmount * distanceMultiplier;
             npc.HearPlayerFootstep(transform, addValue);
         }
     }

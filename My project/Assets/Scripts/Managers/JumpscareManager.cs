@@ -4,13 +4,26 @@ using Unity.Cinemachine;
 public class JumpscareManager : MonoBehaviour
 {
     public static JumpscareManager Instance;
+
     public CinemachineCamera jumpscareCam;
+    [SerializeField] private GameObject wishlistBanner;
+
     private GameObject player;
 
     void Awake()
     {
         Instance = this;
         player = GameObject.FindWithTag("Player");
+
+        if (wishlistBanner == null)
+        {
+            var found = GameObject.Find("Wishlist Banner");
+            if (found != null)
+                wishlistBanner = found;
+        }
+
+        if (wishlistBanner != null)
+            wishlistBanner.SetActive(false);
     }
 
     public void TriggerJumpscare(Transform jumpscarePoint, Transform npcFace)
@@ -23,21 +36,15 @@ public class JumpscareManager : MonoBehaviour
             lookDirector?.CancelHoldAndClearLook();
         }
 
-        // Position the camera at the jumpscare point
         jumpscareCam.transform.position = jumpscarePoint.position;
-
         jumpscareCam.Priority = 50;
 
-        // Disable player input here
+        if (wishlistBanner != null)
+            wishlistBanner.SetActive(true);
     }
-
 
     public void EndJumpscare()
     {
-        // Lower camera priority so player cam takes over
         jumpscareCam.Priority = 0;
-
-        // Re-enable player input or show game over screen
-        // playerControllerScript.enabled = true; // if you want to restore control
     }
 }

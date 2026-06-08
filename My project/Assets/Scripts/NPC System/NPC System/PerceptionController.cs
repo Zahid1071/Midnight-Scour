@@ -19,9 +19,6 @@ public class PerceptionController : MonoBehaviour
     [SerializeField] private Vector3 faceForwardEulerOffset;
     public Transform searchTarget;               // used by Suspicious/Search/Ambush
 
-    // Events (both names for backward compatibility)
-    public event Action OnVisionAlerted;   // soft-sight reached (Natural only)
-    public event Action OnPlayerSeen;      // alias to the same moment
     public event Action OnVisionConfirmed; // sustained sight -> Chase
 
     // Runtime state
@@ -34,12 +31,10 @@ public class PerceptionController : MonoBehaviour
     // Cached config from NPCData
     float maxViewDistance, maxViewHalfAngle;
     float confirmSeconds, buildRate, decayRate;
-    float preAlertSeconds;   // now comes from SO
     float gracePeriod, keepChaseDist;
     float ambushAudioMul;
 
-    // Streak guards / timers
-    bool alertedThisStreak, confirmedThisStreak;
+    bool confirmedThisStreak;
     float lostSightTimer;
 
     LayerMask ignoreLayer;
@@ -59,30 +54,22 @@ public class PerceptionController : MonoBehaviour
             Debug.LogWarning($"{name}: NPCData missing. Using safe defaults.");
             maxViewDistance = 10f; maxViewHalfAngle = 90f;
             confirmSeconds = 1.5f; buildRate = 1f; decayRate = 1.5f;
-            preAlertSeconds = 0.45f;               // fallback default
             gracePeriod = 2f; keepChaseDist = 3f;
             ambushAudioMul = 0.5f;
             return;
         }
 
-        // Vision (from NPCData.VisionSettings)
         maxViewDistance  = data.vision.maxViewDistance;
         maxViewHalfAngle = data.vision.maxViewAngle;
-        confirmSeconds   = data.vision.confirmSeconds;
-        preAlertSeconds  = data.vision.preAlertSeconds;  // <-- read from SO
-        buildRate        = data.vision.buildRate;
-        decayRate        = data.vision.decayRate;
+        confirmSeconds   = Mathf.Max(0f, data.vision.confirmSeconds);
+        buildRate        = Mathf.Max(0.01f, data.vision.buildRate);
+        decayRate        = Mathf.Max(0.01f, data.vision.decayRate);
 
-        // Hearing & chase retention
         ambushAudioMul   = data.hearing.ambushSuspicionMultiplier;
         gracePeriod      = data.chaseRetention.gracePeriod;
         keepChaseDist    = data.chaseRetention.keepChasingDistance;
 
         ignoreLayer      = data.vision.ignoreLayer;
-
-        // Safety: if designer left it 0, derive a sane value
-        if (preAlertSeconds <= 0f)
-            preAlertSeconds = Mathf.Clamp(confirmSeconds * 0.3f, 0.2f, Mathf.Max(0.2f, confirmSeconds - 0.05f));
     }
 
     void Update()
@@ -111,15 +98,11 @@ public class PerceptionController : MonoBehaviour
     {
         Transform view = face ? face : transform;
 
-        // Treat "forward" as an arbitrary local axis of the face bone,
-        // optionally rotated by an offset (useful for rigs with odd bone orientation).
         Quaternion basisRot = view.rotation * Quaternion.Euler(faceForwardEulerOffset);
         origin = view.position;
         forward = (basisRot * AxisVector(faceForwardAxis)).normalized;
         Vector3 candidateUp = (basisRot * Vector3.up).normalized;
 
-        // If forward is (nearly) parallel to up, rotating around up collapses the cone.
-        // Pick a stable axis that is perpendicular to forward.
         if (Mathf.Abs(Vector3.Dot(candidateUp, forward)) > 0.95f)
             upAxis = (basisRot * Vector3.right).normalized;
         else
@@ -136,16 +119,13 @@ public class PerceptionController : MonoBehaviour
         Vector3 leftDir = Quaternion.AngleAxis(-half, upAxis) * forward;
         Vector3 rightDir = Quaternion.AngleAxis(half, upAxis) * forward;
 
-        // Center ray (blue)
         Gizmos.color = Color.blue;
         Gizmos.DrawLine(origin, origin + forward * dist);
 
-        // Extreme edges (yellow)
         Gizmos.color = Color.yellow;
         Gizmos.DrawLine(origin, origin + leftDir * dist);
         Gizmos.DrawLine(origin, origin + rightDir * dist);
 
-        // Arc at max distance
         Gizmos.color = Color.blue;
         const int segments = 24;
         Vector3 prev = origin + leftDir * dist;
@@ -206,40 +186,27 @@ public class PerceptionController : MonoBehaviour
         var playerCol = player.GetComponentInChildren<Collider>();
         if (!playerCol) { CanSeePlayer = false; return; }
 
-        // Vektör Hesaplamaları
         GetViewBasis(out Vector3 eye, out Vector3 viewForward, out _);
-        Vector3 aim = playerCol.bounds.center;                // Hedef (Oyuncu göğsü)
-        Vector3 dirToTarget = (aim - eye).normalized;         // Hedefe giden yön vektörü
+        Vector3 aim = playerCol.bounds.center;
+        Vector3 dirToTarget = (aim - eye).normalized;
 
-        // --- EKLENEN KISIM: AÇI KONTROLÜ (FOV) ---
-        
-        // NPC'nin yüzü (transform.forward) ile Hedef arasındaki açıyı bul
         float angleToTarget = Vector3.Angle(viewForward, dirToTarget);
-
-        // Eğer açı, izin verilen yarı-açıdan (maxViewHalfAngle) büyükse
-        // (Örneğin 60 dereceden büyükse, yani oyuncu çok yandaysa veya arkadaysa)
         if (angleToTarget > maxViewHalfAngle)
         {
             CanSeePlayer = false;
-            return; // Göremez, fonksiyondan çık
+            return;
         }
-        // -----------------------------------------
 
-        // 2. RAYCAST (Mesafe ve Duvar Kontrolü)
-        // Açı tutuyorsa şimdi de arada duvar var mı diye bakıyoruz
         if (Physics.Raycast(eye, dirToTarget, out RaycastHit hit, maxViewDistance, ~ignoreLayer, QueryTriggerInteraction.Ignore))
         {
             if (hit.collider.transform.root == player.root)
             {
                 LastKnownPlayerPosition = aim;
                 CanSeePlayer = true;
-                //Debug.Log(hit.transform.name);
                 return;
-
             }
         }
 
-        // Çizim debug (Sadece sahne ekranında görünür)
         Debug.DrawRay(eye, dirToTarget * maxViewDistance, CanSeePlayer ? Color.green : Color.red);
 
         CanSeePlayer = false;
@@ -247,42 +214,60 @@ public class PerceptionController : MonoBehaviour
 
     private void UpdateVisionMeters()
     {
-        // meter in seconds-equivalent
-        if (CanSeePlayer) visionMeter += buildRate * Time.deltaTime;
-        else              visionMeter -= decayRate * Time.deltaTime;
+        if (CanSeePlayer)
+            visionMeter += buildRate * Time.deltaTime;
+        else
+            visionMeter -= decayRate * Time.deltaTime;
 
         visionMeter = Mathf.Clamp(visionMeter, 0f, confirmSeconds);
 
-        // NATURAL-only soft alert gate
-        if (!alertedThisStreak &&
-            npc.currentState == NPCController.AIState.Natural &&
-            visionMeter >= preAlertSeconds)
-        {
-            alertedThisStreak = true;
-            OnVisionAlerted?.Invoke();
-            OnPlayerSeen?.Invoke(); // alias for older/newer NPCController versions
-        }
-
-        // Confirm chase (any state)
         if (!confirmedThisStreak && visionMeter >= confirmSeconds)
         {
             confirmedThisStreak = true;
             OnVisionConfirmed?.Invoke();
         }
 
-        // fully drained resets streak guards
         if (!CanSeePlayer && visionMeter <= 0f)
-        {
-            alertedThisStreak = false;
             confirmedThisStreak = false;
-        }
+    }
+
+    public const float DefaultMaxHearingDistance = 15f;
+    public const float DefaultMinHearingDistance = 5f;
+    public const float DistanceHearingFalloffPower = 5f;
+
+    public static float DistanceHearingMultiplier(
+        Vector3 soundPosition,
+        Vector3 listenerPosition,
+        float maxHearingDistance = DefaultMaxHearingDistance,
+        float minHearingDistance = DefaultMinHearingDistance)
+    {
+        float dist = Vector3.Distance(listenerPosition, soundPosition);
+        float t = Mathf.InverseLerp(maxHearingDistance, minHearingDistance, dist);
+        return Mathf.Pow(Mathf.Clamp01(t), DistanceHearingFalloffPower);
+    }
+
+    /// <summary>
+    /// Loud local noise scaled by the same distance falloff used for player footsteps.
+    /// </summary>
+    public void HearNoiseAt(
+        Vector3 worldPosition,
+        float baseSuspicion,
+        float maxHearingDistance = DefaultMaxHearingDistance,
+        float minHearingDistance = DefaultMinHearingDistance)
+    {
+        float scaled = baseSuspicion * DistanceHearingMultiplier(
+            worldPosition, transform.position, maxHearingDistance, minHearingDistance);
+
+        if (scaled <= 0f)
+            return;
+
+        HearLoudWorldNoise(worldPosition, scaled);
     }
 
     public void HearPlayerFootstep(Transform soundSource, float suspicionAmount)
     {
         if (!soundSource) return;
 
-        // If the player is in the cage/captive layer, ignore player-made noise.
         if (soundSource.gameObject.layer == 12) return;
 
         if (npc.currentState == NPCController.AIState.Ambush)
@@ -327,30 +312,22 @@ public class PerceptionController : MonoBehaviour
             float dist = Vector3.Distance(transform.position, player.position);
 
             if (dist < keepChaseDist)
-            {
                 lostSightTimer = 0f;
-            }
             else
-            {
                 lostSightTimer += Time.deltaTime;
-                // if (lostSightTimer >= gracePeriod)
-                //     npc.fsm.SetState(NPCController.AIState.Suspicious);
-            }
         }
     }
 
     [Header("Cage Settings")]
-    public Cage targetCage; // Inspector'dan Cage.cs olan objeyi sürükle
-    private bool cageAlertTriggered = false; // Sürekli spamlamaması için
+    public Cage targetCage;
+    private bool cageAlertTriggered = false;
 
     private void CageCheckVision()
     {
         if (targetCage == null || cageAlertTriggered) return;
 
-        // Göz ve Hedef Vektörleri
         Vector3 eye = transform.position + Vector3.up * 1.7f;
-        
-        // Kafes Merkezini Bul
+
         Vector3 cageCenter = targetCage.transform.position;
         Collider triggerCol = targetCage.GetComponent<Collider>();
         if (triggerCol != null) cageCenter = triggerCol.bounds.center;
@@ -361,26 +338,19 @@ public class PerceptionController : MonoBehaviour
 
         if (distToCage > maxViewDistance) return;
 
-        // RAYCAST (Layer filtresi yok, direkt bakıyor)
         if (Physics.Raycast(eye, dirToCage, out RaycastHit hit, maxViewDistance))
         {
             Cage hitCage = hit.transform.GetComponentInParent<Cage>();
 
             if (hitCage != null && hitCage == targetCage)
             {
-                
-                // 1. Durum: İçerisi Boş mu?
                 bool isEmpty = (hitCage.isOccupied == false);
-
-                // 2. Durum: Kapı Açık mı? (Referans atanmışsa kontrol et, yoksa kapalı varsay)
                 bool isOpen = (hitCage.cageDoor != null && hitCage.cageDoor.objectOpen);
 
-                // VEYA (||) mantığı: Boşsa VEYA Açıksa -> ALARM!
                 if (isEmpty || isOpen)
                 {
                     Debug.Log($"⚠️ NPC: Player Escaped! (isEmpty: {isEmpty}, isOpen: {isOpen})");
 
-                    // Already chasing (or capturing) — remember escape, do not interrupt with Search.
                     if (npc.currentState != NPCController.AIState.Chase
                         && npc.currentState != NPCController.AIState.Capture)
                     {
@@ -393,6 +363,5 @@ public class PerceptionController : MonoBehaviour
         }
     }
 
-    // Convenience accessor
     public Transform PlayerTransform => player;
 }

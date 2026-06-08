@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Hammer
   m_EditorClassIdentifier: 
   itemName: Hammer
-  icon: {fileID: 21300000, guid: 85cac97d05e6fde439cbb4dfd45d35f3, type: 3}
+  icon: {fileID: 21300000, guid: 3c79ad95e2b198744924c1177d9016d4, type: 3}
   worldPrefab: {fileID: 1577113404445322810, guid: cff5c97a404180d46877d898442bf84b, type: 3}
   dropLandSFX: {fileID: 0}
   canDrop: 1

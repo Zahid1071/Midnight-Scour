@@ -4,7 +4,7 @@ using System.Collections;
 
 public class NPCController : MonoBehaviour
 {
-    public enum AIState { Natural, Alerted, Suspicious, Search, Chase, Capture, Dead, Patrol, Ambush , Scripted}
+    public enum AIState { Natural, Suspicious, Search, Chase, Capture, Dead, Patrol, Ambush, Scripted }
     public AIState currentState;
 
     [HideInInspector] public FSMController fsm;
@@ -73,13 +73,8 @@ public class NPCController : MonoBehaviour
             runSpeed  = Mathf.Max(walkSpeed, data.locomotion.runningSpeed);
         }
 
-        // Perception -> State transitions (event-driven)
         if (perception != null)
-        {
-            perception.OnVisionAlerted   += HandleVisionAlerted;   // soft sight fill
-            perception.OnPlayerSeen      += HandleVisionAlerted;   // alias
-            perception.OnVisionConfirmed += HandleVisionConfirmed; // sustained sight -> Chase
-        }
+            perception.OnVisionConfirmed += HandleVisionConfirmed;
 
         if (suspicion != null)
             suspicion.OnSuspicionThresholdReached += HandleSuspicionReached;
@@ -94,10 +89,6 @@ public class NPCController : MonoBehaviour
     void Update()
     {
         fsm?.Update();
-
-        if (currentState == AIState.Natural && ShouldImmediatelyChasePlayer())
-            BeginChaseFromPerception();
-
         TickNaturalPoiLook();
     }
 
@@ -185,12 +176,6 @@ public class NPCController : MonoBehaviour
 
     // ========== Perception event handlers ==========
 
-    public bool ShouldImmediatelyChasePlayer()
-    {
-        if (perception == null || !perception.CanSeePlayer) return false;
-        return !IsPlayerStealthHidden(perception.PlayerTransform);
-    }
-
     /// <summary>
     /// Drop routine, door routes, and POI — run straight at the player.
     /// </summary>
@@ -213,27 +198,6 @@ public class NPCController : MonoBehaviour
         fsm.TickChase();
     }
 
-    static bool IsPlayerStealthHidden(Transform playerTransform)
-    {
-        if (playerTransform == null) return false;
-        if (playerTransform.gameObject.layer == 7) return true;
-        var hider = playerTransform.GetComponent<PlayerHider>();
-        return hider != null && hider.isHidden;
-    }
-
-    private void HandleVisionAlerted()
-    {
-        if (currentState == AIState.Chase || currentState == AIState.Capture || currentState == AIState.Dead) return;
-
-        if (currentState == AIState.Natural)
-        {
-            BeginChaseFromPerception();
-            return;
-        }
-
-        interaction?.CancelAndExitGracefully(AIState.Chase);
-    }
-
     private void HandleSuspicionReached()
     {
         if (currentState == AIState.Chase || currentState == AIState.Capture || currentState == AIState.Dead) return;
@@ -243,7 +207,9 @@ public class NPCController : MonoBehaviour
 
     private void HandleVisionConfirmed()
     {
-        if (currentState == AIState.Capture || currentState == AIState.Dead || currentState == AIState.Scripted) return;
+        if (currentState == AIState.Chase || currentState == AIState.Capture
+            || currentState == AIState.Dead || currentState == AIState.Scripted)
+            return;
 
         if (currentState == AIState.Natural)
         {

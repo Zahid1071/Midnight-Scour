@@ -47,7 +47,7 @@ public class InventoryUI : MonoBehaviour
 
     private void Update()
     {
-        if (PlayerControlGate.IsInputBlocked)
+        if (PlayerControlGate.IsInputBlocked || ReadPanelUI.IsBlockingPlayerInput)
             return;
 
         if (Input.GetKeyDown(KeyCode.Alpha1)) SelectSlot(0);

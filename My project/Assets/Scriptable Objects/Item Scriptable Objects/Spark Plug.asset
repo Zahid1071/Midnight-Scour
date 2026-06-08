@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemName: Spark Plug
   icon: {fileID: 21300000, guid: 723e04e84494a46408fb373724c0b170, type: 3}
-  worldPrefab: {fileID: 100100000, guid: c96de3a77f393ed41ab882919b2bf62e, type: 3}
-  dropLandSFX: {fileID: 0}
+  worldPrefab: {fileID: 6998863449693313039, guid: c96de3a77f393ed41ab882919b2bf62e, type: 3}
+  dropLandSFX: {fileID: 8300000, guid: f5dc1aebb3da41d46a8bece3122fd117, type: 3}
   canDrop: 1
   pickUpSFX: {fileID: 8300000, guid: bf4beb9cc9f0d2c4988065da775888b6, type: 3}
   useSuccessSound: {fileID: 0}

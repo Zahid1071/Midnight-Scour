@@ -17,4 +17,17 @@ public class CinematicPlayerControlLock : MonoBehaviour
         PlayerControlGate.Release(PlayerControlGate.ReasonCinematic);
         GameplayHudVisibility.Instance?.ShowGameplayHud();
     }
+
+    /// <summary>Timeline signal entry point — always-active relay to the UI prefab.</summary>
+    public void ShowControlsHint()
+    {
+        var hint = FindFirstObjectByType<ControlsPanelHint>(FindObjectsInactive.Include);
+        if (hint == null)
+        {
+            Debug.LogWarning("[CinematicPlayerControlLock] ControlsPanelHint not found in scene.");
+            return;
+        }
+
+        hint.Show();
+    }
 }

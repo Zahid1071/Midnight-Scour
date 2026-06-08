@@ -20,7 +20,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 122
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &3807232785276411698
 Transform:
   m_ObjectHideFlags: 0
@@ -29,14 +29,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 89629937377143449}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0.00006298973, y: 0.4684567, z: -0.14349177}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2680558425962720462}
   m_Father: {fileID: 1441796910051676508}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!33 &1042500444223882021
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -148,7 +148,7 @@ MonoBehaviour:
   openStateName: Open
   closeStateName: Close
   lockedTriggerName: Locked
-  crossFadeDuration: 0.1
+  crossFadeDuration: 0.4
   minToggleProgress: 0.25
   isLocked: 0
   requiredKey: {fileID: 0}
@@ -543,3 +543,5 @@ MonoBehaviour:
   alreadyFlushedMessage: The water's already gone.
   successMessage: 
   flush: {fileID: 8300000, guid: 469f656379e73114289f1ef4d15e3577, type: 3}
+  npcSuspicionOnFlush: 300
+  flushSfxVolume: 1

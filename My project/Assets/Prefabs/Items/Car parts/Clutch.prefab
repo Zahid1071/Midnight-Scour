@@ -14,15 +14,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e0e23a3b6a985b743afd3eb6043a08c3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 23.490967
+      value: 10.155204
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e0e23a3b6a985b743afd3eb6043a08c3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.8427753
+      value: -1.895
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e0e23a3b6a985b743afd3eb6043a08c3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -31.57332
+      value: -10.416842
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e0e23a3b6a985b743afd3eb6043a08c3, type: 3}
       propertyPath: m_LocalRotation.w
@@ -189,6 +189,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: 822f7a68a04d8c44ebb46aedc1165674, type: 2}
+  grateGate: {fileID: 0}
+  blockedUntilBenchViceReleased: 0
+  benchViceStuckMessage: It is stuck.
+  blockedMessage: I can't reach that.
 --- !u!65 &3176446831607461974
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -204,9 +208,9 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.39, y: 0.2, z: 0.44}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 0.29, y: 0.043380022, z: 0.2927494}
+  m_Center: {x: 0, y: 0.00489676, z: -0.0026826859}

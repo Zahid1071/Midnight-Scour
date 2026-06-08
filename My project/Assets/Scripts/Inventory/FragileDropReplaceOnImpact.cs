@@ -19,6 +19,11 @@ public sealed class FragileDropReplaceOnImpact : MonoBehaviour
     [Header("NPC reaction")]
     [Min(0f)]
     [SerializeField] private float npcSuspicionFromBreak = 300f;
+    [Min(0f)]
+    [Tooltip("Beyond this distance the break is inaudible to NPCs. Uses the same falloff curve as footsteps.")]
+    [SerializeField] private float npcMaxHearDistance = 20f;
+    [Min(0f)]
+    [SerializeField] private float npcMinHearDistance = 5f;
 
     private AudioClip _breakClip;
     private bool _replaced;
@@ -63,7 +68,13 @@ public sealed class FragileDropReplaceOnImpact : MonoBehaviour
         if (npcSuspicionFromBreak > 0f)
         {
             foreach (var perception in Object.FindObjectsByType<PerceptionController>(FindObjectsSortMode.None))
-                perception.HearLoudWorldNoise(impactPoint, npcSuspicionFromBreak);
+            {
+                perception.HearNoiseAt(
+                    impactPoint,
+                    npcSuspicionFromBreak,
+                    npcMaxHearDistance,
+                    npcMinHearDistance);
+            }
         }
 
         Destroy(gameObject);
