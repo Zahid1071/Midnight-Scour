@@ -21,22 +21,32 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private string sfxParam = "SFX";
 
     [Header("Scene Routing")]
-    [Tooltip("Scenes considered 'menus' will play menuMusic. Others play gameMusic + ambience.")]
+    [Tooltip("Scenes considered 'menus' will play menuMusic. Others use gameplay music + ambience.")]
     [SerializeField] private string[] menuSceneNames = new[] { "Main Menu", "Menu", "Title" };
 
-    [Header("Clips")]
+    [Header("Music - Menus")]
     public AudioClip menuMusic;
+
+    [Header("Music - Gameplay")]
+    [Tooltip("Default exploration music for all non-captive layers.")]
     public AudioClip gameMusic;
+    [Tooltip("Played while the player is on the captive layer (12). Falls back to gameMusic if unset.")]
+    public AudioClip captiveLayerMusic;
+    [Tooltip("Temporary override while any NPC is chasing. Clears back to layer music when chase ends.")]
+    public AudioClip chaseMusic;
+    [SerializeField] private int captiveLayerIndex = 12;
+    [SerializeField] private float gameplayMusicFade = 0.5f;
+
+    [Header("Ambience")]
     public AudioClip defaultAmbience;
+
     [Header("UI Clips")]
     public AudioClip uiClickClip;
     public AudioClip uiHoverClip; // optional
     [Tooltip("Played on failed interact (wrong item, out of reach, empty click, etc.).")]
     public AudioClip actionFailClip;
 
-    [Header("Optional banks")]
-    public AudioClip[] musicBank;
-    public AudioClip[] ambienceBank;
+    [Header("SFX banks")]
     public AudioClip[] sfxBank;
     public AudioClip[] tensionSFXBank;
 
@@ -68,6 +78,14 @@ public class SoundManager : MonoBehaviour
     private Coroutine musicFadeRoutine;
     private bool usingA = true;
 
+    Transform _player;
+    int _lastPlayerLayer = -1;
+    bool _playerOnCaptiveLayer;
+    bool _chaseMusicActive;
+    bool _inGameplayScene;
+    bool _gameplayMusicReady;
+    Coroutine _gameplayMusicRoutine;
+
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -75,21 +93,26 @@ public class SoundManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         EnsureSources();
+        SilenceMusicSources();
         Build3DPool();
 
-        // listen scene changes
-        SceneManager.activeSceneChanged += OnSceneChanged;
+        SceneManager.sceneLoaded += OnSceneLoaded;
 
-        // pull volumes from PlayerPrefs once at boot (your settings menu can call ApplyMixerFromPrefs() again on Apply)
         ApplyMixerFromPrefs();
     }
 
+    void Update()
+    {
+        if (!_inGameplayScene || !_gameplayMusicReady || _chaseMusicActive)
+            return;
 
+        RefreshPlayerLayerMusic();
+    }
 
     void OnDestroy()
     {
         if (Instance == this)
-            SceneManager.activeSceneChanged -= OnSceneChanged;
+            SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
     private void EnsureSources()
@@ -104,6 +127,25 @@ public class SoundManager : MonoBehaviour
         musicSourceB.volume = 1f;
         ambienceSource.volume = 1f;
         sfxSource.volume = 1f;
+    }
+
+    void SilenceMusicSources()
+    {
+        StopMusic(0f);
+
+        if (musicSourceA != null)
+        {
+            musicSourceA.playOnAwake = false;
+            musicSourceA.Stop();
+            musicSourceA.clip = null;
+        }
+
+        if (musicSourceB != null)
+        {
+            musicSourceB.playOnAwake = false;
+            musicSourceB.Stop();
+            musicSourceB.clip = null;
+        }
     }
 
     private AudioSource CreateChildSource(string name, AudioMixerGroup group, bool loop)
@@ -141,6 +183,23 @@ public class SoundManager : MonoBehaviour
     }
 
     // ---------- PUBLIC API ----------
+
+    /// <summary>NPC chase started — chase music overrides layer music until cleared.</summary>
+    public void SetChaseMusicActive(bool active)
+    {
+        if (_chaseMusicActive == active)
+            return;
+
+        _chaseMusicActive = active;
+
+        if (!_inGameplayScene)
+            return;
+
+        if (!active)
+            RefreshPlayerLayerMusic(force: true);
+
+        ApplyGameplayMusic();
+    }
 
     public void PlayMusic(AudioClip clip, float fade = 0.5f)
     {
@@ -346,20 +405,111 @@ public class SoundManager : MonoBehaviour
 
     private static float Linear01ToDb(float v) => (v <= 0.0001f) ? -80f : Mathf.Log10(Mathf.Clamp01(v)) * 20f;
 
-    private void OnSceneChanged(Scene oldScene, Scene newScene)
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        // decide what to play
-        bool isMenu = IsMenuScene(newScene.name);
+        HandleSceneAudio(scene);
+    }
+
+    void HandleSceneAudio(Scene scene)
+    {
+        if (_gameplayMusicRoutine != null)
+        {
+            StopCoroutine(_gameplayMusicRoutine);
+            _gameplayMusicRoutine = null;
+        }
+
+        bool isMenu = IsMenuScene(scene.name);
+        _inGameplayScene = !isMenu;
+        _gameplayMusicReady = false;
+        _player = null;
+        _lastPlayerLayer = -1;
+        _playerOnCaptiveLayer = false;
+        _chaseMusicActive = false;
+
+        SilenceMusicSources();
+
         if (isMenu)
         {
             PlayAmbience(null);
-            PlayMusic(menuMusic, 0.4f);
+            PlayMusic(menuMusic);
+            return;
         }
-        else
+
+        _gameplayMusicRoutine = StartCoroutine(BeginGameplayAudioDeferred());
+    }
+
+    IEnumerator BeginGameplayAudioDeferred()
+    {
+        PlayAmbience(defaultAmbience, true);
+
+        const float findPlayerTimeout = 3f;
+        float elapsed = 0f;
+        while (_player == null && elapsed < findPlayerTimeout)
         {
-            PlayMusic(gameMusic, 0.6f);
-            PlayAmbience(defaultAmbience != null ? defaultAmbience : (ambienceBank != null && ambienceBank.Length > 0 ? ambienceBank[0] : null), true);
+            var playerGo = GameObject.FindWithTag("Player");
+            if (playerGo != null)
+                _player = playerGo.transform;
+
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
         }
+
+        // Let Cage / layer scripts settle before picking the track.
+        yield return null;
+        yield return null;
+
+        RefreshPlayerLayerMusic(force: true);
+        _gameplayMusicReady = true;
+        _gameplayMusicRoutine = null;
+    }
+
+    void RefreshPlayerLayerMusic(bool force = false)
+    {
+        if (_player == null)
+        {
+            var playerGo = GameObject.FindWithTag("Player");
+            if (playerGo != null)
+                _player = playerGo.transform;
+        }
+
+        if (_player == null)
+            return;
+
+        int layer = _player.gameObject.layer;
+        bool captive = layer == captiveLayerIndex;
+
+        if (!force && layer == _lastPlayerLayer && captive == _playerOnCaptiveLayer)
+            return;
+
+        _lastPlayerLayer = layer;
+        _playerOnCaptiveLayer = captive;
+        ApplyGameplayMusic();
+    }
+
+    void ApplyGameplayMusic()
+    {
+        if (!_inGameplayScene)
+            return;
+
+        AudioClip clip = ResolveGameplayMusicClip();
+        if (clip == null)
+            return;
+
+        if (CurrentMusicClip == clip)
+            return;
+
+        PlayMusic(clip, gameplayMusicFade);
+    }
+
+    AudioClip ResolveGameplayMusicClip()
+    {
+        if (_chaseMusicActive && chaseMusic != null)
+            return chaseMusic;
+
+        if (_playerOnCaptiveLayer)
+            return captiveLayerMusic != null ? captiveLayerMusic : gameMusic;
+
+        return gameMusic;
     }
 
     private bool IsMenuScene(string sceneName)

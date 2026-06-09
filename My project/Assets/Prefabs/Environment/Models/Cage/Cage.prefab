@@ -107,6 +107,7 @@ MonoBehaviour:
   minToggleProgress: 0.25
   isLocked: 1
   requiredKey: {fileID: 11400000, guid: a2ac5111d0b7f21438e805fe05202450, type: 2}
+  lockedMessage: the lock seems easy to break
   lockedAnimationDuration: 1
   openSound: {fileID: 8300000, guid: 8113092160f2f964b999a0d90c946fec, type: 3}
   closeSound: {fileID: 8300000, guid: 3e3d7ebd45de1d14fb71941b553ee314, type: 3}

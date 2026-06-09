@@ -103,6 +103,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: 45937426966d95246bf6c742a44d0697, type: 2}
   grateGate: {fileID: 0}
+  blockedUntilBenchViceReleased: 0
+  benchViceStuckMessage: It is stuck.
   blockedMessage: I can't reach that.
 --- !u!114 &8820011223344556677
 MonoBehaviour:
@@ -120,6 +122,7 @@ MonoBehaviour:
   replacementPrefab: {fileID: 6513483553446225893, guid: 05f3690d2b10175428a2b31f22017083, type: 3}
   wrongItemMessage: That won't work here.
   successMessage: Stuck the gum on the bone.
+  successSound: {fileID: 8300000, guid: 0795300357c64bc41826ab5157159d13, type: 3}
 --- !u!64 &1446215162034198263
 MeshCollider:
   m_ObjectHideFlags: 0

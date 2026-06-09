@@ -57,6 +57,9 @@ public class FSMController
         var prev = npc.currentState;
         npc.currentState = newState;
 
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.SetChaseMusicActive(newState == NPCController.AIState.Chase);
+
         switch (newState)
         {
             case NPCController.AIState.Suspicious:
@@ -80,7 +83,6 @@ public class FSMController
             //     break;
 
             case NPCController.AIState.Natural:
-                SoundManager.Instance.PlayMusic(SoundManager.Instance.musicBank[0]);
                 npc.interaction.StartNextRoutine();
                 Debug.Log("🌿 State: NATURAL");
                 break;
@@ -88,8 +90,6 @@ public class FSMController
             case NPCController.AIState.Chase:
                 nav?.ClearRoute();
                 Debug.Log("🏃 State: CHASE");
-                // if (SoundManager.Instance.CurrentMusicClip != SoundManager.Instance.musicBank[1])
-                //     SoundManager.Instance.PlayMusic(SoundManager.Instance.musicBank[1]);
                 break;
 
             case NPCController.AIState.Capture:
@@ -191,8 +191,8 @@ public class FSMController
 
         if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured)) return;
 
-        SoundManager.Instance.PlaySFX(SoundManager.Instance.tensionSFXBank[0], 0.5f);
         SoundManager.Instance.PlaySFXAt(SoundManager.Instance.tensionSFXBank[0], npc.transform.position);
+        SoundManager.Instance.PlaySFXAt(SoundManager.Instance.tensionSFXBank[1], npc.transform.position);
         PlayerControlGate.Acquire(PlayerControlGate.ReasonCaptured);
 
         Debug.Log("Player Caught!");
@@ -514,7 +514,10 @@ public class FSMController
             }
         }
 
-        // 4. Hareket (Navigation)
+        // 4. Hareket — door-aware routing (wait at gate, open, cross). Skip replans mid-door.
+        if (nav.IsInDoorTransit)
+            return;
+
         float now = Time.time;
         bool targetMovedEnough =
             (npc._lastChaseTarget.x == float.PositiveInfinity) ||
@@ -522,10 +525,7 @@ public class FSMController
 
         if (targetMovedEnough || now >= npc._nextChaseReplanTime)
         {
-            if (canSee)
-                nav.SetDestinationDirect(targetPosition);
-            else
-                nav.GoToPoint(targetPosition);
+            nav.GoToPoint(targetPosition);
 
             npc._lastChaseTarget = targetPosition;
             npc._nextChaseReplanTime = now + npc.chaseReplanCooldown;

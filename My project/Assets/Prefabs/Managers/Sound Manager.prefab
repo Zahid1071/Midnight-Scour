@@ -59,15 +59,15 @@ MonoBehaviour:
   menuSceneNames:
   - Main Menu
   menuMusic: {fileID: 8300000, guid: b911662f2b94547e8a834cff9d26a788, type: 3}
-  gameMusic: {fileID: 8300000, guid: dc1d6b96e081b4befbd033dee4730596, type: 3}
-  defaultAmbience: {fileID: 8300000, guid: b3e6a73d0a0b27c468ba4f217b5621e5, type: 3}
+  gameMusic: {fileID: 8300000, guid: ee403a3067a0c476dbd3e34a5f69c4a3, type: 3}
+  captiveLayerMusic: {fileID: 8300000, guid: dc1d6b96e081b4befbd033dee4730596, type: 3}
+  chaseMusic: {fileID: 8300000, guid: 6f8ac1fb6c4da43309fc6f2608f82ab6, type: 3}
+  captiveLayerIndex: 12
+  gameplayMusicFade: 0.5
+  defaultAmbience: {fileID: 0}
   uiClickClip: {fileID: 8300000, guid: 29c9b7f66b2ae3f47882d7d526ecd150, type: 3}
   uiHoverClip: {fileID: 8300000, guid: 438f6a52fe6be9641b074b55236b9ef6, type: 3}
-  actionFailClip: {fileID: 0}
-  musicBank:
-  - {fileID: 8300000, guid: dc1d6b96e081b4befbd033dee4730596, type: 3}
-  - {fileID: 8300000, guid: 9dc520664b2fd3747838f1c251c34285, type: 3}
-  ambienceBank: []
+  actionFailClip: {fileID: 8300000, guid: 72ae4b80546a8b74d966135c77d4a680, type: 3}
   sfxBank:
   - {fileID: 8300000, guid: 582f50205d17f1848bf3d8912008438f, type: 3}
   - {fileID: 8300000, guid: 95da03083a914cd4ca92d38c94536a42, type: 3}
@@ -75,12 +75,22 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 55bb594b195705346807f97f6fae9fc7, type: 3}
   tensionSFXBank:
   - {fileID: 8300000, guid: 5044f4d4737e3cb47b4ce02487db2729, type: 3}
+  - {fileID: 8300000, guid: 582f50205d17f1848bf3d8912008438f, type: 3}
+  itemDropLandClip: {fileID: 8300000, guid: a21b4179f3ffd8e4c86b7c2ddb3bf9a7, type: 3}
   musicSourceA: {fileID: 228075428072045804}
   musicSourceB: {fileID: 7535631578845724816}
   ambienceSource: {fileID: 8021086284184574946}
   sfxSource: {fileID: 4528937523506965284}
   poolSize: 8
   threeDSpatialBlend: 1
+  sfxMinDistance: 1
+  sfxMaxDistance: 18
+  occlusionLayers:
+    serializedVersion: 2
+    m_Bits: 17207
+  occludedVolumeMultiplier: 0.5
+  occludedLowpassCutoff: 1400
+  clearLowpassCutoff: 22000
 --- !u!1 &4504894872282728294
 GameObject:
   m_ObjectHideFlags: 0
@@ -125,7 +135,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: -1967921720306482560, guid: d0494497af355c44f913d2de9798dce5, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -254,7 +264,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 8490756812914523323, guid: d0494497af355c44f913d2de9798dce5, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 1
@@ -383,7 +393,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 1301280918907549777, guid: d0494497af355c44f913d2de9798dce5, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -512,7 +522,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 8490756812914523323, guid: d0494497af355c44f913d2de9798dce5, type: 2}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 1

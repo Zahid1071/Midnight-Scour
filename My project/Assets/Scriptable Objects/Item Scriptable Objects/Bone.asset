@@ -21,6 +21,7 @@ MonoBehaviour:
   useSuccessSound: {fileID: 0}
   consumeOnUse: 1
   interactionReachBonus: 0
+  reachAttemptFailMessage: the bone needs to be sticky
   breaksOnWrongUse: 0
   breakOnWrongUseSound: {fileID: 0}
   breakOnWrongUseMessage: 

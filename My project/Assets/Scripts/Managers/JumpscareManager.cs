@@ -1,19 +1,23 @@
+using System.Collections;
 using UnityEngine;
 using Unity.Cinemachine;
+using UnityEngine.SceneManagement;
 
 public class JumpscareManager : MonoBehaviour
 {
     public static JumpscareManager Instance;
 
     public CinemachineCamera jumpscareCam;
-    [SerializeField] private GameObject wishlistBanner;
 
-    private GameObject player;
+    [SerializeField] private GameObject wishlistBanner;
+    [SerializeField] private string menuSceneName = "Main Menu";
+    [SerializeField] private float endGameDelaySeconds = 4f;
+
+    Coroutine _endGameRoutine;
 
     void Awake()
     {
         Instance = this;
-        player = GameObject.FindWithTag("Player");
 
         if (wishlistBanner == null)
         {
@@ -41,10 +45,38 @@ public class JumpscareManager : MonoBehaviour
 
         if (wishlistBanner != null)
             wishlistBanner.SetActive(true);
+
+        if (_endGameRoutine != null)
+            StopCoroutine(_endGameRoutine);
+
+        _endGameRoutine = StartCoroutine(EndGameAfterDelay());
+    }
+
+    IEnumerator EndGameAfterDelay()
+    {
+        yield return new WaitForSeconds(endGameDelaySeconds);
+
+        EndJumpscare();
+        LoadMenuScene();
+        _endGameRoutine = null;
     }
 
     public void EndJumpscare()
     {
-        jumpscareCam.Priority = 0;
+        if (jumpscareCam != null)
+            jumpscareCam.Priority = 0;
+    }
+
+    void LoadMenuScene()
+    {
+        PlayerControlGate.Clear();
+
+        Time.timeScale = 1f;
+        AudioListener.pause = false;
+
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        SceneManager.LoadScene(menuSceneName);
     }
 }

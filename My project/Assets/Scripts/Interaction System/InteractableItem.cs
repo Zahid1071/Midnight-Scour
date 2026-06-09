@@ -10,6 +10,8 @@ public class InteractableItem : MonoBehaviour, IInteractable
 
     bool _consumed;
 
+    public bool IsBlockedByGrate => grateGate != null && !grateGate.IsRemoved;
+
     public bool Interact()
     {
         if (_consumed)

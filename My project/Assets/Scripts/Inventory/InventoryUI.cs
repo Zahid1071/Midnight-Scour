@@ -185,9 +185,15 @@ public class InventoryUI : MonoBehaviour
             return;
         }
 
-        if (isPrimaryClick && target is InteractableItem && selected.interactionReachBonus <= 0f)
+        if (isPrimaryClick && target is InteractableItem itemTarget && selected.interactionReachBonus <= 0f)
         {
-            ShowWarning("You can't use that here.", 2.5f);
+            bool needsReachTool = itemTarget.IsBlockedByGrate
+                || interactor.IsBeyondWorldReach(hit.point);
+
+            string message = needsReachTool && !string.IsNullOrWhiteSpace(selected.reachAttemptFailMessage)
+                ? selected.reachAttemptFailMessage
+                : "You can't use that here.";
+            ShowWarning(message, 2.5f);
             return;
         }
 

@@ -25,6 +25,7 @@ public class InventoryItem : ScriptableObject
     [Header("Interaction")]
     [Tooltip("Added to the player's interact range while this item is selected (e.g. bone to reach through a grate).")]
     public float interactionReachBonus;
+    [TextArea] public string reachAttemptFailMessage;
 
     [Header("Fragile tool (optional)")]
     [Tooltip("If true, using this item on the wrong locked door (SimpleOpenClose) removes it and plays break sound.")]
