@@ -26,7 +26,6 @@ public class SettingsSelector : MonoBehaviour
     [SerializeField] private string[] options = { "Option 1", "Option 2", "Option 3" };
 
     private int currentIndex;
-    private Resolution[] resolutions;
 
     private void Awake()
     {
@@ -77,6 +76,7 @@ public class SettingsSelector : MonoBehaviour
         switch (settingType)
         {
             case SettingType.Resolution:
+                var resolutions = GetResolutions();
                 if (resolutions != null && currentIndex >= 0 && currentIndex < resolutions.Length)
                     return $"{resolutions[currentIndex].width}x{resolutions[currentIndex].height}";
                 break;
@@ -103,13 +103,6 @@ public class SettingsSelector : MonoBehaviour
         switch (settingType)
         {
             case SettingType.Resolution:
-                resolutions = Screen.resolutions
-                    .Where(r => r.refreshRateRatio.value >= 59.5f)
-                    .OrderBy(r => r.width)
-                    .ThenBy(r => r.height)
-                    .GroupBy(r => new { r.width, r.height })
-                    .Select(g => g.First())
-                    .ToArray();
                 break;
 
             case SettingType.Quality:
@@ -132,6 +125,7 @@ public class SettingsSelector : MonoBehaviour
         switch (settingType)
         {
             case SettingType.Resolution:
+                var resolutions = GetResolutions();
                 return resolutions != null ? resolutions.Length : 0;
             case SettingType.Quality:
                 return QualitySettings.names.Length;
@@ -150,6 +144,14 @@ public class SettingsSelector : MonoBehaviour
             currentIndex = Mathf.Clamp(currentIndex, 0, count - 1);
         else
             currentIndex = 0;
+    }
+
+    Resolution[] GetResolutions()
+    {
+        if (GameSettingsManager.Instance != null && GameSettingsManager.Instance.AvailableResolutions != null)
+            return GameSettingsManager.Instance.AvailableResolutions;
+
+        return GameSettingsManager.BuildAvailableResolutions();
     }
 
 #if UNITY_EDITOR

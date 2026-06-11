@@ -145,6 +145,6 @@ MonoBehaviour:
   breakSfxVolume: 4
   debrisDisappearMinSeconds: 2
   debrisDisappearMaxSeconds: 3
-  npcSuspicionFromBreak: 300
-  npcMaxHearDistance: 20
+  npcSuspicionFromBreak: 50
+  npcMaxHearDistance: 10
   npcMinHearDistance: 5

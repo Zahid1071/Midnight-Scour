@@ -13,15 +13,16 @@ MonoBehaviour:
   m_Name: Bone
   m_EditorClassIdentifier: 
   itemName: Bone
-  icon: {fileID: 21300000, guid: 4272ca2e710606c48a91c02e8294c9c5, type: 3}
-  worldPrefab: {fileID: 4463944515492736518, guid: 501ca2be895a1804a8da54f9959d7f34, type: 3}
+  icon: {fileID: 21300000, guid: 549899bf161059049b7046b5d304662a, type: 3}
+  worldPrefab: {fileID: 8256093101841648045, guid: 8d5a6211caab3d244b9640fb22437279, type: 3}
   dropLandSFX: {fileID: 8300000, guid: 6a0775e6a69f993418751733a90ec2d9, type: 3}
   canDrop: 1
   pickUpSFX: {fileID: 8300000, guid: 96aa1c851b5195a4cb753cbcce978920, type: 3}
   useSuccessSound: {fileID: 0}
   consumeOnUse: 1
   interactionReachBonus: 0
-  reachAttemptFailMessage: the bone needs to be sticky
+  reachAttemptFailMessage: It keeps slipping, I need to stick something to the bone
+    maybe.
   breaksOnWrongUse: 0
   breakOnWrongUseSound: {fileID: 0}
   breakOnWrongUseMessage: 

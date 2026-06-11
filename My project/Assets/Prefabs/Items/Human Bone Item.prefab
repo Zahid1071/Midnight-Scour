@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &6513483553446225893
+--- !u!1 &8256093101841648045
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,49 +8,49 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2051641975653096843}
-  - component: {fileID: 4889134770276976762}
-  - component: {fileID: 2472896471762962169}
-  - component: {fileID: 4285494518883233922}
-  - component: {fileID: 2153284346350654911}
-  - component: {fileID: 2791362047952987019}
+  - component: {fileID: 8563716852454382941}
+  - component: {fileID: 4443904088758424384}
+  - component: {fileID: 7480204851468125247}
+  - component: {fileID: 6375287795274697252}
+  - component: {fileID: 5034705231718822275}
+  - component: {fileID: 2384690109589101416}
   m_Layer: 6
-  m_Name: Gummy Bone Item
+  m_Name: Human Bone Item
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2051641975653096843
+--- !u!4 &8563716852454382941
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6513483553446225893}
+  m_GameObject: {fileID: 8256093101841648045}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.40470684, y: 0.48676494, z: -0.585257, w: 0.5067017}
-  m_LocalPosition: {x: 8.872, y: -2.6459, z: -21.795}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 7.345, y: -2.666, z: -20.279}
+  m_LocalScale: {x: 100, y: 100, z: 100}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 9.186, y: 78.397, z: -90.733}
---- !u!33 &4889134770276976762
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &4443904088758424384
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6513483553446225893}
-  m_Mesh: {fileID: -2922656728150256677, guid: caab7ca5eb34d4e44a89ad4256d37bc8, type: 3}
---- !u!23 &2472896471762962169
+  m_GameObject: {fileID: 8256093101841648045}
+  m_Mesh: {fileID: 5742955690553059161, guid: 8790edd1805e33445a4a844ae11121f2, type: 3}
+--- !u!23 &7480204851468125247
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6513483553446225893}
+  m_GameObject: {fileID: 8256093101841648045}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -67,7 +67,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: beac92ef0ee078a4fb40e5850800764c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -89,51 +89,54 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &4285494518883233922
+--- !u!114 &6375287795274697252
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6513483553446225893}
+  m_GameObject: {fileID: 8256093101841648045}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ef522ec4ff79e6a42b719502c5b1c6aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemData: {fileID: 11400000, guid: 26d964051acdf674091c84dabc678a13, type: 2}
+  itemData: {fileID: 11400000, guid: 45937426966d95246bf6c742a44d0697, type: 2}
   grateGate: {fileID: 0}
+  blockedUntilBenchViceReleased: 0
+  benchViceStuckMessage: It is stuck.
   blockedMessage: I can't reach that.
---- !u!114 &2153284346350654911
+--- !u!114 &5034705231718822275
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6513483553446225893}
+  m_GameObject: {fileID: 8256093101841648045}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c4e8a2b9f1d3e6540a1b2c3d4e5f607, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceptedItem: {fileID: 0}
-  replacementPrefab: {fileID: 0}
+  acceptedItem: {fileID: 11400000, guid: 1293d34a2e68cf94bb95f41fd1ac18cd, type: 2}
+  replacementPrefab: {fileID: 1742678514842377678, guid: a35d79fff279f2244b6541e313479645, type: 3}
   wrongItemMessage: That won't work here.
-  successMessage: 
---- !u!64 &2791362047952987019
+  successMessage: Stuck the gum on the bone.
+  successSound: {fileID: 8300000, guid: 0795300357c64bc41826ab5157159d13, type: 3}
+--- !u!64 &2384690109589101416
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6513483553446225893}
+  m_GameObject: {fileID: 8256093101841648045}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 0
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -141,4 +144,4 @@ MeshCollider:
   serializedVersion: 5
   m_Convex: 1
   m_CookingOptions: 30
-  m_Mesh: {fileID: -2922656728150256677, guid: caab7ca5eb34d4e44a89ad4256d37bc8, type: 3}
+  m_Mesh: {fileID: 5742955690553059161, guid: 8790edd1805e33445a4a844ae11121f2, type: 3}

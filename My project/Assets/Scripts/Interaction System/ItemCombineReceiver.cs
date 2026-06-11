@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -5,6 +6,8 @@ using UnityEngine;
 /// </summary>
 public class ItemCombineReceiver : MonoBehaviour, IItemReceiver
 {
+    public static event Action OnCombineSuccess;
+
     [SerializeField] private InventoryItem acceptedItem;
     [SerializeField] private GameObject replacementPrefab;
     [SerializeField] private string wrongItemMessage = "That won't work here.";
@@ -39,6 +42,8 @@ public class ItemCombineReceiver : MonoBehaviour, IItemReceiver
 
         AudioClip sfx = successSound != null ? successSound : item.useSuccessSound;
         InteractionFeedback.Success(successMessage, sfx, position);
+
+        OnCombineSuccess?.Invoke();
 
         Destroy(gameObject);
         return true;

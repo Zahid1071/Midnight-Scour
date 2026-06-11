@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager Instance { get; private set; }
+
+    public static event Action OnInventoryChanged;
 
     [SerializeField] private int maxSlots = 4;
     private List<InventoryItem> inventory = new();
@@ -30,7 +33,8 @@ public class InventoryManager : MonoBehaviour
         inventory.Add(item);
         Debug.Log("👜 Added to inventory: " + item.itemName);
 
-        InventoryUI.Instance?.RefreshUI(); // ✅ Updates slotImages with icons
+        InventoryUI.Instance?.RefreshUI();
+        OnInventoryChanged?.Invoke();
         return true;
     }
 
@@ -47,19 +51,23 @@ public class InventoryManager : MonoBehaviour
 
         inventory.RemoveAt(index);
         if (refreshUI)
-            RefreshAfterInventoryChange();
+            InventoryUI.Instance?.RefreshUI();
+
+        OnInventoryChanged?.Invoke();
         return true;
     }
 
     private void RefreshAfterInventoryChange()
     {
         InventoryUI.Instance?.RefreshUI();
+        OnInventoryChanged?.Invoke();
     }
 
     public void ClearInventory()
     {
         inventory.Clear();
-        InventoryUI.Instance?.RefreshUI(); // ✅ Refresh cleared state
+        InventoryUI.Instance?.RefreshUI();
+        OnInventoryChanged?.Invoke();
     }
 
     public List<InventoryItem> GetInventory() => inventory;

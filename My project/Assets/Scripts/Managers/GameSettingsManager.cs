@@ -68,6 +68,13 @@ public class GameSettingsManager : MonoBehaviour
     /// <summary>PlayerPrefs key: 1 = auto-save hooks enabled, 0 = disabled.</summary>
     public const string AUTO_SAVE_PREFS_KEY = "settings_autoSave";
 
+    /// <summary>PlayerPrefs flag set after migrating resolution indices to descending order.</summary>
+    private const string RESOLUTION_INDEX_DESC_KEY = "settings_resolutionIndexDesc";
+
+    /// <summary>Resolutions below this size are omitted from the settings list.</summary>
+    private const int MIN_RESOLUTION_WIDTH = 1024;
+    private const int MIN_RESOLUTION_HEIGHT = 768;
+
     /// <summary>
     /// Effective sensitivity multiplier range applied by camera scripts.
     /// MouseSensitivity (0..1) is mapped to [MIN, MAX] before being multiplied
@@ -274,6 +281,11 @@ public class GameSettingsManager : MonoBehaviour
         get => _currentSettings.resolutionIndex;
         set { _currentSettings.resolutionIndex = Mathf.Clamp(value, 0, Mathf.Max(0, _availableResolutions.Length - 1)); ApplyGraphicsSettings(); }
     }
+
+    /// <summary>
+    /// Stored <see cref="ResolutionIndex"/> resolved for UI/apply (-1 = auto).
+    /// </summary>
+    public int EffectiveResolutionIndex => ResolveResolutionIndex(_currentSettings.resolutionIndex);
     
     /// <summary>
     /// Quality level index matching QualitySettings.names order.
@@ -458,6 +470,12 @@ public class GameSettingsManager : MonoBehaviour
         ApplyAllSettings();
     }
 
+    private void Start()
+    {
+        // Re-apply audio once the audio system is fully up (Awake can be too early).
+        ApplyAudioSettings();
+    }
+
     /// <summary>
     /// Auto-bootstrap: ensures a GameSettingsManager exists at runtime even if
     /// no scene contains the prefab. Runs BEFORE the first scene's Awake calls,
@@ -507,7 +525,7 @@ public class GameSettingsManager : MonoBehaviour
         // Apply resolution
         if (_availableResolutions.Length > 0)
         {
-            int resIdx = Mathf.Clamp(_currentSettings.resolutionIndex, 0, _availableResolutions.Length - 1);
+            int resIdx = ResolveResolutionIndex(_currentSettings.resolutionIndex);
             Resolution res = _availableResolutions[resIdx];
             Screen.SetResolution(res.width, res.height, mode);
         }
@@ -593,20 +611,12 @@ public class GameSettingsManager : MonoBehaviour
     /// </summary>
     public void LoadSettings()
     {
-        // Determine default resolution index (highest available)
-        int defaultResIndex = Mathf.Max(0, _availableResolutions.Length - 1);
-        
-        // Find current resolution in the list for better default
-        int currentResIndex = Array.FindIndex(_availableResolutions, 
-            r => r.width == Screen.currentResolution.width && r.height == Screen.currentResolution.height);
-        if (currentResIndex < 0) currentResIndex = defaultResIndex;
-        
         _currentSettings = new SettingsData
         {
             fullscreen = PlayerPrefs.GetInt("settings_fullscreen", DefaultSettings.fullscreen ? 1 : 0) == 1,
             displayModeIndex = LoadDisplayModeFromPrefs(),
             resolutionIndex = PlayerPrefs.GetInt("settings_resolutionIndex",
-                                PlayerPrefs.GetInt("resIndex", currentResIndex)),
+                                PlayerPrefs.GetInt("resIndex", DefaultSettings.resolutionIndex)),
             qualityIndex = PlayerPrefs.GetInt("settings_qualityIndex",
                                 PlayerPrefs.GetInt("qualityIndex", QualitySettings.GetQualityLevel())),
             
@@ -628,8 +638,10 @@ public class GameSettingsManager : MonoBehaviour
             autoSaveEnabled = PlayerPrefs.GetInt(AUTO_SAVE_PREFS_KEY, DefaultSettings.autoSaveEnabled ? 1 : 0) == 1
         };
         
-        // Clamp values to valid ranges
-        _currentSettings.resolutionIndex = Mathf.Clamp(_currentSettings.resolutionIndex, 0, Mathf.Max(0, _availableResolutions.Length - 1));
+        MigrateResolutionIndexFromAscendingOrder(ref _currentSettings.resolutionIndex);
+
+        // Clamp values to valid ranges (-1 means auto: prefer 1920x1080 / desktop default)
+        _currentSettings.resolutionIndex = ResolveResolutionIndex(_currentSettings.resolutionIndex);
         _currentSettings.qualityIndex = Mathf.Clamp(_currentSettings.qualityIndex, 0, QualitySettings.names.Length - 1);
         _currentSettings.mouseSensitivity = Mathf.Clamp01(_currentSettings.mouseSensitivity);
         _currentSettings.brightness = Mathf.Clamp01(_currentSettings.brightness);
@@ -727,10 +739,8 @@ public class GameSettingsManager : MonoBehaviour
     /// </summary>
     public void ResetToDefaults()
     {
-        int defaultResIndex = Mathf.Max(0, _availableResolutions.Length - 1);
-
         var fresh = DefaultSettings;
-        fresh.resolutionIndex = defaultResIndex;
+        fresh.resolutionIndex = GetPreferredDefaultResolutionIndex();
         fresh.qualityIndex = Mathf.Min(DefaultSettings.qualityIndex, QualitySettings.names.Length - 1);
 
         // Use SetSettings so change events fire and consumers refresh.
@@ -754,8 +764,8 @@ public class GameSettingsManager : MonoBehaviour
 
         _currentSettings = newSettings;
         
-        // Clamp values
-        _currentSettings.resolutionIndex = Mathf.Clamp(_currentSettings.resolutionIndex, 0, Mathf.Max(0, _availableResolutions.Length - 1));
+        // Clamp values (-1 = auto)
+        _currentSettings.resolutionIndex = ResolveResolutionIndex(_currentSettings.resolutionIndex);
         _currentSettings.qualityIndex = Mathf.Clamp(_currentSettings.qualityIndex, 0, QualitySettings.names.Length - 1);
         _currentSettings.displayModeIndex = Mathf.Clamp(_currentSettings.displayModeIndex, 0, 2);
         _currentSettings.difficultyIndex = Mathf.Clamp(_currentSettings.difficultyIndex, 0, 2);
@@ -779,22 +789,87 @@ public class GameSettingsManager : MonoBehaviour
     // HELPER METHODS
     // =========================================================================
     
-    private void CacheAvailableResolutions()
+    /// <summary>
+    /// Builds the resolution list used by settings UI and <see cref="ApplyGraphicsSettings"/>.
+    /// Index 0 = highest resolution; last index = lowest offered.
+    /// </summary>
+    public static Resolution[] BuildAvailableResolutions()
     {
-        // Get unique resolutions, sorted by size
-        _availableResolutions = Screen.resolutions
-            .Where(r => r.refreshRateRatio.value >= 59.5) // 60Hz and above
+        var resolutions = Screen.resolutions
+            .Where(r => r.refreshRateRatio.value >= 59.5f) // 60Hz and above
+            .Where(r => r.width >= MIN_RESOLUTION_WIDTH && r.height >= MIN_RESOLUTION_HEIGHT)
             .GroupBy(r => new { r.width, r.height })
             .Select(g => g.First())
-            .OrderBy(r => r.width)
-            .ThenBy(r => r.height)
+            .OrderByDescending(r => r.width)
+            .ThenByDescending(r => r.height)
             .ToArray();
-        
-        if (_availableResolutions.Length == 0)
+
+        if (resolutions.Length > 0)
+            return resolutions;
+
+        // Fallback: keep current desktop resolution even if it fails the min-size filter.
+        return new[] { Screen.currentResolution };
+    }
+
+    private void CacheAvailableResolutions()
+    {
+        _availableResolutions = BuildAvailableResolutions();
+    }
+
+    /// <summary>
+    /// One-time migration: old builds stored index 0 = smallest, last = largest.
+    /// Flip saved indices so existing player choices stay on the same resolution.
+    /// </summary>
+    private void MigrateResolutionIndexFromAscendingOrder(ref int index)
+    {
+        if (index < 0)
+            return;
+
+        if (PlayerPrefs.GetInt(RESOLUTION_INDEX_DESC_KEY, 0) == 1)
+            return;
+
+        if (_availableResolutions == null || _availableResolutions.Length <= 1)
+            return;
+
+        index = (_availableResolutions.Length - 1) - index;
+        PlayerPrefs.SetInt(RESOLUTION_INDEX_DESC_KEY, 1);
+        PlayerPrefs.SetInt("settings_resolutionIndex", index);
+        PlayerPrefs.Save();
+    }
+
+    /// <summary>
+    /// -1 (or any invalid index) means auto: prefer 1920x1080, else current desktop res, else highest listed.
+    /// </summary>
+    int ResolveResolutionIndex(int index)
+    {
+        if (_availableResolutions == null || _availableResolutions.Length == 0)
+            return 0;
+
+        if (index < 0)
+            return GetPreferredDefaultResolutionIndex();
+
+        return Mathf.Clamp(index, 0, _availableResolutions.Length - 1);
+    }
+
+    int GetPreferredDefaultResolutionIndex()
+    {
+        if (_availableResolutions == null || _availableResolutions.Length == 0)
+            return 0;
+
+        for (int i = 0; i < _availableResolutions.Length; i++)
         {
-            // Fallback: use current resolution
-            _availableResolutions = new Resolution[] { Screen.currentResolution };
+            Resolution r = _availableResolutions[i];
+            if (r.width == 1920 && r.height == 1080)
+                return i;
         }
+
+        int current = Array.FindIndex(
+            _availableResolutions,
+            r => r.width == Screen.currentResolution.width && r.height == Screen.currentResolution.height);
+        if (current >= 0)
+            return current;
+
+        return 0;
     }
     
     /// <summary>

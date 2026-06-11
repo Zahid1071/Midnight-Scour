@@ -58,7 +58,12 @@ public class FSMController
         npc.currentState = newState;
 
         if (SoundManager.Instance != null)
-            SoundManager.Instance.SetChaseMusicActive(newState == NPCController.AIState.Chase);
+        {
+            bool tensionMusic =
+                newState == NPCController.AIState.Chase ||
+                newState == NPCController.AIState.Search;
+            SoundManager.Instance.SetChaseMusicActive(tensionMusic);
+        }
 
         switch (newState)
         {

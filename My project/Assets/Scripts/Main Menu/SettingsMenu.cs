@@ -190,9 +190,8 @@ public class SettingsMenu : MonoBehaviour
         if (!EnsureManager()) return;
 
         _pending = GameSettingsManager.DefaultSettings;
-        // Pick a sensible runtime default for indexes that depend on hardware.
-        var resolutions = GameSettingsManager.Instance.AvailableResolutions;
-        _pending.resolutionIndex = Mathf.Max(0, resolutions != null ? resolutions.Length - 1 : 0);
+        // -1 = auto (GameSettingsManager resolves to 1920x1080 when available).
+        _pending.resolutionIndex = -1;
         _pending.qualityIndex = Mathf.Min(GameSettingsManager.DefaultSettings.qualityIndex,
                                            QualitySettings.names.Length - 1);
 
@@ -324,7 +323,12 @@ public class SettingsMenu : MonoBehaviour
             int maxIdx = 0;
             if (GameSettingsManager.Instance != null && GameSettingsManager.Instance.AvailableResolutions != null)
                 maxIdx = Mathf.Max(0, GameSettingsManager.Instance.AvailableResolutions.Length - 1);
-            resolutionSelector.SetIndex(Mathf.Clamp(s.resolutionIndex, 0, maxIdx));
+
+            int displayIndex = s.resolutionIndex;
+            if (displayIndex < 0 && GameSettingsManager.Instance != null)
+                displayIndex = GameSettingsManager.Instance.EffectiveResolutionIndex;
+
+            resolutionSelector.SetIndex(Mathf.Clamp(displayIndex, 0, maxIdx));
         }
 
         if (qualitySelector)

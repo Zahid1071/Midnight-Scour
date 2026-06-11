@@ -44,6 +44,8 @@ public class MainMenuUI : MonoBehaviour
         if (SaveManager.Instance != null)
             SaveManager.Instance.DeleteSave();
 
+        GameplayHintManager.ResetAllHints();
+
         if (InventoryManager.Instance != null)
             InventoryManager.Instance.ClearInventory();
 

@@ -32,9 +32,11 @@ public class SoundManager : MonoBehaviour
     public AudioClip gameMusic;
     [Tooltip("Played while the player is on the captive layer (12). Falls back to gameMusic if unset.")]
     public AudioClip captiveLayerMusic;
-    [Tooltip("Temporary override while any NPC is chasing. Clears back to layer music when chase ends.")]
+    [Tooltip("Played while any NPC is chasing or searching. Overrides layer music until hunt ends.")]
     public AudioClip chaseMusic;
     [SerializeField] private int captiveLayerIndex = 12;
+    [Tooltip("Stealth hiding layer — layer swaps here never change music.")]
+    [SerializeField] private int hiddenLayerIndex = 7;
     [SerializeField] private float gameplayMusicFade = 0.5f;
 
     [Header("Ambience")]
@@ -82,6 +84,7 @@ public class SoundManager : MonoBehaviour
     int _lastPlayerLayer = -1;
     bool _playerOnCaptiveLayer;
     bool _chaseMusicActive;
+    bool _wasPlayerHiddenForMusic;
     bool _inGameplayScene;
     bool _gameplayMusicReady;
     Coroutine _gameplayMusicRoutine;
@@ -98,7 +101,12 @@ public class SoundManager : MonoBehaviour
 
         SceneManager.sceneLoaded += OnSceneLoaded;
 
-        ApplyMixerFromPrefs();
+        SyncMixerVolumeFromSettings();
+    }
+
+    void Start()
+    {
+        SyncMixerVolumeFromSettings();
     }
 
     void Update()
@@ -184,7 +192,7 @@ public class SoundManager : MonoBehaviour
 
     // ---------- PUBLIC API ----------
 
-    /// <summary>NPC chase started — chase music overrides layer music until cleared.</summary>
+    /// <summary>NPC chase/search started — tension music overrides layer music until cleared.</summary>
     public void SetChaseMusicActive(bool active)
     {
         if (_chaseMusicActive == active)
@@ -195,6 +203,10 @@ public class SoundManager : MonoBehaviour
         if (!_inGameplayScene)
             return;
 
+        // While hidden, never fade out tension — resume layer music only after leaving the spot.
+        if (!active && IsPlayerHiddenForMusic())
+            return;
+
         if (!active)
             RefreshPlayerLayerMusic(force: true);
 
@@ -203,6 +215,7 @@ public class SoundManager : MonoBehaviour
 
     public void PlayMusic(AudioClip clip, float fade = 0.5f)
     {
+        SyncMixerVolumeFromSettings();
         if (clip == null) { StopMusic(fade); return; }
         CrossfadeTo(clip, fade);
     }
@@ -304,19 +317,29 @@ public class SoundManager : MonoBehaviour
         src.pitch = 1f;
     }
 
-    public void ApplyMixerFromPrefs()
-    {
-        // values are stored 0..1 (linear) by your settings menu
-        float master = PlayerPrefs.GetFloat("masterVol", 0.5f);
-        float music = PlayerPrefs.GetFloat("musicVol", 0.5f);
-        float sfx = PlayerPrefs.GetFloat("sfxVol", 0.5f);
+    /// <summary>
+    /// Legacy hook — forwards to <see cref="SyncMixerVolumeFromSettings"/>.
+    /// </summary>
+    public void ApplyMixerFromPrefs() => SyncMixerVolumeFromSettings();
 
-        if (mixer)
-        {
-            mixer.SetFloat(masterParam, Linear01ToDb(master));
-            mixer.SetFloat(musicParam, Linear01ToDb(music));
-            mixer.SetFloat(sfxParam, Linear01ToDb(sfx));
-        }
+    /// <summary>
+    /// Push current settings onto the mixer immediately before any audio plays.
+    /// Uses this manager's mixer reference so volume is applied even if
+    /// GameSettingsManager ran too early in Awake.
+    /// </summary>
+    void SyncMixerVolumeFromSettings()
+    {
+        if (!mixer)
+            return;
+
+        GameSettingsManager.SettingsData settings =
+            GameSettingsManager.Instance != null
+                ? GameSettingsManager.Instance.CurrentSettings
+                : GameSettingsManager.DefaultSettings;
+
+        mixer.SetFloat(masterParam, Linear01ToDb(settings.masterVolume));
+        mixer.SetFloat(musicParam, Linear01ToDb(settings.musicVolume));
+        mixer.SetFloat(sfxParam, Linear01ToDb(settings.sfxVolume));
     }
 
     public void PlayUIClick()
@@ -418,6 +441,8 @@ public class SoundManager : MonoBehaviour
             _gameplayMusicRoutine = null;
         }
 
+        SyncMixerVolumeFromSettings();
+
         bool isMenu = IsMenuScene(scene.name);
         _inGameplayScene = !isMenu;
         _gameplayMusicReady = false;
@@ -425,6 +450,7 @@ public class SoundManager : MonoBehaviour
         _lastPlayerLayer = -1;
         _playerOnCaptiveLayer = false;
         _chaseMusicActive = false;
+        _wasPlayerHiddenForMusic = false;
 
         SilenceMusicSources();
 
@@ -476,6 +502,21 @@ public class SoundManager : MonoBehaviour
             return;
 
         int layer = _player.gameObject.layer;
+        bool hidden = layer == hiddenLayerIndex;
+
+        // Hiding uses a stealth layer only — never cut or swap music for it.
+        if (hidden)
+        {
+            _wasPlayerHiddenForMusic = true;
+            return;
+        }
+
+        if (_wasPlayerHiddenForMusic)
+        {
+            _wasPlayerHiddenForMusic = false;
+            force = true;
+        }
+
         bool captive = layer == captiveLayerIndex;
 
         if (!force && layer == _lastPlayerLayer && captive == _playerOnCaptiveLayer)
@@ -498,7 +539,16 @@ public class SoundManager : MonoBehaviour
         if (CurrentMusicClip == clip)
             return;
 
+        // Hidden: only allow tension music to start — never fade to exploration/captive mid-hide.
+        if (IsPlayerHiddenForMusic() && !_chaseMusicActive)
+            return;
+
         PlayMusic(clip, gameplayMusicFade);
+    }
+
+    bool IsPlayerHiddenForMusic()
+    {
+        return _player != null && _player.gameObject.layer == hiddenLayerIndex;
     }
 
     AudioClip ResolveGameplayMusicClip()

@@ -13,9 +13,24 @@ public class Cage : MonoBehaviour
     // Variables to track player state
     private int originalLayerIndex;
     private GameObject playerRef;
+    private bool _doorWasOpen;
+
+    private void Awake()
+    {
+        if (cageDoor != null)
+            _doorWasOpen = cageDoor.objectOpen;
+    }
 
     private void Update()
     {
+        if (cageDoor != null)
+        {
+            if (cageDoor.objectOpen && !_doorWasOpen)
+                GameplayHintManager.Instance?.NotifyCageDoorOpenedFirstTime();
+
+            _doorWasOpen = cageDoor.objectOpen;
+        }
+
         // Safety check
         if (!isOccupied || playerRef == null || cageDoor == null) return;
 
