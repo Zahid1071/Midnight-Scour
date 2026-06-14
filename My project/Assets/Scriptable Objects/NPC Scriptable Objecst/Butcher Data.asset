@@ -21,7 +21,7 @@ MonoBehaviour:
     weight: 1
     roomPlans:
     - roomAnchorID: Basement_Room
-      weight: 0.05
+      weight: 0.951
       hotspots:
       - hotspotID: Hotspot_Idle2
         weight: 1

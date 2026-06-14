@@ -79,6 +79,7 @@ public class GameplayHintManager : MonoBehaviour
     Coroutine _transitionRoutine;
 
     Coroutine _combineTimerRoutine;
+    bool _combineTimerStarted;
     bool _combineHintShown;
     bool _combineFinished;
     float _combineElapsed;
@@ -132,12 +133,7 @@ public class GameplayHintManager : MonoBehaviour
     void Update()
     {
         EvaluateFirstShiftHint();
-
-        if (_combineFinished || _combineHintShown || HasCombinedStickyBone())
-            return;
-
-        if (HasBoneAndGum() && _combineTimerRoutine == null)
-            _combineTimerRoutine = StartCoroutine(ShowCombineHintAfterDelay());
+        EvaluateCombineTimer();
     }
 
     public void NotifyCageDoorOpenedFirstTime()
@@ -239,15 +235,21 @@ public class GameplayHintManager : MonoBehaviour
         if (_combineHintShown)
             return;
 
-        if (HasBoneAndGum())
-        {
-            if (_combineTimerRoutine == null)
-                _combineTimerRoutine = StartCoroutine(ShowCombineHintAfterDelay());
-            return;
-        }
+        EvaluateCombineTimer();
+    }
 
-        // Missing bone or gum — pause countdown only; keep hint visible once shown.
-        StopCombineTimerCoroutine();
+    void EvaluateCombineTimer()
+    {
+        if (_combineFinished || _combineHintShown || HasCombinedStickyBone())
+            return;
+
+        if (HasBoneAndGum())
+            _combineTimerStarted = true;
+
+        if (!_combineTimerStarted || _combineTimerRoutine != null)
+            return;
+
+        _combineTimerRoutine = StartCoroutine(ShowCombineHintAfterDelay());
     }
 
     IEnumerator ShowCombineHintAfterDelay()
@@ -260,19 +262,13 @@ public class GameplayHintManager : MonoBehaviour
                 yield break;
             }
 
-            if (!HasBoneAndGum())
-            {
-                _combineTimerRoutine = null;
-                yield break;
-            }
-
             _combineElapsed += Time.deltaTime;
             yield return null;
         }
 
         _combineTimerRoutine = null;
 
-        if (_combineFinished || HasCombinedStickyBone() || !HasBoneAndGum())
+        if (_combineFinished || HasCombinedStickyBone())
             yield break;
 
         if (Show(BoneGumCombine))
@@ -741,6 +737,7 @@ public class GameplayHintManager : MonoBehaviour
 
         Instance._combineHintShown = false;
         Instance._combineFinished = false;
+        Instance._combineTimerStarted = false;
         Instance._combineElapsed = 0f;
         Instance._boneDropHintFinished = false;
         Instance._boneDropHintVisible = false;

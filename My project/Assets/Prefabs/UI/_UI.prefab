@@ -84,6 +84,14 @@ MonoBehaviour:
   - id: sound
     canvasGroup: {fileID: 6532462506063222177}
   fadeDuration: 0.25
+  transientHintDurationSeconds: 60
+  springStartScale: 0.6
+  springStiffness: 300
+  springDamping: 8
+  springInitialVelocity: 7
+  flashDuration: 0.45
+  flashIntensity: 1
+  flashBrightnessBoost: 0.12
   boneItem: {fileID: 11400000, guid: 45937426966d95246bf6c742a44d0697, type: 2}
   gumItem: {fileID: 11400000, guid: 1293d34a2e68cf94bb95f41fd1ac18cd, type: 2}
   gummyBoneItem: {fileID: 11400000, guid: 26d964051acdf674091c84dabc678a13, type: 2}

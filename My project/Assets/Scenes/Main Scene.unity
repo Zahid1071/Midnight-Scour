@@ -3048,7 +3048,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 496484862}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.16859941, y: -0.23574556, z: 0.041568298, w: 0.9561749}
+  m_LocalRotation: {x: 0.16859947, y: -0.2357442, z: 0.041568056, w: 0.95617527}
   m_LocalPosition: {x: 8.184, y: -1.096, z: -21.617}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5476,6 +5476,81 @@ Transform:
   m_Children: []
   m_Father: {fileID: 969370648}
   m_LocalEulerAnglesHint: {x: 0, y: -97.962, z: 0}
+--- !u!1 &1055512934
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1055512936}
+  - component: {fileID: 1055512935}
+  m_Layer: 0
+  m_Name: Trailer Camera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1055512935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1055512934}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9dfa5b682dcd46bda6128250e975f58, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Priority:
+    Enabled: 0
+    m_Value: 74
+  OutputChannel: 1
+  StandbyUpdate: 2
+  m_StreamingVersion: 20241001
+  m_LegacyPriority: 0
+  Target:
+    TrackingTarget: {fileID: 0}
+    LookAtTarget: {fileID: 0}
+    CustomLookAtTarget: 0
+  Lens:
+    FieldOfView: 60.000004
+    OrthographicSize: 10
+    NearClipPlane: 0.1
+    FarClipPlane: 5000
+    Dutch: 0
+    ModeOverride: 0
+    PhysicalProperties:
+      GateFit: 2
+      SensorSize: {x: 21.946, y: 16.002}
+      LensShift: {x: 0, y: 0}
+      FocusDistance: 10
+      Iso: 200
+      ShutterSpeed: 0.005
+      Aperture: 16
+      BladeCount: 5
+      Curvature: {x: 2, y: 11}
+      BarrelClipping: 0.25
+      Anamorphism: 0
+  BlendHint: 0
+--- !u!4 &1055512936
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1055512934}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.024771566, y: 0.97435427, z: -0.13592876, w: -0.177605}
+  m_LocalPosition: {x: 6.5965986, y: -0.6364608, z: -9.963894}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1064511181 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8199701492156567837, guid: 6f7f20b04bbae0c40a16fb1ee57273da, type: 3}
@@ -9279,7 +9354,7 @@ PrefabInstance:
       objectReference: {fileID: 8300000, guid: cadcad0814d4866448f13fe108edbe10, type: 3}
     - target: {fileID: 5455817935211510943, guid: 6f7f20b04bbae0c40a16fb1ee57273da, type: 3}
       propertyPath: crossFadeDuration
-      value: 0.4
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 5455817935211510943, guid: 6f7f20b04bbae0c40a16fb1ee57273da, type: 3}
       propertyPath: lockedAnimationDuration
@@ -13320,8 +13395,8 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 880001007, guid: 16e3dff79b452490a989645aa094bfe3, type: 3}
-      propertyPath: flashIntensity
-      value: 1
+      propertyPath: combineHintDelaySeconds
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 229416324526037546, guid: 16e3dff79b452490a989645aa094bfe3, type: 3}
       propertyPath: m_AnchorMax.y
@@ -15284,6 +15359,7 @@ SceneRoots:
   - {fileID: 1859007287}
   - {fileID: 5004863849194061836}
   - {fileID: 978463085}
+  - {fileID: 1055512936}
   - {fileID: 1810197292}
   - {fileID: 485493796}
   - {fileID: 175469065}

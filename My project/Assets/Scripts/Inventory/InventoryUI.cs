@@ -142,7 +142,7 @@ public class InventoryUI : MonoBehaviour
 
         if (!interactor.IsWithinActionRange(hit, actionRange))
         {
-            if (TryShowRegularBoneOnScrewdriverHint(selected, target, interactor, hit.point))
+            if (TryShowRegularBoneOnScrewdriverHint(selected, target))
                 return;
 
             interactor.ShowOutOfReach();
@@ -188,18 +188,6 @@ public class InventoryUI : MonoBehaviour
             return;
         }
 
-        if (isPrimaryClick && target is InteractableItem itemTarget && selected.interactionReachBonus <= 0f)
-        {
-            bool needsReachTool = itemTarget.IsBlockedByGrate
-                || interactor.IsBeyondWorldReach(hit.point);
-
-            if (needsReachTool)
-            {
-                ShowWarning(GetRegularBoneReachHint(selected, itemTarget), 4f);
-                return;
-            }
-        }
-
         // Pickups, bolts, etc. — extended reach tools (e.g. gummy bone through grate).
         interactor.PerformInteract(target, hit);
     }
@@ -209,43 +197,33 @@ public class InventoryUI : MonoBehaviour
     const string DefaultBoneOnScrewdriverHint = "It keeps slipping, I need to stick something to this.";
 
     static bool IsRegularBone(InventoryItem item) =>
-        item != null && item.interactionReachBonus <= 0f;
+        item != null && item.itemName == "Bone" && item.interactionReachBonus <= 0f;
 
     static bool IsScrewdriverPickup(InteractableItem pickup) =>
         pickup != null && pickup.itemData != null && pickup.itemData.itemName == "Screwdriver";
 
-    bool TryShowRegularBoneOnScrewdriverHint(
-        InventoryItem selected,
-        IInteractable target,
-        PlayerInteractor interactor,
-        Vector3 hitPoint)
+    bool TryShowRegularBoneOnScrewdriverHint(InventoryItem selected, IInteractable target)
     {
-        if (!IsRegularBone(selected))
+        if (target is not InteractableItem pickup)
             return false;
 
-        if (target is not InteractableItem pickup || !IsScrewdriverPickup(pickup))
+        return TryShowRegularBoneOnScrewdriverHint(selected, pickup);
+    }
+
+    bool TryShowRegularBoneOnScrewdriverHint(InventoryItem selected, InteractableItem pickup)
+    {
+        if (!IsRegularBone(selected) || !IsScrewdriverPickup(pickup))
             return false;
 
-        if (!interactor.IsBeyondWorldReach(hitPoint))
-            return false;
-
-        ShowWarning(GetRegularBoneReachHint(selected, pickup), 4f);
+        ShowWarning(GetBoneOnScrewdriverHint(selected), 4f);
         return true;
     }
 
-    static string GetRegularBoneReachHint(InventoryItem selected, InteractableItem pickup)
+    static string GetBoneOnScrewdriverHint(InventoryItem selected)
     {
-        if (IsRegularBone(selected) && IsScrewdriverPickup(pickup))
-        {
-            return !string.IsNullOrWhiteSpace(selected.reachAttemptFailMessage)
-                ? selected.reachAttemptFailMessage
-                : DefaultBoneOnScrewdriverHint;
-        }
-
-        if (!string.IsNullOrWhiteSpace(selected.reachAttemptFailMessage))
-            return selected.reachAttemptFailMessage;
-
-        return "You can't use that here.";
+        return !string.IsNullOrWhiteSpace(selected.reachAttemptFailMessage)
+            ? selected.reachAttemptFailMessage
+            : DefaultBoneOnScrewdriverHint;
     }
 
     private void TryDropSelectedItem()
