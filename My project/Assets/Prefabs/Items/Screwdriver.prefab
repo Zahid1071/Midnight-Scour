@@ -10,43 +10,43 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.508
+      value: 7.1526093
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.657
+      value: -2.67552
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -22.25
+      value: -20.271978
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.99274653
+      value: 0.9127383
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.06108317
+      value: 0.017030295
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.101657405
+      value: 0.4075614
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.01972621
+      value: 0.022637788
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: -7.198
+      value: 0.724
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 11.596
+      value: 48.144
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 1.545
+      value: 3.165
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
       propertyPath: m_Name
@@ -62,18 +62,35 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 812760518577972258}
+      addedObject: {fileID: 3062981395498247149}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3062981395498247149}
+      addedObject: {fileID: 5406401839935899050}
   m_SourcePrefab: {fileID: 100100000, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
 --- !u!1 &7779702028675145206 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
   m_PrefabInstance: {fileID: 7437241885159874727}
   m_PrefabAsset: {fileID: 0}
---- !u!64 &812760518577972258
-MeshCollider:
+--- !u!114 &3062981395498247149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7779702028675145206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef522ec4ff79e6a42b719502c5b1c6aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemData: {fileID: 11400000, guid: 2771dad0276634d4ab27043760a0bc9e, type: 2}
+  grateGate: {fileID: 0}
+  blockedUntilBenchViceReleased: 0
+  benchViceStuckMessage: It is stuck.
+  blockedMessage: I can't reach that.
+--- !u!65 &5406401839935899050
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -90,22 +107,6 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 555016202480650758, guid: ad3263a0addd57b4eb6d8031bd7d80a3, type: 3}
---- !u!114 &3062981395498247149
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7779702028675145206}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef522ec4ff79e6a42b719502c5b1c6aa, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  itemData: {fileID: 11400000, guid: 2771dad0276634d4ab27043760a0bc9e, type: 2}
-  grateGate: {fileID: 0}
-  blockedMessage: I can't reach that.
+  serializedVersion: 3
+  m_Size: {x: 0.0003002974, y: 0.00030029734, z: 0.0026129382}
+  m_Center: {x: 1.2402754e-11, y: -6.201377e-12, z: 0.0008323346}

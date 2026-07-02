@@ -19,8 +19,9 @@ MonoBehaviour:
   canDrop: 1
   pickUpSFX: {fileID: 8300000, guid: 14703ce226e238f43a4662e941bfc9f1, type: 3}
   useSuccessSound: {fileID: 8300000, guid: b256899b6c04b9b40a1c6970d540a728, type: 3}
-  consumeOnUse: 0
+  consumeOnUse: 1
   interactionReachBonus: 0
+  reachAttemptFailMessage: 
   breaksOnWrongUse: 1
   breakOnWrongUseSound: {fileID: 8300000, guid: 14703ce226e238f43a4662e941bfc9f1, type: 3}
   breakOnWrongUseMessage: The screwdriver snapped.
