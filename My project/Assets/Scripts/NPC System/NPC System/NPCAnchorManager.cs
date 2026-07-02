@@ -59,6 +59,20 @@ public class NPCAnchorManager : MonoBehaviour
         return result;
     }
 
+    /// <summary>All room anchor transforms registered for a zone (for ambush / patrol spot scans).</summary>
+    public void GetRoomAnchorsInZone(string zoneID, List<Transform> results)
+    {
+        results.Clear();
+        if (string.IsNullOrEmpty(zoneID) || !roomAnchorsByZone.TryGetValue(zoneID, out var rooms))
+            return;
+
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            if (rooms[i] != null)
+                results.Add(rooms[i].transform);
+        }
+    }
+
     /// <summary>
     /// Finds which room contains a position by checking immediate doors.
     /// Returns the room anchor for the first valid immediate door found.

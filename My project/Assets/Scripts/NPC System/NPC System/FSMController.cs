@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
 using FS_Atmo;
+using System.Collections.Generic;
+
 
 public class FSMController
 {
@@ -62,7 +64,7 @@ public class FSMController
             bool tensionMusic =
                 newState == NPCController.AIState.Chase ||
                 newState == NPCController.AIState.Search;
-            SoundManager.Instance.SetChaseMusicActive(tensionMusic);
+            //SoundManager.Instance.SetChaseMusicActive(tensionMusic);
         }
 
         switch (newState)
@@ -77,10 +79,10 @@ public class FSMController
                 npc.StartCoroutine(SearchRoutine());
                 break;
 
-            // case NPCController.AIState.Ambush:
-            //     Debug.Log("😈 State: AMBUSH");
-            //     npc.StartCoroutine(AmbushRoutine());
-            //     break;
+            case NPCController.AIState.Ambush:
+                Debug.Log("😈 State: AMBUSH");
+                npc.StartCoroutine(AmbushRoutine());
+                break;
 
             // case NPCController.AIState.Patrol:
             //     Debug.Log("🚶 State: PATROL");
@@ -88,12 +90,16 @@ public class FSMController
             //     break;
 
             case NPCController.AIState.Natural:
+                if (agent != null)
+                    agent.isStopped = false;
                 npc.interaction.StartNextRoutine();
                 Debug.Log("🌿 State: NATURAL");
                 break;
 
             case NPCController.AIState.Chase:
                 nav?.ClearRoute();
+                if (agent != null)
+                    agent.isStopped = false;
                 Debug.Log("🏃 State: CHASE");
                 break;
 
@@ -127,6 +133,11 @@ public class FSMController
 
             case NPCController.AIState.Search:
                 agent.speed = walkingSpeed + ((runningSpeed - walkingSpeed) / 3f);
+                break;
+
+            case NPCController.AIState.Ambush:
+                agent.speed = runningSpeed;
+                agent.acceleration = Mathf.Max(agent.acceleration, runningSpeed * 4f);
                 break;
 
             case NPCController.AIState.Chase:
@@ -238,110 +249,155 @@ public class FSMController
         }
     }
 
-    // === AMBUSH ===
-    // private IEnumerator AmbushRoutine()
-    // {
-    //     string zoneID = npc.interaction.data.homeID;
+    private IEnumerator AmbushRoutine()
+    {
+        var data = npc.interaction?.data;
+        if (data == null || NPCAnchorManager.Instance == null)
+        {
+            SetState(NPCController.AIState.Natural);
+            yield break;
+        }
 
-    //     // prefer searchTarget, then last known, then self
-    //     Vector3 center =
-    //         npc.perception.searchTarget != null ? npc.perception.searchTarget.position :
-    //         (npc.perception.LastKnownPlayerPosition != Vector3.zero ? npc.perception.LastKnownPlayerPosition :
-    //         npc.transform.position);
+        string zoneID = data.homeID;
 
-    //     // progressively widen the search for ambush_position children
-    //     List<Transform> ambushSpots = new List<Transform>();
-    //     int[] batches = { 3, 8, 16, 32, 64 }; // widen until we find any (cap to something sane)
-    //     foreach (int count in batches)
-    //     {
-    //         var rooms = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(zoneID, center, count);
-    //         ambushSpots.Clear();
+        Vector3 center =
+            npc.perception.searchTarget != null ? npc.perception.searchTarget.position :
+            (npc.perception.LastKnownPlayerPosition != Vector3.zero ? npc.perception.LastKnownPlayerPosition :
+            npc.transform.position);
 
-    //         foreach (var room in rooms)
-    //         {
-    //             if (!room) continue;
+        var zoneRooms = new List<Transform>();
+        NPCAnchorManager.Instance.GetRoomAnchorsInZone(zoneID, zoneRooms);
+        zoneRooms.Sort((a, b) =>
+            Vector3.SqrMagnitude(a.position - center).CompareTo(Vector3.SqrMagnitude(b.position - center)));
 
-    //             for (int i = 0; i < room.childCount; i++)
-    //             {
-    //                 var child = room.GetChild(i);
-    //                 if (!child) continue;
+        var ambushSpots = new List<Transform>();
+        int[] batches = { 3, 8, 16, 32, 64 };
+        foreach (int count in batches)
+        {
+            ambushSpots.Clear();
+            int roomLimit = Mathf.Min(count, zoneRooms.Count);
+            for (int i = 0; i < roomLimit; i++)
+                CollectAmbushSpotsInRoom(zoneRooms[i], ambushSpots);
 
-    //                 string n = child.name;
-    //                 if (!string.IsNullOrEmpty(n) &&
-    //                     n.IndexOf("ambush_position", System.StringComparison.OrdinalIgnoreCase) >= 0)
-    //                 {
-    //                     ambushSpots.Add(child);
-    //                 }
-    //             }
-    //         }
+            if (ambushSpots.Count > 0)
+                break;
+        }
 
-    //         if (ambushSpots.Count > 0)
-    //             break; // found at least one; stop widening
-    //     }
+        if (ambushSpots.Count == 0)
+        {
+            SetState(NPCController.AIState.Natural);
+            yield break;
+        }
 
-    //     if (ambushSpots.Count == 0)
-    //     {
-    //         SetState(NPCController.AIState.Search);
-    //         yield break;
-    //     }
+        if (npc.perception.searchTarget != null)
+            ambushSpots.RemoveAll(t => t == npc.perception.searchTarget);
 
-    //     if (npc.perception.searchTarget != null)
-    //         ambushSpots.RemoveAll(t => t == npc.perception.searchTarget);
+        if (ambushSpots.Count == 0)
+        {
+            SetState(NPCController.AIState.Natural);
+            yield break;
+        }
 
-    //     Transform ambushPoint = ambushSpots[UnityEngine.Random.Range(0, ambushSpots.Count)];
+        Transform ambushPoint = ambushSpots[Random.Range(0, ambushSpots.Count)];
 
-    //     var agent = npc.interaction.agent ?? npc.GetComponent<NavMeshAgent>();
-    //     if (nav != null) nav.GoToPoint(ambushPoint.position);
-    //     else if (agent != null) agent.SetDestination(ambushPoint.position);
+        NavMeshAgent moveAgent = npc.interaction.agent ?? agent;
+        if (moveAgent != null)
+            moveAgent.isStopped = false;
 
-    //     yield return new WaitUntil(() =>
-    //         !agent.pathPending && agent.remainingDistance < 0.3f);
+        if (nav != null)
+            nav.GoToPoint(ambushPoint.position);
+        else if (moveAgent != null)
+            moveAgent.SetDestination(ambushPoint.position);
 
-    //     float waitTime = UnityEngine.Random.Range(
-    //         npc.interaction.data.ambushWaitRange.x,
-    //         npc.interaction.data.ambushWaitRange.y
-    //     );
+        yield return WaitUntilNavArrived(moveAgent, .4f);
 
-    //     float confirm = Mathf.Max(0f, npc.interaction.data.vision.confirmSeconds / 2f);
-    //     float seenTimer = 0f;
+        if (npc.currentState != NPCController.AIState.Ambush)
+            yield break;
 
-    //     float timer = 0f;
-    //     Transform target = npc.perception.PlayerTransform;
+        StopAgentMovement();
 
-    //     while (timer < waitTime)
-    //     {
-    //         timer += Time.deltaTime;
+        float waitTime = Random.Range(data.ambushWaitRange.x, data.ambushWaitRange.y);
+        float confirm = Mathf.Max(0f, data.vision.confirmSeconds * 0.5f);
+        float seenTimer = 0f;
+        float timer = 0f;
+        Transform target = npc.perception.PlayerTransform;
 
-    //         if (target != null)
-    //         {
-    //             Vector3 dir = target.position - npc.transform.position;
-    //             dir.y = 0f;
-    //             if (dir.sqrMagnitude > 0.0001f)
-    //             {
-    //                 var lookRot = Quaternion.LookRotation(dir);
-    //                 npc.transform.rotation = Quaternion.Slerp(npc.transform.rotation, lookRot, Time.deltaTime * 5f);
-    //             }
-    //         }
+        while (timer < waitTime)
+        {
+            if (npc.currentState != NPCController.AIState.Ambush)
+                yield break;
 
-    //         if (npc.perception.CanSeePlayer)
-    //         {
-    //             seenTimer += Time.deltaTime;
-    //             if (seenTimer >= confirm)   
-    //             {
-    //                 SetState(NPCController.AIState.Chase);
-    //                 yield break;
-    //             }
-    //         }
-    //         else
-    //         {
-    //             seenTimer = 0f;
-    //         }
+            timer += Time.deltaTime;
 
-    //         yield return null;
-    //     }
+            if (target != null)
+            {
+                Vector3 dir = target.position - npc.transform.position;
+                dir.y = 0f;
+                if (dir.sqrMagnitude > 0.0001f)
+                {
+                    var lookRot = Quaternion.LookRotation(dir);
+                    npc.transform.rotation = Quaternion.Slerp(npc.transform.rotation, lookRot, Time.deltaTime * 5f);
+                }
+            }
 
-    //     SetState(NPCController.AIState.Search);
-    // }
+            if (!IsPlayerStealthHidden() && npc.perception.CanSeePlayer)
+            {
+                seenTimer += Time.deltaTime;
+                if (seenTimer >= confirm)
+                {
+                    npc.BeginChaseFromPerception();
+                    yield break;
+                }
+            }
+            else
+            {
+                seenTimer = 0f;
+            }
+
+            yield return null;
+        }
+
+        SetState(NPCController.AIState.Natural);
+    }
+
+    static void CollectAmbushSpotsInRoom(Transform room, List<Transform> results)
+    {
+        if (room == null)
+            return;
+
+        var transforms = room.GetComponentsInChildren<Transform>(true);
+        for (int i = 0; i < transforms.Length; i++)
+        {
+            var t = transforms[i];
+            if (t == null)
+                continue;
+
+            string n = t.name;
+            if (!string.IsNullOrEmpty(n) &&
+                n.IndexOf("ambush_position", System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                results.Add(t);
+            }
+        }
+    }
+
+    static IEnumerator WaitUntilNavArrived(NavMeshAgent moveAgent, float distanceThreshold)
+    {
+        if (moveAgent == null)
+            yield break;
+
+        while (moveAgent.pathPending || moveAgent.remainingDistance > distanceThreshold)
+            yield return null;
+    }
+
+    void TryAmbushOrNaturalAfterSearch()
+    {
+        var data = npc.interaction?.data;
+        if (data != null && Random.value < data.ambushChance)
+            SetState(NPCController.AIState.Ambush);
+        else
+            SetState(NPCController.AIState.Natural);
+    }
 
     // === SEARCH ===
     private IEnumerator SearchRoutine()
@@ -439,15 +495,8 @@ public class FSMController
             if (!IsPlayerStealthHidden() && npc.perception != null && npc.perception.CanSeePlayer)
                 npc.BeginChaseFromPerception();
             else
-                SetState(NPCController.AIState.Natural);
+                TryAmbushOrNaturalAfterSearch();
         }
-            
-
-        // if (UnityEngine.Random.value < npc.interaction.data.patrolChance)
-        //     SetState(NPCController.AIState.Patrol);
-        // else
-        //     SetState(NPCController.AIState.Natural);
-            
     }
 
     static bool IsPlayerStealthHidden(Transform playerTransform)

@@ -183,8 +183,6 @@ public class InventoryUI : MonoBehaviour
                     InteractionUIManager.Instance?.PlaySuccessShake();
                 }
             }
-            else
-                InteractionFeedback.Fail();
             return;
         }
 

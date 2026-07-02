@@ -55,25 +55,34 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
         if (_wrenchReleased)
             return false;
 
+        ShowContextualHint(InventoryUI.Instance?.GetSelectedItem());
+        return false;
+    }
+
+    /// <summary>Same hints as empty-hand E, keyed off puzzle state and what the player is holding.</summary>
+    public string GetContextualHintMessage(InventoryItem held)
+    {
+        if (_wrenchReleased)
+            return null;
+
         if (!_barInserted)
         {
-            InventoryItem selected = InventoryUI.Instance?.GetSelectedItem();
-            if (selected == barItem || selected == hammerItem)
-                InteractionFeedback.Fail(useBarOnViseMessage, 3f);
-            else
-                InteractionFeedback.Fail(needBarMessage, 3f);
-            return false;
+            if (held == barItem || held == hammerItem)
+                return useBarOnViseMessage;
+            return needBarMessage;
         }
 
-        InventoryItem held = InventoryUI.Instance?.GetSelectedItem();
         if (held == hammerItem)
-        {
-            InteractionFeedback.Fail(useHammerOnBarMessage, 3f);
-            return false;
-        }
+            return useHammerOnBarMessage;
 
-        InteractionFeedback.Fail(barWontBudgeMessage, 3f);
-        return false;
+        return barWontBudgeMessage;
+    }
+
+    void ShowContextualHint(InventoryItem held)
+    {
+        string message = GetContextualHintMessage(held);
+        if (!string.IsNullOrWhiteSpace(message))
+            InteractionFeedback.Fail(message, 3f);
     }
 
     public bool ReceiveItem(InventoryItem item)
@@ -90,7 +99,7 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
         if (_barInserted && !_wrenchReleased && item == hammerItem)
             return TryStrikeWithHammer(item);
 
-        InteractionFeedback.Fail(wrongItemMessage, 2.5f);
+        ShowContextualHint(item);
         return false;
     }
 

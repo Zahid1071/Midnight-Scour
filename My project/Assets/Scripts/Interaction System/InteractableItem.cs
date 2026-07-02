@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class InteractableItem : MonoBehaviour, IInteractable
+public class InteractableItem : MonoBehaviour, IInteractable, IItemReceiver
 {
     public InventoryItem itemData;
     [SerializeField] GrateSystem grateGate;
@@ -14,13 +14,30 @@ public class InteractableItem : MonoBehaviour, IInteractable
 
     public bool Interact()
     {
-        if (_consumed)
+        if (TryShowBlockedMessage())
             return false;
+
+        return TryPickup();
+    }
+
+    public bool ReceiveItem(InventoryItem item)
+    {
+        if (TryShowBlockedMessage())
+            return false;
+
+        // Wrong item on a ready pickup still picks up (same as empty-hand E).
+        return TryPickup();
+    }
+
+    bool TryShowBlockedMessage()
+    {
+        if (_consumed)
+            return true;
 
         if (grateGate != null && !grateGate.IsRemoved)
         {
             InteractionFeedback.Fail(blockedMessage, 3f);
-            return false;
+            return true;
         }
 
         if (blockedUntilBenchViceReleased)
@@ -29,9 +46,17 @@ public class InteractableItem : MonoBehaviour, IInteractable
             if (vice != null && !vice.IsWrenchReleased)
             {
                 InteractionFeedback.Fail(benchViceStuckMessage, 3f);
-                return false;
+                return true;
             }
         }
+
+        return false;
+    }
+
+    bool TryPickup()
+    {
+        if (_consumed)
+            return false;
 
         if (itemData == null)
         {

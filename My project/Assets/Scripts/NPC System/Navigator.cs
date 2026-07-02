@@ -236,6 +236,7 @@ namespace FS_Atmo
             if (NavMesh.SamplePosition(pos, out var hit, 0.75f, NavMesh.AllAreas))
                 pos = hit.position;
 
+            agent.isStopped = false;
             agent.SetDestination(pos);
 
             float timer = 0f;

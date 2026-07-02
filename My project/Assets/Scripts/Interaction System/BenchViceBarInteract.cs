@@ -19,7 +19,14 @@ public class BenchViceBarInteract : MonoBehaviour, IInteractable
         if (puzzle != null && puzzle.IsWrenchReleased)
             return false;
 
-        InteractionFeedback.Fail(wontBudgeMessage, 3f);
+        string message = puzzle != null
+            ? puzzle.GetContextualHintMessage(InventoryUI.Instance?.GetSelectedItem())
+            : wontBudgeMessage;
+
+        if (string.IsNullOrWhiteSpace(message))
+            message = wontBudgeMessage;
+
+        InteractionFeedback.Fail(message, 3f);
         return false;
     }
 }

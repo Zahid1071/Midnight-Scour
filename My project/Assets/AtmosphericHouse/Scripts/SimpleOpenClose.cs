@@ -13,7 +13,7 @@ namespace FS_Atmo
         [SerializeField] private string lockedTriggerName = "Locked";
 
         [Header("Blending")]
-        [SerializeField] private float crossFadeDuration = 0.10f;
+        [SerializeField] private float crossFadeDuration = 0.6f;
         [Range(0f, 1f)]
         [SerializeField] private float minToggleProgress = 0.25f;
 
@@ -309,7 +309,7 @@ namespace FS_Atmo
                 if (handleOpenSound != null)
                     yield return new WaitForSeconds(openSoundDelayAfterHandle);
 
-                SoundManager.Instance.PlaySFXSafe(openSound, primaryPosition,.4f);
+                SoundManager.Instance.PlaySFXSafe(openSound, primaryPosition);
 
                 if (additionalPosition.HasValue)
                     SoundManager.Instance.PlaySFXSafe(openSound, additionalPosition.Value);
