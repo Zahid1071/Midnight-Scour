@@ -309,7 +309,7 @@ namespace FS_Atmo
                 if (handleOpenSound != null)
                     yield return new WaitForSeconds(openSoundDelayAfterHandle);
 
-                SoundManager.Instance.PlaySFXSafe(openSound, primaryPosition);
+                SoundManager.Instance.PlaySFXSafe(openSound, primaryPosition,.4f);
 
                 if (additionalPosition.HasValue)
                     SoundManager.Instance.PlaySFXSafe(openSound, additionalPosition.Value);

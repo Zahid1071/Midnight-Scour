@@ -76,6 +76,7 @@ MonoBehaviour:
     confirmSeconds: 1
     buildRate: 1
     decayRate: 0.1
+    instantConfirmDistance: 2
   hearing:
     ambushSuspicionMultiplier: 0.5
   suspicion:

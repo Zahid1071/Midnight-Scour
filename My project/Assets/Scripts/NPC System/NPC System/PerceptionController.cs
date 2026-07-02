@@ -30,7 +30,7 @@ public class PerceptionController : MonoBehaviour
 
     // Cached config from NPCData
     float maxViewDistance, maxViewHalfAngle;
-    float confirmSeconds, buildRate, decayRate;
+    float confirmSeconds, buildRate, decayRate, instantConfirmDistance;
     float gracePeriod, keepChaseDist;
     float ambushAudioMul;
 
@@ -54,6 +54,7 @@ public class PerceptionController : MonoBehaviour
             Debug.LogWarning($"{name}: NPCData missing. Using safe defaults.");
             maxViewDistance = 10f; maxViewHalfAngle = 90f;
             confirmSeconds = 1.5f; buildRate = 1f; decayRate = 1.5f;
+            instantConfirmDistance = 2f;
             gracePeriod = 2f; keepChaseDist = 3f;
             ambushAudioMul = 0.5f;
             return;
@@ -64,6 +65,7 @@ public class PerceptionController : MonoBehaviour
         confirmSeconds   = Mathf.Max(0f, data.vision.confirmSeconds);
         buildRate        = Mathf.Max(0.01f, data.vision.buildRate);
         decayRate        = Mathf.Max(0.01f, data.vision.decayRate);
+        instantConfirmDistance = Mathf.Max(0f, data.vision.instantConfirmDistance);
 
         ambushAudioMul   = data.hearing.ambushSuspicionMultiplier;
         gracePeriod      = data.chaseRetention.gracePeriod;
@@ -214,6 +216,17 @@ public class PerceptionController : MonoBehaviour
 
     private void UpdateVisionMeters()
     {
+        if (CanSeePlayer && ShouldInstantConfirmVision())
+        {
+            visionMeter = confirmSeconds;
+            if (!confirmedThisStreak)
+            {
+                confirmedThisStreak = true;
+                OnVisionConfirmed?.Invoke();
+            }
+            return;
+        }
+
         if (CanSeePlayer)
             visionMeter += buildRate * Time.deltaTime;
         else
@@ -229,6 +242,21 @@ public class PerceptionController : MonoBehaviour
 
         if (!CanSeePlayer && visionMeter <= 0f)
             confirmedThisStreak = false;
+    }
+
+    bool ShouldInstantConfirmVision()
+    {
+        if (instantConfirmDistance <= 0f || !player)
+            return false;
+
+        if (player.gameObject.layer == 7)
+            return false;
+
+        var hider = player.GetComponent<PlayerHider>();
+        if (hider != null && hider.isHidden)
+            return false;
+
+        return Vector3.Distance(transform.position, player.position) < instantConfirmDistance;
     }
 
     public const float DefaultMaxHearingDistance = 15f;

@@ -16,6 +16,9 @@ public struct VisionSettings
 
     [Tooltip("Vision meter drain per second when not seeing.")]
     [Min(0f)] public float decayRate;
+
+    [Tooltip("While the player is exposed (not hiding), sight within this range skips confirmSeconds. 0 = disabled.")]
+    [Min(0f)] public float instantConfirmDistance;
 }
 
 [System.Serializable]
@@ -91,7 +94,8 @@ public class NPCData : ScriptableObject
         maxViewAngle    = 90f,
         confirmSeconds  = 1.5f,
         buildRate       = 1.0f,
-        decayRate       = 1.5f
+        decayRate       = 1.5f,
+        instantConfirmDistance = 2f
     };
 
     public HearingSettings hearing = new HearingSettings {
