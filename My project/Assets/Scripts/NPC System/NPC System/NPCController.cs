@@ -41,6 +41,8 @@ public class NPCController : MonoBehaviour
     // optional: expose for debug
     public Transform jumpscarePoint;
 
+    public bool HearingDisabled { get; private set; }
+
     Coroutine _captureRoutine;
 
     public void BeginCapture()
@@ -117,7 +119,10 @@ public class NPCController : MonoBehaviour
 
             // Ensure we don't leave the rig weight up when leaving Natural.
             if (poiLookDirector != null && currentState != AIState.Chase && currentState != AIState.Capture)
-                poiLookDirector.CancelHoldAndClearLook();
+            {
+                if (!poiLookDirector.IsLockedToPlayer)
+                    poiLookDirector.CancelHoldAndClearLook();
+            }
         }
     }
 
@@ -176,6 +181,13 @@ public class NPCController : MonoBehaviour
 
     // ========== Perception event handlers ==========
 
+    public void SetHearingDisabled(bool disabled)
+    {
+        HearingDisabled = disabled;
+        if (disabled)
+            suspicion?.ResetMeters();
+    }
+
     /// <summary>
     /// Drop routine, door routes, and POI — run straight at the player.
     /// </summary>
@@ -188,7 +200,10 @@ public class NPCController : MonoBehaviour
         interaction?.CancelInteraction();
 
         if (poiLookDirector != null)
+        {
+            poiLookDirector.UnlockLookFromPlayer();
             poiLookDirector.CancelHoldAndClearLook();
+        }
 
         _lastChaseTarget = new Vector3(float.PositiveInfinity, 0f, 0f);
         _nextChaseReplanTime = 0f;
@@ -200,6 +215,7 @@ public class NPCController : MonoBehaviour
 
     private void HandleSuspicionReached()
     {
+        if (HearingDisabled) return;
         if (currentState == AIState.Chase || currentState == AIState.Capture || currentState == AIState.Dead) return;
         navigator.ClearRoute();
         interaction?.CancelAndExitGracefully(AIState.Chase);

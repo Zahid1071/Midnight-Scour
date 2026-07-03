@@ -48,6 +48,12 @@ public class SuspicionSystem : MonoBehaviour
         footstepSuspicion += amount;
     }
 
+    public void ResetMeters()
+    {
+        footstepSuspicion = 0f;
+        suspicionLevel = 0f;
+    }
+
     void HandleFootstepSuspicion()
     {
         if (footstepSuspicion > 0f)

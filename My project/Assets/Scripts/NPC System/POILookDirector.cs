@@ -18,6 +18,9 @@ public class POILookDirector : MonoBehaviour
     Rig _lookRig;
     MultiAimConstraint[] _aimConstraints;
     Coroutine _holdRoutine;
+    bool _lockedToPlayer;
+
+    public bool IsLockedToPlayer => _lockedToPlayer;
 
     void Awake()
     {
@@ -77,6 +80,33 @@ public class POILookDirector : MonoBehaviour
     {
         if (playerPoi == null) return;
         SetPOIPosition(playerPoi.position);
+    }
+
+    /// <summary>
+    /// Keeps the look rig pinned on the player until <see cref="UnlockLookFromPlayer"/> is called.
+    /// </summary>
+    public void LockLookToPlayer()
+    {
+        _lockedToPlayer = true;
+        StopHold();
+        EnsureRig();
+        SetLookWeight(1f);
+        SnapPOIToPlayer();
+    }
+
+    public void UnlockLookFromPlayer()
+    {
+        _lockedToPlayer = false;
+    }
+
+    /// <summary>Call while locked so the POI tracks a moving player.</summary>
+    public void TickLockedPlayerLook()
+    {
+        if (!_lockedToPlayer)
+            return;
+
+        SetLookWeight(1f);
+        SnapPOIToPlayer();
     }
 
     public void SnapPOIToRandomInBounds()
@@ -164,6 +194,9 @@ public class POILookDirector : MonoBehaviour
 
     public void CancelHoldAndClearLook()
     {
+        if (_lockedToPlayer)
+            return;
+
         StopHold();
         if (_lookRig != null)
             _lookRig.weight = 0f;

@@ -7,6 +7,7 @@ public class InteractableItem : MonoBehaviour, IInteractable, IItemReceiver
     [SerializeField] bool blockedUntilBenchViceReleased;
     [SerializeField] string benchViceStuckMessage = "It is stuck.";
     [SerializeField] string blockedMessage = "I can't reach that.";
+    [SerializeField] DemoEndDirector demoEndOnPickup;
 
     bool _consumed;
 
@@ -91,6 +92,10 @@ public class InteractableItem : MonoBehaviour, IInteractable, IItemReceiver
                 if (idx >= 0)
                     InventoryUI.Instance.SelectSlot(idx);
             }
+
+            demoEndOnPickup?.NotifyItemPickedUp(itemData);
+            if (demoEndOnPickup == null)
+                FindFirstObjectByType<DemoEndDirector>()?.NotifyItemPickedUp(itemData);
 
             Destroy(gameObject);
             return true;

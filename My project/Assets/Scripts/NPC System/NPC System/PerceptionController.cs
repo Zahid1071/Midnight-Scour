@@ -244,6 +244,17 @@ public class PerceptionController : MonoBehaviour
             confirmedThisStreak = false;
     }
 
+    /// <summary>
+    /// True when the player is currently visible and within <see cref="NPCData.vision.instantConfirmDistance"/>.
+    /// </summary>
+    public bool CanInstantConfirmVisiblePlayer()
+    {
+        if (!CanSeePlayer)
+            return false;
+
+        return ShouldInstantConfirmVision();
+    }
+
     bool ShouldInstantConfirmVision()
     {
         if (instantConfirmDistance <= 0f || !player)
@@ -283,6 +294,9 @@ public class PerceptionController : MonoBehaviour
         float maxHearingDistance = DefaultMaxHearingDistance,
         float minHearingDistance = DefaultMinHearingDistance)
     {
+        if (npc != null && npc.HearingDisabled)
+            return;
+
         float scaled = baseSuspicion * DistanceHearingMultiplier(
             worldPosition, transform.position, maxHearingDistance, minHearingDistance);
 
@@ -294,6 +308,9 @@ public class PerceptionController : MonoBehaviour
 
     public void HearPlayerFootstep(Transform soundSource, float suspicionAmount)
     {
+        if (npc != null && npc.HearingDisabled)
+            return;
+
         if (!soundSource) return;
 
         if (soundSource.gameObject.layer == 12) return;
@@ -317,6 +334,9 @@ public class PerceptionController : MonoBehaviour
     /// </summary>
     public void HearLoudWorldNoise(Vector3 worldPosition, float footstepSuspicionToAdd = 300f)
     {
+        if (npc != null && npc.HearingDisabled)
+            return;
+
         if (npc.currentState == NPCController.AIState.Ambush)
             footstepSuspicionToAdd *= ambushAudioMul;
 

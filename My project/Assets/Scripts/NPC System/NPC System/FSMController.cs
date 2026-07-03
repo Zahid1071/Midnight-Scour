@@ -342,6 +342,12 @@ public class FSMController
 
             if (!IsPlayerStealthHidden() && npc.perception.CanSeePlayer)
             {
+                if (npc.perception.CanInstantConfirmVisiblePlayer())
+                {
+                    npc.BeginChaseFromPerception();
+                    yield break;
+                }
+
                 seenTimer += Time.deltaTime;
                 if (seenTimer >= confirm)
                 {
