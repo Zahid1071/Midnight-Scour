@@ -17,6 +17,9 @@ public class FSMController
     float runningSpeed = 6f;
     bool locomotionCached;
 
+    Coroutine _searchRoutineCo;
+    Coroutine _ambushRoutineCo;
+
     
     
     public FSMController(NPCController controller)
@@ -53,8 +56,9 @@ public class FSMController
 
     public void SetState(NPCController.AIState newState)
     {
+        if (newState == npc.currentState)
+            return;
 
-        
         npc.interaction.CancelInteraction();
         var prev = npc.currentState;
         npc.currentState = newState;
@@ -71,17 +75,16 @@ public class FSMController
         {
             case NPCController.AIState.Suspicious:
                 Debug.Log("🤔 State: Suspicous");
-                npc.StartCoroutine(SearchRoutine());
                 break;
 
 
             case NPCController.AIState.Search:
-                npc.StartCoroutine(SearchRoutine());
+                StartSearchRoutine();
                 break;
 
             case NPCController.AIState.Ambush:
                 Debug.Log("😈 State: AMBUSH");
-                npc.StartCoroutine(AmbushRoutine());
+                StartAmbushRoutine();
                 break;
 
             // case NPCController.AIState.Patrol:
@@ -90,6 +93,8 @@ public class FSMController
             //     break;
 
             case NPCController.AIState.Natural:
+                StopSearchRoutine();
+                StopAmbushRoutine();
                 if (agent != null)
                     agent.isStopped = false;
                 npc.interaction.StartNextRoutine();
@@ -97,6 +102,8 @@ public class FSMController
                 break;
 
             case NPCController.AIState.Chase:
+                StopSearchRoutine();
+                StopAmbushRoutine();
                 nav?.ClearRoute();
                 if (agent != null)
                     agent.isStopped = false;
@@ -104,12 +111,56 @@ public class FSMController
                 break;
 
             case NPCController.AIState.Capture:
+                StopSearchRoutine();
+                StopAmbushRoutine();
                 StopAgentMovement();
                 npc.poiLookDirector?.CancelHoldAndClearLook();
                 Debug.Log("State: CAPTURE");
                 npc.BeginCapture();
                 break;
         }
+    }
+
+    void StartSearchRoutine()
+    {
+        StopSearchRoutine();
+        _searchRoutineCo = npc.StartCoroutine(RunSearchRoutine());
+    }
+
+    void StopSearchRoutine()
+    {
+        if (_searchRoutineCo == null)
+            return;
+
+        npc.StopCoroutine(_searchRoutineCo);
+        _searchRoutineCo = null;
+    }
+
+    IEnumerator RunSearchRoutine()
+    {
+        yield return SearchRoutine();
+        _searchRoutineCo = null;
+    }
+
+    void StartAmbushRoutine()
+    {
+        StopAmbushRoutine();
+        _ambushRoutineCo = npc.StartCoroutine(RunAmbushRoutine());
+    }
+
+    void StopAmbushRoutine()
+    {
+        if (_ambushRoutineCo == null)
+            return;
+
+        npc.StopCoroutine(_ambushRoutineCo);
+        _ambushRoutineCo = null;
+    }
+
+    IEnumerator RunAmbushRoutine()
+    {
+        yield return AmbushRoutine();
+        _ambushRoutineCo = null;
     }
 
     public void Update()
@@ -136,8 +187,7 @@ public class FSMController
                 break;
 
             case NPCController.AIState.Ambush:
-                agent.speed = runningSpeed;
-                agent.acceleration = Mathf.Max(agent.acceleration, runningSpeed * 4f);
+                agent.speed = walkingSpeed;
                 break;
 
             case NPCController.AIState.Chase:
@@ -270,35 +320,12 @@ public class FSMController
         zoneRooms.Sort((a, b) =>
             Vector3.SqrMagnitude(a.position - center).CompareTo(Vector3.SqrMagnitude(b.position - center)));
 
-        var ambushSpots = new List<Transform>();
-        int[] batches = { 3, 8, 16, 32, 64 };
-        foreach (int count in batches)
-        {
-            ambushSpots.Clear();
-            int roomLimit = Mathf.Min(count, zoneRooms.Count);
-            for (int i = 0; i < roomLimit; i++)
-                CollectAmbushSpotsInRoom(zoneRooms[i], ambushSpots);
-
-            if (ambushSpots.Count > 0)
-                break;
-        }
-
-        if (ambushSpots.Count == 0)
+        Transform ambushPoint = PickAmbushPoint(zoneRooms, npc.perception.searchTarget);
+        if (ambushPoint == null)
         {
             SetState(NPCController.AIState.Natural);
             yield break;
         }
-
-        if (npc.perception.searchTarget != null)
-            ambushSpots.RemoveAll(t => t == npc.perception.searchTarget);
-
-        if (ambushSpots.Count == 0)
-        {
-            SetState(NPCController.AIState.Natural);
-            yield break;
-        }
-
-        Transform ambushPoint = ambushSpots[Random.Range(0, ambushSpots.Count)];
 
         NavMeshAgent moveAgent = npc.interaction.agent ?? agent;
         if (moveAgent != null)
@@ -316,11 +343,13 @@ public class FSMController
 
         StopAgentMovement();
 
+        float alignDuration = npc.interaction != null ? npc.interaction.rotationDuration : 0.4f;
+        yield return AlignRootToTransform(npc.transform, ambushPoint, alignDuration);
+
         float waitTime = Random.Range(data.ambushWaitRange.x, data.ambushWaitRange.y);
         float confirm = Mathf.Max(0f, data.vision.confirmSeconds * 0.5f);
         float seenTimer = 0f;
         float timer = 0f;
-        Transform target = npc.perception.PlayerTransform;
 
         while (timer < waitTime)
         {
@@ -328,17 +357,6 @@ public class FSMController
                 yield break;
 
             timer += Time.deltaTime;
-
-            if (target != null)
-            {
-                Vector3 dir = target.position - npc.transform.position;
-                dir.y = 0f;
-                if (dir.sqrMagnitude > 0.0001f)
-                {
-                    var lookRot = Quaternion.LookRotation(dir);
-                    npc.transform.rotation = Quaternion.Slerp(npc.transform.rotation, lookRot, Time.deltaTime * 5f);
-                }
-            }
 
             if (!IsPlayerStealthHidden() && npc.perception.CanSeePlayer)
             {
@@ -364,6 +382,52 @@ public class FSMController
         }
 
         SetState(NPCController.AIState.Natural);
+    }
+
+    static Transform PickAmbushPoint(List<Transform> zoneRooms, Transform exclude)
+    {
+        if (zoneRooms == null || zoneRooms.Count == 0)
+            return null;
+
+        var roomSpots = new List<Transform>();
+
+        for (int r = 0; r < zoneRooms.Count; r++)
+        {
+            roomSpots.Clear();
+            CollectAmbushSpotsInRoom(zoneRooms[r], roomSpots);
+            if (roomSpots.Count == 0)
+                continue;
+
+            if (exclude != null)
+                roomSpots.RemoveAll(t => t == exclude);
+
+            if (roomSpots.Count == 0)
+                continue;
+
+            return roomSpots[Random.Range(0, roomSpots.Count)];
+        }
+
+        return null;
+    }
+
+    static IEnumerator AlignRootToTransform(Transform root, Transform target, float duration)
+    {
+        if (root == null || target == null)
+            yield break;
+
+        Quaternion startRot = root.rotation;
+        Quaternion targetRot = target.rotation;
+        float alignDuration = Mathf.Max(0.01f, duration);
+        float t = 0f;
+
+        while (t < alignDuration)
+        {
+            t += Time.deltaTime;
+            root.rotation = Quaternion.Slerp(startRot, targetRot, t / alignDuration);
+            yield return null;
+        }
+
+        root.rotation = targetRot;
     }
 
     static void CollectAmbushSpotsInRoom(Transform room, List<Transform> results)
@@ -427,73 +491,73 @@ public class FSMController
             !npc.GetComponent<NavMeshAgent>().pathPending &&
             npc.GetComponent<NavMeshAgent>().remainingDistance <2f);
 
-        var hidingSpots = roomAnchor.GetComponentsInChildren<HidingSpot>();
+        var data = npc.interaction?.data;
+        var allStops = roomAnchor.GetComponentsInChildren<HidingSpot>();
+        var searchStops = PickSearchSpots(allStops, data?.searchExtraSpotChances);
         var lookDirector = npc.poiLookDirector;
 
-        foreach (var spot in hidingSpots)
-        {
-            if (!IsPlayerStealthHidden() && npc.perception.CanSeePlayer)
-            {
-                SetState(NPCController.AIState.Chase);
-                yield break;
-            }
+        Debug.Log($"🔎 Searching {searchStops.Count}/{allStops.Length} spot(s) in {roomAnchor.name}");
 
-            if (nav != null) nav.GoToPoint(spot.PivotForNPCSearchRoutine.transform.position);
-            else npc.GetComponent<NavMeshAgent>().SetDestination(spot.PivotForNPCSearchRoutine.transform.position);
+        foreach (var spot in searchStops)
+        {
+            if (TryBreakSearchForChase())
+                yield break;
+
+            if (spot == null)
+                continue;
+
+            Transform searchPivot = spot.GetSearchPivot();
+            if (searchPivot == null)
+                continue;
+
+            if (nav != null) nav.GoToPoint(searchPivot.position);
+            else npc.GetComponent<NavMeshAgent>().SetDestination(searchPivot.position);
 
             yield return new WaitUntil(() =>
                 !npc.GetComponent<NavMeshAgent>().pathPending &&
                 npc.GetComponent<NavMeshAgent>().remainingDistance < 2f);
 
-            // Look at this hiding spot's POI during the wait window
-            Transform hidingPoi = null;
-            var tfs = spot.GetComponentsInChildren<Transform>(true);
-            for (int i = 0; i < tfs.Length; i++)
-            {
-                if (tfs[i] != null && (tfs[i].name == "HidingPOI" || tfs[i].name == "hidingPOI"))
-                {
-                    hidingPoi = tfs[i];
-                    break;
-                }
-            }
-            if (hidingPoi == null)
-                hidingPoi = spot.PivotForNPCSearchRoutine;
+            if (TryBreakSearchForChase())
+                yield break;
+
+            Transform searchPoi = spot.ResolveSearchLookTarget();
+            float waitTime = spot.GetSearchWaitSeconds(data);
+            const float checkEvery = 0.25f;
 
             if (lookDirector != null)
             {
-                // One-shot "look at this hiding spot" (do not pin for the whole wait).
-                lookDirector.SnapPOITo(hidingPoi);
-
-                // Optional: briefly engage look rig (keeps it routine-driven).
+                lookDirector.SnapPOITo(searchPoi);
                 lookDirector.TriggerLookHold();
 
-                // During the search wait, allow occasional scary snaps to the player.
-                float t = 0f;
-                const float window = 4f;
-                const float checkEvery = 0.25f;
-                while (t < window)
+                float elapsed = 0f;
+                while (elapsed < waitTime)
                 {
-                    // Keep baseline target as the hiding spot unless the random roll snaps elsewhere.
-                    lookDirector.SnapPOITo(hidingPoi);
+                    if (TryBreakSearchForChase())
+                        yield break;
+
+                    lookDirector.SnapPOITo(searchPoi);
                     lookDirector.SnapPOIToRandomOrPlayer();
 
                     yield return new WaitForSeconds(checkEvery);
-                    t += checkEvery;
+                    elapsed += checkEvery;
                 }
 
                 lookDirector.CancelHoldAndClearLook();
             }
             else
             {
-                yield return new WaitForSeconds(4f);
+                yield return new WaitForSeconds(waitTime);
             }
 
-            bool willSearch = UnityEngine.Random.value < npc.interaction.data.searchChance;
-            if (willSearch && spot.isOccupied)
+            if (!spot.searchCheckpointOnly && data != null)
             {
-                Debug.Log($"🎯 Player Caught in: {spot.name}");
-                SetState(NPCController.AIState.Capture);
-                yield break;
+                bool willCapture = UnityEngine.Random.value < data.captureChance;
+                if (willCapture && spot.isOccupied)
+                {
+                    Debug.Log($"🎯 Player Caught in: {spot.name}");
+                    SetState(NPCController.AIState.Capture);
+                    yield break;
+                }
             }
         }
         if (npc.currentState != NPCController.AIState.Capture)
@@ -503,6 +567,53 @@ public class FSMController
             else
                 TryAmbushOrNaturalAfterSearch();
         }
+    }
+
+    bool TryBreakSearchForChase()
+    {
+        if (!IsPlayerStealthHidden() && npc.perception != null && npc.perception.CanSeePlayer)
+        {
+            SetState(NPCController.AIState.Chase);
+            return true;
+        }
+
+        return false;
+    }
+
+    static List<HidingSpot> PickSearchSpots(HidingSpot[] allStops, float[] extraSpotChances)
+    {
+        var picked = new List<HidingSpot>();
+        if (allStops == null || allStops.Length == 0)
+            return picked;
+
+        var pool = new List<HidingSpot>(allStops.Length);
+        for (int i = 0; i < allStops.Length; i++)
+        {
+            if (allStops[i] != null)
+                pool.Add(allStops[i]);
+        }
+
+        if (pool.Count == 0)
+            return picked;
+
+        int first = Random.Range(0, pool.Count);
+        picked.Add(pool[first]);
+        pool.RemoveAt(first);
+
+        if (extraSpotChances == null)
+            return picked;
+
+        for (int i = 0; i < extraSpotChances.Length && pool.Count > 0; i++)
+        {
+            if (Random.value >= extraSpotChances[i])
+                break;
+
+            int next = Random.Range(0, pool.Count);
+            picked.Add(pool[next]);
+            pool.RemoveAt(next);
+        }
+
+        return picked;
     }
 
     static bool IsPlayerStealthHidden(Transform playerTransform)

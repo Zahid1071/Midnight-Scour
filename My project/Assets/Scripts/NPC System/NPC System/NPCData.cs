@@ -76,7 +76,11 @@ public class NPCData : ScriptableObject
     
 
     [Header("Routine / Search")]
-    [Range(0f, 1f)] public float searchChance = 0.3f; // chance to actually search a hiding spot
+    [Range(0f, 1f)] public float captureChance = 0.3f; // chance to pull the player out of an occupied hiding spot
+    [Tooltip("Seconds to pause at search-checkpoint hiding spots (searchCheckpointOnly) while searching a room.")]
+    public Vector2 searchPositionWaitRange = new Vector2(2f, 3f);
+    [Tooltip("After each searched spot, roll these chances in order to visit another random spot in the room. Stops on first failed roll or when no spots remain.")]
+    public float[] searchExtraSpotChances = { 0.35f, 0.12f };
     public List<WeightedZonePlan> weightedRoutinePlans;
 
     [Header("Patrol / Ambush")]

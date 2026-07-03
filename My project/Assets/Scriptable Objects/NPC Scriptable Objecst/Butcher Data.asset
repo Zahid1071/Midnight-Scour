@@ -15,7 +15,11 @@ MonoBehaviour:
   npcName: Butcher
   npcPrefab: {fileID: 4884186263421869, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
   homeID: House_001
-  searchChance: 0.1
+  captureChance: 0.1
+  searchPositionWaitRange: {x: 2, y: 3}
+  searchExtraSpotChances:
+  - 0.35
+  - 0.12
   weightedRoutinePlans:
   - zoneID: House_001
     weight: 1

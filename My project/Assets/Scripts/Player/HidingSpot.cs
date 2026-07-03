@@ -15,6 +15,11 @@ public class HidingSpot : MonoBehaviour, IInteractable
     [Header("Settings")]
     public float blendDuration = 1.0f;
     public float animationDelay = 0.2f;
+    [Tooltip("Seconds after hide starts before the player moves to the hidden layer. Enter animation plays immediately.")]
+    [Min(0f)]
+    public float stealthLayerDelay = 1f;
+    [Tooltip("Restore the player layer immediately when exit begins (before the exit animation finishes).")]
+    public bool restoreLayerOnExitStart = true;
 
     private Transform activePivot;
     private Animator activeAnimator;
@@ -27,6 +32,36 @@ public class HidingSpot : MonoBehaviour, IInteractable
     private GameObject playerRef;
 
     public Transform PivotForNPCSearchRoutine;
+
+    [Header("NPC Search")]
+    [Tooltip("NPC pauses here during room search but the player cannot hide. Uses the same pivot/POI as a normal hiding spot.")]
+    public bool searchCheckpointOnly;
+
+    public Transform GetSearchPivot() =>
+        PivotForNPCSearchRoutine != null ? PivotForNPCSearchRoutine : transform;
+
+    public float GetSearchWaitSeconds(NPCData data)
+    {
+        if (!searchCheckpointOnly)
+            return 4f;
+
+        Vector2 range = data != null ? data.searchPositionWaitRange : new Vector2(2f, 3f);
+        return Random.Range(
+            Mathf.Max(0f, range.x),
+            Mathf.Max(range.x, range.y));
+    }
+
+    public Transform ResolveSearchLookTarget()
+    {
+        var tfs = GetComponentsInChildren<Transform>(true);
+        for (int i = 0; i < tfs.Length; i++)
+        {
+            if (tfs[i] != null && (tfs[i].name == "HidingPOI" || tfs[i].name == "hidingPOI"))
+                return tfs[i];
+        }
+
+        return GetSearchPivot();
+    }
 
     /// <summary>Cage ile aynı: NPC bu hiding spot collider merkezine LOS ile bakıyorsa true.</summary>
     private bool IsHidingSpotVisibleToAnyNPC()
@@ -175,6 +210,9 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
     public bool Interact()
     {
+        if (searchCheckpointOnly)
+            return false;
+
         if (isToggling)
         {
             HudManager.Instance?.ShowSubtitle("Wait a moment.", 2f);
@@ -230,17 +268,20 @@ public class HidingSpot : MonoBehaviour, IInteractable
         isToggling = true;
         isOccupied = true;
         originalLayerIndex = player.layer;
+        playerRef = player;
 
         HidingCameraSystem.Instance.AttachToPivot(activePivot);
-
-        if (activeAnimator != null) activeAnimator.Play("Idle");
-
         HidingCameraSystem.Instance.SetActive(true);
         hider.DisableControlsOnly();
 
-        yield return new WaitForSeconds(blendDuration);
+        if (activeAnimator != null)
+        {
+            activeAnimator.Play("Idle");
+            activeAnimator.SetTrigger("Enter");
+        }
 
-        playerRef = player;
+        if (stealthLayerDelay > 0f)
+            yield return new WaitForSeconds(stealthLayerDelay);
 
         if (!CanGrantStealthAtEntry(player))
         {
@@ -253,10 +294,6 @@ public class HidingSpot : MonoBehaviour, IInteractable
         player.layer = hiddenLayer;
         hider.SetVisuals(false);
         hider.SetHiddenState(true, this);
-
-        yield return new WaitForSeconds(animationDelay);
-
-        if (activeAnimator != null) activeAnimator.SetTrigger("Enter");
 
         isToggling = false;
     }
@@ -282,6 +319,18 @@ public class HidingSpot : MonoBehaviour, IInteractable
     {
         isToggling = true;
         playerRef = null;
+
+        PlayerHider hider = player.GetComponent<PlayerHider>();
+
+        if (!forCapture && restoreLayerOnExitStart)
+        {
+            player.layer = originalLayerIndex;
+            if (hider != null)
+            {
+                hider.SetHiddenState(false, null);
+                hider.SetVisuals(true);
+            }
+        }
 
         if (activeAnimator != null)
         {
@@ -309,13 +358,16 @@ public class HidingSpot : MonoBehaviour, IInteractable
             yield return new WaitForSeconds(0.5f);
         }
 
-        PlayerHider hider = player.GetComponent<PlayerHider>();
-        if (hider != null)
+        if (!forCapture && !restoreLayerOnExitStart)
         {
-            hider.SetVisuals(true);
-            hider.SetHiddenState(false, null);
+            if (hider != null)
+            {
+                hider.SetVisuals(true);
+                hider.SetHiddenState(false, null);
+            }
+
+            player.layer = originalLayerIndex;
         }
-        player.layer = originalLayerIndex;
 
         if (forCapture)
         {
