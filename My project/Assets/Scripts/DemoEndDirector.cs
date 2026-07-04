@@ -46,10 +46,19 @@ public class DemoEndDirector : MonoBehaviour
 
     IEnumerator DoorAmbushRoutine()
     {
-        butcher.interaction?.CancelInteraction();
+        butcher.fsm.SetState(NPCController.AIState.Scripted);
+
+        var interaction = butcher.interaction;
+        if (interaction != null && interaction.IsPerformingHotspotAction)
+            interaction.CancelAndExitGracefully(NPCController.AIState.Scripted);
+        else
+            interaction?.CancelInteraction();
+
+        while (interaction != null && interaction.IsBusyWithRoutine())
+            yield return null;
+
         butcher.GetComponent<Navigator>()?.ClearRoute();
         butcher.poiLookDirector?.CancelHoldAndClearLook();
-        butcher.fsm.SetState(NPCController.AIState.Scripted);
 
         var nav = butcher.GetComponent<Navigator>();
         var agent = butcher.GetComponent<NavMeshAgent>();

@@ -37,6 +37,27 @@ public class HidingSpot : MonoBehaviour, IInteractable
     [Tooltip("NPC pauses here during room search but the player cannot hide. Uses the same pivot/POI as a normal hiding spot.")]
     public bool searchCheckpointOnly;
 
+    public float GetSearchPickWeight()
+    {
+        var player = GameObject.FindWithTag("Player");
+        var hider = player != null ? player.GetComponent<PlayerHider>() : null;
+        return hider != null ? hider.GetSearchPickWeight(this) : 1f;
+    }
+
+    public float GetCaptureChance(float baseChance)
+    {
+        var hider = ResolveOccupyingHider();
+        return hider != null ? hider.GetCaptureChance(this, baseChance) : baseChance;
+    }
+
+    public PlayerHider ResolveOccupyingHider()
+    {
+        if (!isOccupied || playerRef == null)
+            return null;
+
+        return playerRef.GetComponent<PlayerHider>();
+    }
+
     public Transform GetSearchPivot() =>
         PivotForNPCSearchRoutine != null ? PivotForNPCSearchRoutine : transform;
 

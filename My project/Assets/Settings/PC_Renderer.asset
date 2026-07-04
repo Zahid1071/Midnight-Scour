@@ -1,5 +1,19 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8353161463915904328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7530d9b1c28e471998cd8b99935d3b7, type: 3}
+  m_Name: AnalogGlitchRendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  _passEvent: 600
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26,7 +40,9 @@ MonoBehaviour:
     probeVolumeBlendStatesCS: {fileID: 7200000, guid: b9a23f869c4fd45f19c5ada54dd82176, type: 3}
   m_RendererFeatures:
   - {fileID: 7833122117494664109}
-  m_RendererFeatureMap: ad6b866f10d7b46c
+  - {fileID: -8353161463915904328}
+  - {fileID: 5702947094838723012}
+  m_RendererFeatureMap: ad6b866f10d7b46cb882cfcfe79b138cc441b5d02af0244f
   m_UseNativeRenderPass: 1
   xrSystemData: {fileID: 0}
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
@@ -78,6 +94,20 @@ MonoBehaviour:
   depthTexture: 0
   isLogPrinted: 0
   isCookiePrinted: 0
+--- !u!114 &5702947094838723012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a38fee1e350c0419ab0131008ca74048, type: 3}
+  m_Name: DigitalGlitchRendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  _passEvent: 600
 --- !u!114 &5791932633276930073
 MonoBehaviour:
   m_ObjectHideFlags: 0

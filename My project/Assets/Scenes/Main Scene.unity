@@ -962,6 +962,14 @@ PrefabInstance:
       propertyPath: occludedVolumeMultiplier
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 6895426862770261785, guid: c113c783466b1e942997871770f5cff8, type: 3}
+      propertyPath: tensionSFXBank.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6895426862770261785, guid: c113c783466b1e942997871770f5cff8, type: 3}
+      propertyPath: 'tensionSFXBank.Array.data[2]'
+      value: 
+      objectReference: {fileID: 8300000, guid: faf77f6b98dab4147a9305d061697b66, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3070,6 +3078,7 @@ GameObject:
   - component: {fileID: 496484868}
   - component: {fileID: 496484869}
   - component: {fileID: 496484870}
+  - component: {fileID: 496484871}
   m_Layer: 0
   m_Name: MainCamera
   m_TagString: MainCamera
@@ -3294,6 +3303,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   globalVolume: {fileID: 496484868}
   createColorAdjustmentsIfMissing: 1
+--- !u!114 &496484871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 496484862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 897555bfb049f43c0a341b72b6883d00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <ScanLineJitter>k__BackingField: 0
+  <VerticalJump>k__BackingField: 0
+  <HorizontalShake>k__BackingField: 0
+  <ColorDrift>k__BackingField: 0
+  <HorizontalRipple>k__BackingField: 0
+  _shader: {fileID: 4800000, guid: 754922b6576fa498bbb2fbbebfe256ef, type: 3}
 --- !u!4 &504333042 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400016, guid: fb4b189d2629f3341a839074d8cff2da, type: 3}
@@ -4874,6 +4901,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &896018198 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1170833190092708455, guid: 6f7f20b04bbae0c40a16fb1ee57273da, type: 3}
+  m_PrefabInstance: {fileID: 1906716945}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &898032346
 GameObject:
   m_ObjectHideFlags: 0
@@ -8278,7 +8310,7 @@ MonoBehaviour:
   rightAnimator: {fileID: 1544600075}
   blendDuration: 0
   animationDelay: 0
-  stealthLayerDelay: 1
+  stealthLayerDelay: 2.2
   restoreLayerOnExitStart: 1
   PivotForNPCSearchRoutine: {fileID: 1403411977}
   searchCheckpointOnly: 0
@@ -10746,6 +10778,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3820890344281213050, guid: 6f7f20b04bbae0c40a16fb1ee57273da, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1609434173}
+    - targetCorrespondingSourceObject: {fileID: 1170833190092708455, guid: 6f7f20b04bbae0c40a16fb1ee57273da, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1964602098}
     - targetCorrespondingSourceObject: {fileID: 5941139058620538857, guid: 6f7f20b04bbae0c40a16fb1ee57273da, type: 3}
       insertIndex: -1
       addedObject: {fileID: 420803778}
@@ -11206,6 +11241,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 9036679899467952187, guid: 4aadd9c33e6435c4b92e7f5fef391b55, type: 3}
   m_PrefabInstance: {fileID: 1963631531}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1964602097
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1964602098}
+  m_Layer: 0
+  m_Name: ambush_position
+  m_TagString: Untagged
+  m_Icon: {fileID: 7174288486110832750, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1964602098
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1964602097}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.77985525, z: -0, w: 0.62596}
+  m_LocalPosition: {x: 4.04, y: 0, z: 0.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 896018198}
+  m_LocalEulerAnglesHint: {x: 0, y: -102.495, z: 0}
 --- !u!1 &1979351946
 GameObject:
   m_ObjectHideFlags: 0
@@ -14630,7 +14696,7 @@ MonoBehaviour:
   rightAnimator: {fileID: 0}
   blendDuration: 0.05
   animationDelay: 0
-  stealthLayerDelay: 1
+  stealthLayerDelay: 1.3
   restoreLayerOnExitStart: 1
   PivotForNPCSearchRoutine: {fileID: 1669199386}
   searchCheckpointOnly: 0

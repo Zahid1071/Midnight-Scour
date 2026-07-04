@@ -3,6 +3,7 @@ using UnityEngine.AI;
 using System.Collections;
 using FS_Atmo;
 using System.Collections.Generic;
+using KinoGlitch;
 
 
 public class FSMController
@@ -20,8 +21,9 @@ public class FSMController
     Coroutine _searchRoutineCo;
     Coroutine _ambushRoutineCo;
 
-    
-    
+    Transform _lastAmbushSpot;
+    int _consecutiveSameAmbushCount;
+
     public FSMController(NPCController controller)
     {
         npc = controller;
@@ -117,6 +119,12 @@ public class FSMController
                 npc.poiLookDirector?.CancelHoldAndClearLook();
                 Debug.Log("State: CAPTURE");
                 npc.BeginCapture();
+                break;
+
+            case NPCController.AIState.Scripted:
+                StopSearchRoutine();
+                StopAmbushRoutine();
+                npc.poiLookDirector?.CancelHoldAndClearLook();
                 break;
         }
     }
@@ -320,7 +328,7 @@ public class FSMController
         zoneRooms.Sort((a, b) =>
             Vector3.SqrMagnitude(a.position - center).CompareTo(Vector3.SqrMagnitude(b.position - center)));
 
-        Transform ambushPoint = PickAmbushPoint(zoneRooms, npc.perception.searchTarget);
+        Transform ambushPoint = PickAmbushPoint(zoneRooms);
         if (ambushPoint == null)
         {
             SetState(NPCController.AIState.Natural);
@@ -384,7 +392,7 @@ public class FSMController
         SetState(NPCController.AIState.Natural);
     }
 
-    static Transform PickAmbushPoint(List<Transform> zoneRooms, Transform exclude)
+    Transform PickAmbushPoint(List<Transform> zoneRooms)
     {
         if (zoneRooms == null || zoneRooms.Count == 0)
             return null;
@@ -398,13 +406,30 @@ public class FSMController
             if (roomSpots.Count == 0)
                 continue;
 
-            if (exclude != null)
-                roomSpots.RemoveAll(t => t == exclude);
+            var candidates = roomSpots;
+            if (_lastAmbushSpot != null && _consecutiveSameAmbushCount >= 3 && roomSpots.Count > 1)
+            {
+                candidates = new List<Transform>(roomSpots.Count - 1);
+                for (int i = 0; i < roomSpots.Count; i++)
+                {
+                    if (roomSpots[i] != _lastAmbushSpot)
+                        candidates.Add(roomSpots[i]);
+                }
 
-            if (roomSpots.Count == 0)
-                continue;
+                if (candidates.Count == 0)
+                    candidates = roomSpots;
+            }
 
-            return roomSpots[Random.Range(0, roomSpots.Count)];
+            Transform picked = candidates[Random.Range(0, candidates.Count)];
+            if (picked == _lastAmbushSpot)
+                _consecutiveSameAmbushCount++;
+            else
+            {
+                _lastAmbushSpot = picked;
+                _consecutiveSameAmbushCount = 1;
+            }
+
+            return picked;
         }
 
         return null;
@@ -483,6 +508,8 @@ public class FSMController
             yield break;
         }
 
+        RegisterSearchExposureForHiddenPlayer(roomAnchor);
+
         // ensure we actually route to the room (door-aware)
         var room = roomAnchor.GetComponent<RoomAnchor>();
         if (nav != null && room != null) nav.GoToRoom(room);
@@ -528,33 +555,40 @@ public class FSMController
             {
                 lookDirector.SnapPOITo(searchPoi);
                 lookDirector.TriggerLookHold();
+            }
 
-                float elapsed = 0f;
-                while (elapsed < waitTime)
+            float elapsed = 0f;
+            while (elapsed < waitTime)
+            {
+                if (TryBreakSearchForChase())
+                    yield break;
+
+                ApplySearchGlitch(spot, data, elapsed, waitTime);
+
+                if (lookDirector != null)
                 {
-                    if (TryBreakSearchForChase())
-                        yield break;
-
                     lookDirector.SnapPOITo(searchPoi);
                     lookDirector.SnapPOIToRandomOrPlayer();
-
-                    yield return new WaitForSeconds(checkEvery);
-                    elapsed += checkEvery;
                 }
 
-                lookDirector.CancelHoldAndClearLook();
-            }
-            else
-            {
-                yield return new WaitForSeconds(waitTime);
+                yield return new WaitForSeconds(checkEvery);
+                elapsed += checkEvery;
             }
 
-            if (!spot.searchCheckpointOnly && data != null)
+            ApplySearchGlitch(spot, data, waitTime, waitTime);
+
+            if (lookDirector != null)
+                lookDirector.CancelHoldAndClearLook();
+
+            ResetGlitch();
+
+            if (!spot.searchCheckpointOnly && data != null && spot.isOccupied)
             {
-                bool willCapture = UnityEngine.Random.value < data.captureChance;
-                if (willCapture && spot.isOccupied)
+                float captureChance = spot.GetCaptureChance(data.captureChance);
+                if (UnityEngine.Random.value < captureChance)
                 {
                     Debug.Log($"🎯 Player Caught in: {spot.name}");
+                    ResetGlitch();
                     SetState(NPCController.AIState.Capture);
                     yield break;
                 }
@@ -573,11 +607,90 @@ public class FSMController
     {
         if (!IsPlayerStealthHidden() && npc.perception != null && npc.perception.CanSeePlayer)
         {
+            ResetGlitch();
             SetState(NPCController.AIState.Chase);
             return true;
         }
 
         return false;
+    }
+
+    const float MaxSearchGlitch = 0.05f;
+
+    static void ApplySearchGlitch(HidingSpot spot, NPCData data, float elapsed, float waitTime)
+    {
+        if (spot == null || !spot.isOccupied || spot.searchCheckpointOnly)
+        {
+            ResetGlitch();
+            return;
+        }
+
+        float baseChance = data != null ? data.captureChance : 0f;
+        float captureChance = spot.GetCaptureChance(baseChance);
+        float chanceScale = Mathf.Lerp(1f, 2f, Mathf.Clamp01(captureChance));
+        float maxGlitch = MaxSearchGlitch * chanceScale;
+
+        float progress = waitTime > 0f ? Mathf.Clamp01(elapsed / waitTime) : 1f;
+        SetGlitch(Mathf.Lerp(0f, maxGlitch, progress));
+
+        float audioIntensity = progress * (chanceScale / 2f);
+        SoundManager.Instance?.SetSearchTension(audioIntensity);
+    }
+
+    static void ResetGlitch()
+    {
+        SetGlitch(0f);
+        SoundManager.Instance?.StopSearchTension();
+    }
+
+    static void SetGlitch(float value)
+    {
+        var glitch = Camera.main != null ? Camera.main.GetComponent<AnalogGlitchController>() : null;
+        if (glitch == null)
+            return;
+
+        glitch.ScanLineJitter = value;
+        glitch.HorizontalShake = value;
+        glitch.ColorDrift = value;
+        glitch.HorizontalRipple = value;
+        glitch.VerticalJump = 0f;
+    }
+
+    static void RegisterSearchExposureForHiddenPlayer(Transform roomAnchor)
+    {
+        if (roomAnchor == null)
+            return;
+
+        var player = GameObject.FindWithTag("Player");
+        if (player == null)
+            return;
+
+        var hider = player.GetComponent<PlayerHider>();
+        if (hider == null)
+            return;
+
+        hider.NotifySearchWhileHidden(roomAnchor);
+    }
+
+    static int PickWeightedSearchSpotIndex(List<HidingSpot> pool)
+    {
+        float total = 0f;
+        for (int i = 0; i < pool.Count; i++)
+            total += pool[i].GetSearchPickWeight();
+
+        if (total <= 0f)
+            return Random.Range(0, pool.Count);
+
+        float roll = Random.value * total;
+        float acc = 0f;
+        for (int i = 0; i < pool.Count; i++)
+        {
+            acc += pool[i].GetSearchPickWeight();
+            if (roll <= acc)
+                return i;
+        }
+
+        return pool.Count - 1;
     }
 
     static List<HidingSpot> PickSearchSpots(HidingSpot[] allStops, float[] extraSpotChances)
@@ -596,7 +709,7 @@ public class FSMController
         if (pool.Count == 0)
             return picked;
 
-        int first = Random.Range(0, pool.Count);
+        int first = PickWeightedSearchSpotIndex(pool);
         picked.Add(pool[first]);
         pool.RemoveAt(first);
 
@@ -608,7 +721,7 @@ public class FSMController
             if (Random.value >= extraSpotChances[i])
                 break;
 
-            int next = Random.Range(0, pool.Count);
+            int next = PickWeightedSearchSpotIndex(pool);
             picked.Add(pool[next]);
             pool.RemoveAt(next);
         }

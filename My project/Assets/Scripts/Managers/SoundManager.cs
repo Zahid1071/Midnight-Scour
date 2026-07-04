@@ -76,6 +76,9 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private float clearLowpassCutoff = 22000f;
 
     private readonly Queue<AudioSource> threeDPool = new();
+    AudioSource _searchTensionSource;
+
+    const int SearchTensionClipIndex = 2;
 
     private Coroutine musicFadeRoutine;
     private bool usingA = true;
@@ -237,6 +240,58 @@ public class SoundManager : MonoBehaviour
     }
 
     public void StopAmbience() => ambienceSource.Stop();
+
+    AudioClip GetSearchTensionClip()
+    {
+        if (tensionSFXBank == null || tensionSFXBank.Length <= SearchTensionClipIndex)
+            return null;
+
+        return tensionSFXBank[SearchTensionClipIndex];
+    }
+
+    void EnsureSearchTensionSource()
+    {
+        if (_searchTensionSource != null)
+            return;
+
+        _searchTensionSource = CreateChildSource("Search Tension", sfxGroup, loop: false);
+    }
+
+    /// <summary>0 = stop. 1 = full volume at end of search wait (scaled by capture chance in FSM).</summary>
+    public void SetSearchTension(float intensity01)
+    {
+        var clip = GetSearchTensionClip();
+        if (clip == null)
+            return;
+
+        intensity01 = Mathf.Clamp01(intensity01);
+        if (intensity01 <= 0f)
+        {
+            StopSearchTension();
+            return;
+        }
+
+        EnsureSearchTensionSource();
+
+        if (_searchTensionSource.clip != clip)
+        {
+            _searchTensionSource.clip = clip;
+            _searchTensionSource.time = 0f;
+        }
+
+        _searchTensionSource.volume = intensity01;
+        if (!_searchTensionSource.isPlaying)
+            _searchTensionSource.Play();
+    }
+
+    public void StopSearchTension()
+    {
+        if (_searchTensionSource == null)
+            return;
+
+        _searchTensionSource.Stop();
+        _searchTensionSource.time = 0f;
+    }
 
     public void PlaySFX(AudioClip clip, float volume = 1f, float pitch = 1f)
     {
