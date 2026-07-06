@@ -3,7 +3,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// Fades the controls panel in, holds, then fades out. Dismiss early with any key or mouse button.
+/// Fades the controls panel in, holds, then fades out. Dismiss early with any key or mouse button
+/// after <see cref="dismissDelay"/> seconds.
 /// Wire Timeline signal to <see cref="Show"/> (or <see cref="CinematicPlayerControlLock.ShowControlsHint"/>).
 /// </summary>
 [DisallowMultipleComponent]
@@ -14,6 +15,7 @@ public class ControlsPanelHint : MonoBehaviour
     [SerializeField] private float fadeInDuration = 0.35f;
     [SerializeField] private float displayDuration = 7.5f;
     [SerializeField] private float fadeOutDuration = 0.45f;
+    [SerializeField] private float dismissDelay = 5f;
 
     [Header("Hide during hint")]
     [Tooltip("Optional UI element hidden while the controls hint is visible, then faded back in afterward.")]
@@ -25,6 +27,7 @@ public class ControlsPanelHint : MonoBehaviour
     Coroutine _routine;
     float _companionRestAlpha = 1f;
     bool _companionHiddenWithSetActive;
+    float _showElapsed;
 
     public bool IsShowing { get; private set; }
 
@@ -72,6 +75,7 @@ public class ControlsPanelHint : MonoBehaviour
 
         yield return HideCompanion();
 
+        _showElapsed = 0f;
         bool dismissRequested = false;
         yield return FadeUntilCompleteOrDismiss(canvasGroup, 0f, 1f, fadeInDuration, () => dismissRequested = true);
 
@@ -80,7 +84,8 @@ public class ControlsPanelHint : MonoBehaviour
             float elapsed = 0f;
             while (elapsed < displayDuration)
             {
-                if (WasAnyInputPressedThisFrame())
+                _showElapsed += Time.unscaledDeltaTime;
+                if (_showElapsed >= dismissDelay && WasAnyInputPressedThisFrame())
                 {
                     dismissRequested = true;
                     break;
@@ -114,7 +119,8 @@ public class ControlsPanelHint : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < duration)
         {
-            if (WasAnyInputPressedThisFrame())
+            _showElapsed += Time.unscaledDeltaTime;
+            if (_showElapsed >= dismissDelay && WasAnyInputPressedThisFrame())
             {
                 onDismiss?.Invoke();
                 yield break;

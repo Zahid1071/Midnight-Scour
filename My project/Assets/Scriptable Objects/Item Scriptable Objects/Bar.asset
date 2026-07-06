@@ -18,9 +18,10 @@ MonoBehaviour:
   dropLandSFX: {fileID: 0}
   canDrop: 1
   pickUpSFX: {fileID: 8300000, guid: 9c063062c4b98944fabbf9bc3cb175d7, type: 3}
-  useSuccessSound: {fileID: 0}
+  useSuccessSound: {fileID: 8300000, guid: b47d99d53c724b54191e6fa0c2bc79fa, type: 3}
   consumeOnUse: 1
   interactionReachBonus: 0
+  reachAttemptFailMessage: 
   breaksOnWrongUse: 0
   breakOnWrongUseSound: {fileID: 0}
   breakOnWrongUseMessage: 

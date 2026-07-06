@@ -40,10 +40,10 @@ Material:
   m_Shader: {fileID: -6465566751694194690, guid: 9a62b1915c8add54d86e343647b9b861, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords:
+  m_ValidKeywords: []
+  m_InvalidKeywords:
   - _DISABLE_DECALS
   - _DISABLE_SSR_TRANSPARENT
-  m_InvalidKeywords:
   - _METALLICSPECGLOSSMAP
   - _NORMALMAP
   - _OCCLUSIONMAP
@@ -279,7 +279,7 @@ Material:
     - Boolean_C393CA46: 0
     - Boolean_D1FDA930: 0
     - Boolean_D43897A3: 1
-    - Boolean_DC2AF350: 0
+    - Boolean_DC2AF350: 1
     - Boolean_E06F73AA: 1
     - Boolean_E6B25EA1: 0
     - Boolean_EDBB8DBC: 0
@@ -289,7 +289,7 @@ Material:
     - Vector1_1BA9CE6B: 1
     - Vector1_206F73E1: 0.5
     - Vector1_21CE1D80: 1
-    - Vector1_2610B3FF: 1
+    - Vector1_2610B3FF: 2
     - Vector1_2667875F: 0.131
     - Vector1_29CA497B: 0.5
     - Vector1_361079E2: 0

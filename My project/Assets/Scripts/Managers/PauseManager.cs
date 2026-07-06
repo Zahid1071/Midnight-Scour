@@ -36,11 +36,17 @@ public class PauseManager : MonoBehaviour
 
     void Update()
     {
-        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
-            if (IsPaused) OnContinue();
-            else Pause_Internal();
-        }
+        if (Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame)
+            return;
+
+        var demoEnd = DemoEndScreenUI.Instance;
+        if (demoEnd != null && demoEnd.IsShowing && demoEnd.IsExitReady)
+            return;
+
+        if (IsPaused)
+            OnContinue();
+        else
+            Pause_Internal();
     }
     
 

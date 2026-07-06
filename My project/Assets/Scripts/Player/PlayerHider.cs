@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 public class PlayerHider : MonoBehaviour
 {
     public bool isHidden { get; private set; }
+    public bool IsHidingEngaged { get; private set; }
     public HidingSpot CurrentHidingSpot => currentHidingSpot;
 
     private HidingSpot currentHidingSpot;
@@ -48,6 +49,11 @@ public class PlayerHider : MonoBehaviour
     public void SetVisuals(bool isActive)
     {
         if (visualRoot != null) visualRoot.SetActive(isActive);
+    }
+
+    public void SetHidingEngaged(bool engaged)
+    {
+        IsHidingEngaged = engaged;
     }
 
     public void SetHiddenState(bool hidden, HidingSpot spot)

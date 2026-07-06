@@ -13,13 +13,31 @@ public class HidingSpot : MonoBehaviour, IInteractable
     public Animator rightAnimator;
 
     [Header("Settings")]
+    [Tooltip("Camera crossfade duration when leaving a hide spot.")]
     public float blendDuration = 1.0f;
+    [Tooltip("Seconds after Exit starts before the camera blends back to the player. Door animation keeps playing.")]
+    [Min(0f)]
+    public float exitCameraBlendStartTime = 0.35f;
     public float animationDelay = 0.2f;
     [Tooltip("Seconds after hide starts before the player moves to the hidden layer. Enter animation plays immediately.")]
     [Min(0f)]
     public float stealthLayerDelay = 1f;
     [Tooltip("Restore the player layer immediately when exit begins (before the exit animation finishes).")]
     public bool restoreLayerOnExitStart = true;
+    [Tooltip("Seconds after exit starts before the player spotlight fades back in. Tune per hide spot.")]
+    [Min(0f)]
+    public float restoreLightInSeconds = 1.5f;
+
+    [Header("Door SFX")]
+    [SerializeField] AudioClip doorOpenSfx;
+    [SerializeField] AudioClip doorCloseSfx;
+    [SerializeField] float doorSfxVolume = 1f;
+    [Tooltip("Seconds after Enter starts before playing the open SFX.")]
+    [Min(0f)]
+    [SerializeField] float doorOpenSfxDelay = 0.2f;
+    [Tooltip("Seconds after Exit starts before playing the close SFX.")]
+    [Min(0f)]
+    [SerializeField] float doorCloseSfxDelay = 0.2f;
 
     private Transform activePivot;
     private Animator activeAnimator;
@@ -216,8 +234,11 @@ public class HidingSpot : MonoBehaviour, IInteractable
         HidingCameraSystem.Instance.SetActive(false);
         HidingCameraSystem.Instance.Detach();
 
+        SetHideLighting(player, false);
+
         hider.SetVisuals(true);
         hider.SetHiddenState(false, null);
+        hider.SetHidingEngaged(false);
         if (!captured)
             hider.EnableControls();
 
@@ -258,6 +279,16 @@ public class HidingSpot : MonoBehaviour, IInteractable
             return false;
         }
 
+        var hidingStamina = player.GetComponent<HidingStamina>();
+        if (hidingStamina != null && !hidingStamina.CanEnterHide)
+        {
+            if (hidingStamina.IsOnCooldown)
+                HudManager.Instance?.ShowSubtitle("I have to catch my breath first.", 2.5f);
+            else
+                HudManager.Instance?.ShowSubtitle("I am too exhausted to hide.", 2.5f);
+            return false;
+        }
+
         if (rightPivot == null)
         {
             activePivot = leftPivot;
@@ -291,6 +322,10 @@ public class HidingSpot : MonoBehaviour, IInteractable
         originalLayerIndex = player.layer;
         playerRef = player;
 
+        hider.SetHidingEngaged(true);
+
+        SetHideLighting(player, true);
+
         HidingCameraSystem.Instance.AttachToPivot(activePivot);
         HidingCameraSystem.Instance.SetActive(true);
         hider.DisableControlsOnly();
@@ -300,6 +335,8 @@ public class HidingSpot : MonoBehaviour, IInteractable
             activeAnimator.Play("Idle");
             activeAnimator.SetTrigger("Enter");
         }
+
+        StartCoroutine(PlayDoorSfxAfterDelay(doorOpenSfx, doorOpenSfxDelay));
 
         if (stealthLayerDelay > 0f)
             yield return new WaitForSeconds(stealthLayerDelay);
@@ -343,6 +380,9 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
         PlayerHider hider = player.GetComponent<PlayerHider>();
 
+        if (!forCapture)
+            StartCoroutine(RestoreHideLightAfterSeconds(player, restoreLightInSeconds));
+
         if (!forCapture && restoreLayerOnExitStart)
         {
             player.layer = originalLayerIndex;
@@ -353,25 +393,36 @@ public class HidingSpot : MonoBehaviour, IInteractable
             }
         }
 
+        float elapsed = 0f;
+        bool cameraHandoffStarted = false;
+
         if (activeAnimator != null)
         {
             float startOffset = 0f;
             AnimatorStateInfo stateInfo = activeAnimator.GetCurrentAnimatorStateInfo(0);
 
-            if (stateInfo.IsName("Enter"))
-            {
-                if (stateInfo.normalizedTime < 1.0f)
-                    startOffset = 1.0f - stateInfo.normalizedTime;
-            }
+            if (stateInfo.IsName("Enter") && stateInfo.normalizedTime < 1.0f)
+                startOffset = 1.0f - stateInfo.normalizedTime;
 
             activeAnimator.Play("Exit", 0, startOffset);
-
             yield return null;
 
-            if (!forCapture)
+            StartCoroutine(PlayDoorSfxAfterDelay(doorCloseSfx, doorCloseSfxDelay));
+
+            AnimatorStateInfo exitState = activeAnimator.GetCurrentAnimatorStateInfo(0);
+            float exitDuration = exitState.length / Mathf.Max(0.01f, Mathf.Abs(exitState.speed));
+
+            while (elapsed < exitDuration)
             {
-                yield return new WaitUntil(() =>
-                    activeAnimator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f);
+                elapsed += Time.deltaTime;
+
+                if (!forCapture && !cameraHandoffStarted && elapsed >= exitCameraBlendStartTime)
+                {
+                    cameraHandoffStarted = true;
+                    HidingCameraSystem.Instance.SetActive(false);
+                }
+
+                yield return null;
             }
         }
         else if (!forCapture)
@@ -392,24 +443,46 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
         if (forCapture)
         {
-            // Keep hiding camera at pivot until capture/jumpscare finishes cleanup.
             isOccupied = false;
             isToggling = false;
             yield break;
         }
 
-        HidingCameraSystem.Instance.SetActive(false);
+        if (activeAnimator == null || !cameraHandoffStarted)
+            HidingCameraSystem.Instance.SetActive(false);
 
-        yield return new WaitForSeconds(blendDuration);
+        if (activeAnimator != null)
+        {
+            float blendElapsed = cameraHandoffStarted ? elapsed - exitCameraBlendStartTime : 0f;
+            float blendRemaining = Mathf.Max(0f, blendDuration - blendElapsed);
+            if (blendRemaining > 0f)
+                yield return new WaitForSeconds(blendRemaining);
+        }
+        else if (blendDuration > 0f)
+        {
+            yield return new WaitForSeconds(blendDuration);
+        }
 
-        if (hider != null) hider.EnableControls();
+        if (hider != null)
+            hider.EnableControls();
+
+        if (hider != null)
+            hider.SetHidingEngaged(false);
+
         HidingCameraSystem.Instance.Detach();
 
         isOccupied = false;
         isToggling = false;
-
         activePivot = null;
         activeAnimator = null;
+    }
+
+    private IEnumerator RestoreHideLightAfterSeconds(GameObject player, float seconds)
+    {
+        if (seconds > 0f)
+            yield return new WaitForSeconds(seconds);
+
+        SetHideLighting(player, false);
     }
 
     public static void EndHidingCameraForCapture()
@@ -417,5 +490,43 @@ public class HidingSpot : MonoBehaviour, IInteractable
         if (HidingCameraSystem.Instance == null) return;
         HidingCameraSystem.Instance.SetActive(false);
         HidingCameraSystem.Instance.Detach();
+    }
+
+    static void SetHideLighting(GameObject player, bool suppressed)
+    {
+        if (player == null)
+            return;
+
+        var dimmer = player.GetComponent<PlayerSpotlightWallDimmer>();
+        if (dimmer != null)
+            dimmer.SetHideLightSuppressed(suppressed);
+    }
+
+    public void PlayDoorOpenSfx(Vector3 worldPosition)
+    {
+        if (doorOpenSfx == null || SoundManager.Instance == null)
+            return;
+
+        SoundManager.Instance.PlaySFXAt(doorOpenSfx, worldPosition, doorSfxVolume);
+    }
+
+    public void PlayDoorCloseSfx(Vector3 worldPosition)
+    {
+        if (doorCloseSfx == null || SoundManager.Instance == null)
+            return;
+
+        SoundManager.Instance.PlaySFXAt(doorCloseSfx, worldPosition, doorSfxVolume);
+    }
+
+    IEnumerator PlayDoorSfxAfterDelay(AudioClip clip, float seconds)
+    {
+        if (clip == null || SoundManager.Instance == null)
+            yield break;
+
+        if (seconds > 0f)
+            yield return new WaitForSeconds(seconds);
+
+        Vector3 pos = activePivot != null ? activePivot.position : transform.position;
+        SoundManager.Instance.PlaySFXAt(clip, pos, doorSfxVolume);
     }
 }

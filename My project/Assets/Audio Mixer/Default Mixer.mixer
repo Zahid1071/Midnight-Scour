@@ -47,6 +47,24 @@ AudioMixerEffectController:
   m_SendTarget: {fileID: 0}
   m_EnableWetMix: 0
   m_Bypass: 0
+--- !u!244 &-182781486193485369
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: b3da83ad4dae10e4ba6bd478130936a2
+  m_EffectName: Lowpass
+  m_MixLevel: 9a5c3d7014f510247ba119cf4dfbddd0
+  m_Parameters:
+  - m_ParameterName: Cutoff freq
+    m_GUID: 5df39c94c4a1f38458ee5c3eec1fe11a
+  - m_ParameterName: Resonance
+    m_GUID: 1cf271de554720e42bbb751018a044f1
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
 --- !u!241 &24100000
 AudioMixerController:
   m_ObjectHideFlags: 0
@@ -126,14 +144,24 @@ AudioMixerSnapshotController:
   m_AudioMixer: {fileID: 24100000}
   m_SnapshotID: d0d6d9fd6b757194690e5a442a8e4c68
   m_FloatValues:
-    bf23c411289a33f459fdee1752fcb610: 0
+    4a95b910af1f9a14c8efe98f3e957fec: 1
+    8b62c9f0267865b4b925023e7c359574: 6794
+    bf23c411289a33f459fdee1752fcb610: -10
     0003454222b1c9f40bfa6d62a97c32e7: 1
+    521a76b21cb6b544a9a8c164afffce41: 100
+    c1f950134e6f39a4c857441d0f1c51cd: 0
     659f1aa33e3d4674db8e4e73efffa06a: 1
     70b4b974ea27057409fef8fd4c481242: 1368
-    42bb0eb66323caf4cb24441ebea23db4: 0
+    5df39c94c4a1f38458ee5c3eec1fe11a: 2000
+    ef2b60058cce6c544a8d466854adef9c: 216
+    42bb0eb66323caf4cb24441ebea23db4: -0.23287517
+    b73af838b92cb5740b1ccbb3d34683d0: 0
     72bcff783fb524a448c2e17ad289b73d: 1
+    46a0f679c5e2fee449f76573a1c27caa: 2042
     33d7e8f994cecee4699d9363a5dedbef: 0
     3cb9c7bb273dd4944aeb71566c99e5f7: 0
+    1cf271de554720e42bbb751018a044f1: 1
+    2ade47dfc7ab29042a9214cfaf457fa9: 100
   m_TransitionOverrides: {}
 --- !u!244 &238327034020824986
 AudioMixerEffectController:
@@ -164,6 +192,7 @@ AudioMixerGroupController:
   m_Send: 00000000000000000000000000000000
   m_Effects:
   - {fileID: -1391964017915092837}
+  - {fileID: -182781486193485369}
   m_UserColorIndex: 0
   m_Mute: 0
   m_Solo: 0

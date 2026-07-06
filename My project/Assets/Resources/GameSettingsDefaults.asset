@@ -20,7 +20,7 @@ MonoBehaviour:
     masterVolume: 0.8
     musicVolume: 0.2
     sfxVolume: 0.8
-    mouseSensitivity: 0.2
+    mouseSensitivity: 0.1
     invertYAxis: 0
     brightness: 3
     difficultyIndex: 1

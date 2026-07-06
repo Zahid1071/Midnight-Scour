@@ -302,7 +302,7 @@ namespace FS_Atmo
                 yield break;
 
             if (handleOpenSound != null)
-                SoundManager.Instance.PlaySFXAt(handleOpenSound, primaryPosition,.4f);
+                SoundManager.Instance.PlaySFXAt(handleOpenSound, primaryPosition,.2f);
 
             if (openSound != null)
             {

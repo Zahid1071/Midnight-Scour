@@ -13,51 +13,47 @@ using UnityEngine.InputSystem;
 /// </summary>
 public class GameplayHintManager : MonoBehaviour
 {
-    public const string BoneDrop = "bone_drop";
-    public const string BoneGumCombine = "bone_gum_combine";
-    public const string HidingSpot = "hiding_spot";
-    public const string Sound = "sound";
-
-    static readonly Dictionary<string, int> HintWeights = new()
-    {
-        { HidingSpot, 10 },
-        { Sound, 20 },
-        { BoneDrop, 30 },
-        { BoneGumCombine, 40 },
-    };
-
-    static readonly HashSet<string> TimedHints = new()
-    {
-        HidingSpot,
-        Sound,
-    };
-
     public static GameplayHintManager Instance { get; private set; }
 
     [Serializable]
     struct HintEntry
     {
+        [Tooltip("Name used by Show() and the trigger fields below. Can be anything you like.")]
         public string id;
         public CanvasGroup canvasGroup;
+        [Tooltip("Higher priority replaces lower. Equal or higher cuts the current hint immediately.")]
+        public int priority;
     }
 
-    [Header("Panels — match id to each hint box's Canvas Group")]
+    [Header("Panels")]
     [SerializeField] HintEntry[] panels;
+    [Tooltip("How long hint panels take to fade in or out.")]
     [SerializeField] float fadeDuration = 0.25f;
 
     [Header("Transient hints")]
-    [SerializeField] float transientHintDurationSeconds = 60f;
+    [Tooltip("Shown hints automatically hide after this many seconds.")]
+    [SerializeField] float transientHintDurationSeconds = 30f;
 
     [Header("Show spring")]
+    [Tooltip("Scale when the hint first pops in. 1 = normal size; lower = starts smaller.")]
     [SerializeField] float springStartScale = 0.6f;
+    [Tooltip("Spring pull toward normal size. Higher = faster, snappier bounce.")]
     [SerializeField] float springStiffness = 300f;
+    [Tooltip("How fast the bounce settles. Lower = more wobbles; higher = dies out quicker.")]
     [SerializeField] float springDamping = 8f;
+    [Tooltip("Initial shove into the bounce. Higher = bigger first overshoot past normal size.")]
     [SerializeField] float springInitialVelocity = 7f;
 
     [Header("Background flash")]
-    [SerializeField] float flashDuration = 0.45f;
+    [Tooltip("Flash strength at each scale peak. 0 = no flash, 1 = full blend to peak color.")]
     [SerializeField] float flashIntensity = 0.55f;
+    [Tooltip("How much brighter/whiter the hint background gets at each flash peak.")]
     [SerializeField] float flashBrightnessBoost = 0.12f;
+    [Tooltip("Extra multiplier on flash strength if peaks feel too subtle.")]
+    [SerializeField] float springFlashStrength = 1.25f;
+    [Tooltip("Bright flashes on scale peaks, then stops. 0 = never flash. Spring bounce still runs.")]
+    [Min(0)]
+    [SerializeField] int maxFlashCount = 3;
 
     [Header("Items (optional — matched by asset or name if unset)")]
     [SerializeField] InventoryItem boneItem;
@@ -65,13 +61,21 @@ public class GameplayHintManager : MonoBehaviour
     [SerializeField] InventoryItem gummyBoneItem;
 
     [Header("Combine hint")]
+    [Tooltip("Seconds after picking up bone + gum before the combine hint can appear.")]
     [SerializeField] float combineHintDelaySeconds = 5f;
 
+    [Header("Triggered hints — Id must match a panel Id above")]
+    [SerializeField] string hidingSpotHintId = "Hiding Spot";
+    [SerializeField] string soundHintId = "Sound";
+    [SerializeField] string boneDropHintId = "Drop Item";
+    [SerializeField] string boneGumCombineHintId = "Bone Gum Combine";
+    [SerializeField] string noteHintId = "Note";
+
     readonly Dictionary<string, CanvasGroup> _groups = new();
+    readonly Dictionary<string, int> _priorities = new();
     readonly Dictionary<string, Image> _backgrounds = new();
     readonly Dictionary<string, Color> _baseBackgroundColors = new();
     readonly Dictionary<string, Coroutine> _springRoutines = new();
-    readonly Dictionary<string, Coroutine> _flashRoutines = new();
     readonly Dictionary<string, Coroutine> _autoHideRoutines = new();
     readonly List<string> _pendingHints = new();
 
@@ -87,6 +91,14 @@ public class GameplayHintManager : MonoBehaviour
     bool _boneDropHintVisible;
     bool _hidingSpotHintShown;
     bool _soundHintShown;
+
+    [Header("Note hint (optional)")]
+    [Tooltip("If enabled, shows the note hint every N seconds.")]
+    [SerializeField] bool noteHintEnabled = true;
+    [Tooltip("Seconds between note hint reminders.")]
+    [Min(1f)]
+    [SerializeField] float noteHintIntervalSeconds = 20f;
+    float _noteHintElapsed;
 
     void Awake()
     {
@@ -126,14 +138,21 @@ public class GameplayHintManager : MonoBehaviour
         StopCombineTimerCoroutine();
         StopTransitionRoutine();
         StopAllSpringRoutines();
-        StopAllFlashRoutines();
         StopAllAutoHideRoutines();
     }
 
     void Update()
     {
+        if (PlayerControlGate.IsInputBlocked)
+        {
+            if (_activeHintId != null || _pendingHints.Count > 0)
+                HideAll();
+            return;
+        }
+
         EvaluateFirstShiftHint();
         EvaluateCombineTimer();
+        TickNoteHint();
     }
 
     public void NotifyCageDoorOpenedFirstTime()
@@ -141,7 +160,7 @@ public class GameplayHintManager : MonoBehaviour
         if (_hidingSpotHintShown)
             return;
 
-        if (Show(HidingSpot))
+        if (Show(hidingSpotHintId))
             _hidingSpotHintShown = true;
     }
 
@@ -150,8 +169,20 @@ public class GameplayHintManager : MonoBehaviour
         if (_soundHintShown || !WasShiftPressedThisFrame())
             return;
 
-        if (Show(Sound))
+        if (!IsPlayerOnPlayerLayer())
+            return;
+
+        if (Show(soundHintId))
             _soundHintShown = true;
+    }
+
+    static bool IsPlayerOnPlayerLayer()
+    {
+        var player = GameObject.FindWithTag("Player");
+        if (player == null)
+            return false;
+
+        return player.layer == LayerMask.NameToLayer("Player");
     }
 
     static bool WasShiftPressedThisFrame()
@@ -166,6 +197,7 @@ public class GameplayHintManager : MonoBehaviour
     void RegisterPanels()
     {
         _groups.Clear();
+        _priorities.Clear();
         _backgrounds.Clear();
         _baseBackgroundColors.Clear();
 
@@ -178,6 +210,7 @@ public class GameplayHintManager : MonoBehaviour
                 continue;
 
             _groups[entry.id] = entry.canvasGroup;
+            _priorities[entry.id] = entry.priority;
 
             var background = entry.canvasGroup.GetComponent<Image>();
             if (background == null)
@@ -193,7 +226,7 @@ public class GameplayHintManager : MonoBehaviour
         _combineFinished = true;
         _combineElapsed = 0f;
         StopCombineTimerCoroutine();
-        Hide(BoneGumCombine);
+        Hide(boneGumCombineHintId);
     }
 
     void EvaluateHints()
@@ -209,14 +242,14 @@ public class GameplayHintManager : MonoBehaviour
 
         if (HasRegularBone())
         {
-            if (Show(BoneDrop))
+            if (Show(boneDropHintId))
                 _boneDropHintVisible = true;
             return;
         }
 
         if (_boneDropHintVisible)
         {
-            Hide(BoneDrop);
+            Hide(boneDropHintId);
             _boneDropHintVisible = false;
             _boneDropHintFinished = true;
         }
@@ -228,7 +261,7 @@ public class GameplayHintManager : MonoBehaviour
         {
             _combineElapsed = 0f;
             StopCombineTimerCoroutine();
-            Hide(BoneGumCombine);
+            Hide(boneGumCombineHintId);
             return;
         }
 
@@ -271,7 +304,7 @@ public class GameplayHintManager : MonoBehaviour
         if (_combineFinished || HasCombinedStickyBone())
             yield break;
 
-        if (Show(BoneGumCombine))
+        if (Show(boneGumCombineHintId))
             _combineHintShown = true;
     }
 
@@ -286,6 +319,9 @@ public class GameplayHintManager : MonoBehaviour
 
     public bool Show(string hintId)
     {
+        if (PlayerControlGate.IsInputBlocked)
+            return false;
+
         if (string.IsNullOrEmpty(hintId) || !_groups.TryGetValue(hintId, out var group) || group == null)
         {
             Debug.LogWarning($"[GameplayHintManager] No panel registered for id '{hintId}'.");
@@ -295,40 +331,29 @@ public class GameplayHintManager : MonoBehaviour
         if (hintId == _activeHintId || IsPending(hintId))
             return true;
 
-        int newWeight = GetWeight(hintId);
-
         if (_transitionRoutine != null)
-        {
-            if (_activeHintId != null && newWeight > GetWeight(_activeHintId))
-            {
-                RemovePending(hintId);
-                StopTransitionRoutine();
-                BeginTransition(_activeHintId, hintId);
-            }
-            else
-            {
-                InsertPending(hintId);
-            }
+            StopTransitionRoutine();
 
+        if (_activeHintId == null)
+        {
+            RemovePending(hintId);
+            BeginTransition(null, hintId);
             return true;
         }
 
-        if (_activeHintId != null)
-        {
-            if (newWeight > GetWeight(_activeHintId))
-            {
-                RemovePending(hintId);
-                BeginTransition(_activeHintId, hintId);
-            }
-            else
-            {
-                InsertPending(hintId);
-            }
+        int newPriority = GetWeight(hintId);
+        int activePriority = GetWeight(_activeHintId);
 
-            return true;
+        if (newPriority >= activePriority)
+        {
+            RemovePending(hintId);
+            BeginInstantSwap(_activeHintId, hintId);
+        }
+        else
+        {
+            InsertPending(hintId);
         }
 
-        BeginTransition(null, hintId);
         return true;
     }
 
@@ -350,7 +375,6 @@ public class GameplayHintManager : MonoBehaviour
     {
         StopTransitionRoutine();
         StopAllSpringRoutines();
-        StopAllFlashRoutines();
         StopAllAutoHideRoutines();
         _pendingHints.Clear();
         _activeHintId = null;
@@ -372,13 +396,44 @@ public class GameplayHintManager : MonoBehaviour
         _transitionRoutine = StartCoroutine(TransitionRoutine(fromHintId, toHintId));
     }
 
+    // Equal or higher priority: cut the current hint immediately, then show the new one.
+    void BeginInstantSwap(string fromHintId, string toHintId)
+    {
+        StopTransitionRoutine();
+
+        if (!string.IsNullOrEmpty(fromHintId))
+        {
+            CancelAutoHide(fromHintId);
+            StopSpring(fromHintId);
+
+            if (_groups.TryGetValue(fromHintId, out var fromGroup) && fromGroup != null)
+            {
+                fromGroup.alpha = 0f;
+                fromGroup.transform.localScale = Vector3.one;
+                ResetBackgroundColor(fromHintId);
+            }
+        }
+
+        _activeHintId = null;
+
+        if (!string.IsNullOrEmpty(toHintId) && _groups.TryGetValue(toHintId, out var toGroup) && toGroup != null)
+        {
+            toGroup.gameObject.SetActive(true);
+            toGroup.alpha = 1f;
+            StartSpring(toHintId, toGroup.transform);
+            _activeHintId = toHintId;
+            ScheduleAutoHide(toHintId);
+        }
+
+        TryShowNextPending();
+    }
+
     IEnumerator TransitionRoutine(string fromHintId, string toHintId)
     {
         if (!string.IsNullOrEmpty(fromHintId))
         {
             CancelAutoHide(fromHintId);
             StopSpring(fromHintId);
-            StopBackgroundFlash(fromHintId);
 
             if (_groups.TryGetValue(fromHintId, out var fromGroup) && fromGroup != null)
             {
@@ -395,7 +450,6 @@ public class GameplayHintManager : MonoBehaviour
         {
             toGroup.gameObject.SetActive(true);
             StartSpring(toHintId, toGroup.transform);
-            StartBackgroundFlash(toHintId);
             yield return FadeGroup(toGroup, 1f);
             toGroup.alpha = 1f;
             _activeHintId = toHintId;
@@ -408,9 +462,6 @@ public class GameplayHintManager : MonoBehaviour
 
     void ScheduleAutoHide(string hintId)
     {
-        if (!TimedHints.Contains(hintId))
-            return;
-
         CancelAutoHide(hintId);
         _autoHideRoutines[hintId] = StartCoroutine(AutoHideAfterDelay(hintId));
     }
@@ -470,21 +521,70 @@ public class GameplayHintManager : MonoBehaviour
         if (target == null)
             yield break;
 
+        _backgrounds.TryGetValue(hintId, out var background);
+        Color baseColor = background != null ? GetBaseBackgroundColor(hintId, background) : default;
+        Color peakColor = background != null
+            ? new Color(
+                Mathf.Min(baseColor.r + flashBrightnessBoost, 1f),
+                Mathf.Min(baseColor.g + flashBrightnessBoost, 1f),
+                Mathf.Min(baseColor.b + flashBrightnessBoost, 1f),
+                Mathf.Min(baseColor.a + 0.18f, 1f))
+            : baseColor;
+
         float scale = springStartScale;
         float velocity = springInitialVelocity;
         target.localScale = Vector3.one * scale;
+
+        bool flashActive = false;
+        float lastPeakDelta = 0.001f;
+        int flashPeaksSeen = 0;
 
         while (Mathf.Abs(scale - 1f) > 0.001f || Mathf.Abs(velocity) > 0.001f)
         {
             float dt = Time.unscaledDeltaTime;
             float acceleration = -springStiffness * (scale - 1f) - springDamping * velocity;
+            float prevVelocity = velocity;
             velocity += acceleration * dt;
             scale += velocity * dt;
             target.localScale = Vector3.one * scale;
+
+            if (background != null)
+            {
+                // Peak detected (moving up, then starts moving down)
+                if (prevVelocity > 0f && velocity <= 0f && scale > 1f)
+                {
+                    flashPeaksSeen++;
+                    if (flashPeaksSeen <= maxFlashCount)
+                    {
+                        flashActive = true;
+                        lastPeakDelta = Mathf.Max(0.001f, scale - 1f);
+                    }
+                    else
+                    {
+                        flashActive = false;
+                    }
+                }
+
+                // Once we returned to/below normal size, stop the current flash window.
+                if (scale <= 1f)
+                    flashActive = false;
+
+                float t = 0f;
+                if (flashActive && scale > 1f)
+                {
+                    float normalized = (scale - 1f) / lastPeakDelta;
+                    t = Mathf.Clamp01(normalized) * flashIntensity * springFlashStrength;
+                }
+
+                background.color = Color.Lerp(baseColor, peakColor, t);
+            }
+
             yield return null;
         }
 
         target.localScale = Vector3.one;
+        if (background != null)
+            background.color = baseColor;
         _springRoutines.Remove(hintId);
     }
 
@@ -500,6 +600,8 @@ public class GameplayHintManager : MonoBehaviour
 
         if (_groups.TryGetValue(hintId, out var group) && group != null)
             group.transform.localScale = Vector3.one;
+
+        ResetBackgroundColor(hintId);
     }
 
     void StopAllSpringRoutines()
@@ -514,64 +616,6 @@ public class GameplayHintManager : MonoBehaviour
         }
 
         _springRoutines.Clear();
-    }
-
-    void StartBackgroundFlash(string hintId)
-    {
-        StopBackgroundFlash(hintId);
-
-        if (!_backgrounds.TryGetValue(hintId, out var background) || background == null)
-            return;
-
-        _flashRoutines[hintId] = StartCoroutine(BackgroundFlashRoutine(hintId, background));
-    }
-
-    IEnumerator BackgroundFlashRoutine(string hintId, Image background)
-    {
-        Color baseColor = GetBaseBackgroundColor(hintId, background);
-        Color peakColor = new(
-            Mathf.Min(baseColor.r + flashBrightnessBoost, 1f),
-            Mathf.Min(baseColor.g + flashBrightnessBoost, 1f),
-            Mathf.Min(baseColor.b + flashBrightnessBoost, 1f),
-            Mathf.Min(baseColor.a + 0.18f, 1f));
-
-        float elapsed = 0f;
-
-        while (elapsed < flashDuration)
-        {
-            elapsed += Time.unscaledDeltaTime;
-            float wave = Mathf.Sin((elapsed / flashDuration) * Mathf.PI);
-            background.color = Color.Lerp(baseColor, peakColor, wave * flashIntensity);
-            yield return null;
-        }
-
-        background.color = baseColor;
-        _flashRoutines.Remove(hintId);
-    }
-
-    void StopBackgroundFlash(string hintId)
-    {
-        if (string.IsNullOrEmpty(hintId) || !_flashRoutines.TryGetValue(hintId, out var routine))
-            return;
-
-        if (routine != null)
-            StopCoroutine(routine);
-
-        _flashRoutines.Remove(hintId);
-        ResetBackgroundColor(hintId);
-    }
-
-    void StopAllFlashRoutines()
-    {
-        foreach (var kv in _flashRoutines)
-        {
-            if (kv.Value != null)
-                StopCoroutine(kv.Value);
-
-            ResetBackgroundColor(kv.Key);
-        }
-
-        _flashRoutines.Clear();
     }
 
     void ResetBackgroundColor(string hintId)
@@ -660,7 +704,51 @@ public class GameplayHintManager : MonoBehaviour
 
     static int GetWeight(string hintId)
     {
-        return HintWeights.TryGetValue(hintId, out int weight) ? weight : 0;
+        if (Instance != null && !string.IsNullOrEmpty(hintId) && Instance._priorities.TryGetValue(hintId, out int p))
+            return p;
+        return 0;
+    }
+
+    void TickNoteHint()
+    {
+        if (!noteHintEnabled || string.IsNullOrEmpty(noteHintId))
+            return;
+
+        _noteHintElapsed += Time.unscaledDeltaTime;
+        if (_noteHintElapsed < noteHintIntervalSeconds)
+            return;
+
+        _noteHintElapsed = 0f;
+
+        if (PlayerControlGate.IsInputBlocked)
+            return;
+
+        ShowPeriodicNote();
+    }
+
+    void ShowPeriodicNote()
+    {
+        if (string.IsNullOrEmpty(noteHintId) || !_groups.TryGetValue(noteHintId, out var group) || group == null)
+        {
+            Debug.LogWarning($"[GameplayHintManager] No panel registered for note hint id '{noteHintId}'.");
+            return;
+        }
+
+        RemovePending(noteHintId);
+
+        if (_activeHintId == noteHintId)
+        {
+            StopTransitionRoutine();
+            CancelAutoHide(noteHintId);
+            StopSpring(noteHintId);
+            group.gameObject.SetActive(true);
+            group.alpha = 1f;
+            StartSpring(noteHintId, group.transform);
+            ScheduleAutoHide(noteHintId);
+            return;
+        }
+
+        Show(noteHintId);
     }
 
     void StopTransitionRoutine()

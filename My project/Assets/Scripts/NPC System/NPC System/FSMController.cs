@@ -24,6 +24,13 @@ public class FSMController
     Transform _lastAmbushSpot;
     int _consecutiveSameAmbushCount;
 
+    Vector3 _ambushWaitPosition;
+    bool _ambushAtPost;
+    bool _ambushRustleArmed;
+    bool _ambushRustlePlayed;
+    float _ambushRustleDelay;
+    float _ambushRustleElapsed;
+
     public FSMController(NPCController controller)
     {
         npc = controller;
@@ -163,6 +170,28 @@ public class FSMController
 
         npc.StopCoroutine(_ambushRoutineCo);
         _ambushRoutineCo = null;
+        EndAmbushPresentation();
+    }
+
+    void ResetAmbushRustleState()
+    {
+        _ambushRustleArmed = false;
+        _ambushRustlePlayed = false;
+        _ambushRustleDelay = 0f;
+        _ambushRustleElapsed = 0f;
+    }
+
+    void EndAmbushPresentation()
+    {
+        _ambushAtPost = false;
+        ResetAmbushRustleState();
+        npc.poiLookDirector?.UnlockLookFromPlayer();
+    }
+
+    void BeginAmbushPresentation()
+    {
+        ResetAmbushRustleState();
+        npc.poiLookDirector?.LockLookToPlayer();
     }
 
     IEnumerator RunAmbushRoutine()
@@ -196,6 +225,10 @@ public class FSMController
 
             case NPCController.AIState.Ambush:
                 agent.speed = walkingSpeed;
+                npc.poiLookDirector?.TickLockedPlayerLook();
+                TickAmbushRustle();
+                if (_ambushAtPost)
+                    TickAmbushBodyRotationTowardsPlayer();
                 break;
 
             case NPCController.AIState.Chase:
@@ -316,6 +349,8 @@ public class FSMController
             yield break;
         }
 
+        BeginAmbushPresentation();
+
         string zoneID = data.homeID;
 
         Vector3 center =
@@ -331,6 +366,7 @@ public class FSMController
         Transform ambushPoint = PickAmbushPoint(zoneRooms);
         if (ambushPoint == null)
         {
+            EndAmbushPresentation();
             SetState(NPCController.AIState.Natural);
             yield break;
         }
@@ -347,12 +383,18 @@ public class FSMController
         yield return WaitUntilNavArrived(moveAgent, .4f);
 
         if (npc.currentState != NPCController.AIState.Ambush)
+        {
+            EndAmbushPresentation();
             yield break;
+        }
 
         StopAgentMovement();
 
         float alignDuration = npc.interaction != null ? npc.interaction.rotationDuration : 0.4f;
         yield return AlignRootToTransform(npc.transform, ambushPoint, alignDuration);
+
+        _ambushWaitPosition = ambushPoint.position;
+        _ambushAtPost = true;
 
         float waitTime = Random.Range(data.ambushWaitRange.x, data.ambushWaitRange.y);
         float confirm = Mathf.Max(0f, data.vision.confirmSeconds * 0.5f);
@@ -362,7 +404,10 @@ public class FSMController
         while (timer < waitTime)
         {
             if (npc.currentState != NPCController.AIState.Ambush)
+            {
+                EndAmbushPresentation();
                 yield break;
+            }
 
             timer += Time.deltaTime;
 
@@ -370,6 +415,7 @@ public class FSMController
             {
                 if (npc.perception.CanInstantConfirmVisiblePlayer())
                 {
+                    EndAmbushPresentation();
                     npc.BeginChaseFromPerception();
                     yield break;
                 }
@@ -377,6 +423,7 @@ public class FSMController
                 seenTimer += Time.deltaTime;
                 if (seenTimer >= confirm)
                 {
+                    EndAmbushPresentation();
                     npc.BeginChaseFromPerception();
                     yield break;
                 }
@@ -389,7 +436,79 @@ public class FSMController
             yield return null;
         }
 
+        EndAmbushPresentation();
         SetState(NPCController.AIState.Natural);
+    }
+
+    void TickAmbushBodyRotationTowardsPlayer()
+    {
+        Transform player = npc.perception != null ? npc.perception.PlayerTransform : null;
+        if (player == null)
+            return;
+
+        Transform root = npc.transform;
+        Vector3 toPlayer = player.position - root.position;
+        toPlayer.y = 0f;
+        if (toPlayer.sqrMagnitude < 0.01f)
+            return;
+
+        Vector3 forward = root.forward;
+        forward.y = 0f;
+        if (forward.sqrMagnitude < 0.01f)
+            return;
+
+        float angle = Vector3.Angle(forward.normalized, toPlayer.normalized);
+        if (angle <= npc.AmbushTurnAngleThreshold)
+            return;
+
+        Quaternion targetRot = Quaternion.LookRotation(toPlayer.normalized, Vector3.up);
+        float step = npc.AmbushTurnSpeed * Time.deltaTime;
+        root.rotation = Quaternion.RotateTowards(root.rotation, targetRot, step);
+    }
+
+    void TickAmbushRustle()
+    {
+        if (_ambushRustlePlayed || npc.AmbushMetalRustleSfx == null)
+            return;
+
+        if (!_ambushRustleArmed)
+        {
+            if (!IsPlayerOnPlayerLayer())
+                return;
+
+            _ambushRustleArmed = true;
+            _ambushRustleDelay = Random.Range(1f, 3f);
+            _ambushRustleElapsed = 0f;
+        }
+
+        _ambushRustleElapsed += Time.deltaTime;
+        if (_ambushRustleElapsed < _ambushRustleDelay)
+            return;
+
+        if (npc.currentState != NPCController.AIState.Ambush)
+            return;
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlaySFXAt(npc.AmbushMetalRustleSfx, npc.transform.position, npc.AmbushRustleVolume);
+
+        _ambushRustlePlayed = true;
+    }
+
+    bool IsAtAmbushPost()
+    {
+        if (!_ambushAtPost)
+            return false;
+
+        return Vector3.Distance(npc.transform.position, _ambushWaitPosition) <= npc.AmbushPositionTolerance;
+    }
+
+    static bool IsPlayerOnPlayerLayer()
+    {
+        var player = GameObject.FindWithTag("Player");
+        if (player == null)
+            return false;
+
+        return player.layer == LayerMask.NameToLayer("Player");
     }
 
     Transform PickAmbushPoint(List<Transform> zoneRooms)

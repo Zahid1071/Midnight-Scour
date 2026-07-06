@@ -293,6 +293,46 @@ public class SoundManager : MonoBehaviour
         _searchTensionSource.time = 0f;
     }
 
+    /// <summary>Fades music and SFX mixer buses to silence. Ambience is left playing.</summary>
+    public void FadeOutMusicAndSfx(float duration = 1.5f)
+    {
+        StopMusic(0.25f);
+        StopSearchTension();
+        _chaseMusicActive = false;
+
+        if (!mixer)
+            return;
+
+        StartCoroutine(FadeMixerParamsToSilence(duration, musicParam, sfxParam));
+    }
+
+    IEnumerator FadeMixerParamsToSilence(float duration, params string[] paramNames)
+    {
+        var startValues = new float[paramNames.Length];
+        for (int i = 0; i < paramNames.Length; i++)
+            mixer.GetFloat(paramNames[i], out startValues[i]);
+
+        if (duration <= 0f)
+        {
+            for (int i = 0; i < paramNames.Length; i++)
+                mixer.SetFloat(paramNames[i], -80f);
+            yield break;
+        }
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            for (int i = 0; i < paramNames.Length; i++)
+                mixer.SetFloat(paramNames[i], Mathf.Lerp(startValues[i], -80f, t));
+            yield return null;
+        }
+
+        for (int i = 0; i < paramNames.Length; i++)
+            mixer.SetFloat(paramNames[i], -80f);
+    }
+
     public void PlaySFX(AudioClip clip, float volume = 1f, float pitch = 1f)
     {
         if (!clip) return;

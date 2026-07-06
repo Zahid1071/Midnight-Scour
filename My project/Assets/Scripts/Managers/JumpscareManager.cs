@@ -10,6 +10,7 @@ public class JumpscareManager : MonoBehaviour
     public CinemachineCamera jumpscareCam;
 
     [SerializeField] private GameObject wishlistBanner;
+    [SerializeField] private DemoEndScreenUI demoEndScreen;
     [SerializeField] private string menuSceneName = "Main Menu";
     [SerializeField] private float endGameDelaySeconds = 4f;
 
@@ -28,6 +29,9 @@ public class JumpscareManager : MonoBehaviour
 
         if (wishlistBanner != null)
             wishlistBanner.SetActive(false);
+
+        if (demoEndScreen == null)
+            demoEndScreen = FindFirstObjectByType<DemoEndScreenUI>(FindObjectsInactive.Include);
     }
 
     public void TriggerJumpscare(Transform jumpscarePoint, Transform npcFace)
@@ -54,9 +58,21 @@ public class JumpscareManager : MonoBehaviour
 
     IEnumerator EndGameAfterDelay()
     {
-        yield return new WaitForSeconds(endGameDelaySeconds);
+        yield return new WaitForSecondsRealtime(endGameDelaySeconds);
 
         EndJumpscare();
+
+        if (demoEndScreen == null)
+            demoEndScreen = FindFirstObjectByType<DemoEndScreenUI>(FindObjectsInactive.Include);
+
+        if (DemoEndDirector.IsDemoFinaleActive && demoEndScreen != null)
+        {
+            if (wishlistBanner != null)
+                wishlistBanner.SetActive(false);
+
+            yield return StartCoroutine(demoEndScreen.WaitForExitRoutine());
+        }
+
         LoadMenuScene();
         _endGameRoutine = null;
     }
@@ -67,7 +83,7 @@ public class JumpscareManager : MonoBehaviour
             jumpscareCam.Priority = 0;
     }
 
-    void LoadMenuScene()
+    public void LoadMenuScene()
     {
         PlayerControlGate.Clear();
 

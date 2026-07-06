@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 347363445501941914}
   - component: {fileID: 4627939252604270034}
-  m_Layer: 3
+  m_Layer: 12
   m_Name: Breathing SFX
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -139,7 +139,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4135013735270702856}
   - component: {fileID: 4866319616214824650}
-  m_Layer: 3
+  m_Layer: 12
   m_Name: PlayerCameraRoot
   m_TagString: CinemachineTarget
   m_Icon: {fileID: 0}
@@ -189,7 +189,7 @@ GameObject:
   - component: {fileID: 5393215578589016641}
   - component: {fileID: 5393215578589016654}
   - component: {fileID: 5393215578589016655}
-  m_Layer: 3
+  m_Layer: 12
   m_Name: Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -273,7 +273,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5233345560498324799}
-  m_Layer: 3
+  m_Layer: 12
   m_Name: playerPOI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -319,7 +319,8 @@ GameObject:
   - component: {fileID: 750681375347046963}
   - component: {fileID: 8847291056384729103}
   - component: {fileID: 2242704982271436769}
-  m_Layer: 3
+  - component: {fileID: 5193847261059384721}
+  m_Layer: 12
   m_Name: PlayerCapsule
   m_TagString: Player
   m_Icon: {fileID: -964228994112308473, guid: 0000000000000000d000000000000000, type: 0}
@@ -367,7 +368,7 @@ CharacterController:
   m_Radius: 0.25
   m_SlopeLimit: 45
   m_StepOffset: 0.3
-  m_SkinWidth: 0.0001
+  m_SkinWidth: 0.1
   m_MinMoveDistance: 0
   m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!82 &422331346628894323
@@ -703,6 +704,8 @@ MonoBehaviour:
   runThreshold: 3
   walkThreshold: 2
   sneakThreshold: 0.1
+  maxHearingDistance: 15
+  minHearingDistance: 5
 --- !u!114 &6319191353915927965
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -836,3 +839,33 @@ MonoBehaviour:
   dimSpeed: 10
   restoreSpeed: 6
   dimWhileHidden: 1
+--- !u!114 &5193847261059384721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8616685848737228372}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8c3f1e29b4d6a847c0e5f2d8b7a9134, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHideSeconds: 30
+  cooldownSeconds: 3
+  regenSeconds: 8
+  staminaPanel: {fileID: 0}
+  staminaSlider: {fileID: 0}
+  staminaFillImage: {fileID: 0}
+  fullColor: {r: 0.45, g: 0.95, b: 0.5, a: 1}
+  emptyColor: {r: 0.95, g: 0.28, b: 0.22, a: 1}
+  maxBarShakeStrength: 5
+  shakeStartStamina: 0.5
+  hidingCameraNoise: {fileID: 0}
+  maxAmplitudeMultiplier: 2
+  maxFrequencyMultiplier: 7
+  noiseFadeSeconds: 1.5
+  breathingSource: {fileID: 4627939252604270034}
+  outOfBreathClip: {fileID: 8300000, guid: adc28a62c2467fa47af40d3c3e629c8b, type: 3}
+  outOfBreathStaminaThreshold: 0.1
+  barFadeOutStartStamina: 0.15

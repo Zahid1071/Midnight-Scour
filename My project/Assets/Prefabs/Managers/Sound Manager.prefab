@@ -64,7 +64,7 @@ MonoBehaviour:
   chaseMusic: {fileID: 8300000, guid: 6f8ac1fb6c4da43309fc6f2608f82ab6, type: 3}
   captiveLayerIndex: 12
   gameplayMusicFade: 0.5
-  defaultAmbience: {fileID: 0}
+  defaultAmbience: {fileID: 8300000, guid: f6217049e48b14f49a471ebd1b0fccb5, type: 3}
   uiClickClip: {fileID: 8300000, guid: 29c9b7f66b2ae3f47882d7d526ecd150, type: 3}
   uiHoverClip: {fileID: 8300000, guid: 438f6a52fe6be9641b074b55236b9ef6, type: 3}
   actionFailClip: {fileID: 8300000, guid: 72ae4b80546a8b74d966135c77d4a680, type: 3}

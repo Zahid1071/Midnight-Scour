@@ -51,18 +51,21 @@ public sealed class PlayerSpotlightWallDimmer : MonoBehaviour
     [SerializeField] private float restoreSpeed = 6f;
 
     [Header("Hiding")]
-    [Tooltip("If true, force the light to 0 while the player is hidden in a hide spot.")]
     [SerializeField] private bool dimWhileHidden = true;
 
     private float _currentIntensity;
     private Collider[] _selfColliders;
-    private PlayerHider _playerHider;
+    private bool _hideLightSuppressed;
+
+    public void SetHideLightSuppressed(bool suppressed)
+    {
+        _hideLightSuppressed = suppressed;
+    }
 
     private void Awake()
     {
         ResolveReferences();
         _selfColliders = ignoreSelf ? GetComponentsInChildren<Collider>(true) : null;
-        TryGetComponent(out _playerHider);
     }
 
     private void OnEnable()
@@ -97,11 +100,11 @@ public sealed class PlayerSpotlightWallDimmer : MonoBehaviour
         float normalI = Mathf.Max(0f, normalIntensity);
         float minI = Mathf.Clamp(minIntensity, 0f, normalI);
 
-        bool isHidden = dimWhileHidden && _playerHider != null && _playerHider.isHidden;
-        bool shouldDim = !isHidden && IsWallFacePalm();
+        bool forceHideLight = dimWhileHidden && _hideLightSuppressed;
+        bool shouldDim = !forceHideLight && IsWallFacePalm();
 
-        float target = isHidden ? 0f : (shouldDim ? minI : normalI);
-        float speed = isHidden ? dimSpeed : (shouldDim ? dimSpeed : restoreSpeed);
+        float target = forceHideLight ? 0f : (shouldDim ? minI : normalI);
+        float speed = forceHideLight ? dimSpeed : (shouldDim ? dimSpeed : restoreSpeed);
 
         if (speed <= 0f)
         {

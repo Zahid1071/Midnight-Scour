@@ -5,6 +5,8 @@ public class Cage : MonoBehaviour
 {
     [Header("References")]
     public SimpleOpenClose cageDoor;
+    [Tooltip("Basement-side pre-point for the cage door. Auto-finds DoorController.prePointA if unset.")]
+    public Transform basementSidePrePoint;
     public bool isOccupied = false;
 
     // Hardcoded layer ID as requested
@@ -23,6 +25,10 @@ public class Cage : MonoBehaviour
 
     private void Update()
     {
+        // If the player starts inside the trigger (e.g. scene start/load),
+        // OnTriggerEnter may never fire, so we re-detect occupancy cheaply.
+        EnsureOccupancy();
+
         if (cageDoor != null)
         {
             if (cageDoor.objectOpen && !_doorWasOpen)
@@ -52,8 +58,48 @@ public class Cage : MonoBehaviour
         // Only assign if different to avoid overhead
         if (playerRef.layer != targetLayer)
         {
+            bool becameCaptive = targetLayer == CAPTIVE_LAYER && playerRef.layer != CAPTIVE_LAYER;
             playerRef.layer = targetLayer;
+
+            if (becameCaptive)
+                RedirectNpcHearingAwayFromCage();
         }
+    }
+
+    void RedirectNpcHearingAwayFromCage()
+    {
+        Transform prePoint = ResolveBasementSidePrePoint();
+        if (prePoint == null)
+            return;
+
+        PerceptionController.RedirectAllLastKnownPositions(prePoint.position);
+    }
+
+    Transform ResolveBasementSidePrePoint()
+    {
+        if (basementSidePrePoint != null)
+            return basementSidePrePoint;
+
+        if (cageDoor != null)
+        {
+            var doorController = cageDoor.GetComponentInParent<DoorController>();
+            if (doorController != null && doorController.prePointA != null)
+                return doorController.prePointA;
+        }
+
+        var transforms = GetComponentsInChildren<Transform>(true);
+        for (int i = 0; i < transforms.Length; i++)
+        {
+            Transform t = transforms[i];
+            if (t == null)
+                continue;
+
+            string name = t.name.Trim();
+            if (name.Equals("PrePointA", System.StringComparison.OrdinalIgnoreCase))
+                return t;
+        }
+
+        return null;
     }
 
     private bool IsCageVisibleToAnyNPC()
@@ -119,5 +165,32 @@ public class Cage : MonoBehaviour
 
             playerRef = null;
         }
+    }
+
+    void EnsureOccupancy()
+    {
+        if (isOccupied && playerRef != null)
+            return;
+
+        Collider triggerCol = GetComponent<Collider>();
+        if (triggerCol == null)
+            return;
+
+        // Must be a trigger volume for this to make sense.
+        if (!triggerCol.isTrigger)
+            return;
+
+        var player = GameObject.FindWithTag("Player");
+        if (player == null)
+            return;
+
+        Vector3 p = player.transform.position;
+        if (!triggerCol.bounds.Contains(p))
+            return;
+
+        // Treat as captured/inside.
+        playerRef = player.transform.root != null ? player.transform.root.gameObject : player;
+        originalLayerIndex = playerRef.layer;
+        isOccupied = true;
     }
 }

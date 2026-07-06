@@ -351,6 +351,39 @@ public class PerceptionController : MonoBehaviour
         npc.GetComponent<SuspicionSystem>()?.AddFootstepSuspicion(footstepSuspicionToAdd);
     }
 
+    /// <summary>
+    /// Moves the NPC's last-heard/last-known point (e.g. when the player hides in the cage).
+    /// </summary>
+    public void RedirectLastKnownPosition(Vector3 worldPosition)
+    {
+        LastKnownPlayerPosition = worldPosition;
+
+        string home = npc?.interaction?.data?.homeID ?? string.Empty;
+        if (NPCAnchorManager.Instance != null)
+        {
+            Transform anchor = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(worldPosition, home);
+            if (anchor != null)
+                searchTarget = anchor;
+        }
+
+        if (npc != null)
+            npc._lastChaseTarget = new Vector3(float.PositiveInfinity, 0f, 0f);
+    }
+
+    public static void RedirectAllLastKnownPositions(Vector3 worldPosition)
+    {
+#if UNITY_2023_1_OR_NEWER
+        var perceivers = UnityEngine.Object.FindObjectsByType<PerceptionController>(FindObjectsSortMode.None);
+#else
+        var perceivers = UnityEngine.Object.FindObjectsOfType<PerceptionController>();
+#endif
+        foreach (var perception in perceivers)
+        {
+            if (perception != null)
+                perception.RedirectLastKnownPosition(worldPosition);
+        }
+    }
+
     private void HandleVisionLoss()
     {
         if (CanSeePlayer) { lostSightTimer = 0f; return; }

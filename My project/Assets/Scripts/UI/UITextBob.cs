@@ -14,10 +14,9 @@ public class UITextBob : MonoBehaviour
     void Awake()
     {
         _rect = transform as RectTransform;
-        CacheRest();
     }
 
-    void OnEnable()
+    void Start()
     {
         CacheRest();
     }

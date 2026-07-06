@@ -24,6 +24,19 @@ public class NPCController : MonoBehaviour
     [Tooltip("Seconds to wait after starting hide exit before jumpscare (when captured while hiding).")]
     public float hideExitSecondsBeforeCapture = 1.5f;
 
+    [Header("Ambush")]
+    [SerializeField] AudioClip ambushMetalRustleSfx;
+    [SerializeField] float ambushRustleVolume = 1f;
+    [SerializeField] float ambushPositionTolerance = 0.75f;
+    [SerializeField] float ambushTurnSpeed = 120f;
+    [SerializeField] float ambushTurnAngleThreshold = 45f;
+
+    public AudioClip AmbushMetalRustleSfx => ambushMetalRustleSfx;
+    public float AmbushRustleVolume => ambushRustleVolume;
+    public float AmbushPositionTolerance => ambushPositionTolerance;
+    public float AmbushTurnSpeed => ambushTurnSpeed;
+    public float AmbushTurnAngleThreshold => ambushTurnAngleThreshold;
+
     [Header("Chase Replan")]
     [Tooltip("Seconds between destination replans during chase.")]
     public float chaseReplanCooldown = 0.25f;

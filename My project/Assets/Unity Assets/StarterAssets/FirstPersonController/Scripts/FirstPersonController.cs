@@ -270,6 +270,21 @@ namespace StarterAssets
 			}
 		}
 
+		public void ResetMovementState()
+		{
+			_verticalVelocity = -2f;
+			_speed = 0f;
+			Grounded = true;
+			_jumpTimeoutDelta = JumpTimeout;
+			_fallTimeoutDelta = FallTimeout;
+
+			if (_input != null)
+			{
+				_input.move = Vector2.zero;
+				_input.jump = false;
+			}
+		}
+
 		private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
 		{
 			if (lfAngle < -360f) lfAngle += 360f;

@@ -314,9 +314,12 @@ public class InteractionController : MonoBehaviour
 
     public void CancelAndExitGracefully(NPCController.AIState nextState)
     {
-        if (IsPerformingHotspotAction && interactionRoutine != null)
-        {
+        if (interactionRoutine != null)
             StopCoroutine(interactionRoutine);
+
+        if (IsPerformingHotspotAction || hasVisualOffset)
+        {
+            isCancelled = true;
             interactionRoutine = StartCoroutine(GracefulExitRoutine(nextState));
         }
         else

@@ -10,6 +10,9 @@ using UnityEngine.AI;
 /// </summary>
 public class DemoEndDirector : MonoBehaviour
 {
+    public static DemoEndDirector Instance { get; private set; }
+    public static bool IsDemoFinaleActive => Instance != null && Instance._started;
+
     [Header("References")]
     [SerializeField] NPCController butcher;
     [SerializeField] Transform doorAmbushPoint;
@@ -19,8 +22,23 @@ public class DemoEndDirector : MonoBehaviour
     [SerializeField] float arriveDistance = 0.4f;
     [SerializeField] float alignRotationDuration = 0.4f;
 
+    [Header("Post-key tension")]
+    [Tooltip("Child trigger on this object — enabled when the basement key is picked up.")]
+    [SerializeField] ButcherProximityTensionZone tensionZone;
+
     bool _started;
     Coroutine _ambushRoutine;
+
+    void Awake()
+    {
+        Instance = this;
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this)
+            Instance = null;
+    }
 
     public void NotifyItemPickedUp(InventoryItem item)
     {
@@ -37,6 +55,7 @@ public class DemoEndDirector : MonoBehaviour
 
         _started = true;
         butcher.SetHearingDisabled(true);
+        EnableTensionZone();
 
         if (_ambushRoutine != null)
             StopCoroutine(_ambushRoutine);
@@ -46,16 +65,17 @@ public class DemoEndDirector : MonoBehaviour
 
     IEnumerator DoorAmbushRoutine()
     {
-        butcher.fsm.SetState(NPCController.AIState.Scripted);
-
         var interaction = butcher.interaction;
-        if (interaction != null && interaction.IsPerformingHotspotAction)
-            interaction.CancelAndExitGracefully(NPCController.AIState.Scripted);
-        else
-            interaction?.CancelInteraction();
+
+        // CancelAndExitGracefully must run before fsm.SetState — SetState always calls
+        // CancelInteraction() and would skip the stand-up / smooth exit while sitting.
+        interaction?.CancelAndExitGracefully(NPCController.AIState.Scripted);
 
         while (interaction != null && interaction.IsBusyWithRoutine())
             yield return null;
+
+        if (butcher.currentState != NPCController.AIState.Scripted)
+            butcher.fsm.SetState(NPCController.AIState.Scripted);
 
         butcher.GetComponent<Navigator>()?.ClearRoute();
         butcher.poiLookDirector?.CancelHoldAndClearLook();
@@ -120,6 +140,7 @@ public class DemoEndDirector : MonoBehaviour
 
             if (IsPlayerVisible(perception))
             {
+                StopTensionZone();
                 butcher.BeginChaseFromPerception();
                 yield break;
             }
@@ -142,5 +163,23 @@ public class DemoEndDirector : MonoBehaviour
 
         var hider = player.GetComponent<PlayerHider>();
         return hider == null || !hider.isHidden;
+    }
+
+    void EnableTensionZone()
+    {
+        if (tensionZone == null)
+            return;
+
+        tensionZone.gameObject.SetActive(true);
+        tensionZone.Activate(butcher != null ? butcher.transform : null);
+    }
+
+    void StopTensionZone()
+    {
+        if (tensionZone == null)
+            return;
+
+        tensionZone.Deactivate();
+        tensionZone.gameObject.SetActive(false);
     }
 }
