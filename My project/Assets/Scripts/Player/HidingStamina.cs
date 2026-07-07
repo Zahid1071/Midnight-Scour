@@ -270,7 +270,7 @@ public class HidingStamina : MonoBehaviour
             return;
 
         hider.CurrentHidingSpot.RevealPlayer(gameObject);
-        HudManager.Instance?.ShowSubtitle("I have to get out of here!", 2.5f, HudManager.Instance.WarningColor);
+        HudManager.Instance?.ShowSubtitle(Loc.Get("gameplay.stamina_exit"), 2.5f, HudManager.Instance.WarningColor);
     }
 
     void RefreshUI()

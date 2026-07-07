@@ -1,0 +1,581 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: GameStrings_ja
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: ja
+  m_SharedData: {fileID: 11400000, guid: 23aaa987a5caa724aac997d9b6cae0ae, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 5707297325056
+    m_Localized: "設定"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325057
+    m_Localized: "終了"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325058
+    m_Localized: "戻る"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325059
+    m_Localized: "適用"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325060
+    m_Localized: "デフォルト"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1843970048000
+    m_Localized: "続ける"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325061
+    m_Localized: "ニューゲーム"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325062
+    m_Localized: "クレジット"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325063
+    m_Localized: "セーブ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325064
+    m_Localized: "ポーズ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296576
+    m_Localized: "再開"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296577
+    m_Localized: "『Midnight Scour』の体験版をプレイしていただき、ありがとうございます。
+
+このビルドは最終的な体験のほんの一部にすぎません。製品版では、この核となる潜入と生存のループを、複数の異なる部屋や環境にまで拡張し、新しい配置や行動パターン、脅威に絶えず適応することが求められます。
+
+『Midnight Scour』は2026年後半の発売を予定しています。
+
+体験版を気に入っていただけましたら、SteamのウィッシュリストにぜひAddしてください。それが本プロジェクトの継続的な開発を支援する最も効果的な方法です。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296578
+    m_Localized: "何かキーを押すと終了します"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296579
+    m_Localized: "何かキーを押してください"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296580
+    m_Localized: "メモを読むと手がかりが見つかります"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296581
+    m_Localized: "隠れ場所を使って殺人鬼から逃れよう"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296582
+    m_Localized: "音を立てると殺人鬼に気づかれるかもしれません"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296583
+    m_Localized: "{0}を押すと選択中のアイテムを落とします"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296584
+    m_Localized: "アイテムを使う／組み合わせる"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296585
+    m_Localized: "インタラクト"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296586
+    m_Localized: "設定"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296587
+    m_Localized: "画面"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296588
+    m_Localized: "音声"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296589
+    m_Localized: "操作"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296590
+    m_Localized: "ゲームプレイ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296591
+    m_Localized: "一般"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296592
+    m_Localized: "マスター音量"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296593
+    m_Localized: "音楽音量"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296594
+    m_Localized: "効果音音量"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296595
+    m_Localized: "明るさ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296596
+    m_Localized: "マウス感度"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296597
+    m_Localized: "解像度"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296598
+    m_Localized: "フルスクリーン"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296599
+    m_Localized: "表示モード"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296600
+    m_Localized: "画質"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296601
+    m_Localized: "垂直同期"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296602
+    m_Localized: "オートセーブ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296603
+    m_Localized: "言語"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296604
+    m_Localized: "ここでは使えない。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296605
+    m_Localized: "鍵がかかっている。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296606
+    m_Localized: "あれには手が届かない。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296607
+    m_Localized: "びくともしない。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296608
+    m_Localized: "少し待って。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296609
+    m_Localized: "もう隠れている。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296610
+    m_Localized: "まず息を整えないと。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296611
+    m_Localized: "疲れすぎて隠れられない。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296612
+    m_Localized: "ここから出ないと！"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296613
+    m_Localized: "{0}が必要だ。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296614
+    m_Localized: "{0}を使った。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296615
+    m_Localized: "{0}で開いた。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296616
+    m_Localized: "ボルトを外した。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296617
+    m_Localized: "動かない。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296618
+    m_Localized: "このインタラクションは設定されていません。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296619
+    m_Localized: "しまうものが何もない。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296620
+    m_Localized: "収納した：{0}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296621
+    m_Localized: "{0}はすでに取り付けられている。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296622
+    m_Localized: "まずインベントリから車のパーツを選んで。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296623
+    m_Localized: "{0}を持っていない。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296624
+    m_Localized: "{0}を取り付けた。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296625
+    m_Localized: "このスロットは設定されていません。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296626
+    m_Localized: "脱出シーケンスが設定されていません。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296627
+    m_Localized: "すべてのパーツを取り付けた。脱出成功！"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296628
+    m_Localized: "まだ足りないもの：{0}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296629
+    m_Localized: "読み込み中..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296630
+    m_Localized: "鉄の棒"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296631
+    m_Localized: "骨"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296632
+    m_Localized: "骨"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296633
+    m_Localized: "地下室の鍵"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296634
+    m_Localized: "金属箱の鍵"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296635
+    m_Localized: "ガム"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296636
+    m_Localized: "クラッチ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296637
+    m_Localized: "ハンマー"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296638
+    m_Localized: "ラバーカップ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296639
+    m_Localized: "ドライバー"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296640
+    m_Localized: "スパークプラグ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296641
+    m_Localized: "花瓶"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296642
+    m_Localized: "レンチ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296643
+    m_Localized: "鉄の棒を入手した"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296644
+    m_Localized: "骨をインベントリに追加した"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296645
+    m_Localized: "ガム付きの骨をインベントリに追加した"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296646
+    m_Localized: "鍵を入手した"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296647
+    m_Localized: "小さな鍵を入手した"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296648
+    m_Localized: "ガムを入手した"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296649
+    m_Localized: "ハンマーを入手した"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296650
+    m_Localized: "ラバーカップを入手した"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296651
+    m_Localized: "ドライバーを入手した"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296652
+    m_Localized: "中に何か入っている"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296653
+    m_Localized: "レンチを入手した"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296654
+    m_Localized: "完全に詰まっている。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296655
+    m_Localized: "水はもう流れてしまった。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296656
+    m_Localized: "回すには何かで叩く必要がありそうだ。完全に錆びついている。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296657
+    m_Localized: "鉄の棒を万力に使う。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296658
+    m_Localized: "ハンマーを鉄の棒に使う。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296659
+    m_Localized: "ガムを骨にくっつけた。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296660
+    m_Localized: "ずっと滑る、骨に何か貼り付けないと"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296661
+    m_Localized: "ドライバーが折れた。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296662
+    m_Localized: "ヒント：隠れ場所を使って敵から逃れよう。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296663
+    m_Localized: "ヒント：周囲を注意深く調べると、重要な手がかりが見つかるかもしれない。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296664
+    m_Localized: "ヒント：静かにしていないと、敵に気づかれてしまう。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296665
+    m_Localized: "ヒント：懐中電灯のバッテリーには限りがあるので、大切に使おう。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296666
+    m_Localized: "ヒント：特別な鍵が必要なドアもある。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296667
+    m_Localized: "ヒント：走ると敵に気づかれることがある。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296668
+    m_Localized: "ヒント：メモや書類を読んで物語を明らかにしよう。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296669
+    m_Localized: "ヒント：暗い隅に隠れると敵から身を守りやすくなる。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296670
+    m_Localized: "ここには何もない。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296671
+    m_Localized: "インベントリがいっぱいです。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296672
+    m_Localized: "格子はまだボルトで固定されている。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296673
+    m_Localized: "確認"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296674
+    m_Localized: "はい"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296675
+    m_Localized: "いいえ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296676
+    m_Localized: "本当に終了しますか？\n\n未保存の進行状況は失われます。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296677
+    m_Localized: "終了"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296678
+    m_Localized: "終了"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296679
+    m_Localized: "本当にメインメニューに戻りますか？\n\n未保存の進行状況は失われます。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296680
+    m_Localized: "メインメニュー"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296681
+    m_Localized: "戻る"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296682
+    m_Localized: "あの花瓶の中に何かあったと思う。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296683
+    m_Localized: "{0} を落とした。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296684
+    m_Localized: "有効"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296685
+    m_Localized: "無効"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296686
+    m_Localized: "フルスクリーン"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296687
+    m_Localized: "ウィンドウ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296688
+    m_Localized: "枠付き"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296689
+    m_Localized: "排他フルスクリーン"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296690
+    m_Localized: "非常に低"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296691
+    m_Localized: "低"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296692
+    m_Localized: "中"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296693
+    m_Localized: "高"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296694
+    m_Localized: "非常に高"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296695
+    m_Localized: "ウルトラ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296696
+    m_Localized: "アイテムを使う"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296697
+    m_Localized: "落とす"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296698
+    m_Localized: "手の届くところに何もない。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296699
+    m_Localized: "トイレが詰まっている。ラバーカップが見つからない。桶の中のどこかにあったはずだが、どこだったか思い出せない。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296701
+    m_Localized: "クラッチを入手した"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296700
+    m_Localized: "スパークプラグを入手した"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296702
+    m_Localized: う
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296703
+    m_Localized: け
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

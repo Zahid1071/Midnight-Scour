@@ -71,10 +71,10 @@ public class ConfirmationDialog : MonoBehaviour
     [SerializeField] private float fadeInDuration = 0.15f;
     [SerializeField] private float fadeOutDuration = 0.1f;
     
-    [Header("Default Texts (Turkish)")]
-    [SerializeField] private string defaultTitle = "Onay";
-    [SerializeField] private string defaultConfirmText = "Evet";
-    [SerializeField] private string defaultCancelText = "Hayır";
+    [Header("Default Texts")]
+    [SerializeField] private string defaultTitleKey = "ui.confirm.title";
+    [SerializeField] private string defaultConfirmKey = "ui.confirm.yes";
+    [SerializeField] private string defaultCancelKey = "ui.confirm.no";
 
     // =========================================================================
     // PRIVATE STATE
@@ -127,17 +127,24 @@ public class ConfirmationDialog : MonoBehaviour
     /// </summary>
     public static void ShowQuitConfirmation(Action onConfirm)
     {
-        Show("Oyundan çıkmak istediğinize emin misiniz?\nKaydedilmemiş ilerleme kaybolacak.", 
-             onConfirm, null, "Çıkış", "Çık", "İptal");
+        Show(
+            Loc.Get("ui.confirm.quit_message"),
+            onConfirm,
+            null,
+            Loc.Get("ui.confirm.quit_title"),
+            Loc.Get("ui.confirm.quit_confirm"),
+            Loc.Get("ui.confirm.no"));
     }
-    
-    /// <summary>
-    /// Shows confirmation for returning to main menu.
-    /// </summary>
+
     public static void ShowReturnToMenuConfirmation(Action onConfirm)
     {
-        Show("Ana menüye dönmek istediğinize emin misiniz?\nKaydedilmemiş ilerleme kaybolacak.", 
-             onConfirm, null, "Ana Menü", "Dön", "İptal");
+        Show(
+            Loc.Get("ui.confirm.menu_message"),
+            onConfirm,
+            null,
+            Loc.Get("ui.confirm.menu_title"),
+            Loc.Get("ui.confirm.menu_confirm"),
+            Loc.Get("ui.confirm.no"));
     }
     
     /// <summary>
@@ -164,13 +171,13 @@ public class ConfirmationDialog : MonoBehaviour
         
         // Set texts
         if (titleText != null)
-            titleText.text = title ?? defaultTitle;
+            UIFont.SetText(titleText, title ?? Loc.Get(defaultTitleKey));
         if (messageText != null)
-            messageText.text = message;
+            UIFont.SetText(messageText, message);
         if (confirmButtonText != null)
-            confirmButtonText.text = confirmText ?? defaultConfirmText;
+            UIFont.SetText(confirmButtonText, confirmText ?? Loc.Get(defaultConfirmKey));
         if (cancelButtonText != null)
-            cancelButtonText.text = cancelText ?? defaultCancelText;
+            UIFont.SetText(cancelButtonText, cancelText ?? Loc.Get(defaultCancelKey));
         
         // Show panel
         if (dialogPanel != null)

@@ -25,5 +25,7 @@ MonoBehaviour:
   breaksOnWrongUse: 0
   breakOnWrongUseSound: {fileID: 0}
   breakOnWrongUseMessage: The screwdriver snapped.
+  nameKey: item.gummy_bone.name
+  pickupKey: item.gummy_bone.pickup
   pickUpText: Gummy Bone added to inventory
   description: 

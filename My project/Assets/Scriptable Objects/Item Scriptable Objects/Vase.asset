@@ -24,5 +24,7 @@ MonoBehaviour:
   breaksOnWrongUse: 0
   breakOnWrongUseSound: {fileID: 0}
   breakOnWrongUseMessage: 
+  nameKey: item.vase.name
+  pickupKey: item.vase.pickup
   pickUpText: There is something inside it
   description: 

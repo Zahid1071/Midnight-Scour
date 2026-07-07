@@ -9,10 +9,6 @@ public class ToiletWaterFlush : MonoBehaviour, IInteractable, IItemReceiver
 
     [SerializeField] private InventoryItem plungerItem;
     [SerializeField] private Animator animator;
-    [SerializeField] private string needPlungerMessage = "I need a plunger.";
-    [SerializeField] private string wrongItemMessage = "That won't work here.";
-    [SerializeField] private string alreadyFlushedMessage = "The water's already gone.";
-    [SerializeField] private string successMessage = "";
     [SerializeField] AudioClip flush;
     [Header("NPC Suspicion")]
     [Tooltip("Footstep-suspicion added to NPCs when the toilet flushes.")]
@@ -33,13 +29,13 @@ public class ToiletWaterFlush : MonoBehaviour, IInteractable, IItemReceiver
         InventoryItem selected = InventoryUI.Instance?.GetSelectedItem();
         if (selected == null)
         {
-            InteractionFeedback.Fail(needPlungerMessage, 2.5f);
+            InteractionFeedback.Fail(Loc.Get("gameplay.need_plunger"), 2.5f);
             return false;
         }
 
         if (selected != plungerItem)
         {
-            InteractionFeedback.Fail(wrongItemMessage, 2.5f);
+            InteractionFeedback.Fail(Loc.Get("gameplay.wrong_item"), 2.5f);
             return false;
         }
 
@@ -50,17 +46,16 @@ public class ToiletWaterFlush : MonoBehaviour, IInteractable, IItemReceiver
     {
         if (_hasFlushed)
         {
-            InteractionFeedback.Fail(alreadyFlushedMessage, 2.5f);
+            InteractionFeedback.Fail(Loc.Get("gameplay.already_flushed"), 2.5f);
             return false;
         }
 
         if (item == null || item != plungerItem)
         {
-            InteractionFeedback.Fail(wrongItemMessage, 2.5f);
+            InteractionFeedback.Fail(Loc.Get("gameplay.wrong_item"), 2.5f);
             return false;
         }
 
-        // InventoryUI plays SFX / crosshair shake after a successful ReceiveItem.
         return TryFlush(item, playFeedback: false);
     }
 
@@ -68,7 +63,7 @@ public class ToiletWaterFlush : MonoBehaviour, IInteractable, IItemReceiver
     {
         if (_hasFlushed)
         {
-            InteractionFeedback.Fail(alreadyFlushedMessage, 2.5f);
+            InteractionFeedback.Fail(Loc.Get("gameplay.already_flushed"), 2.5f);
             return false;
         }
 
@@ -92,9 +87,6 @@ public class ToiletWaterFlush : MonoBehaviour, IInteractable, IItemReceiver
 
         if (item.consumeOnUse)
             InventoryManager.Instance?.RemoveItem(item);
-
-        if (!string.IsNullOrWhiteSpace(successMessage))
-            HudManager.Instance?.ShowSubtitle(successMessage, 3f);
 
         if (playFeedback)
         {

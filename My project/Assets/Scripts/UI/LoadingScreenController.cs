@@ -64,17 +64,17 @@ public class LoadingScreenController : MonoBehaviour
     [SerializeField] private float fadeOutDuration = 0.5f;
     [SerializeField] private float minimumLoadTime = 1.5f; // Minimum time to show tips
     
-    [Header("Gameplay Tips (Turkish)")]
-    [SerializeField] private string[] gameplayTips = new string[]
+    [Header("Gameplay Tips")]
+    static readonly string[] TipKeys =
     {
-        "İPUCU: Saklanma noktalarını kullanarak düşmanlardan kaçabilirsiniz.",
-        "İPUCU: Etrafı dikkatli araştırın, önemli ipuçları bulabilirsiniz.",
-        "İPUCU: Sesinizi kısık tutun, düşmanlar sizi duyabilir.",
-        "İPUCU: El feneriniz sınırlı pile sahip, dikkatli kullanın.",
-        "İPUCU: Bazı kapılar özel anahtarlar gerektirir.",
-        "İPUCU: Koşmak düşmanların dikkatini çekebilir.",
-        "İPUCU: Notları ve dökümanları okuyarak hikayeyi keşfedin.",
-        "İPUCU: Karanlık köşelerde saklanmak düşmanlardan korunmanıza yardımcı olur."
+        "loading.tip.hiding",
+        "loading.tip.explore",
+        "loading.tip.quiet",
+        "loading.tip.flashlight",
+        "loading.tip.doors",
+        "loading.tip.running",
+        "loading.tip.notes",
+        "loading.tip.dark_corners"
     };
 
     // =========================================================================
@@ -245,14 +245,11 @@ public class LoadingScreenController : MonoBehaviour
         }
         
         // Set random tip
-        if (tipText != null && gameplayTips != null && gameplayTips.Length > 0)
-        {
-            tipText.text = gameplayTips[Random.Range(0, gameplayTips.Length)];
-        }
-        
-        // Set loading status
+        if (tipText != null && TipKeys.Length > 0)
+            UIFont.SetText(tipText, Loc.Get(TipKeys[Random.Range(0, TipKeys.Length)]));
+
         if (loadingStatusText != null)
-            loadingStatusText.text = "Yükleniyor...";
+            UIFont.SetText(loadingStatusText, Loc.Get("loading.status"));
     }
     
     private void UpdateProgress(float progress)
@@ -261,7 +258,7 @@ public class LoadingScreenController : MonoBehaviour
             progressBar.value = progress;
         
         if (progressText != null)
-            progressText.text = $"{Mathf.RoundToInt(progress * 100)}%";
+            UIFont.SetText(progressText, $"{Mathf.RoundToInt(progress * 100)}%");
     }
 
     // =========================================================================

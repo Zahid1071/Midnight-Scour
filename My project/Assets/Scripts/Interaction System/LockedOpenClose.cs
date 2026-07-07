@@ -73,7 +73,7 @@ public class LockedOpenClose : MonoBehaviour, IInteractable, IItemReceiver
             if (selected != null && requiredKey != null && selected == requiredKey)
                 return false;
 
-            InteractionFeedback.Fail(lockedMessage, 2.5f);
+            InteractionFeedback.Fail(Loc.Get("gameplay.locked"), 2.5f);
             PlayLockedFeedback();
             return false;
         }
@@ -98,7 +98,7 @@ public class LockedOpenClose : MonoBehaviour, IInteractable, IItemReceiver
                 return false;
             }
 
-            InteractionFeedback.Fail(wrongItemMessage, 2.5f);
+            InteractionFeedback.Fail(Loc.Get("gameplay.wrong_item"), 2.5f);
             PlayLockedFeedback();
             return false;
         }
@@ -106,12 +106,13 @@ public class LockedOpenClose : MonoBehaviour, IInteractable, IItemReceiver
         var inventory = InventoryManager.Instance?.GetInventory();
         if (inventory == null || !inventory.Contains(item))
         {
-            InteractionFeedback.Fail("You do not have that item.", 2.5f);
+            InteractionFeedback.Fail(Loc.Format("gameplay.dont_have_item", item.GetLocalizedName()), 2.5f);
             return false;
         }
 
         isLocked = false;
-        HudManager.Instance?.ShowSubtitle($"{item.itemName} unlocked it.", 2.5f, HudManager.Instance.SuccessColor);
+        HudManager.Instance?.ShowSubtitle(
+            Loc.Format("gameplay.item_unlocked", item.GetLocalizedName()), 2.5f, HudManager.Instance.SuccessColor);
 
         if (item.consumeOnUse)
         {

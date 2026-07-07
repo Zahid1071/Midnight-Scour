@@ -16,9 +16,36 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField] private string gameSceneName = "Cinematics";
     [SerializeField] private string creditsSceneName = "CreditsScene";
 
+    void Awake() => ResolveReferences();
+
+#if UNITY_EDITOR
+    void OnValidate() => ResolveReferences();
+#endif
+
+    void ResolveReferences()
+    {
+        if (settingsMenu == null)
+            settingsMenu = transform.root.GetComponentInChildren<SettingsMenu>(true);
+
+        if (settingsMenu != null)
+            settingsPanel = settingsMenu.gameObject;
+        else if (settingsPanel != null)
+            settingsMenu = settingsPanel.GetComponent<SettingsMenu>();
+
+        if (mainMenuPanel == null)
+        {
+            var buttons = transform.Find("Buttons");
+            if (buttons != null)
+                mainMenuPanel = buttons.gameObject;
+        }
+    }
+
     private void Start()
     {
-        mainMenuPanel.SetActive(true);
+        ResolveReferences();
+
+        if (mainMenuPanel != null)
+            mainMenuPanel.SetActive(true);
         if (settingsPanel) settingsPanel.SetActive(false);
 
         // Grey-out Continue when there is nothing to resume
@@ -69,9 +96,12 @@ public class MainMenuUI : MonoBehaviour
 
     public void CloseSettingsWithoutApply()
     {
-        settingsMenu.CancelEditing();
-        settingsPanel.SetActive(false);
-        mainMenuPanel.SetActive(true);
+        if (settingsMenu != null)
+            settingsMenu.CancelEditing();
+        if (settingsPanel != null)
+            settingsPanel.SetActive(false);
+        if (mainMenuPanel != null)
+            mainMenuPanel.SetActive(true);
     }
 
     public void OpenCredits()

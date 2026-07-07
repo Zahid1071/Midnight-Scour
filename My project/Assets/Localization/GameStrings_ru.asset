@@ -1,0 +1,581 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: GameStrings_ru
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: ru
+  m_SharedData: {fileID: 11400000, guid: 23aaa987a5caa724aac997d9b6cae0ae, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 5707297325056
+    m_Localized: "Настройки"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325057
+    m_Localized: "Выход"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325058
+    m_Localized: "Назад"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325059
+    m_Localized: "Применить"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325060
+    m_Localized: "По умолчанию"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1843970048000
+    m_Localized: "Продолжить"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325061
+    m_Localized: "Новая игра"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325062
+    m_Localized: "Титры"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325063
+    m_Localized: "Сохранить игру"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325064
+    m_Localized: "ПАУЗА"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296576
+    m_Localized: "Продолжить"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296577
+    m_Localized: "Спасибо за игру в демоверсию Midnight Scour.
+
+Эта сборка представляет собой лишь часть финального опыта. Полная игра расширит этот основной цикл скрытности и выживания на несколько разных комнат и локаций, заставляя вас постоянно приспосабливаться к новым планировкам, поведению и угрозам.
+
+Выход Midnight Scour запланирован на конец 2026 года.
+
+Если вам понравилась демоверсия, пожалуйста, добавьте игру в список желаемого Steam. Это самый эффективный способ поддержать дальнейшую разработку проекта."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296578
+    m_Localized: "нажмите любую клавишу, чтобы выйти"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296579
+    m_Localized: "нажмите любую клавишу"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296580
+    m_Localized: "Вы можете читать записки, чтобы найти подсказки"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296581
+    m_Localized: "Используйте укрытия, чтобы спрятаться от убийцы"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296582
+    m_Localized: "Шум может привлечь внимание убийцы"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296583
+    m_Localized: "Нажмите {0}, чтобы выбросить выбранный предмет"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296584
+    m_Localized: "Использовать/Соединить предмет"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296585
+    m_Localized: "Взаимодействие"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296586
+    m_Localized: "НАСТРОЙКИ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296587
+    m_Localized: "Экран"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296588
+    m_Localized: "Звук"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296589
+    m_Localized: "Управление"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296590
+    m_Localized: "Геймплей"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296591
+    m_Localized: "Общие"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296592
+    m_Localized: "Общая громкость"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296593
+    m_Localized: "Громкость музыки"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296594
+    m_Localized: "Громкость эффектов"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296595
+    m_Localized: "Яркость"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296596
+    m_Localized: "Чувствительность мыши"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296597
+    m_Localized: "Разрешение"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296598
+    m_Localized: "Полноэкранный режим"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296599
+    m_Localized: "Режим экрана"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296600
+    m_Localized: "Качество"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296601
+    m_Localized: "Вертикальная синхронизация"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296602
+    m_Localized: "Автосохранение"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296603
+    m_Localized: "Язык"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296604
+    m_Localized: "Это здесь не сработает."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296605
+    m_Localized: "Заперто."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296606
+    m_Localized: "Я не могу до этого дотянуться."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296607
+    m_Localized: "Не поддаётся."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296608
+    m_Localized: "Подожди немного."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296609
+    m_Localized: "Ты уже прячешься."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296610
+    m_Localized: "Сначала нужно отдышаться."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296611
+    m_Localized: "Я слишком измотан, чтобы прятаться."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296612
+    m_Localized: "Мне нужно выбраться отсюда!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296613
+    m_Localized: "Нужен {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296614
+    m_Localized: "{0} использован."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296615
+    m_Localized: "{0} открыл это."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296616
+    m_Localized: "Болт снят."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296617
+    m_Localized: "Застряло."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296618
+    m_Localized: "Это взаимодействие не настроено."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296619
+    m_Localized: "Тебе нечего складывать."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296620
+    m_Localized: "Сохранено: {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296621
+    m_Localized: "{0} уже установлен."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296622
+    m_Localized: "Сначала выберите деталь автомобиля в инвентаре."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296623
+    m_Localized: "У тебя нет {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296624
+    m_Localized: "{0} установлен."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296625
+    m_Localized: "Этот слот не настроен."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296626
+    m_Localized: "Последовательность побега не настроена."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296627
+    m_Localized: "Все детали установлены. Ты сбежал!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296628
+    m_Localized: "Всё ещё не хватает: {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296629
+    m_Localized: "Загрузка..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296630
+    m_Localized: "Лом"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296631
+    m_Localized: "Кость"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296632
+    m_Localized: "Кость"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296633
+    m_Localized: "Ключ от подвала"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296634
+    m_Localized: "Металлический ключ от ящика"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296635
+    m_Localized: "Жвачка"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296636
+    m_Localized: "Сцепление"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296637
+    m_Localized: "Молоток"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296638
+    m_Localized: "Вантуз"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296639
+    m_Localized: "Отвёртка"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296640
+    m_Localized: "Свеча зажигания"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296641
+    m_Localized: "Ваза"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296642
+    m_Localized: "Гаечный ключ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296643
+    m_Localized: "Поднят лом"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296644
+    m_Localized: "Кость добавлена в инвентарь"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296645
+    m_Localized: "Кость с жвачкой добавлена в инвентарь"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296646
+    m_Localized: "Поднят ключ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296647
+    m_Localized: "Поднят маленький ключ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296648
+    m_Localized: "Поднята жвачка"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296649
+    m_Localized: "Поднят молоток"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296650
+    m_Localized: "Поднят вантуз"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296651
+    m_Localized: "Поднята отвёртка"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296652
+    m_Localized: "Там что-то внутри"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296653
+    m_Localized: "Поднят гаечный ключ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296654
+    m_Localized: "Он полностью засорён."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296655
+    m_Localized: "Вода уже ушла."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296656
+    m_Localized: "Думаю, нужно ударить чем-нибудь, чтобы провернуть — он полностью заржавел"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296657
+    m_Localized: "Используй лом на тисках."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296658
+    m_Localized: "Используй молоток на ломе."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296659
+    m_Localized: "Прилепил жвачку к кости."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296660
+    m_Localized: "Постоянно соскальзывает, нужно что-то приклеить к кости"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296661
+    m_Localized: "Отвёртка сломалась."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296662
+    m_Localized: "СОВЕТ: Используйте укрытия, чтобы избежать врагов."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296663
+    m_Localized: "СОВЕТ: Исследуйте окрестности внимательно, вы можете найти важные подсказки."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296664
+    m_Localized: "СОВЕТ: Ведите себя тихо, враги могут вас услышать."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296665
+    m_Localized: "СОВЕТ: У вашего фонарика ограниченный заряд батареи, используйте его с умом."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296666
+    m_Localized: "СОВЕТ: Некоторым дверям нужны особые ключи."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296667
+    m_Localized: "СОВЕТ: Бег может привлечь внимание врагов."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296668
+    m_Localized: "СОВЕТ: Читайте записки и документы, чтобы раскрыть историю."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296669
+    m_Localized: "СОВЕТ: Прятаться в тёмных углах помогает укрыться от врагов."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296670
+    m_Localized: "Здесь ничего нет."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296671
+    m_Localized: "Ваш инвентарь полон."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296672
+    m_Localized: "Решётка всё ещё прикручена."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296673
+    m_Localized: "Подтвердить"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296674
+    m_Localized: "Да"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296675
+    m_Localized: "Нет"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296676
+    m_Localized: "Вы уверены, что хотите выйти?\n\nНесохранённый прогресс будет потерян."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296677
+    m_Localized: "Выход"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296678
+    m_Localized: "Выйти"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296679
+    m_Localized: "Вы уверены, что хотите вернуться в главное меню?\n\nНесохранённый прогресс будет потерян."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296680
+    m_Localized: "Главное меню"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296681
+    m_Localized: "Вернуться"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296682
+    m_Localized: "Думаю, в той вазе что-то было."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296683
+    m_Localized: "Выброшено: {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296684
+    m_Localized: "Включено"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296685
+    m_Localized: "Отключено"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296686
+    m_Localized: "Полный экран"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296687
+    m_Localized: "Оконный режим"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296688
+    m_Localized: "С рамкой"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296689
+    m_Localized: "Эксклюзивный полный экран"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296690
+    m_Localized: "Очень низкое"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296691
+    m_Localized: "Низкое"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296692
+    m_Localized: "Среднее"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296693
+    m_Localized: "Высокое"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296694
+    m_Localized: "Очень высокое"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296695
+    m_Localized: "Ультра"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296696
+    m_Localized: "Использовать предмет"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296697
+    m_Localized: "Выбросить"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296698
+    m_Localized: "Ничего не досягается."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296699
+    m_Localized: "Унитаз засорён, не могу найти вантуз. Он был где-то в ведре, но я не помню где."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296701
+    m_Localized: "Поднято сцепление"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296700
+    m_Localized: "Поднята свеча зажигания"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296702
+    m_Localized: У
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296703
+    m_Localized: П
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

@@ -136,7 +136,7 @@ public class InventoryUI : MonoBehaviour
 
         if (!interactor.TryRaycastForHint(out RaycastHit hit, out IInteractable target))
         {
-            ShowWarning("Nothing in reach.", 2.5f);
+            ShowWarning(Loc.Get("gameplay.nothing_in_reach"), 2.5f);
             return;
         }
 
@@ -192,7 +192,7 @@ public class InventoryUI : MonoBehaviour
 
     void ShowWarning(string message, float duration) => InteractionFeedback.Fail(message, duration);
 
-    const string DefaultBoneOnScrewdriverHint = "It keeps slipping, I need to stick something to this.";
+    const string DefaultBoneOnScrewdriverHintKey = "gameplay.bone_slip";
 
     static bool IsRegularBone(InventoryItem item) =>
         item != null && item.itemName == "Bone" && item.interactionReachBonus <= 0f;
@@ -221,7 +221,7 @@ public class InventoryUI : MonoBehaviour
     {
         return !string.IsNullOrWhiteSpace(selected.reachAttemptFailMessage)
             ? selected.reachAttemptFailMessage
-            : DefaultBoneOnScrewdriverHint;
+            : Loc.Get(DefaultBoneOnScrewdriverHintKey);
     }
 
     private void TryDropSelectedItem()
@@ -275,7 +275,7 @@ public class InventoryUI : MonoBehaviour
         if (selected.pickUpSFX != null && SoundManager.Instance != null)
             SoundManager.Instance.PlaySFXAt(selected.pickUpSFX, dropped.transform.position);
 
-        string msg = $"Dropped {selected.itemName}.";
+        string msg = Loc.Format("gameplay.item_dropped", selected.GetLocalizedName());
         HudManager.Instance?.ShowSubtitle(msg, 2f);
     }
 

@@ -1,0 +1,191 @@
+"Key","Id","English(en)","Chinese (Simplified)(zh-Hans)","French(fr)","Japanese(ja)","Polish(pl)","Portuguese (Brazil)(pt-BR)","Russian(ru)","Turkish(tr)","Spanish(es-419)"
+"ui.common.settings","5707297325056","Settings","设置","Paramètres","設定","Ustawienia","Configurações","Настройки","Ayarlar","Configuración"
+"ui.common.quit","5707297325057","Quit","退出","Quitter","終了","Wyjście","Sair","Выход","Çıkış","Salir"
+"ui.common.back","5707297325058","Back","返回","Retour","戻る","Wstecz","Voltar","Назад","Geri","Atrás"
+"ui.common.apply","5707297325059","Apply","应用","Appliquer","適用","Zastosuj","Aplicar","Применить","Uygula","Aplicar"
+"ui.common.default","5707297325060","Default","默认","Par défaut","デフォルト","Domyślne","Padrão","По умолчанию","Varsayılan","Predeterminado"
+"ui.menu.continue","1843970048000","Continue","继续","Continuer","続ける","Kontynuuj","Continuar","Продолжить","Devam Et","Continuar"
+"ui.menu.new_game","5707297325061","New Game","新游戏","Nouvelle partie","ニューゲーム","Nowa gra","Novo Jogo","Новая игра","Yeni Oyun","Nueva partida"
+"ui.menu.credits","5707297325062","Credits","制作人员","Crédits","クレジット","Napisy końcowe","Créditos","Титры","Jenerik","Créditos"
+"ui.menu.save_game","5707297325063","Save Game","保存游戏","Sauvegarder","セーブ","Zapisz grę","Salvar Jogo","Сохранить игру","Oyunu Kaydet","Guardar partida"
+"ui.pause.title","5707297325064","PAUSE","暂停","PAUSE","ポーズ","PAUZA","PAUSA","ПАУЗА","DURAKLATILDI","PAUSA"
+"ui.pause.resume","5707318296576","Resume","继续","Reprendre","再開","Wznów","Continuar","Продолжить","Devam Et","Reanudar"
+"demo.thank_you","5707318296577","Thank you for playing the Midnight Scour demo.
+
+This build represents a fraction of the final experience. The full game will expand this core stealth and survival loop across multiple distinct rooms and environments, requiring you to constantly adapt to new layouts, behaviors, and threats.
+
+Midnight Scour is scheduled for release in late 2026.
+
+If you enjoyed the demo, please consider adding the game to your Steam Wishlist. It is the most effective way to support the continued development of the project.","感谢您游玩《午夜搜寻》试玩版。
+
+本次试玩仅代表最终体验的一小部分。完整版游戏将把这个核心潜行与生存循环扩展到多个不同的房间和环境中，要求你不断适应新的布局、行为和威胁。
+
+《午夜搜寻》计划于2026年末发售。
+
+如果你喜欢这个试玩版，请考虑将本作加入你的Steam愿望单。这是支持项目持续开发的最有效方式。","Merci d'avoir joué à la démo de Midnight Scour.
+
+Cette version ne représente qu'une fraction de l'expérience finale. Le jeu complet étendra cette boucle d'infiltration et de survie à plusieurs pièces et environnements distincts, vous obligeant à vous adapter constamment à de nouvelles configurations, comportements et menaces.
+
+La sortie de Midnight Scour est prévue pour fin 2026.
+
+Si vous avez apprécié la démo, pensez à ajouter le jeu à votre liste de souhaits Steam. C'est le moyen le plus efficace de soutenir le développement continu du projet.","『Midnight Scour』の体験版をプレイしていただき、ありがとうございます。
+
+このビルドは最終的な体験のほんの一部にすぎません。製品版では、この核となる潜入と生存のループを、複数の異なる部屋や環境にまで拡張し、新しい配置や行動パターン、脅威に絶えず適応することが求められます。
+
+『Midnight Scour』は2026年後半の発売を予定しています。
+
+体験版を気に入っていただけましたら、SteamのウィッシュリストにぜひAddしてください。それが本プロジェクトの継続的な開発を支援する最も効果的な方法です。","Dziękujemy za granie w wersję demonstracyjną Midnight Scour.
+
+Ta wersja stanowi jedynie fragment finalnego doświadczenia. Pełna gra rozszerzy ten podstawowy cykl skradania się i przetrwania o wiele różnych pomieszczeń i otoczeń, zmuszając cię do ciągłego przystosowywania się do nowych układów, zachowań i zagrożeń.
+
+Premiera Midnight Scour planowana jest na koniec 2026 roku.
+
+Jeśli podobało ci się demo, rozważ dodanie gry do swojej listy życzeń na Steam. To najskuteczniejszy sposób wsparcia dalszego rozwoju projektu.","Obrigado por jogar a demo de Midnight Scour.
+
+Esta versão representa apenas uma fração da experiência final. O jogo completo vai expandir esse ciclo central de furtividade e sobrevivência para várias salas e ambientes diferentes, exigindo que você se adapte constantemente a novos layouts, comportamentos e ameaças.
+
+Midnight Scour tem lançamento previsto para o final de 2026.
+
+Se você gostou da demo, considere adicionar o jogo à sua lista de desejos da Steam. É a forma mais eficaz de apoiar o desenvolvimento contínuo do projeto.","Спасибо за игру в демоверсию Midnight Scour.
+
+Эта сборка представляет собой лишь часть финального опыта. Полная игра расширит этот основной цикл скрытности и выживания на несколько разных комнат и локаций, заставляя вас постоянно приспосабливаться к новым планировкам, поведению и угрозам.
+
+Выход Midnight Scour запланирован на конец 2026 года.
+
+Если вам понравилась демоверсия, пожалуйста, добавьте игру в список желаемого Steam. Это самый эффективный способ поддержать дальнейшую разработку проекта.","Midnight Scour demosunu oynadığınız için teşekkür ederiz.
+
+Bu sürüm, nihai deneyimin yalnızca bir bölümünü temsil etmektedir. Tam oyun, bu temel gizlilik ve hayatta kalma döngüsünü birden fazla farklı oda ve ortama genişletecek ve sizi sürekli olarak yeni düzenlere, davranışlara ve tehditlere uyum sağlamaya zorlayacaktır.
+
+Midnight Scour, 2026'nın sonlarında piyasaya sürülmesi planlanıyor.
+
+Demoyu beğendiyseniz, lütfen oyunu Steam İstek Listenize eklemeyi düşünün. Projenin gelişimini desteklemenin en etkili yolu budur.","Gracias por jugar la demo de Midnight Scour.
+
+Esta versión representa solo una fracción de la experiencia final. El juego completo ampliará este ciclo central de sigilo y supervivencia a múltiples habitaciones y entornos distintos, obligándote a adaptarte constantemente a nuevos diseños, comportamientos y amenazas.
+
+Se espera que Midnight Scour se lance a finales de 2026.
+
+Si disfrutaste la demo, considera agregar el juego a tu lista de deseos de Steam. Es la forma más efectiva de apoyar el desarrollo continuo del proyecto."
+"demo.press_any_key","5707318296578","press any key to exit","按任意键退出","appuyez sur une touche pour quitter","何かキーを押すと終了します","naciśnij dowolny klawisz, aby wyjść","pressione qualquer tecla para sair","нажмите любую клавишу, чтобы выйти","çıkmak için herhangi bir tuşa basın","presiona cualquier tecla para salir"
+"demo.press_any_key_short","5707318296579","press any key","按任意键","appuyez sur une touche","何かキーを押してください","naciśnij dowolny klawisz","pressione qualquer tecla","нажмите любую клавишу","herhangi bir tuşa basın","presiona cualquier tecla"
+"hint.note","5707318296580","You can read notes for clues","你可以阅读纸条来获取线索","Vous pouvez lire les notes pour trouver des indices","メモを読むと手がかりが見つかります","Możesz czytać notatki, aby znaleźć wskazówki","Você pode ler bilhetes para encontrar pistas","Вы можете читать записки, чтобы найти подсказки","İpuçları için notları okuyabilirsiniz","Puedes leer notas para encontrar pistas"
+"hint.hiding_spot","5707318296581","Use hiding spots to avoid the killer","利用藏身点躲避杀手","Utilisez les cachettes pour éviter le tueur","隠れ場所を使って殺人鬼から逃れよう","Używaj kryjówek, aby uniknąć zabójcy","Use esconderijos para evitar o assassino","Используйте укрытия, чтобы спрятаться от убийцы","Katilden kaçınmak için saklanma noktalarını kullanın","Usa los escondites para evitar al asesino"
+"hint.sound","5707318296582","Making noise might alert the killer","发出声响可能会引起杀手的注意","Faire du bruit peut alerter le tueur","音を立てると殺人鬼に気づかれるかもしれません","Hałasowanie może zaalarmować zabójcę","Fazer barulho pode alertar o assassino","Шум может привлечь внимание убийцы","Gürültü yapmak katili uyarabilir","Hacer ruido puede alertar al asesino"
+"hint.drop_item","5707318296583","Press {0} to drop selected item","按 {0} 丢弃选中的物品","Appuyez sur {0} pour déposer l'objet sélectionné","{0}を押すと選択中のアイテムを落とします","Naciśnij {0}, aby upuścić wybrany przedmiot","Pressione {0} para soltar o item selecionado","Нажмите {0}, чтобы выбросить выбранный предмет","Seçili öğeyi bırakmak için {0} tuşuna basın","Presiona {0} para soltar el objeto seleccionado"
+"hint.combine","5707318296584","Use Item/Combine Item","使用/组合物品","Utiliser/Combiner un objet","アイテムを使う／組み合わせる","Użyj/Połącz przedmiot","Usar/Combinar Item","Использовать/Соединить предмет","Öğeyi Kullan/Birleştir","Usar/Combinar objeto"
+"hint.interact","5707318296585","Interact","互动","Interagir","インタラクト","Interakcja","Interagir","Взаимодействие","Etkileşim","Interactuar"
+"ui.settings.title","5707318296586","SETTINGS","设置","PARAMÈTRES","設定","USTAWIENIA","CONFIGURAÇÕES","НАСТРОЙКИ","AYARLAR","CONFIGURACIÓN"
+"ui.settings.display","5707318296587","Display","画面","Affichage","画面","Ekran","Tela","Экран","Görüntü","Pantalla"
+"ui.settings.audio","5707318296588","Audio","音频","Audio","音声","Dźwięk","Áudio","Звук","Ses","Audio"
+"ui.settings.controls","5707318296589","Controls","操作","Commandes","操作","Sterowanie","Controles","Управление","Kontroller","Controles"
+"ui.settings.gameplay","5707318296590","Gameplay","游戏玩法","Gameplay","ゲームプレイ","Rozgrywka","Jogabilidade","Геймплей","Oynanış","Jugabilidad"
+"ui.settings.general","5707318296591","General","通用","Général","一般","Ogólne","Geral","Общие","Genel","General"
+"ui.settings.master_volume","5707318296592","Master Volume","主音量","Volume principal","マスター音量","Głośność główna","Volume Geral","Общая громкость","Ana Ses","Volumen general"
+"ui.settings.music_volume","5707318296593","Music Volume","音乐音量","Volume de la musique","音楽音量","Głośność muzyki","Volume da Música","Громкость музыки","Müzik Sesi","Volumen de música"
+"ui.settings.sfx_volume","5707318296594","SFX Volume","音效音量","Volume des effets","効果音音量","Głośność efektów","Volume dos Efeitos","Громкость эффектов","Efekt Sesi","Volumen de efectos"
+"ui.settings.brightness","5707318296595","Brightness","亮度","Luminosité","明るさ","Jasność","Brilho","Яркость","Parlaklık","Brillo"
+"ui.settings.mouse_sensitivity","5707318296596","Mouse Sensitivity","鼠标灵敏度","Sensibilité de la souris","マウス感度","Czułość myszy","Sensibilidade do Mouse","Чувствительность мыши","Fare Hassasiyeti","Sensibilidad del mouse"
+"ui.settings.resolution","5707318296597","Resolution","分辨率","Résolution","解像度","Rozdzielczość","Resolução","Разрешение","Çözünürlük","Resolución"
+"ui.settings.fullscreen","5707318296598","Fullscreen","全屏","Plein écran","フルスクリーン","Pełny ekran","Tela Cheia","Полноэкранный режим","Tam Ekran","Pantalla completa"
+"ui.settings.display_mode","5707318296599","Display Mode","显示模式","Mode d'affichage","表示モード","Tryb wyświetlania","Modo de Tela","Режим экрана","Görüntü Modu","Modo de pantalla"
+"ui.settings.quality","5707318296600","Quality","画质","Qualité","画質","Jakość","Qualidade","Качество","Kalite","Calidad"
+"ui.settings.vsync","5707318296601","VSync","垂直同步","Synchronisation verticale","垂直同期","Synchronizacja pionowa","V-Sync","Вертикальная синхронизация","Dikey Senkron","Sincronización vertical"
+"ui.settings.auto_save","5707318296602","Auto-Save","自动保存","Sauvegarde automatique","オートセーブ","Autozapis","Salvamento Automático","Автосохранение","Otomatik Kayıt","Autoguardado"
+"ui.settings.language","5707318296603","Language","语言","Langue","言語","Język","Idioma","Язык","Dil","Idioma"
+"gameplay.wrong_item","5707318296604","That won't work here.","这个在这里没用。","Ça ne marchera pas ici.","ここでは使えない。","To tutaj nie zadziała.","Isso não vai funcionar aqui.","Это здесь не сработает.","Bu burada işe yaramaz.","Eso no va a funcionar aquí."
+"gameplay.locked","5707318296605","It's locked.","锁住了。","C'est verrouillé.","鍵がかかっている。","Zamknięte na klucz.","Está trancado.","Заперто.","Kilitli.","Está cerrado con llave."
+"gameplay.cant_reach","5707318296606","I can't reach that.","我够不到那个。","Je ne peux pas atteindre ça.","あれには手が届かない。","Nie mogę tego dosięgnąć.","Não consigo alcançar isso.","Я не могу до этого дотянуться.","Oraya ulaşamıyorum.","No puedo alcanzar eso."
+"gameplay.wont_budge","5707318296607","It won't budge.","它纹丝不动。","Ça ne bouge pas.","びくともしない。","Nie chce drgnąć.","Não sai do lugar.","Не поддаётся.","Kıpırdamıyor.","No se mueve."
+"gameplay.wait_moment","5707318296608","Wait a moment.","稍等一下。","Attends un instant.","少し待って。","Chwila moment.","Espere um momento.","Подожди немного.","Bir dakika bekle.","Espera un momento."
+"gameplay.already_hiding","5707318296609","You are already hiding.","你已经在躲藏了。","Tu es déjà caché.","もう隠れている。","Już się ukrywasz.","Você já está se escondendo.","Ты уже прячешься.","Zaten saklanıyorsun.","Ya te estás escondiendo."
+"gameplay.catch_breath","5707318296610","I have to catch my breath first.","我得先喘口气。","Je dois d'abord reprendre mon souffle.","まず息を整えないと。","Muszę najpierw złapać oddech.","Preciso recuperar o fôlego primeiro.","Сначала нужно отдышаться.","Önce nefesimi toplamalıyım.","Primero tengo que recuperar el aliento."
+"gameplay.too_exhausted","5707318296611","I am too exhausted to hide.","我太累了，没法躲藏。","Je suis trop épuisé pour me cacher.","疲れすぎて隠れられない。","Jestem zbyt wyczerpany, by się ukryć.","Estou exausto demais para me esconder.","Я слишком измотан, чтобы прятаться.","Saklanamayacak kadar bitkinim.","Estoy demasiado agotado para esconderme."
+"gameplay.stamina_exit","5707318296612","I have to get out of here!","我得离开这里！","Je dois sortir d'ici !","ここから出ないと！","Muszę się stąd wydostać!","Eu preciso sair daqui!","Мне нужно выбраться отсюда!","Buradan çıkmalıyım!","¡Tengo que salir de aquí!"
+"gameplay.need_item","5707318296613","You need {0}.","需要{0}。","Il te faut {0}.","{0}が必要だ。","Potrzebujesz {0}.","Você precisa de {0}.","Нужен {0}.","{0} gerekiyor.","Necesitas {0}."
+"gameplay.item_used","5707318296614","{0} was used.","使用了{0}。","{0} a été utilisé.","{0}を使った。","Użyto {0}.","{0} foi usado.","{0} использован.","{0} kullanıldı.","Se usó {0}."
+"gameplay.item_unlocked","5707318296615","{0} unlocked it.","{0}把它打开了。","{0} a débloqué ceci.","{0}で開いた。","{0} to odblokował.","{0} destrancou isso.","{0} открыл это.","{0} kilidi açtı.","{0} lo desbloqueó."
+"gameplay.bolt_removed","5707318296616","Bolt removed.","螺栓已拆下。","Boulon retiré.","ボルトを外した。","Śruba usunięta.","Parafuso removido.","Болт снят.","Cıvata çıkarıldı.","Perno retirado."
+"gameplay.stuck","5707318296617","It is stuck.","卡住了。","C'est coincé.","動かない。","To utknęło.","Está emperrado.","Застряло.","Sıkışmış durumda.","Está atascado."
+"gameplay.not_configured","5707318296618","This interaction is not configured.","这个互动尚未配置。","Cette interaction n'est pas configurée.","このインタラクションは設定されていません。","Ta interakcja nie jest skonfigurowana.","Esta interação não está configurada.","Это взаимодействие не настроено.","Bu etkileşim yapılandırılmamış.","Esta interacción no está configurada."
+"gameplay.nothing_to_store","5707318296619","You have nothing to store.","你没有东西可以存放。","Tu n'as rien à ranger.","しまうものが何もない。","Nie masz nic do schowania.","Você não tem nada para guardar.","Тебе нечего складывать.","Saklayacak bir şeyin yok.","No tienes nada que guardar."
+"gameplay.stored","5707318296620","Stored: {0}.","已存放：{0}。","Rangé : {0}.","収納した：{0}","Schowano: {0}.","Guardado: {0}.","Сохранено: {0}.","Saklandı: {0}.","Guardado: {0}."
+"gameplay.already_installed","5707318296621","{0} is already installed.","{0}已经安装好了。","{0} est déjà installé.","{0}はすでに取り付けられている。","{0} jest już zainstalowany.","{0} já está instalado.","{0} уже установлен.","{0} zaten takılı.","{0} ya está instalado."
+"gameplay.select_part_first","5707318296622","Select a car part from your inventory first.","先从背包里选择一个汽车零件。","Sélectionne d'abord une pièce de voiture dans ton inventaire.","まずインベントリから車のパーツを選んで。","Najpierw wybierz część samochodu z ekwipunku.","Selecione uma peça do carro no seu inventário primeiro.","Сначала выберите деталь автомобиля в инвентаре.","Önce envanterinden bir araba parçası seç.","Selecciona primero una pieza de auto de tu inventario."
+"gameplay.dont_have_item","5707318296623","You do not have {0}.","你没有{0}。","Tu n'as pas {0}.","{0}を持っていない。","Nie masz {0}.","Você não tem {0}.","У тебя нет {0}.","{0} yok senin.","No tienes {0}."
+"gameplay.item_installed","5707318296624","{0} installed.","{0}已安装。","{0} installé.","{0}を取り付けた。","{0} zainstalowano.","{0} instalado.","{0} установлен.","{0} takıldı.","{0} instalado."
+"gameplay.slot_not_configured","5707318296625","This slot is not configured.","这个插槽尚未配置。","Cet emplacement n'est pas configuré.","このスロットは設定されていません。","Ten slot nie jest skonfigurowany.","Este slot não está configurado.","Этот слот не настроен.","Bu yuva yapılandırılmamış.","Esta ranura no está configurada."
+"gameplay.escape_not_setup","5707318296626","Escape sequence is not set up.","逃脱流程尚未设置。","La séquence d'évasion n'est pas configurée.","脱出シーケンスが設定されていません。","Sekwencja ucieczki nie została skonfigurowana.","A sequência de fuga não está configurada.","Последовательность побега не настроена.","Kaçış dizisi ayarlanmamış.","La secuencia de escape no está configurada."
+"gameplay.all_parts_installed","5707318296627","All parts installed. You escaped!","所有零件都已安装。你逃出去了！","Toutes les pièces sont installées. Tu t'es échappé !","すべてのパーツを取り付けた。脱出成功！","Wszystkie części zainstalowane. Uciekłeś!","Todas as peças instaladas. Você escapou!","Все детали установлены. Ты сбежал!","Tüm parçalar takıldı. Kaçtın!","Todas las piezas instaladas. ¡Escapaste!"
+"gameplay.still_missing","5707318296628","Still missing: {0}.","仍然缺少：{0}。","Il manque encore : {0}.","まだ足りないもの：{0}","Nadal brakuje: {0}.","Ainda faltando: {0}.","Всё ещё не хватает: {0}.","Hâlâ eksik: {0}.","Todavía falta: {0}."
+"loading.status","5707318296629","Loading...","加载中...","Chargement...","読み込み中...","Wczytywanie...","Carregando...","Загрузка...","Yükleniyor...","Cargando..."
+"item.bar.name","5707318296630","Bar","铁棍","Barre de fer","鉄の棒","Łom","Barra de Ferro","Лом","Demir Çubuk","Barra de metal"
+"item.bone.name","5707318296631","Bone","骨头","Os","骨","Kość","Osso","Кость","Kemik","Hueso"
+"item.gummy_bone.name","5707318296632","Bone","骨头","Os","骨","Kość","Osso","Кость","Kemik","Hueso"
+"item.basement_key.name","5707318296633","Basement Key","地下室钥匙","Clé du sous-sol","地下室の鍵","Klucz do piwnicy","Chave do Porão","Ключ от подвала","Bodrum Anahtarı","Llave del sótano"
+"item.box_key.name","5707318296634","Metal Box Key","金属箱钥匙","Clé de boîte métallique","金属箱の鍵","Metalowy klucz do skrzynki","Chave da Caixa de Metal","Металлический ключ от ящика","Metal Kutu Anahtarı","Llave de la caja metálica"
+"item.chewing_gum.name","5707318296635","Chewing Gum","口香糖","Chewing-gum","ガム","Guma do żucia","Chiclete","Жвачка","Sakız","Chicle"
+"item.clutch.name","5707318296636","Clutch","离合器","Embrayage","クラッチ","Sprzęgło","Embreagem","Сцепление","Debriyaj","Embrague"
+"item.clutch.pickup","5707318296701","Picked up Clutch","拾取了离合器","Embrayage récupéré","クラッチを入手した","Podniesiono sprzęgło","Pegou a Embreagem","Поднято сцепление","Debriyaj alındı","Recogiste el embrague"
+"item.hammer.name","5707318296637","Hammer","锤子","Marteau","ハンマー","Młotek","Martelo","Молоток","Çekiç","Martillo"
+"item.plunger.name","5707318296638","Plunger","搋子","Ventouse","ラバーカップ","Przepychacz","Desentupidor","Вантуз","Pompa","Desatascador"
+"item.screwdriver.name","5707318296639","Screwdriver","螺丝刀","Tournevis","ドライバー","Śrubokręt","Chave de Fenda","Отвёртка","Tornavida","Destornillador"
+"item.spark_plug.name","5707318296640","Spark Plug","火花塞","Bougie d'allumage","スパークプラグ","Świeca zapłonowa","Vela de Ignição","Свеча зажигания","Buji","Bujía"
+"item.spark_plug.pickup","5707318296700","Picked up Spark Plug","拾取了火花塞","Bougie d'allumage récupérée","スパークプラグを入手した","Podniesiono świecę zapłonową","Pegou a Vela de Ignição","Поднята свеча зажигания","Buji alındı","Recogiste la bujía"
+"item.vase.name","5707318296641","Vase","花瓶","Vase","花瓶","Wazon","Vaso","Ваза","Vazo","Florero"
+"item.wrench.name","5707318296642","Wrench","扳手","Clé à molette","レンチ","Klucz płaski","Chave Inglesa","Гаечный ключ","İngiliz Anahtarı","Llave inglesa"
+"item.bar.pickup","5707318296643","Picked up Bar","拾取了铁棍","Barre de fer récupérée","鉄の棒を入手した","Podniesiono łom","Pegou a Barra de Ferro","Поднят лом","Demir Çubuk alındı","Recogiste la barra de metal"
+"item.bone.pickup","5707318296644","Bone added to inventory","骨头已加入背包","Os ajouté à l'inventaire","骨をインベントリに追加した","Kość dodana do ekwipunku","Osso adicionado ao inventário","Кость добавлена в инвентарь","Kemik envantere eklendi","Hueso añadido al inventario"
+"item.gummy_bone.pickup","5707318296645","Gummy Bone added to inventory","粘着口香糖的骨头已加入背包","Os avec chewing-gum ajouté à l'inventaire","ガム付きの骨をインベントリに追加した","Kość z gumą dodana do ekwipunku","Osso com Chiclete adicionado ao inventário","Кость с жвачкой добавлена в инвентарь","Sakızlı Kemik envantere eklendi","Hueso con chicle añadido al inventario"
+"item.basement_key.pickup","5707318296646","Picked up key","拾取了钥匙","Clé récupérée","鍵を入手した","Podniesiono klucz","Pegou a chave","Поднят ключ","Anahtar alındı","Recogiste la llave"
+"item.box_key.pickup","5707318296647","Picked up small key","拾取了小钥匙","Petite clé récupérée","小さな鍵を入手した","Podniesiono mały klucz","Pegou a chave pequena","Поднят маленький ключ","Küçük anahtar alındı","Recogiste la llave pequeña"
+"item.chewing_gum.pickup","5707318296648","Picked up Chewing Gum","拾取了口香糖","Chewing-gum récupéré","ガムを入手した","Podniesiono gumę do żucia","Pegou o Chiclete","Поднята жвачка","Sakız alındı","Recogiste el chicle"
+"item.hammer.pickup","5707318296649","Picked up Hammer","拾取了锤子","Marteau récupéré","ハンマーを入手した","Podniesiono młotek","Pegou o Martelo","Поднят молоток","Çekiç alındı","Recogiste el martillo"
+"item.plunger.pickup","5707318296650","Picked up Plunger","拾取了搋子","Ventouse récupérée","ラバーカップを入手した","Podniesiono przepychacz","Pegou o Desentupidor","Поднят вантуз","Pompa alındı","Recogiste el desatascador"
+"item.screwdriver.pickup","5707318296651","Picked up Screwdriver","拾取了螺丝刀","Tournevis récupéré","ドライバーを入手した","Podniesiono śrubokręt","Pegou a Chave de Fenda","Поднята отвёртка","Tornavida alındı","Recogiste el destornillador"
+"item.vase.pickup","5707318296652","There is something inside it","里面好像有什么东西","Il y a quelque chose à l'intérieur","中に何か入っている","Coś w tym jest","Tem alguma coisa dentro","Там что-то внутри","İçinde bir şey var","Hay algo adentro"
+"item.wrench.pickup","5707318296653","Picked up Wrench","拾取了扳手","Clé à molette récupérée","レンチを入手した","Podniesiono klucz płaski","Pegou a Chave Inglesa","Поднят гаечный ключ","İngiliz Anahtarı alındı","Recogiste la llave inglesa"
+"gameplay.need_plunger","5707318296654","It is completely clogged.","完全堵住了。","C'est complètement bouché.","完全に詰まっている。","Jest całkowicie zatkany.","Está completamente entupido.","Он полностью засорён.","Tamamen tıkanmış.","Está completamente atascado."
+"gameplay.already_flushed","5707318296655","The water's already gone.","水已经排空了。","L'eau est déjà partie.","水はもう流れてしまった。","Woda już zniknęła.","A água já se foi.","Вода уже ушла.","Su zaten gitmiş.","El agua ya se fue."
+"gameplay.need_bar","5707318296656","I think I need to hit it with something to rotate, it is completely rusty","我觉得得用什么东西敲一下才能转动，它完全锈死了。","Je crois qu'il faut le frapper avec quelque chose pour le faire tourner, il est complètement rouillé","回すには何かで叩く必要がありそうだ。完全に錆びついている。","Chyba muszę to uderzyć czymś, żeby obrócić — jest kompletnie zardzewiałe","Acho que preciso bater com algo para girar, está completamente enferrujado","Думаю, нужно ударить чем-нибудь, чтобы провернуть — он полностью заржавел","Döndürmek için bir şeyle vurmam gerekiyor gibi, tamamen paslanmış","Creo que necesito golpearlo con algo para girarlo, está completamente oxidado"
+"gameplay.use_bar_vise","5707318296657","Use the bar on the vise.","把铁棍用在台钳上。","Utilise la barre de fer sur l'étau.","鉄の棒を万力に使う。","Użyj łomu na imadle.","Use a barra na morsa.","Используй лом на тисках.","Çubuğu mengeneye kullan.","Usa la barra en el tornillo de banco."
+"gameplay.use_hammer_bar","5707318296658","Use the hammer on the bar.","把锤子用在铁棍上。","Utilise le marteau sur la barre de fer.","ハンマーを鉄の棒に使う。","Użyj młotka na łomie.","Use o martelo na barra.","Используй молоток на ломе.","Çekici çubuğun üzerinde kullan.","Usa el martillo en la barra."
+"gameplay.gum_on_bone","5707318296659","Stuck the gum on the bone.","把口香糖粘在了骨头上。","A collé le chewing-gum sur l'os.","ガムを骨にくっつけた。","Przykleił gumę do kości.","Grudou o chiclete no osso.","Прилепил жвачку к кости.","Sakızı kemiğe yapıştırdı.","Pegó el chicle en el hueso."
+"gameplay.bone_slip","5707318296660","It keeps slipping, I need to stick something to the bone","它一直打滑，我需要把什么东西粘到骨头上","Ça glisse sans arrêt, je dois coller quelque chose sur l'os","ずっと滑る、骨に何か貼り付けないと","Ciągle się ześlizguje, muszę coś przykleić do kości","Fica escorregando, preciso grudar algo no osso","Постоянно соскальзывает, нужно что-то приклеить к кости","Sürekli kayıyor, kemiğe bir şey yapıştırmam gerekiyor","Sigue resbalando, necesito pegar algo al hueso"
+"gameplay.screwdriver_snapped","5707318296661","The screwdriver snapped.","螺丝刀断了。","Le tournevis s'est cassé.","ドライバーが折れた。","Śrubokręt się złamał.","A chave de fenda quebrou.","Отвёртка сломалась.","Tornavida kırıldı.","El destornillador se rompió."
+"loading.tip.hiding","5707318296662","TIP: Use hiding spots to escape enemies.","提示：利用藏身点躲避敌人。","ASTUCE : Utilisez les cachettes pour échapper aux ennemis.","ヒント：隠れ場所を使って敵から逃れよう。","WSKAZÓWKA: Używaj kryjówek, aby uniknąć wrogów.","DICA: Use esconderijos para escapar dos inimigos.","СОВЕТ: Используйте укрытия, чтобы избежать врагов.","İPUCU: Saklanma noktalarını kullanarak düşmanlardan kaçabilirsiniz.","CONSEJO: Usa los escondites para evitar a los enemigos."
+"loading.tip.explore","5707318296663","TIP: Explore carefully, you might find important clues.","提示：仔细探索四周，你可能会找到重要线索。","ASTUCE : Explorez attentivement les environs, vous pourriez trouver des indices importants.","ヒント：周囲を注意深く調べると、重要な手がかりが見つかるかもしれない。","WSKAZÓWKA: Eksploruj otoczenie uważnie, możesz znaleźć ważne wskazówki.","DICA: Explore com cuidado, você pode encontrar pistas importantes.","СОВЕТ: Исследуйте окрестности внимательно, вы можете найти важные подсказки.","İPUCU: Etrafı dikkatli araştırın, önemli ipuçları bulabilirsiniz.","CONSEJO: Explora con cuidado, podrías encontrar pistas importantes."
+"loading.tip.quiet","5707318296664","TIP: Keep quiet, enemies can hear you.","提示：保持安静，敌人能听到你的声音。","ASTUCE : Restez silencieux, les ennemis peuvent vous entendre.","ヒント：静かにしていないと、敵に気づかれてしまう。","WSKAZÓWKA: Zachowuj ciszę, wrogowie mogą cię usłyszeć.","DICA: Fique em silêncio, os inimigos podem ouvir você.","СОВЕТ: Ведите себя тихо, враги могут вас услышать.","İPUCU: Sesinizi kısık tutun, düşmanlar sizi duyabilir.","CONSEJO: Mantente en silencio, los enemigos pueden escucharte."
+"loading.tip.flashlight","5707318296665","TIP: Your flashlight has limited battery, use it wisely.","提示：手电筒电量有限，请谨慎使用。","ASTUCE : Votre lampe torche a une batterie limitée, utilisez-la avec prudence.","ヒント：懐中電灯のバッテリーには限りがあるので、大切に使おう。","WSKAZÓWKA: Twoja latarka ma ograniczoną baterię, używaj jej rozważnie.","DICA: Sua lanterna tem bateria limitada, use com sabedoria.","СОВЕТ: У вашего фонарика ограниченный заряд батареи, используйте его с умом.","İPUCU: El feneriniz sınırlı pile sahip, dikkatli kullanın.","CONSEJO: Tu linterna tiene batería limitada, úsala con cuidado."
+"loading.tip.doors","5707318296666","TIP: Some doors require special keys.","提示：有些门需要特殊钥匙。","ASTUCE : Certaines portes nécessitent des clés spéciales.","ヒント：特別な鍵が必要なドアもある。","WSKAZÓWKA: Niektóre drzwi wymagają specjalnych kluczy.","DICA: Algumas portas exigem chaves especiais.","СОВЕТ: Некоторым дверям нужны особые ключи.","İPUCU: Bazı kapılar özel anahtarlar gerektirir.","CONSEJO: Algunas puertas requieren llaves especiales."
+"loading.tip.running","5707318296667","TIP: Running can attract enemies' attention.","提示：奔跑可能会引起敌人的注意。","ASTUCE : Courir peut attirer l'attention des ennemis.","ヒント：走ると敵に気づかれることがある。","WSKAZÓWKA: Bieganie może zwrócić uwagę wrogów.","DICA: Correr pode chamar a atenção dos inimigos.","СОВЕТ: Бег может привлечь внимание врагов.","İPUCU: Koşmak düşmanların dikkatini çekebilir.","CONSEJO: Correr puede llamar la atención de los enemigos."
+"loading.tip.notes","5707318296668","TIP: Read notes and documents to uncover the story.","提示：阅读纸条和文件来揭开故事。","ASTUCE : Lisez les notes et documents pour découvrir l'histoire.","ヒント：メモや書類を読んで物語を明らかにしよう。","WSKAZÓWKA: Czytaj notatki i dokumenty, aby odkryć fabułę.","DICA: Leia bilhetes e documentos para descobrir a história.","СОВЕТ: Читайте записки и документы, чтобы раскрыть историю.","İPUCU: Notları ve dökümanları okuyarak hikayeyi keşfedin.","CONSEJO: Lee notas y documentos para descubrir la historia."
+"loading.tip.dark_corners","5707318296669","TIP: Hiding in dark corners helps protect you from enemies.","提示：躲在阴暗角落有助于避开敌人。","ASTUCE : Se cacher dans les coins sombres aide à se protéger des ennemis.","ヒント：暗い隅に隠れると敵から身を守りやすくなる。","WSKAZÓWKA: Ukrywanie się w ciemnych kątach pomaga uniknąć wrogów.","DICA: Esconder-se em cantos escuros ajuda a se proteger dos inimigos.","СОВЕТ: Прятаться в тёмных углах помогает укрыться от врагов.","İPUCU: Karanlık köşelerde saklanmak düşmanlardan korunmanıza yardımcı olur.","CONSEJO: Esconderte en rincones oscuros te ayuda a protegerte de los enemigos."
+"gameplay.nothing_here","5707318296670","Nothing here.","这里什么都没有。","Il n'y a rien ici.","ここには何もない。","Nic tu nie ma.","Nada aqui.","Здесь ничего нет.","Burada bir şey yok.","No hay nada aquí."
+"gameplay.inventory_full","5707318296671","Your inventory is full.","你的背包已满。","Votre inventaire est plein.","インベントリがいっぱいです。","Twój ekwipunek jest pełny.","Seu inventário está cheio.","Ваш инвентарь полон.","Envanterin dolu.","Tu inventario está lleno."
+"gameplay.grate_bolted","5707318296672","The grate is still bolted down.","格栅仍然被螺栓固定着。","La grille est encore boulonnée.","格子はまだボルトで固定されている。","Kratka jest nadal przykręcona.","A grade ainda está parafusada.","Решётка всё ещё прикручена.","Izgara hâlâ civatalı.","La reja sigue atornillada."
+"ui.confirm.title","5707318296673","Confirm","确认","Confirmer","確認","Potwierdź","Confirmar","Подтвердить","Onay","Confirmar"
+"ui.confirm.yes","5707318296674","Yes","是","Oui","はい","Tak","Sim","Да","Evet","Sí"
+"ui.confirm.no","5707318296675","No","否","Non","いいえ","Nie","Não","Нет","Hayır","No"
+"ui.confirm.quit_message","5707318296676","Are you sure you want to quit?\n\nUnsaved progress will be lost.","确定要退出吗？\n\n未保存的进度将会丢失。","Voulez-vous vraiment quitter ?\n\nLa progression non sauvegardée sera perdue.","本当に終了しますか？\n\n未保存の進行状況は失われます。","Czy na pewno chcesz wyjść?\n\nNiezapisany postęp zostanie utracony.","Tem certeza de que deseja sair?\n\nO progresso não salvo será perdido.","Вы уверены, что хотите выйти?\n\nНесохранённый прогресс будет потерян.","Oyundan çıkmak istediğinize emin misiniz?\nKaydedilmemiş ilerleme kaybolacak.","¿Seguro que quieres salir?\n\nSe perderá el progreso no guardado."
+"ui.confirm.quit_title","5707318296677","Quit","退出","Quitter","終了","Wyjście","Sair","Выход","Çıkış","Salir"
+"ui.confirm.quit_confirm","5707318296678","Quit","退出","Quitter","終了","Wyjdź","Sair","Выйти","Çık","Salir"
+"ui.confirm.menu_message","5707318296679","Are you sure you want to return to the main menu?\n\nUnsaved progress will be lost.","确定要返回主菜单吗？\n\n未保存的进度将会丢失。","Voulez-vous vraiment retourner au menu principal ?\n\nLa progression non sauvegardée sera perdue.","本当にメインメニューに戻りますか？\n\n未保存の進行状況は失われます。","Czy na pewno chcesz wrócić do menu głównego?\n\nNiezapisany postęp zostanie utracony.","Tem certeza de que deseja voltar ao menu principal?\n\nO progresso não salvo será perdido.","Вы уверены, что хотите вернуться в главное меню?\n\nНесохранённый прогресс будет потерян.","Ana menüye dönmek istediğinize emin misiniz?\nKaydedilmemiş ilerleme kaybolacak.","¿Seguro que quieres volver al menú principal?\n\nSe perderá el progreso no guardado."
+"ui.confirm.menu_title","5707318296680","Main Menu","主菜单","Menu principal","メインメニュー","Menu główne","Menu Principal","Главное меню","Ana Menü","Menú principal"
+"ui.confirm.menu_confirm","5707318296681","Return","返回","Retour","戻る","Wróć","Voltar","Вернуться","Dön","Volver"
+"letter.left_without_word","5707318296682","I think there was something inside that vase","我觉得那个花瓶里有什么东西。","Je pense qu'il y avait quelque chose dans ce vase.","あの花瓶の中に何かあったと思う。","Myślę, że coś było w tym wazonie.","Acho que tinha alguma coisa dentro daquele vaso.","Думаю, в той вазе что-то было.","Sanırım o vazonun içinde bir şey vardı.","Creo que había algo dentro de ese jarrón."
+"letter.toilet_plunger_note","5707318296699","The toilet is clogged, I can't find the plunger. It was somewhere inside a bucket, but I don't remember where.","马桶堵了，我找不到搋子。它在一个桶里的某个地方，但我不记得在哪里了。","Les toilettes sont bouchées, je ne trouve pas la ventouse. Elle était quelque part dans un seau, mais je ne me souviens plus où.","トイレが詰まっている。ラバーカップが見つからない。桶の中のどこかにあったはずだが、どこだったか思い出せない。","Toaleta jest zatkana, nie mogę znaleźć przepychacza. Był gdzieś w wiaderku, ale nie pamiętam gdzie.","O vaso está entupido, não consigo achar o desentupidor. Estava em algum lugar dentro de um balde, mas não lembro onde.","Унитаз засорён, не могу найти вантуз. Он был где-то в ведре, но я не помню где.","Tuvalet tıkalı, pompayı bulamıyorum. Bir kovanın içinde bir yerdeydi ama yerini hatırlamıyorum.","El inodoro está atascado, no encuentro el desatascador. Estaba en algún lugar dentro de un cubo, pero no recuerdo dónde."
+"gameplay.item_dropped","5707318296683","Dropped {0}.","已丢弃 {0}。","{0} déposé.","{0} を落とした。","Upuszczono {0}.","{0} foi solto.","Выброшено: {0}.","{0} bırakıldı.","Se soltó {0}."
+"ui.option.enabled","5707318296684","Enabled","启用","Activé","有効","Włączone","Ativado","Включено","Etkin","Activado"
+"ui.option.disabled","5707318296685","Disabled","禁用","Désactivé","無効","Wyłączone","Desativado","Отключено","Devre Dışı","Desactivado"
+"ui.option.fullscreen","5707318296686","Fullscreen","全屏","Plein écran","フルスクリーン","Pełny ekran","Tela cheia","Полный экран","Tam Ekran","Pantalla completa"
+"ui.option.windowed","5707318296687","Windowed","窗口","Fenêtré","ウィンドウ","Okienkowy","Janela","Оконный режим","Pencere","Ventana"
+"ui.option.bordered","5707318296688","Bordered","带边框","Avec bordure","枠付き","Z ramką","Com borda","С рамкой","Kenarlıklı","Con bordes"
+"ui.option.exclusive_fullscreen","5707318296689","Exclusive Fullscreen","独占全屏","Plein écran exclusif","排他フルスクリーン","Pełny ekran (wyłączny)","Tela cheia exclusiva","Эксклюзивный полный экран","Özel Tam Ekran","Pantalla completa exclusiva"
+"ui.option.quality.very_low","5707318296690","Very Low","极低","Très faible","非常に低","Bardzo niski","Muito baixo","Очень низкое","Çok Düşük","Muy bajo"
+"ui.option.quality.low","5707318296691","Low","低","Faible","低","Niski","Baixo","Низкое","Düşük","Bajo"
+"ui.option.quality.medium","5707318296692","Medium","中","Moyen","中","Średni","Médio","Среднее","Orta","Medio"
+"ui.option.quality.high","5707318296693","High","高","Élevé","高","Wysoki","Alto","Высокое","Yüksek","Alto"
+"ui.option.quality.very_high","5707318296694","Very High","极高","Très élevé","非常に高","Bardzo wysoki","Muito alto","Очень высокое","Çok Yüksek","Muy alto"
+"ui.option.quality.ultra","5707318296695","Ultra","超高","Ultra","ウルトラ","Ultra","Ultra","Ультра","Ultra","Ultra"
+"hint.use_item","5707318296696","Use Item","使用物品","Utiliser l'objet","アイテムを使う","Użyj przedmiotu","Usar item","Использовать предмет","Öğeyi Kullan","Usar objeto"
+"hint.drop","5707318296697","Drop","丢弃","Lâcher","落とす","Upuść","Soltar","Выбросить","Bırak","Soltar"
+"gameplay.nothing_in_reach","5707318296698","Nothing in reach.","够不到任何东西。","Il n'y a rien à portée de main.","手の届くところに何もない。","Nie ma nic w zasięgu.","Não há nada ao alcance.","Ничего не досягается.","Erişebileceğim bir şey yok.","No hay nada a tu alcance."

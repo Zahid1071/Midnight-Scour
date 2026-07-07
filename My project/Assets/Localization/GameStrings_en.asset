@@ -1,0 +1,581 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: GameStrings_en
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: 23aaa987a5caa724aac997d9b6cae0ae, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 5707297325057
+    m_Localized: Quit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325056
+    m_Localized: Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325058
+    m_Localized: Back
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325059
+    m_Localized: Apply
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325060
+    m_Localized: Default
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1843970048000
+    m_Localized: Continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325061
+    m_Localized: New Game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325062
+    m_Localized: Credits
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325063
+    m_Localized: Save Game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325064
+    m_Localized: PAUSE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296576
+    m_Localized: Resume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296577
+    m_Localized: "Thank you for playing the Midnight Scour demo.
+
+This build represents a fraction of the final experience. The full game will expand this core stealth and survival loop across multiple distinct rooms and environments, requiring you to constantly adapt to new layouts, behaviors, and threats.
+
+Midnight Scour is scheduled for release in late 2026.
+
+If you enjoyed the demo, please consider adding the game to your Steam Wishlist. It is the most effective way to support the continued development of the project."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296578
+    m_Localized: press any key to exit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296579
+    m_Localized: press any key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296580
+    m_Localized: You can read notes for clues
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296581
+    m_Localized: Use hiding spots to avoid the killer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296582
+    m_Localized: Making noise might alert the killer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296583
+    m_Localized: "Press {0} to drop selected item"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296584
+    m_Localized: Use Item/Combine Item
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296585
+    m_Localized: Interact
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296586
+    m_Localized: SETTINGS
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296587
+    m_Localized: Display
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296588
+    m_Localized: Audio
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296589
+    m_Localized: Controls
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296590
+    m_Localized: Gameplay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296591
+    m_Localized: General
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296592
+    m_Localized: Master Volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296593
+    m_Localized: Music Volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296594
+    m_Localized: SFX Volume
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296595
+    m_Localized: Brightness
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296596
+    m_Localized: Mouse Sensitivity
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296597
+    m_Localized: Resolution
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296598
+    m_Localized: Fullscreen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296599
+    m_Localized: Display Mode
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296600
+    m_Localized: Quality
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296601
+    m_Localized: VSync
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296602
+    m_Localized: Auto-Save
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296603
+    m_Localized: Language
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296604
+    m_Localized: That won't work here.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296605
+    m_Localized: It's locked.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296606
+    m_Localized: I can't reach that.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296607
+    m_Localized: It won't budge.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296608
+    m_Localized: Wait a moment.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296609
+    m_Localized: You are already hiding.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296610
+    m_Localized: I have to catch my breath first.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296611
+    m_Localized: I am too exhausted to hide.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296612
+    m_Localized: I have to get out of here!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296613
+    m_Localized: "You need {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296614
+    m_Localized: "{0} was used."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296615
+    m_Localized: "{0} unlocked it."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296616
+    m_Localized: Bolt removed.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296617
+    m_Localized: It is stuck.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296618
+    m_Localized: This interaction is not configured.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296619
+    m_Localized: You have nothing to store.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296620
+    m_Localized: "Stored: {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296621
+    m_Localized: "{0} is already installed."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296622
+    m_Localized: Select a car part from your inventory first.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296623
+    m_Localized: "You do not have {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296624
+    m_Localized: "{0} installed."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296625
+    m_Localized: This slot is not configured.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296626
+    m_Localized: Escape sequence is not set up.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296627
+    m_Localized: All parts installed. You escaped!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296628
+    m_Localized: "Still missing: {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296629
+    m_Localized: Loading...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296630
+    m_Localized: Bar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296631
+    m_Localized: Bone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296632
+    m_Localized: Bone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296633
+    m_Localized: Basement Key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296634
+    m_Localized: Metal Box Key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296635
+    m_Localized: Chewing Gum
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296636
+    m_Localized: Clutch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296637
+    m_Localized: Hammer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296638
+    m_Localized: Plunger
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296639
+    m_Localized: Screwdriver
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296640
+    m_Localized: Spark Plug
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296641
+    m_Localized: Vase
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296642
+    m_Localized: Wrench
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296643
+    m_Localized: Picked up Bar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296644
+    m_Localized: Bone added to inventory
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296645
+    m_Localized: Gummy Bone added to inventory
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296646
+    m_Localized: Picked up key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296647
+    m_Localized: Picked up small key
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296648
+    m_Localized: Picked up Chewing Gum
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296649
+    m_Localized: Picked up Hammer
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296650
+    m_Localized: Picked up Plunger
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296651
+    m_Localized: Picked up Screwdriver
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296652
+    m_Localized: There is something inside it
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296653
+    m_Localized: Picked up Wrench
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296654
+    m_Localized: It is completely clogged.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296655
+    m_Localized: The water's already gone.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296656
+    m_Localized: I think I need to hit it with something to rotate, it is completely rusty
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296657
+    m_Localized: Use the bar on the vise.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296658
+    m_Localized: Use the hammer on the bar.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296659
+    m_Localized: Stuck the gum on the bone.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296660
+    m_Localized: It keeps slipping, I need to stick something to the bone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296661
+    m_Localized: The screwdriver snapped.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296662
+    m_Localized: TIP: Use hiding spots to escape enemies.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296663
+    m_Localized: TIP: Explore carefully, you might find important clues.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296664
+    m_Localized: TIP: Keep quiet, enemies can hear you.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296665
+    m_Localized: TIP: Your flashlight has limited battery, use it wisely.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296666
+    m_Localized: TIP: Some doors require special keys.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296667
+    m_Localized: TIP: Running can attract enemies' attention.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296668
+    m_Localized: TIP: Read notes and documents to uncover the story.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296669
+    m_Localized: TIP: Hiding in dark corners helps protect you from enemies.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296670
+    m_Localized: Nothing here.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296671
+    m_Localized: Your inventory is full.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296672
+    m_Localized: The grate is still bolted down.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296673
+    m_Localized: Confirm
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296674
+    m_Localized: Yes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296675
+    m_Localized: No
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296676
+    m_Localized: "Are you sure you want to quit?\n\nUnsaved progress will be lost."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296677
+    m_Localized: Quit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296678
+    m_Localized: Quit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296679
+    m_Localized: "Are you sure you want to return to the main menu?\n\nUnsaved progress will be lost."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296680
+    m_Localized: Main Menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296681
+    m_Localized: Return
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296682
+    m_Localized: I think there was something inside that vase
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296683
+    m_Localized: "Dropped {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296684
+    m_Localized: Enabled
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296685
+    m_Localized: Disabled
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296686
+    m_Localized: Fullscreen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296687
+    m_Localized: Windowed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296688
+    m_Localized: Bordered
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296689
+    m_Localized: Exclusive Fullscreen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296690
+    m_Localized: Very Low
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296691
+    m_Localized: Low
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296692
+    m_Localized: Medium
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296693
+    m_Localized: High
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296694
+    m_Localized: Very High
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296695
+    m_Localized: Ultra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296696
+    m_Localized: Use Item
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296697
+    m_Localized: Drop
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296698
+    m_Localized: Nothing in reach.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296699
+    m_Localized: The toilet is clogged, I can't find the plunger. It was somewhere inside a bucket, but I don't remember where.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296701
+    m_Localized: Picked up Clutch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296700
+    m_Localized: Picked up Spark Plug
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296702
+    m_Localized: E
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296703
+    m_Localized: G
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

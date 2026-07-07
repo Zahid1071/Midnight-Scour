@@ -33,10 +33,24 @@ public class InventoryItem : ScriptableObject
     public AudioClip breakOnWrongUseSound;
     [TextArea] public string breakOnWrongUseMessage = "The screwdriver snapped.";
 
+    [Header("Localization")]
+    [SerializeField] string nameKey;
+    [SerializeField] string pickupKey;
+    [SerializeField] string breakMessageKey;
+
     [TextArea] public string pickUpText;
     [TextArea] public string description;
 
+    public string GetLocalizedName() =>
+        string.IsNullOrWhiteSpace(nameKey) ? itemName : Loc.Get(nameKey);
+
+    public string GetLocalizedPickupText() =>
+        string.IsNullOrWhiteSpace(pickupKey) ? pickUpText : Loc.Get(pickupKey);
+
     public GameObject GetDropPrefab() => worldPrefab;
+
+    public string GetLocalizedBreakMessage() =>
+        string.IsNullOrWhiteSpace(breakMessageKey) ? breakOnWrongUseMessage : Loc.Get(breakMessageKey);
 
     /// <summary>Used when this item is offered to a locked door that expects a different key.</summary>
     public bool TryBreakOnWrongUse(Vector3 soundPosition)
@@ -51,8 +65,8 @@ public class InventoryItem : ScriptableObject
         if (breakOnWrongUseSound != null && SoundManager.Instance != null)
             SoundManager.Instance.PlaySFXAt(breakOnWrongUseSound, soundPosition);
 
-        if (!string.IsNullOrWhiteSpace(breakOnWrongUseMessage) && HudManager.Instance != null)
-            HudManager.Instance.ShowSubtitle(breakOnWrongUseMessage, 3f, HudManager.Instance.ErrorColor);
+        if (!string.IsNullOrWhiteSpace(GetLocalizedBreakMessage()) && HudManager.Instance != null)
+            HudManager.Instance.ShowSubtitle(GetLocalizedBreakMessage(), 3f, HudManager.Instance.ErrorColor);
         return true;
     }
 }

@@ -62,7 +62,7 @@ public class HudManager : MonoBehaviour
 
         float d = durationSeconds ?? defaultDuration;
         subtitleText.color = color ?? defaultSubtitleColor;
-        subtitleText.text = message;
+        UIFont.SetText(subtitleText, message);
         subtitleText.gameObject.SetActive(true);
 
         if (hideRoutine != null)

@@ -1,0 +1,581 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: GameStrings_es-419
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: es-419
+  m_SharedData: {fileID: 11400000, guid: 23aaa987a5caa724aac997d9b6cae0ae, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 5707297325056
+    m_Localized: "Configuración"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325057
+    m_Localized: Salir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325058
+    m_Localized: "Atrás"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325059
+    m_Localized: Aplicar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325060
+    m_Localized: Predeterminado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1843970048000
+    m_Localized: Continuar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325061
+    m_Localized: Nueva partida
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325062
+    m_Localized: "Créditos"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325063
+    m_Localized: Guardar partida
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325064
+    m_Localized: PAUSA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296576
+    m_Localized: Reanudar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296577
+    m_Localized: "Gracias por jugar la demo de Midnight Scour.
+
+Esta versión representa solo una fracción de la experiencia final. El juego completo ampliará este ciclo central de sigilo y supervivencia a múltiples habitaciones y entornos distintos, obligándote a adaptarte constantemente a nuevos diseños, comportamientos y amenazas.
+
+Se espera que Midnight Scour se lance a finales de 2026.
+
+Si disfrutaste la demo, considera agregar el juego a tu lista de deseos de Steam. Es la forma más efectiva de apoyar el desarrollo continuo del proyecto."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296578
+    m_Localized: presiona cualquier tecla para salir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296579
+    m_Localized: presiona cualquier tecla
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296580
+    m_Localized: Puedes leer notas para encontrar pistas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296581
+    m_Localized: Usa los escondites para evitar al asesino
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296582
+    m_Localized: Hacer ruido puede alertar al asesino
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296583
+    m_Localized: "Presiona {0} para soltar el objeto seleccionado"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296584
+    m_Localized: Usar/Combinar objeto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296585
+    m_Localized: Interactuar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296586
+    m_Localized: "CONFIGURACIÓN"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296587
+    m_Localized: Pantalla
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296588
+    m_Localized: Audio
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296589
+    m_Localized: Controles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296590
+    m_Localized: Jugabilidad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296591
+    m_Localized: General
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296592
+    m_Localized: Volumen general
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296593
+    m_Localized: "Volumen de música"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296594
+    m_Localized: Volumen de efectos
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296595
+    m_Localized: Brillo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296596
+    m_Localized: Sensibilidad del mouse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296597
+    m_Localized: "Resolución"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296598
+    m_Localized: Pantalla completa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296599
+    m_Localized: Modo de pantalla
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296600
+    m_Localized: Calidad
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296601
+    m_Localized: "Sincronización vertical"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296602
+    m_Localized: Autoguardado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296603
+    m_Localized: Idioma
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296604
+    m_Localized: "Eso no va a funcionar aquí."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296605
+    m_Localized: "Está cerrado con llave."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296606
+    m_Localized: No puedo alcanzar eso.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296607
+    m_Localized: No se mueve.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296608
+    m_Localized: Espera un momento.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296609
+    m_Localized: "Ya te estás escondiendo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296610
+    m_Localized: Primero tengo que recuperar el aliento.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296611
+    m_Localized: Estoy demasiado agotado para esconderme.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296612
+    m_Localized: "¡Tengo que salir de aquí!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296613
+    m_Localized: "Necesitas {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296614
+    m_Localized: "Se usó {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296615
+    m_Localized: "{0} lo desbloqueó."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296616
+    m_Localized: Perno retirado.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296617
+    m_Localized: "Está atascado."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296618
+    m_Localized: "Esta interacción no está configurada."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296619
+    m_Localized: No tienes nada que guardar.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296620
+    m_Localized: "Guardado: {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296621
+    m_Localized: "{0} ya está instalado."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296622
+    m_Localized: Selecciona primero una pieza de auto de tu inventario.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296623
+    m_Localized: "No tienes {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296624
+    m_Localized: "{0} instalado."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296625
+    m_Localized: "Esta ranura no está configurada."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296626
+    m_Localized: "La secuencia de escape no está configurada."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296627
+    m_Localized: "Todas las piezas instaladas. ¡Escapaste!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296628
+    m_Localized: "Todavía falta: {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296629
+    m_Localized: Cargando...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296630
+    m_Localized: Barra de metal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296631
+    m_Localized: Hueso
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296632
+    m_Localized: Hueso
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296633
+    m_Localized: "Llave del sótano"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296634
+    m_Localized: "Llave de la caja metálica"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296635
+    m_Localized: Chicle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296636
+    m_Localized: Embrague
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296637
+    m_Localized: Martillo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296638
+    m_Localized: Desatascador
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296639
+    m_Localized: Destornillador
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296640
+    m_Localized: "Bujía"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296641
+    m_Localized: Florero
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296642
+    m_Localized: Llave inglesa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296643
+    m_Localized: Recogiste la barra de metal
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296644
+    m_Localized: "Hueso añadido al inventario"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296645
+    m_Localized: "Hueso con chicle añadido al inventario"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296646
+    m_Localized: Recogiste la llave
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296647
+    m_Localized: "Recogiste la llave pequeña"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296648
+    m_Localized: Recogiste el chicle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296649
+    m_Localized: Recogiste el martillo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296650
+    m_Localized: Recogiste el desatascador
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296651
+    m_Localized: Recogiste el destornillador
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296652
+    m_Localized: Hay algo adentro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296653
+    m_Localized: Recogiste la llave inglesa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296654
+    m_Localized: "Está completamente atascado."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296655
+    m_Localized: El agua ya se fue.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296656
+    m_Localized: "Creo que necesito golpearlo con algo para girarlo, está completamente oxidado"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296657
+    m_Localized: Usa la barra en el tornillo de banco.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296658
+    m_Localized: Usa el martillo en la barra.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296659
+    m_Localized: "Pegó el chicle en el hueso."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296660
+    m_Localized: Sigue resbalando, necesito pegar algo al hueso
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296661
+    m_Localized: "El destornillador se rompió."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296662
+    m_Localized: CONSEJO: Usa los escondites para evitar a los enemigos.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296663
+    m_Localized: "CONSEJO: Explora con cuidado, podrías encontrar pistas importantes."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296664
+    m_Localized: CONSEJO: Mantente en silencio, los enemigos pueden escucharte.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296665
+    m_Localized: "CONSEJO: Tu linterna tiene batería limitada, úsala con cuidado."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296666
+    m_Localized: CONSEJO: Algunas puertas requieren llaves especiales.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296667
+    m_Localized: "CONSEJO: Correr puede llamar la atención de los enemigos."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296668
+    m_Localized: CONSEJO: Lee notas y documentos para descubrir la historia.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296669
+    m_Localized: CONSEJO: Esconderte en rincones oscuros te ayuda a protegerte de los enemigos.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296670
+    m_Localized: "No hay nada aquí."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296671
+    m_Localized: "Tu inventario está lleno."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296672
+    m_Localized: La reja sigue atornillada.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296673
+    m_Localized: Confirmar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296674
+    m_Localized: "Sí"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296675
+    m_Localized: No
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296676
+    m_Localized: "¿Seguro que quieres salir?\n\nSe perderá el progreso no guardado."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296677
+    m_Localized: Salir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296678
+    m_Localized: Salir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296679
+    m_Localized: "¿Seguro que quieres volver al menú principal?\n\nSe perderá el progreso no guardado."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296680
+    m_Localized: "Menú principal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296681
+    m_Localized: Volver
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296682
+    m_Localized: "Creo que había algo dentro de ese jarrón."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296683
+    m_Localized: "Se soltó {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296684
+    m_Localized: Activado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296685
+    m_Localized: Desactivado
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296686
+    m_Localized: Pantalla completa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296687
+    m_Localized: Ventana
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296688
+    m_Localized: Con bordes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296689
+    m_Localized: Pantalla completa exclusiva
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296690
+    m_Localized: Muy bajo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296691
+    m_Localized: Bajo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296692
+    m_Localized: Medio
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296693
+    m_Localized: Alto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296694
+    m_Localized: Muy alto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296695
+    m_Localized: Ultra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296696
+    m_Localized: Usar objeto
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296697
+    m_Localized: Soltar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296698
+    m_Localized: No hay nada a tu alcance.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296699
+    m_Localized: "El inodoro está atascado, no encuentro el desatascador. Estaba en algún lugar dentro de un cubo, pero no recuerdo dónde."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296701
+    m_Localized: Recogiste el embrague
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296700
+    m_Localized: "Recogiste la bujía"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296702
+    m_Localized: E
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296703
+    m_Localized: G
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

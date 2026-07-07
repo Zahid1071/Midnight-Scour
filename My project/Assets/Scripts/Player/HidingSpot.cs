@@ -257,7 +257,7 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
         if (isToggling)
         {
-            HudManager.Instance?.ShowSubtitle("Wait a moment.", 2f);
+            HudManager.Instance?.ShowSubtitle(Loc.Get("gameplay.wait_moment"), 2f);
             return false;
         }
 
@@ -275,7 +275,7 @@ public class HidingSpot : MonoBehaviour, IInteractable
                 return true;
             }
 
-            HudManager.Instance?.ShowSubtitle("You are already hiding.", 2.5f);
+            HudManager.Instance?.ShowSubtitle(Loc.Get("gameplay.already_hiding"), 2.5f);
             return false;
         }
 
@@ -283,9 +283,9 @@ public class HidingSpot : MonoBehaviour, IInteractable
         if (hidingStamina != null && !hidingStamina.CanEnterHide)
         {
             if (hidingStamina.IsOnCooldown)
-                HudManager.Instance?.ShowSubtitle("I have to catch my breath first.", 2.5f);
+                HudManager.Instance?.ShowSubtitle(Loc.Get("gameplay.catch_breath"), 2.5f);
             else
-                HudManager.Instance?.ShowSubtitle("I am too exhausted to hide.", 2.5f);
+                HudManager.Instance?.ShowSubtitle(Loc.Get("gameplay.too_exhausted"), 2.5f);
             return false;
         }
 

@@ -10,8 +10,7 @@ public class ItemCombineReceiver : MonoBehaviour, IItemReceiver
 
     [SerializeField] private InventoryItem acceptedItem;
     [SerializeField] private GameObject replacementPrefab;
-    [SerializeField] private string wrongItemMessage = "That won't work here.";
-    [SerializeField] private string successMessage = "Stuck the gum on the bone.";
+    [SerializeField] private string successMessageKey = "gameplay.gum_on_bone";
     [Tooltip("Optional. If unset, uses the accepted item's Use Success Sound.")]
     [SerializeField] private AudioClip successSound;
 
@@ -22,14 +21,14 @@ public class ItemCombineReceiver : MonoBehaviour, IItemReceiver
 
         if (item == null || item != acceptedItem)
         {
-            ShowMessage(wrongItemMessage);
+            ShowMessage(Loc.Get("gameplay.wrong_item"));
             return false;
         }
 
         var inventory = InventoryManager.Instance?.GetInventory();
         if (inventory == null || !inventory.Contains(item))
         {
-            ShowMessage("You do not have that item.");
+            ShowMessage(Loc.Get("gameplay.dont_have_item"));
             return false;
         }
 
@@ -41,7 +40,7 @@ public class ItemCombineReceiver : MonoBehaviour, IItemReceiver
         Instantiate(replacementPrefab, position, rotation);
 
         AudioClip sfx = successSound != null ? successSound : item.useSuccessSound;
-        InteractionFeedback.Success(successMessage, sfx, position);
+        InteractionFeedback.Success(Loc.Get(successMessageKey), sfx, position);
 
         OnCombineSuccess?.Invoke();
 

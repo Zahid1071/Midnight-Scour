@@ -86,7 +86,7 @@ public class GrateSystem : MonoBehaviour, IInteractable
     {
         if (!AllBoltsRemoved)
         {
-            InteractionFeedback.Fail("The grate is still bolted down.", 3f);
+            InteractionFeedback.Fail(Loc.Get("gameplay.grate_bolted"), 3f);
             return false;
         }
 

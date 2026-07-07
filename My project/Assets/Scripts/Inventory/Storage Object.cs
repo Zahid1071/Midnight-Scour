@@ -10,17 +10,16 @@ public class StorageObject : MonoBehaviour, IInteractable
         var inventory = InventoryManager.Instance.GetInventory();
         if (inventory.Count == 0)
         {
-            HudManager.Instance?.ShowSubtitle("You have nothing to store.", 3f);
+            HudManager.Instance?.ShowSubtitle(Loc.Get("gameplay.nothing_to_store"), 3f);
             return false;
         }
 
         foreach (var item in inventory)
-        {
             storedItems.Add(item);
-        }
 
-        string names = string.Join(", ", storedItems.ConvertAll(i => i.itemName));
-        HudManager.Instance?.ShowSubtitle($"Stored: {names}.", 4f, HudManager.Instance.SuccessColor);
+        string names = string.Join(", ", storedItems.ConvertAll(i => i.GetLocalizedName()));
+        HudManager.Instance?.ShowSubtitle(
+            Loc.Format("gameplay.stored", names), 4f, HudManager.Instance.SuccessColor);
 
         InventoryManager.Instance.ClearInventory();
         Object.FindFirstObjectByType<InventoryUI>()?.RefreshUI();

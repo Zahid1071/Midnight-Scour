@@ -143,6 +143,23 @@ public class SettingsMenu : MonoBehaviour
     /// <summary>
     /// Read UI -> push to manager -> apply to Unity systems -> persist.
     /// </summary>
+    /// <summary>
+    /// Back button handler for both main menu and pause menu settings panels.
+    /// </summary>
+    public void ClosePanel()
+    {
+        var mainMenu = Object.FindFirstObjectByType<MainMenuUI>(FindObjectsInactive.Include);
+        if (mainMenu != null)
+        {
+            mainMenu.CloseSettingsWithoutApply();
+            return;
+        }
+
+        var pause = Object.FindFirstObjectByType<PauseManager>(FindObjectsInactive.Include);
+        if (pause != null)
+            pause.OnCloseSettings();
+    }
+
     public void ApplyAndSave()
     {
         if (!EnsureManager()) return;

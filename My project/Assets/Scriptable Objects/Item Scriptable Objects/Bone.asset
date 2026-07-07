@@ -26,5 +26,7 @@ MonoBehaviour:
   breaksOnWrongUse: 0
   breakOnWrongUseSound: {fileID: 0}
   breakOnWrongUseMessage: 
+  nameKey: item.bone.name
+  pickupKey: item.bone.pickup
   pickUpText: Bone added to inventory
   description: 

@@ -76,7 +76,7 @@ public class ReadPanelUI : MonoBehaviour
         _releaseLockAfterUpdates = false;
 
         HudManager.Instance?.ClearSubtitle();
-        bodyText.text = text;
+        UIFont.SetText(bodyText, text);
         _openedOnFrame = Time.frameCount;
         panelRoot.SetActive(true);
 

@@ -1,0 +1,581 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: GameStrings_pl
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: pl
+  m_SharedData: {fileID: 11400000, guid: 23aaa987a5caa724aac997d9b6cae0ae, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 5707297325056
+    m_Localized: Ustawienia
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325057
+    m_Localized: "Wyjście"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325058
+    m_Localized: Wstecz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325059
+    m_Localized: Zastosuj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325060
+    m_Localized: "Domyślne"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1843970048000
+    m_Localized: Kontynuuj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325061
+    m_Localized: Nowa gra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325062
+    m_Localized: "Napisy końcowe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325063
+    m_Localized: "Zapisz grę"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325064
+    m_Localized: PAUZA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296576
+    m_Localized: "Wznów"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296577
+    m_Localized: "Dziękujemy za granie w wersję demonstracyjną Midnight Scour.
+
+Ta wersja stanowi jedynie fragment finalnego doświadczenia. Pełna gra rozszerzy ten podstawowy cykl skradania się i przetrwania o wiele różnych pomieszczeń i otoczeń, zmuszając cię do ciągłego przystosowywania się do nowych układów, zachowań i zagrożeń.
+
+Premiera Midnight Scour planowana jest na koniec 2026 roku.
+
+Jeśli podobało ci się demo, rozważ dodanie gry do swojej listy życzeń na Steam. To najskuteczniejszy sposób wsparcia dalszego rozwoju projektu."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296578
+    m_Localized: "naciśnij dowolny klawisz, aby wyjść"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296579
+    m_Localized: "naciśnij dowolny klawisz"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296580
+    m_Localized: "Możesz czytać notatki, aby znaleźć wskazówki"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296581
+    m_Localized: "Używaj kryjówek, aby uniknąć zabójcy"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296582
+    m_Localized: "Hałasowanie może zaalarmować zabójcę"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296583
+    m_Localized: "Naciśnij {0}, aby upuścić wybrany przedmiot"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296584
+    m_Localized: "Użyj/Połącz przedmiot"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296585
+    m_Localized: Interakcja
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296586
+    m_Localized: USTAWIENIA
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296587
+    m_Localized: Ekran
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296588
+    m_Localized: "Dźwięk"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296589
+    m_Localized: Sterowanie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296590
+    m_Localized: Rozgrywka
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296591
+    m_Localized: "Ogólne"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296592
+    m_Localized: "Głośność główna"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296593
+    m_Localized: "Głośność muzyki"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296594
+    m_Localized: "Głośność efektów"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296595
+    m_Localized: "Jasność"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296596
+    m_Localized: "Czułość myszy"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296597
+    m_Localized: "Rozdzielczość"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296598
+    m_Localized: "Pełny ekran"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296599
+    m_Localized: "Tryb wyświetlania"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296600
+    m_Localized: "Jakość"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296601
+    m_Localized: Synchronizacja pionowa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296602
+    m_Localized: Autozapis
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296603
+    m_Localized: "Język"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296604
+    m_Localized: "To tutaj nie zadziała."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296605
+    m_Localized: "Zamknięte na klucz."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296606
+    m_Localized: "Nie mogę tego dosięgnąć."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296607
+    m_Localized: "Nie chce drgnąć."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296608
+    m_Localized: Chwila moment.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296609
+    m_Localized: "Już się ukrywasz."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296610
+    m_Localized: "Muszę najpierw złapać oddech."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296611
+    m_Localized: "Jestem zbyt wyczerpany, by się ukryć."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296612
+    m_Localized: "Muszę się stąd wydostać!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296613
+    m_Localized: "Potrzebujesz {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296614
+    m_Localized: "Użyto {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296615
+    m_Localized: "{0} to odblokował."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296616
+    m_Localized: "Śruba usunięta."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296617
+    m_Localized: "To utknęło."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296618
+    m_Localized: Ta interakcja nie jest skonfigurowana.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296619
+    m_Localized: Nie masz nic do schowania.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296620
+    m_Localized: "Schowano: {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296621
+    m_Localized: "{0} jest już zainstalowany."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296622
+    m_Localized: "Najpierw wybierz część samochodu z ekwipunku."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296623
+    m_Localized: "Nie masz {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296624
+    m_Localized: "{0} zainstalowano."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296625
+    m_Localized: Ten slot nie jest skonfigurowany.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296626
+    m_Localized: "Sekwencja ucieczki nie została skonfigurowana."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296627
+    m_Localized: "Wszystkie części zainstalowane. Uciekłeś!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296628
+    m_Localized: "Nadal brakuje: {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296629
+    m_Localized: Wczytywanie...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296630
+    m_Localized: "Łom"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296631
+    m_Localized: "Kość"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296632
+    m_Localized: "Kość"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296633
+    m_Localized: Klucz do piwnicy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296634
+    m_Localized: Metalowy klucz do skrzynki
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296635
+    m_Localized: "Guma do żucia"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296636
+    m_Localized: "Sprzęgło"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296637
+    m_Localized: "Młotek"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296638
+    m_Localized: Przepychacz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296639
+    m_Localized: "Śrubokręt"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296640
+    m_Localized: "Świeca zapłonowa"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296641
+    m_Localized: Wazon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296642
+    m_Localized: "Klucz płaski"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296643
+    m_Localized: "Podniesiono łom"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296644
+    m_Localized: "Kość dodana do ekwipunku"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296645
+    m_Localized: "Kość z gumą dodana do ekwipunku"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296646
+    m_Localized: Podniesiono klucz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296647
+    m_Localized: "Podniesiono mały klucz"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296648
+    m_Localized: "Podniesiono gumę do żucia"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296649
+    m_Localized: "Podniesiono młotek"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296650
+    m_Localized: Podniesiono przepychacz
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296651
+    m_Localized: "Podniesiono śrubokręt"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296652
+    m_Localized: "Coś w tym jest"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296653
+    m_Localized: "Podniesiono klucz płaski"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296654
+    m_Localized: "Jest całkowicie zatkany."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296655
+    m_Localized: "Woda już zniknęła."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296656
+    m_Localized: "Chyba muszę to uderzyć czymś, żeby obrócić — jest kompletnie zardzewiałe"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296657
+    m_Localized: "Użyj łomu na imadle."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296658
+    m_Localized: "Użyj młotka na łomie."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296659
+    m_Localized: "Przykleił gumę do kości."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296660
+    m_Localized: "Ciągle się ześlizguje, muszę coś przykleić do kości"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296661
+    m_Localized: "Śrubokręt się złamał."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296662
+    m_Localized: "WSKAZÓWKA: Używaj kryjówek, aby uniknąć wrogów."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296663
+    m_Localized: "WSKAZÓWKA: Eksploruj otoczenie uważnie, możesz znaleźć ważne wskazówki."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296664
+    m_Localized: "WSKAZÓWKA: Zachowuj ciszę, wrogowie mogą cię usłyszeć."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296665
+    m_Localized: "WSKAZÓWKA: Twoja latarka ma ograniczoną baterię, używaj jej rozważnie."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296666
+    m_Localized: "WSKAZÓWKA: Niektóre drzwi wymagają specjalnych kluczy."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296667
+    m_Localized: "WSKAZÓWKA: Bieganie może zwrócić uwagę wrogów."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296668
+    m_Localized: "WSKAZÓWKA: Czytaj notatki i dokumenty, aby odkryć fabułę."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296669
+    m_Localized: "WSKAZÓWKA: Ukrywanie się w ciemnych kątach pomaga uniknąć wrogów."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296670
+    m_Localized: Nic tu nie ma.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296671
+    m_Localized: "Twój ekwipunek jest pełny."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296672
+    m_Localized: "Kratka jest nadal przykręcona."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296673
+    m_Localized: "Potwierdź"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296674
+    m_Localized: Tak
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296675
+    m_Localized: Nie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296676
+    m_Localized: "Czy na pewno chcesz wyjść?\n\nNiezapisany postęp zostanie utracony."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296677
+    m_Localized: "Wyjście"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296678
+    m_Localized: "Wyjdź"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296679
+    m_Localized: "Czy na pewno chcesz wrócić do menu głównego?\n\nNiezapisany postęp zostanie utracony."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296680
+    m_Localized: "Menu główne"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296681
+    m_Localized: "Wróć"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296682
+    m_Localized: "Myślę, że coś było w tym wazonie."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296683
+    m_Localized: "Upuszczono {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296684
+    m_Localized: "Włączone"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296685
+    m_Localized: "Wyłączone"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296686
+    m_Localized: "Pełny ekran"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296687
+    m_Localized: Okienkowy
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296688
+    m_Localized: "Z ramką"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296689
+    m_Localized: "Pełny ekran (wyłączny)"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296690
+    m_Localized: Bardzo niski
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296691
+    m_Localized: Niski
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296692
+    m_Localized: "Średni"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296693
+    m_Localized: Wysoki
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296694
+    m_Localized: Bardzo wysoki
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296695
+    m_Localized: Ultra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296696
+    m_Localized: "Użyj przedmiotu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296697
+    m_Localized: "Upuść"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296698
+    m_Localized: "Nie ma nic w zasięgu."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296699
+    m_Localized: "Toaleta jest zatkana, nie mogę znaleźć przepychacza. Był gdzieś w wiaderku, ale nie pamiętam gdzie."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296701
+    m_Localized: "Podniesiono sprzęgło"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296700
+    m_Localized: "Podniesiono świecę zapłonową"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296702
+    m_Localized: E
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296703
+    m_Localized: G
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

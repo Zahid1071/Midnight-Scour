@@ -1,0 +1,581 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: GameStrings_zh-Hans
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: zh-Hans
+  m_SharedData: {fileID: 11400000, guid: 23aaa987a5caa724aac997d9b6cae0ae, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 5707297325056
+    m_Localized: "设置"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325057
+    m_Localized: "退出"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325058
+    m_Localized: "返回"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325059
+    m_Localized: "应用"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325060
+    m_Localized: "默认"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1843970048000
+    m_Localized: "继续"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325061
+    m_Localized: "新游戏"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325062
+    m_Localized: "制作人员"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325063
+    m_Localized: "保存游戏"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325064
+    m_Localized: "暂停"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296576
+    m_Localized: "继续"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296577
+    m_Localized: "感谢您游玩《午夜搜寻》试玩版。
+
+本次试玩仅代表最终体验的一小部分。完整版游戏将把这个核心潜行与生存循环扩展到多个不同的房间和环境中，要求你不断适应新的布局、行为和威胁。
+
+《午夜搜寻》计划于2026年末发售。
+
+如果你喜欢这个试玩版，请考虑将本作加入你的Steam愿望单。这是支持项目持续开发的最有效方式。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296578
+    m_Localized: "按任意键退出"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296579
+    m_Localized: "按任意键"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296580
+    m_Localized: "你可以阅读纸条来获取线索"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296581
+    m_Localized: "利用藏身点躲避杀手"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296582
+    m_Localized: "发出声响可能会引起杀手的注意"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296583
+    m_Localized: "按 {0} 丢弃选中的物品"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296584
+    m_Localized: "使用/组合物品"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296585
+    m_Localized: "互动"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296586
+    m_Localized: "设置"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296587
+    m_Localized: "画面"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296588
+    m_Localized: "音频"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296589
+    m_Localized: "操作"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296590
+    m_Localized: "游戏玩法"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296591
+    m_Localized: "通用"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296592
+    m_Localized: "主音量"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296593
+    m_Localized: "音乐音量"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296594
+    m_Localized: "音效音量"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296595
+    m_Localized: "亮度"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296596
+    m_Localized: "鼠标灵敏度"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296597
+    m_Localized: "分辨率"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296598
+    m_Localized: "全屏"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296599
+    m_Localized: "显示模式"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296600
+    m_Localized: "画质"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296601
+    m_Localized: "垂直同步"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296602
+    m_Localized: "自动保存"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296603
+    m_Localized: "语言"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296604
+    m_Localized: "这个在这里没用。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296605
+    m_Localized: "锁住了。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296606
+    m_Localized: "我够不到那个。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296607
+    m_Localized: "它纹丝不动。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296608
+    m_Localized: "稍等一下。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296609
+    m_Localized: "你已经在躲藏了。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296610
+    m_Localized: "我得先喘口气。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296611
+    m_Localized: "我太累了，没法躲藏。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296612
+    m_Localized: "我得离开这里！"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296613
+    m_Localized: "需要{0}。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296614
+    m_Localized: "使用了{0}。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296615
+    m_Localized: "{0}把它打开了。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296616
+    m_Localized: "螺栓已拆下。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296617
+    m_Localized: "卡住了。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296618
+    m_Localized: "这个互动尚未配置。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296619
+    m_Localized: "你没有东西可以存放。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296620
+    m_Localized: "已存放：{0}。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296621
+    m_Localized: "{0}已经安装好了。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296622
+    m_Localized: "先从背包里选择一个汽车零件。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296623
+    m_Localized: "你没有{0}。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296624
+    m_Localized: "{0}已安装。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296625
+    m_Localized: "这个插槽尚未配置。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296626
+    m_Localized: "逃脱流程尚未设置。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296627
+    m_Localized: "所有零件都已安装。你逃出去了！"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296628
+    m_Localized: "仍然缺少：{0}。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296629
+    m_Localized: "加载中..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296630
+    m_Localized: "铁棍"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296631
+    m_Localized: "骨头"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296632
+    m_Localized: "骨头"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296633
+    m_Localized: "地下室钥匙"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296634
+    m_Localized: "金属箱钥匙"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296635
+    m_Localized: "口香糖"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296636
+    m_Localized: "离合器"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296637
+    m_Localized: "锤子"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296638
+    m_Localized: "搋子"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296639
+    m_Localized: "螺丝刀"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296640
+    m_Localized: "火花塞"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296641
+    m_Localized: "花瓶"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296642
+    m_Localized: "扳手"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296643
+    m_Localized: "拾取了铁棍"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296644
+    m_Localized: "骨头已加入背包"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296645
+    m_Localized: "粘着口香糖的骨头已加入背包"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296646
+    m_Localized: "拾取了钥匙"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296647
+    m_Localized: "拾取了小钥匙"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296648
+    m_Localized: "拾取了口香糖"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296649
+    m_Localized: "拾取了锤子"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296650
+    m_Localized: "拾取了搋子"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296651
+    m_Localized: "拾取了螺丝刀"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296652
+    m_Localized: "里面好像有什么东西"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296653
+    m_Localized: "拾取了扳手"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296654
+    m_Localized: "完全堵住了。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296655
+    m_Localized: "水已经排空了。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296656
+    m_Localized: "我觉得得用什么东西敲一下才能转动，它完全锈死了。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296657
+    m_Localized: "把铁棍用在台钳上。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296658
+    m_Localized: "把锤子用在铁棍上。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296659
+    m_Localized: "把口香糖粘在了骨头上。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296660
+    m_Localized: "它一直打滑，我需要把什么东西粘到骨头上"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296661
+    m_Localized: "螺丝刀断了。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296662
+    m_Localized: "提示：利用藏身点躲避敌人。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296663
+    m_Localized: "提示：仔细探索四周，你可能会找到重要线索。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296664
+    m_Localized: "提示：保持安静，敌人能听到你的声音。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296665
+    m_Localized: "提示：手电筒电量有限，请谨慎使用。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296666
+    m_Localized: "提示：有些门需要特殊钥匙。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296667
+    m_Localized: "提示：奔跑可能会引起敌人的注意。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296668
+    m_Localized: "提示：阅读纸条和文件来揭开故事。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296669
+    m_Localized: "提示：躲在阴暗角落有助于避开敌人。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296670
+    m_Localized: "这里什么都没有。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296671
+    m_Localized: "你的背包已满。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296672
+    m_Localized: "格栅仍然被螺栓固定着。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296673
+    m_Localized: "确认"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296674
+    m_Localized: "是"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296675
+    m_Localized: "否"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296676
+    m_Localized: "确定要退出吗？\n\n未保存的进度将会丢失。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296677
+    m_Localized: "退出"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296678
+    m_Localized: "退出"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296679
+    m_Localized: "确定要返回主菜单吗？\n\n未保存的进度将会丢失。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296680
+    m_Localized: "主菜单"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296681
+    m_Localized: "返回"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296682
+    m_Localized: "我觉得那个花瓶里有什么东西。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296683
+    m_Localized: "已丢弃 {0}。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296684
+    m_Localized: "启用"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296685
+    m_Localized: "禁用"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296686
+    m_Localized: "全屏"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296687
+    m_Localized: "窗口"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296688
+    m_Localized: "带边框"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296689
+    m_Localized: "独占全屏"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296690
+    m_Localized: "极低"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296691
+    m_Localized: "低"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296692
+    m_Localized: "中"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296693
+    m_Localized: "高"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296694
+    m_Localized: "极高"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296695
+    m_Localized: "超高"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296696
+    m_Localized: "使用物品"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296697
+    m_Localized: "丢弃"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296698
+    m_Localized: "够不到任何东西。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296699
+    m_Localized: "马桶堵了，我找不到搋子。它在一个桶里的某个地方，但我不记得在哪里了。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296701
+    m_Localized: "拾取了离合器"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296700
+    m_Localized: "拾取了火花塞"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296702
+    m_Localized: E
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296703
+    m_Localized: G
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

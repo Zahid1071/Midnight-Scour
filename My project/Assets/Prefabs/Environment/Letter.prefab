@@ -104,7 +104,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5a6b7c8d9e0417293847564758695a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  letterText: They left without a word. If you are reading this, do not stay.
+  letterKey: letter.left_without_word
+  letterText: I think there was something inside that vase
   interactSFX: {fileID: 0}
 --- !u!65 &880010002
 BoxCollider:

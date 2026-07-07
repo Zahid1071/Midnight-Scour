@@ -24,5 +24,7 @@ MonoBehaviour:
   breaksOnWrongUse: 0
   breakOnWrongUseSound: {fileID: 0}
   breakOnWrongUseMessage: 
+  nameKey: item.box_key.name
+  pickupKey: item.box_key.pickup
   pickUpText: Picked up small key
   description: 

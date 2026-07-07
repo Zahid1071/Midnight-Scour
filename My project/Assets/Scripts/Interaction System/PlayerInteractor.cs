@@ -159,7 +159,7 @@ public class PlayerInteractor : MonoBehaviour
     {
         if (!TryRaycastForHint(out RaycastHit hit, out IInteractable interactable))
         {
-            InteractionFeedback.Fail("Nothing here.");
+            InteractionFeedback.Fail(Loc.Get("gameplay.nothing_here"));
             return false;
         }
 
@@ -196,7 +196,7 @@ public class PlayerInteractor : MonoBehaviour
         return true;
     }
 
-    public void ShowOutOfReach() => InteractionFeedback.Fail(outOfReachMessage, 3f);
+    public void ShowOutOfReach() => InteractionFeedback.Fail(Loc.Get("gameplay.cant_reach"), 3f);
 
     Vector3 GetFeetPosition()
     {

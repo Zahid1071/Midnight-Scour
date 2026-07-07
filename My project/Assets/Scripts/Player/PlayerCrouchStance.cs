@@ -95,9 +95,11 @@ public class PlayerCrouchStance : MonoBehaviour
         if (characterController == null)
             return;
 
+        // Freeze current stance while UI/cinematics block input or while hiding.
+        // Snapping to stand here desyncs EyeBaseLocalY from _blend (e.g. reading a note while crouched).
         if (PlayerControlGate.IsInputBlocked || (_hider != null && _hider.isHidden))
         {
-            ApplyStance(0f);
+            ApplyStance(_blend);
             return;
         }
 

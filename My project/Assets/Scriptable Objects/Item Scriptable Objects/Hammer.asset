@@ -24,5 +24,7 @@ MonoBehaviour:
   breaksOnWrongUse: 0
   breakOnWrongUseSound: {fileID: 0}
   breakOnWrongUseMessage: 
+  nameKey: item.hammer.name
+  pickupKey: item.hammer.pickup
   pickUpText: Picked up Hammer
   description: 

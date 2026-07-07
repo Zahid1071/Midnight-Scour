@@ -17,14 +17,14 @@ public class GrateBolt : MonoBehaviour, IInteractable
             InventoryItem selected = InventoryUI.Instance?.GetSelectedItem();
             if (selected != wrench)
             {
-                InteractionFeedback.Fail("It won't budge.", 3f);
+                InteractionFeedback.Fail(Loc.Get("gameplay.wont_budge"), 3f);
                 return false;
             }
         }
 
         _removed = true;
         grate.NotifyBoltRemoved(transform.position);
-        HudManager.Instance?.ShowSubtitle("Bolt removed.", 2.5f, HudManager.Instance.SuccessColor);
+        HudManager.Instance?.ShowSubtitle(Loc.Get("gameplay.bolt_removed"), 2.5f, HudManager.Instance.SuccessColor);
         gameObject.SetActive(false);
         return true;
     }

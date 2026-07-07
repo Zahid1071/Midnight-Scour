@@ -24,5 +24,7 @@ MonoBehaviour:
   breaksOnWrongUse: 0
   breakOnWrongUseSound: {fileID: 0}
   breakOnWrongUseMessage: I can't use it here
+  nameKey: item.plunger.name
+  pickupKey: item.plunger.pickup
   pickUpText: Picked up Plunger
   description: 

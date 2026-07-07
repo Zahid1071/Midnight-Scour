@@ -1,6 +1,8 @@
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Localization.Settings;
 
 /// <summary>
 /// Fades the controls panel in, holds, then fades out. Dismiss early with any key or mouse button
@@ -24,6 +26,10 @@ public class ControlsPanelHint : MonoBehaviour
     [SerializeField] private float companionFadeOutDuration = 0.35f;
     [SerializeField] private float companionFadeInDuration = 0.5f;
 
+    [Header("Key badges")]
+    [SerializeField] private TextMeshProUGUI interactKeyLabel;
+    [SerializeField] private TextMeshProUGUI dropKeyLabel;
+
     Coroutine _routine;
     float _companionRestAlpha = 1f;
     bool _companionHiddenWithSetActive;
@@ -40,10 +46,54 @@ public class ControlsPanelHint : MonoBehaviour
         canvasGroup.blocksRaycasts = false;
 
         ResolveCompanionGroup();
+        ResolveKeyLabels();
+
         if (hideDuringHintGroup != null)
             _companionRestAlpha = hideDuringHintGroup.alpha;
 
         HideImmediate();
+    }
+
+    void OnEnable()
+    {
+        LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
+        StartCoroutine(RefreshKeyLabelsWhenReady());
+    }
+
+    void OnDisable() => LocalizationSettings.SelectedLocaleChanged -= OnLocaleChanged;
+
+    void OnLocaleChanged(UnityEngine.Localization.Locale _) => RefreshKeyLabels();
+
+    void ResolveKeyLabels()
+    {
+        if (interactKeyLabel == null)
+        {
+            var t = transform.Find("Rows/Interact Key/Text (TMP)");
+            if (t != null)
+                interactKeyLabel = t.GetComponent<TextMeshProUGUI>();
+        }
+
+        if (dropKeyLabel == null)
+        {
+            var t = transform.Find("Rows/G Key/Text (TMP)");
+            if (t != null)
+                dropKeyLabel = t.GetComponent<TextMeshProUGUI>();
+        }
+    }
+
+    IEnumerator RefreshKeyLabelsWhenReady()
+    {
+        yield return LocalizationSettings.InitializationOperation;
+        RefreshKeyLabels();
+    }
+
+    void RefreshKeyLabels()
+    {
+        if (interactKeyLabel != null)
+            UIFont.SetText(interactKeyLabel, Loc.Get("controls.key.interact"));
+
+        if (dropKeyLabel != null)
+            UIFont.SetText(dropKeyLabel, Loc.Get("controls.key.drop"));
     }
 
     void ResolveCompanionGroup()
@@ -67,6 +117,8 @@ public class ControlsPanelHint : MonoBehaviour
     {
         if (!gameObject.activeInHierarchy)
             gameObject.SetActive(true);
+
+        RefreshKeyLabels();
 
         IsShowing = true;
         canvasGroup.interactable = false;

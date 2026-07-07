@@ -25,5 +25,7 @@ MonoBehaviour:
   breaksOnWrongUse: 0
   breakOnWrongUseSound: {fileID: 0}
   breakOnWrongUseMessage: The screwdriver snapped.
+  nameKey: item.chewing_gum.name
+  pickupKey: item.chewing_gum.pickup
   pickUpText: Picked up Chewing Gum
   description: 

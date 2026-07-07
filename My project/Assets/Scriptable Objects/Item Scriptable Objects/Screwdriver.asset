@@ -25,5 +25,8 @@ MonoBehaviour:
   breaksOnWrongUse: 1
   breakOnWrongUseSound: {fileID: 8300000, guid: 14703ce226e238f43a4662e941bfc9f1, type: 3}
   breakOnWrongUseMessage: The screwdriver snapped.
+  nameKey: item.screwdriver.name
+  pickupKey: item.screwdriver.pickup
+  breakMessageKey: gameplay.screwdriver_snapped
   pickUpText: Picked up Screwdriver
   description: 

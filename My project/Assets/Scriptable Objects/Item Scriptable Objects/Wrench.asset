@@ -24,5 +24,7 @@ MonoBehaviour:
   breaksOnWrongUse: 0
   breakOnWrongUseSound: {fileID: 0}
   breakOnWrongUseMessage: The screwdriver snapped.
+  nameKey: item.wrench.name
+  pickupKey: item.wrench.pickup
   pickUpText: Picked up Wrench
   description: 

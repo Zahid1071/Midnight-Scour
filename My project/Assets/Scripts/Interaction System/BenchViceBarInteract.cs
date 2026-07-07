@@ -6,7 +6,6 @@ using UnityEngine;
 public class BenchViceBarInteract : MonoBehaviour, IInteractable
 {
     [SerializeField] BenchVicePuzzle puzzle;
-    [SerializeField] string wontBudgeMessage = "It won't budge.";
 
     void Awake()
     {
@@ -21,10 +20,10 @@ public class BenchViceBarInteract : MonoBehaviour, IInteractable
 
         string message = puzzle != null
             ? puzzle.GetContextualHintMessage(InventoryUI.Instance?.GetSelectedItem())
-            : wontBudgeMessage;
+            : Loc.Get("gameplay.wont_budge");
 
         if (string.IsNullOrWhiteSpace(message))
-            message = wontBudgeMessage;
+            message = Loc.Get("gameplay.wont_budge");
 
         InteractionFeedback.Fail(message, 3f);
         return false;

@@ -282,13 +282,9 @@ public class SettingsSpinner : MonoBehaviour
         if (valueText != null)
         {
             if (options != null && options.Count > 0 && currentIndex >= 0 && currentIndex < options.Count)
-            {
-                valueText.text = options[currentIndex];
-            }
+                UIFont.SetText(valueText, options[currentIndex]);
             else
-            {
-                valueText.text = "-";
-            }
+                UIFont.SetText(valueText, "-");
         }
         
         // Update button states

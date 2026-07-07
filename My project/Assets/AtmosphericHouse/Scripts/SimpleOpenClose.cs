@@ -153,7 +153,9 @@ namespace FS_Atmo
 
             // ✅ KİLİT AÇILDI
             isLocked = false;
-            HudManager.Instance?.ShowSubtitle($"{item.itemName} unlocked it.", 2.5f, HudManager.Instance.SuccessColor);
+            HudManager.Instance?.ShowSubtitle(
+                Loc.Format("gameplay.item_unlocked", item.GetLocalizedName()),
+                2.5f, HudManager.Instance.SuccessColor);
             Debug.Log($"✅ {item.itemName} ile kilit açıldı.");
 
             if (item.consumeOnUse)

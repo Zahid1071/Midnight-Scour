@@ -1,0 +1,581 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: GameStrings_tr
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: tr
+  m_SharedData: {fileID: 11400000, guid: 23aaa987a5caa724aac997d9b6cae0ae, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 5707297325056
+    m_Localized: Ayarlar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325057
+    m_Localized: "Çıkış"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325058
+    m_Localized: Geri
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325059
+    m_Localized: Uygula
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325060
+    m_Localized: "Varsayılan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1843970048000
+    m_Localized: Devam Et
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325061
+    m_Localized: Yeni Oyun
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325062
+    m_Localized: Jenerik
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325063
+    m_Localized: Oyunu Kaydet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325064
+    m_Localized: DURAKLATILDI
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296576
+    m_Localized: Devam Et
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296577
+    m_Localized: "Midnight Scour demosunu oynadığınız için teşekkür ederiz.
+
+Bu sürüm, nihai deneyimin yalnızca bir bölümünü temsil etmektedir. Tam oyun, bu temel gizlilik ve hayatta kalma döngüsünü birden fazla farklı oda ve ortama genişletecek ve sizi sürekli olarak yeni düzenlere, davranışlara ve tehditlere uyum sağlamaya zorlayacaktır.
+
+Midnight Scour, 2026'nın sonlarında piyasaya sürülmesi planlanıyor.
+
+Demoyu beğendiyseniz, lütfen oyunu Steam İstek Listenize eklemeyi düşünün. Projenin gelişimini desteklemenin en etkili yolu budur."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296578
+    m_Localized: "çıkmak için herhangi bir tuşa basın"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296579
+    m_Localized: "herhangi bir tuşa basın"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296580
+    m_Localized: "İpuçları için notları okuyabilirsiniz"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296581
+    m_Localized: "Katilden kaçınmak için saklanma noktalarını kullanın"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296582
+    m_Localized: "Gürültü yapmak katili uyarabilir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296583
+    m_Localized: "Seçili öğeyi bırakmak için {0} tuşuna basın"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296584
+    m_Localized: "Öğeyi Kullan/Birleştir"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296585
+    m_Localized: "Etkileşim"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296586
+    m_Localized: AYARLAR
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296587
+    m_Localized: "Görüntü"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296588
+    m_Localized: Ses
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296589
+    m_Localized: Kontroller
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296590
+    m_Localized: "Oynanış"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296591
+    m_Localized: Genel
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296592
+    m_Localized: Ana Ses
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296593
+    m_Localized: "Müzik Sesi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296594
+    m_Localized: Efekt Sesi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296595
+    m_Localized: "Parlaklık"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296596
+    m_Localized: Fare Hassasiyeti
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296597
+    m_Localized: "Çözünürlük"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296598
+    m_Localized: Tam Ekran
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296599
+    m_Localized: "Görüntü Modu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296600
+    m_Localized: Kalite
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296601
+    m_Localized: Dikey Senkron
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296602
+    m_Localized: "Otomatik Kayıt"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296603
+    m_Localized: Dil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296604
+    m_Localized: "Bu burada işe yaramaz."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296605
+    m_Localized: Kilitli.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296606
+    m_Localized: "Oraya ulaşamıyorum."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296607
+    m_Localized: "Kıpırdamıyor."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296608
+    m_Localized: Bir dakika bekle.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296609
+    m_Localized: "Zaten saklanıyorsun."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296610
+    m_Localized: "Önce nefesimi toplamalıyım."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296611
+    m_Localized: Saklanamayacak kadar bitkinim.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296612
+    m_Localized: "Buradan çıkmalıyım!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296613
+    m_Localized: "{0} gerekiyor."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296614
+    m_Localized: "{0} kullanıldı."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296615
+    m_Localized: "{0} kilidi açtı."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296616
+    m_Localized: "Cıvata çıkarıldı."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296617
+    m_Localized: "Sıkışmış durumda."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296618
+    m_Localized: "Bu etkileşim yapılandırılmamış."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296619
+    m_Localized: "Saklayacak bir şeyin yok."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296620
+    m_Localized: "Saklandı: {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296621
+    m_Localized: "{0} zaten takılı."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296622
+    m_Localized: "Önce envanterinden bir araba parçası seç."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296623
+    m_Localized: "{0} yok senin."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296624
+    m_Localized: "{0} takıldı."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296625
+    m_Localized: "Bu yuva yapılandırılmamış."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296626
+    m_Localized: "Kaçış dizisi ayarlanmamış."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296627
+    m_Localized: "Tüm parçalar takıldı. Kaçtın!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296628
+    m_Localized: "Hâlâ eksik: {0}."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296629
+    m_Localized: "Yükleniyor..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296630
+    m_Localized: "Demir Çubuk"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296631
+    m_Localized: Kemik
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296632
+    m_Localized: Kemik
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296633
+    m_Localized: "Bodrum Anahtarı"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296634
+    m_Localized: "Metal Kutu Anahtarı"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296635
+    m_Localized: "Sakız"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296636
+    m_Localized: Debriyaj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296637
+    m_Localized: "Çekiç"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296638
+    m_Localized: Pompa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296639
+    m_Localized: Tornavida
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296640
+    m_Localized: Buji
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296641
+    m_Localized: Vazo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296642
+    m_Localized: "İngiliz Anahtarı"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296643
+    m_Localized: "Demir Çubuk alındı"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296644
+    m_Localized: Kemik envantere eklendi
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296645
+    m_Localized: "Sakızlı Kemik envantere eklendi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296646
+    m_Localized: "Anahtar alındı"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296647
+    m_Localized: "Küçük anahtar alındı"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296648
+    m_Localized: "Sakız alındı"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296649
+    m_Localized: "Çekiç alındı"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296650
+    m_Localized: "Pompa alındı"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296651
+    m_Localized: "Tornavida alındı"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296652
+    m_Localized: "İçinde bir şey var"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296653
+    m_Localized: "İngiliz Anahtarı alındı"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296654
+    m_Localized: "Tamamen tıkanmış."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296655
+    m_Localized: "Su zaten gitmiş."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296656
+    m_Localized: "Döndürmek için bir şeyle vurmam gerekiyor gibi, tamamen paslanmış"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296657
+    m_Localized: "Çubuğu mengeneye kullan."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296658
+    m_Localized: "Çekici çubuğun üzerinde kullan."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296659
+    m_Localized: "Sakızı kemiğe yapıştırdı."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296660
+    m_Localized: "Sürekli kayıyor, kemiğe bir şey yapıştırmam gerekiyor"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296661
+    m_Localized: "Tornavida kırıldı."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296662
+    m_Localized: "İPUCU: Saklanma noktalarını kullanarak düşmanlardan kaçabilirsiniz."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296663
+    m_Localized: "İPUCU: Etrafı dikkatli araştırın, önemli ipuçları bulabilirsiniz."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296664
+    m_Localized: "İPUCU: Sesinizi kısık tutun, düşmanlar sizi duyabilir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296665
+    m_Localized: "İPUCU: El feneriniz sınırlı pile sahip, dikkatli kullanın."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296666
+    m_Localized: "İPUCU: Bazı kapılar özel anahtarlar gerektirir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296667
+    m_Localized: "İPUCU: Koşmak düşmanların dikkatini çekebilir."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296668
+    m_Localized: "İPUCU: Notları ve dökümanları okuyarak hikayeyi keşfedin."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296669
+    m_Localized: "İPUCU: Karanlık köşelerde saklanmak düşmanlardan korunmanıza yardımcı olur."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296670
+    m_Localized: "Burada bir şey yok."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296671
+    m_Localized: Envanterin dolu.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296672
+    m_Localized: "Izgara hâlâ civatalı."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296673
+    m_Localized: Onay
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296674
+    m_Localized: Evet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296675
+    m_Localized: "Hayır"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296676
+    m_Localized: "Oyundan çıkmak istediğinize emin misiniz?\nKaydedilmemiş ilerleme kaybolacak."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296677
+    m_Localized: "Çıkış"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296678
+    m_Localized: "Çık"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296679
+    m_Localized: "Ana menüye dönmek istediğinize emin misiniz?\nKaydedilmemiş ilerleme kaybolacak."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296680
+    m_Localized: "Ana Menü"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296681
+    m_Localized: "Dön"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296682
+    m_Localized: "Sanırım o vazonun içinde bir şey vardı."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296683
+    m_Localized: "{0} bırakıldı."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296684
+    m_Localized: Etkin
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296685
+    m_Localized: "Devre Dışı"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296686
+    m_Localized: Tam Ekran
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296687
+    m_Localized: Pencere
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296688
+    m_Localized: "Kenarlıklı"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296689
+    m_Localized: "Özel Tam Ekran"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296690
+    m_Localized: "Çok Düşük"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296691
+    m_Localized: "Düşük"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296692
+    m_Localized: Orta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296693
+    m_Localized: "Yüksek"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296694
+    m_Localized: "Çok Yüksek"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296695
+    m_Localized: Ultra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296696
+    m_Localized: "Öğeyi Kullan"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296697
+    m_Localized: "Bırak"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296698
+    m_Localized: "Erişebileceğim bir şey yok."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296699
+    m_Localized: "Tuvalet tıkalı, pompayı bulamıyorum. Bir kovanın içinde bir yerdeydi ama yerini hatırlamıyorum."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296701
+    m_Localized: "Debriyaj alındı"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296700
+    m_Localized: "Buji alındı"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296702
+    m_Localized: E
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296703
+    m_Localized: G
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

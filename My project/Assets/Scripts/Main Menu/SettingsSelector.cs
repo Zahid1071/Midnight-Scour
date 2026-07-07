@@ -1,5 +1,5 @@
-using System.Linq;
 using UnityEngine;
+using UnityEngine.Localization.Settings;
 using TMPro;
 
 /// <summary>
@@ -13,7 +13,8 @@ public class SettingsSelector : MonoBehaviour
         Resolution,
         Quality,
         Fullscreen,
-        Custom
+        Custom,
+        Language
     }
 
     [Header("UI References")]
@@ -22,17 +23,27 @@ public class SettingsSelector : MonoBehaviour
     [Header("Setting Configuration")]
     [SerializeField] private SettingType settingType = SettingType.Custom;
 
-    [Tooltip("Only used when Setting Type = Custom or Fullscreen.")]
+    [Tooltip("Localization keys (ui.option.*) or legacy English labels for Custom/Fullscreen.")]
     [SerializeField] private string[] options = { "Option 1", "Option 2", "Option 3" };
 
     private int currentIndex;
 
-    private void Awake()
+    void Awake()
     {
         InitializeOptions();
         ClampIndex();
         RefreshOptionText();
     }
+
+    void OnEnable()
+    {
+        LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
+        RefreshOptionText();
+    }
+
+    void OnDisable() => LocalizationSettings.SelectedLocaleChanged -= OnLocaleChanged;
+
+    void OnLocaleChanged(UnityEngine.Localization.Locale _) => RefreshOptionText();
 
     public void NextOption()
     {
@@ -41,7 +52,7 @@ public class SettingsSelector : MonoBehaviour
             currentIndex = 0;
         ClampIndex();
         RefreshOptionText();
-        Debug.Log($"[SettingsSelector] {settingType} NextOption -> index: {currentIndex} ({GetCurrentOptionString()})");
+        ApplySideEffect();
     }
 
     public void PreviousOption()
@@ -51,19 +62,20 @@ public class SettingsSelector : MonoBehaviour
             currentIndex = GetOptionCount() - 1;
         ClampIndex();
         RefreshOptionText();
-        Debug.Log($"[SettingsSelector] {settingType} PreviousOption -> index: {currentIndex} ({GetCurrentOptionString()})");
+        ApplySideEffect();
     }
 
     public void RefreshOptionText()
     {
         if (optionText == null) return;
-        optionText.text = GetCurrentOptionString();
+        UIFont.SetText(optionText, GetCurrentOptionString());
     }
 
     public void SetIndex(int index)
     {
         currentIndex = Mathf.Clamp(index, 0, Mathf.Max(0, GetOptionCount() - 1));
         RefreshOptionText();
+        ApplySideEffect();
     }
 
     public int GetCurrentIndex() => currentIndex;
@@ -83,44 +95,78 @@ public class SettingsSelector : MonoBehaviour
 
             case SettingType.Quality:
                 if (currentIndex >= 0 && currentIndex < QualitySettings.names.Length)
-                    return QualitySettings.names[currentIndex];
+                    return LocalizeQuality(QualitySettings.names[currentIndex]);
                 break;
 
             case SettingType.Fullscreen:
             case SettingType.Custom:
                 if (options != null && currentIndex >= 0 && currentIndex < options.Length)
-                    return options[currentIndex];
+                    return LocalizeOption(options[currentIndex]);
                 break;
+
+            case SettingType.Language:
+                return LocaleManager.GetLocaleDisplayName(currentIndex);
         }
 
         return "—";
     }
 
-    // ---------- Internal ----------
+    static string LocalizeOption(string option)
+    {
+        if (string.IsNullOrWhiteSpace(option))
+            return "—";
 
-    private void InitializeOptions()
+        if (option.StartsWith("ui."))
+            return Loc.Get(option);
+
+        return option switch
+        {
+            "Enabled" => Loc.Get("ui.option.enabled"),
+            "Disabled" => Loc.Get("ui.option.disabled"),
+            "Fullscreen" => Loc.Get("ui.option.fullscreen"),
+            "Windowed" => Loc.Get("ui.option.windowed"),
+            "Windowed Screen" => Loc.Get("ui.option.windowed"),
+            "Exclusive Fullscreen" => Loc.Get("ui.option.exclusive_fullscreen"),
+            "Bordered Screen" => Loc.Get("ui.option.bordered"),
+            "Low" => Loc.Get("ui.option.quality.low"),
+            "Medium" => Loc.Get("ui.option.quality.medium"),
+            "High" => Loc.Get("ui.option.quality.high"),
+            _ => option
+        };
+    }
+
+    static string LocalizeQuality(string unityName) => unityName switch
+    {
+        "Very Low" => Loc.Get("ui.option.quality.very_low"),
+        "Low" => Loc.Get("ui.option.quality.low"),
+        "Medium" => Loc.Get("ui.option.quality.medium"),
+        "High" => Loc.Get("ui.option.quality.high"),
+        "Very High" => Loc.Get("ui.option.quality.very_high"),
+        "Ultra" => Loc.Get("ui.option.quality.ultra"),
+        _ => unityName
+    };
+
+    void InitializeOptions()
     {
         switch (settingType)
         {
-            case SettingType.Resolution:
-                break;
-
-            case SettingType.Quality:
-                break;
-
             case SettingType.Fullscreen:
                 if (options == null || options.Length == 0)
-                    options = new[] { "Fullscreen", "Windowed", "Exclusive Fullscreen" };
+                    options = new[] { "ui.option.fullscreen", "ui.option.windowed", "ui.option.exclusive_fullscreen" };
                 break;
 
             case SettingType.Custom:
                 if (options == null || options.Length == 0)
-                    options = new[] { "Option 1" };
+                    options = new[] { "ui.option.enabled" };
+                break;
+
+            case SettingType.Language:
+                currentIndex = LocaleManager.GetCurrentLocaleIndex();
                 break;
         }
     }
 
-    private int GetOptionCount()
+    int GetOptionCount()
     {
         switch (settingType)
         {
@@ -132,12 +178,20 @@ public class SettingsSelector : MonoBehaviour
             case SettingType.Fullscreen:
             case SettingType.Custom:
                 return options != null ? options.Length : 0;
+            case SettingType.Language:
+                return LocaleManager.LocaleCodes.Length;
             default:
                 return 0;
         }
     }
 
-    private void ClampIndex()
+    void ApplySideEffect()
+    {
+        if (settingType == SettingType.Language)
+            LocaleManager.SetLocaleByIndex(currentIndex);
+    }
+
+    void ClampIndex()
     {
         int count = GetOptionCount();
         if (count > 0)
@@ -155,7 +209,7 @@ public class SettingsSelector : MonoBehaviour
     }
 
 #if UNITY_EDITOR
-    private void OnValidate()
+    void OnValidate()
     {
         if (optionText == null && settingType != SettingType.Custom)
         {

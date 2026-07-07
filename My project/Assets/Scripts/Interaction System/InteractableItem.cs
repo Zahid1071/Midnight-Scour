@@ -37,7 +37,7 @@ public class InteractableItem : MonoBehaviour, IInteractable, IItemReceiver
 
         if (grateGate != null && !grateGate.IsRemoved)
         {
-            InteractionFeedback.Fail(blockedMessage, 3f);
+            InteractionFeedback.Fail(Loc.Get("gameplay.cant_reach"), 3f);
             return true;
         }
 
@@ -46,7 +46,7 @@ public class InteractableItem : MonoBehaviour, IInteractable, IItemReceiver
             var vice = BenchVicePuzzle.Instance;
             if (vice != null && !vice.IsWrenchReleased)
             {
-                InteractionFeedback.Fail(benchViceStuckMessage, 3f);
+                InteractionFeedback.Fail(Loc.Get("gameplay.stuck"), 3f);
                 return true;
             }
         }
@@ -79,9 +79,9 @@ public class InteractableItem : MonoBehaviour, IInteractable, IItemReceiver
                 InventoryManager.Instance.RemoveItem(heldTool);
             }
 
-            string msg = !string.IsNullOrWhiteSpace(itemData.pickUpText)
-                ? itemData.pickUpText
-                : $"Picked up {itemData.itemName}.";
+            string msg = !string.IsNullOrWhiteSpace(itemData.GetLocalizedPickupText())
+                ? itemData.GetLocalizedPickupText()
+                : Loc.Format("gameplay.item_used", itemData.GetLocalizedName());
             HudManager.Instance?.ShowSubtitle(msg, 3f);
             SoundManager.Instance.PlaySFXAt(itemData.pickUpSFX, transform.position);
 
@@ -101,7 +101,7 @@ public class InteractableItem : MonoBehaviour, IInteractable, IItemReceiver
             return true;
         }
 
-        InteractionFeedback.Fail("Your inventory is full.", 3f);
+        InteractionFeedback.Fail(Loc.Get("gameplay.inventory_full"), 3f);
         return false;
     }
 

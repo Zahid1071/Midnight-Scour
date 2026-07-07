@@ -17,12 +17,6 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
     [Header("Dial strike (used when no Animator)")]
     [SerializeField] float dialStrikeDegrees = 45f;
     [SerializeField] float dialStrikeDuration = 0.35f;
-    [Header("Messages")]
-    [SerializeField] string wrongItemMessage = "That won't work here.";
-    [SerializeField] string barWontBudgeMessage = "It won't budge.";
-    [SerializeField] string needBarMessage = "A bar might loosen this.";
-    [SerializeField] string useBarOnViseMessage = "Use the bar on the vise.";
-    [SerializeField] string useHammerOnBarMessage = "Use the hammer on the bar.";
     [SerializeField] AudioClip strikeSound;
     [Header("NPC Suspicion")]
     [Tooltip("Footstep-suspicion added to NPCs when the hammer strikes (same mechanism as body bag impact).")]
@@ -59,7 +53,6 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
         return false;
     }
 
-    /// <summary>Same hints as empty-hand E, keyed off puzzle state and what the player is holding.</summary>
     public string GetContextualHintMessage(InventoryItem held)
     {
         if (_wrenchReleased)
@@ -68,14 +61,14 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
         if (!_barInserted)
         {
             if (held == barItem || held == hammerItem)
-                return useBarOnViseMessage;
-            return needBarMessage;
+                return Loc.Get("gameplay.use_bar_vise");
+            return Loc.Get("gameplay.need_bar");
         }
 
         if (held == hammerItem)
-            return useHammerOnBarMessage;
+            return Loc.Get("gameplay.use_hammer_bar");
 
-        return barWontBudgeMessage;
+        return Loc.Get("gameplay.wont_budge");
     }
 
     void ShowContextualHint(InventoryItem held)
@@ -108,7 +101,7 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
         var inventory = InventoryManager.Instance?.GetInventory();
         if (inventory == null || !inventory.Contains(item))
         {
-            InteractionFeedback.Fail("You do not have that item.", 2.5f);
+            InteractionFeedback.Fail(Loc.Get("gameplay.dont_have_item"), 2.5f);
             return false;
         }
 
@@ -131,7 +124,7 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
         var inventory = InventoryManager.Instance?.GetInventory();
         if (inventory == null || !inventory.Contains(item))
         {
-            InteractionFeedback.Fail("You do not have that item.", 2.5f);
+            InteractionFeedback.Fail(Loc.Get("gameplay.dont_have_item"), 2.5f);
             return false;
         }
 
