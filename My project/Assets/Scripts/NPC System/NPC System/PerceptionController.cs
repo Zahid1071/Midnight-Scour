@@ -44,6 +44,15 @@ public class PerceptionController : MonoBehaviour
     public float MaxViewHalfAngle => maxViewHalfAngle;
     public LayerMask IgnoreLayer => ignoreLayer;
 
+    // Up close, peripheral vision effectively becomes a half-circle - the player can't stand
+    // right next to/behind the NPC's shoulder and expect to go unnoticed just because they're
+    // outside the "normal" cone.
+    const float CloseRangeWideFovDistance = 2f;
+    const float CloseRangeWideFovHalfAngle = 90f;
+
+    float EffectiveViewHalfAngle(float distanceToTarget) =>
+        distanceToTarget < CloseRangeWideFovDistance ? CloseRangeWideFovHalfAngle : maxViewHalfAngle;
+
     void Awake()
     {
         npc = GetComponent<NPCController>();
@@ -140,6 +149,24 @@ public class PerceptionController : MonoBehaviour
             Gizmos.DrawLine(prev, next);
             prev = next;
         }
+
+        // Close-range "peripheral vision" cone (widens to 90° each side inside this radius).
+        Gizmos.color = Color.magenta;
+        Vector3 wideLeft = Quaternion.AngleAxis(-CloseRangeWideFovHalfAngle, upAxis) * forward;
+        Vector3 wideRight = Quaternion.AngleAxis(CloseRangeWideFovHalfAngle, upAxis) * forward;
+        Gizmos.DrawLine(origin, origin + wideLeft * CloseRangeWideFovDistance);
+        Gizmos.DrawLine(origin, origin + wideRight * CloseRangeWideFovDistance);
+
+        Vector3 prevWide = origin + wideLeft * CloseRangeWideFovDistance;
+        for (int i = 1; i <= segments; i++)
+        {
+            float t = i / (float)segments;
+            float angle = Mathf.Lerp(-CloseRangeWideFovHalfAngle, CloseRangeWideFovHalfAngle, t);
+            Vector3 dir = Quaternion.AngleAxis(angle, upAxis) * forward;
+            Vector3 next = origin + dir * CloseRangeWideFovDistance;
+            Gizmos.DrawLine(prevWide, next);
+            prevWide = next;
+        }
     }
 
     /// <summary>
@@ -156,9 +183,10 @@ public class PerceptionController : MonoBehaviour
         GetViewBasis(out Vector3 eye, out Vector3 viewForward, out _);
         Vector3 aim = playerCol.bounds.center;
         Vector3 dirToTarget = (aim - eye).normalized;
+        float distanceToTarget = Vector3.Distance(eye, aim);
 
         float angleToTarget = Vector3.Angle(viewForward, dirToTarget);
-        if (angleToTarget > maxViewHalfAngle) return false;
+        if (angleToTarget > EffectiveViewHalfAngle(distanceToTarget)) return false;
 
         if (Physics.Raycast(eye, dirToTarget, out RaycastHit hit, maxViewDistance, ~ignoreLayer, QueryTriggerInteraction.Ignore))
         {
@@ -191,9 +219,10 @@ public class PerceptionController : MonoBehaviour
         GetViewBasis(out Vector3 eye, out Vector3 viewForward, out _);
         Vector3 aim = playerCol.bounds.center;
         Vector3 dirToTarget = (aim - eye).normalized;
+        float distanceToTarget = Vector3.Distance(eye, aim);
 
         float angleToTarget = Vector3.Angle(viewForward, dirToTarget);
-        if (angleToTarget > maxViewHalfAngle)
+        if (angleToTarget > EffectiveViewHalfAngle(distanceToTarget))
         {
             CanSeePlayer = false;
             return;

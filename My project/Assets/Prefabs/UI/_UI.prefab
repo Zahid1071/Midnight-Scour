@@ -3530,22 +3530,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Thank you for playing the Midnight Scour demo.
-
-
-    This build represents
-    a fraction of the final experience. The full game will expand this core stealth
-    and survival loop across multiple distinct rooms and environments, requiring
-    you to constantly adapt to new layouts, behaviors, and threats.
-
-
-    Midnight
-    Scour is scheduled for release in late 2026.
-
-
-    If you enjoyed the demo, please
-    consider adding the game to your Steam Wishlist. It is the most effective way
-    to support the continued development of the project.'
+  m_text: "Thank you for playing the Midnight Scour demo.\n\nThis build tries to showcase a small part of the final experience. The full game will expand this core stealth and survival loop across multiple distinct rooms and environments and make better use of chase sequences currently impossible in a single room.\n\nMidnight Scour is scheduled for release in late 2026.\n\nWishlist it on Steam for the full experience and support us!"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fca6355ee4a564c4ca900e2eeb4a9ad6, type: 2}
   m_sharedMaterial: {fileID: 1517768226830932575, guid: fca6355ee4a564c4ca900e2eeb4a9ad6, type: 2}

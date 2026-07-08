@@ -65,11 +65,11 @@ MonoBehaviour:
   - m_Id: 5707318296577
     m_Localized: "Merci d'avoir joué à la démo de Midnight Scour.
 
-Cette version ne représente qu'une fraction de l'expérience finale. Le jeu complet étendra cette boucle d'infiltration et de survie à plusieurs pièces et environnements distincts, vous obligeant à vous adapter constamment à de nouvelles configurations, comportements et menaces.
+Cette version tente de présenter une petite partie de l'expérience finale. Le jeu complet étendra cette boucle centrale d'infiltration et de survie à plusieurs pièces et environnements distincts, et exploitera bien mieux les séquences de poursuite actuellement impossibles dans une seule pièce.
 
 La sortie de Midnight Scour est prévue pour fin 2026.
 
-Si vous avez apprécié la démo, pensez à ajouter le jeu à votre liste de souhaits Steam. C'est le moyen le plus efficace de soutenir le développement continu du projet."
+Ajoutez-le à votre liste de souhaits Steam pour profiter de l'expérience complète et nous soutenir !"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
@@ -385,7 +385,7 @@ Si vous avez apprécié la démo, pensez à ajouter le jeu à votre liste de sou
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296656
-    m_Localized: "Je crois qu'il faut le frapper avec quelque chose pour le faire tourner, il est complètement rouillé"
+    m_Localized: "Il manque la barre pour le faire tourner."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296657
@@ -574,6 +574,10 @@ Si vous avez apprécié la démo, pensez à ajouter le jeu à votre liste de sou
       m_Items: []
   - m_Id: 5707318296703
     m_Localized: G
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296704
+    m_Localized: "Je crois qu'il faut le frapper avec quelque chose pour le faire tourner, il est complètement rouillé"
     m_Metadata:
       m_Items: []
   references:

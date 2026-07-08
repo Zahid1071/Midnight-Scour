@@ -9,6 +9,17 @@ public class Cage : MonoBehaviour
     public Transform basementSidePrePoint;
     public bool isOccupied = false;
 
+    [Header("NPC Noise")]
+    [Tooltip("Footstep-suspicion value added to NPCs whenever the cage door opens or closes.")]
+    [Min(0f)]
+    public float doorSoundSuspicion = 300f;
+    [Tooltip("Distance at which the cage door sound is barely audible to NPCs.")]
+    [Min(0f)]
+    public float doorSoundMaxHearDistance = 150f;
+    [Tooltip("Distance within which the cage door sound is heard at full strength.")]
+    [Min(0f)]
+    public float doorSoundMinHearDistance = 5f;
+
     // Hardcoded layer ID as requested
     private const int CAPTIVE_LAYER = 12;
 
@@ -31,10 +42,16 @@ public class Cage : MonoBehaviour
 
         if (cageDoor != null)
         {
-            if (cageDoor.objectOpen && !_doorWasOpen)
-                GameplayHintManager.Instance?.NotifyCageDoorOpenedFirstTime();
+            bool isOpenNow = cageDoor.objectOpen;
+            if (isOpenNow != _doorWasOpen)
+            {
+                if (isOpenNow)
+                    GameplayHintManager.Instance?.NotifyCageDoorOpenedFirstTime();
 
-            _doorWasOpen = cageDoor.objectOpen;
+                NotifyNpcsOfDoorSound();
+            }
+
+            _doorWasOpen = isOpenNow;
         }
 
         // Safety check
@@ -63,6 +80,30 @@ public class Cage : MonoBehaviour
 
             if (becameCaptive)
                 RedirectNpcHearingAwayFromCage();
+        }
+    }
+
+    void NotifyNpcsOfDoorSound()
+    {
+        if (doorSoundSuspicion <= 0f)
+            return;
+
+        // Emit from just outside the cage (basement side) rather than the door/cage interior itself -
+        // the cage isn't a real searchable room, so we don't want NPC anchor resolution latching onto
+        // it as the "closest room" to investigate.
+        Transform prePoint = ResolveBasementSidePrePoint();
+        Vector3 soundPosition = prePoint != null
+            ? prePoint.position
+            : (cageDoor != null ? cageDoor.transform.position : transform.position);
+
+#if UNITY_2023_1_OR_NEWER
+        foreach (var perception in Object.FindObjectsByType<PerceptionController>(FindObjectsSortMode.None))
+#else
+        foreach (var perception in Object.FindObjectsOfType<PerceptionController>())
+#endif
+        {
+            if (perception != null)
+                perception.HearNoiseAt(soundPosition, doorSoundSuspicion, doorSoundMaxHearDistance, doorSoundMinHearDistance);
         }
     }
 

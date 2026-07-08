@@ -65,11 +65,11 @@ MonoBehaviour:
   - m_Id: 5707318296577
     m_Localized: "『Midnight Scour』の体験版をプレイしていただき、ありがとうございます。
 
-このビルドは最終的な体験のほんの一部にすぎません。製品版では、この核となる潜入と生存のループを、複数の異なる部屋や環境にまで拡張し、新しい配置や行動パターン、脅威に絶えず適応することが求められます。
+このビルドは、最終的な体験のほんの一部をお見せするためのものです。製品版では、この核となる潜入と生存のループを複数の異なる部屋や環境にまで拡張し、単一の部屋では実現できなかった追跡シーケンスをより効果的に活用します。
 
 『Midnight Scour』は2026年後半の発売を予定しています。
 
-体験版を気に入っていただけましたら、SteamのウィッシュリストにぜひAddしてください。それが本プロジェクトの継続的な開発を支援する最も効果的な方法です。"
+ぜひSteamのウィッシュリストに追加して、完全な体験と私たちの開発を応援してください！"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
@@ -281,7 +281,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296630
-    m_Localized: "鉄の棒"
+    m_Localized: "鉄梃子"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296631
@@ -333,7 +333,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296643
-    m_Localized: "鉄の棒を入手した"
+    m_Localized: "鉄梃子を入手した"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296644
@@ -385,15 +385,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296656
-    m_Localized: "回すには何かで叩く必要がありそうだ。完全に錆びついている。"
+    m_Localized: "回すための鉄梃子が足りない。"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296657
-    m_Localized: "鉄の棒を万力に使う。"
+    m_Localized: "鉄梃子を万力に使う。"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296658
-    m_Localized: "ハンマーを鉄の棒に使う。"
+    m_Localized: "ハンマーを鉄梃子に使う。"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296659
@@ -574,6 +574,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5707318296703
     m_Localized: け
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296704
+    m_Localized: "回すには何かで叩く必要がありそうだ。完全に錆びついている。"
     m_Metadata:
       m_Items: []
   references:

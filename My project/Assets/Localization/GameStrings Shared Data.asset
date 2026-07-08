@@ -567,6 +567,10 @@ MonoBehaviour:
     m_Key: controls.key.drop
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296704
+    m_Key: gameplay.bar_stuck_rusty
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

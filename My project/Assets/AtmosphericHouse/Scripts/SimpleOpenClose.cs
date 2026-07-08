@@ -90,7 +90,7 @@ namespace FS_Atmo
                     return false;
                 }
 
-                string message = string.IsNullOrWhiteSpace(lockedMessage) ? "The door is locked." : lockedMessage;
+                string message = string.IsNullOrWhiteSpace(lockedMessage) ? Loc.Get("gameplay.locked") : lockedMessage;
                 InteractionFeedback.Fail(message, 2.5f);
 
                 Debug.Log("❌ Kapı kilitli! (Animasyon Tetikleniyor)");
@@ -138,7 +138,7 @@ namespace FS_Atmo
                     return false;
                 }
 
-                InteractionFeedback.Fail("This item cannot be used here.", 2.5f);
+                InteractionFeedback.Fail(Loc.Get("gameplay.wrong_item"), 2.5f);
                 myAnimator.SetTrigger(lockedHash);
                 nextInteractTime = Time.time + lockedAnimationDuration;
                 return false;
@@ -147,7 +147,7 @@ namespace FS_Atmo
             var inventory = InventoryManager.Instance.GetInventory();
             if (!inventory.Contains(item))
             {
-                InteractionFeedback.Fail("You do not have that item.", 2.5f);
+                InteractionFeedback.Fail(Loc.Format("gameplay.dont_have_item", item.GetLocalizedName()), 2.5f);
                 return false;
             }
 

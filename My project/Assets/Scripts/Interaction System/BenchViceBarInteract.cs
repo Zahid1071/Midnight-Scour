@@ -1,7 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// The bar wedged in the bench vise after insertion — E reports it won't budge until the hammer sequence completes.
+/// The bar wedged in the bench vise after insertion — E reports the contextual hint (rusty/needs hammer)
+/// until the hammer sequence completes.
 /// </summary>
 public class BenchViceBarInteract : MonoBehaviour, IInteractable
 {

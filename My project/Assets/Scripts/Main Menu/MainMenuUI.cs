@@ -48,6 +48,13 @@ public class MainMenuUI : MonoBehaviour
             mainMenuPanel.SetActive(true);
         if (settingsPanel) settingsPanel.SetActive(false);
 
+        // Safety net: PlayerControlGate is a static lock that persists across scene loads
+        // (only a full process restart resets it). If a previous gameplay session ended
+        // abnormally (e.g. an exception mid-capture/jumpscare) without releasing a lock
+        // such as "captured", it would otherwise stay stuck for every future playthrough
+        // in this process, silently freezing the NPC on its next capture attempt.
+        PlayerControlGate.Clear();
+
         // Grey-out Continue when there is nothing to resume
         bool hasSave = SaveManager.Instance != null && SaveManager.Instance.HasSave();
         if (continueButton != null)
@@ -60,13 +67,14 @@ public class MainMenuUI : MonoBehaviour
     public void ContinueGame()
     {
         if (SaveManager.Instance == null || !SaveManager.Instance.HasSave()) return;
+        PlayerControlGate.Clear();
         SaveManager.Instance.LoadGame();
     }
 
     /// <summary>Start a brand-new game (overwrites any existing save).</summary>
     public void NewGame()
     {
-
+        PlayerControlGate.Clear();
 
         if (SaveManager.Instance != null)
             SaveManager.Instance.DeleteSave();
@@ -77,7 +85,6 @@ public class MainMenuUI : MonoBehaviour
             InventoryManager.Instance.ClearInventory();
 
         SceneManager.LoadScene(gameSceneName);
-
     }
 
     /// <summary>Placeholder — wire to your online / multiplayer flow later.</summary>

@@ -71,9 +71,16 @@ public static class UIFont
 
     public static TMP_FontAsset ForCurrentLocale()
     {
-        var code = LocalizationSettings.SelectedLocale != null
-            ? LocalizationSettings.SelectedLocale.Identifier.Code
-            : "en";
+        // Reading SelectedLocale before initialization is done forces Unity's Localization
+        // package to synchronously complete InitializationOperation right here (WaitForCompletion).
+        // If that happens while we're already nested inside another Addressables completion
+        // callback, it can crash with "Reentering the Update method is not allowed" - so we only
+        // ever read it once init has actually finished. Callers refresh again later via
+        // LocaleManager.WhenReady once it's safe.
+        var code = "en";
+        if (LocalizationSettings.InitializationOperation.IsDone && LocalizationSettings.SelectedLocale != null)
+            code = LocalizationSettings.SelectedLocale.Identifier.Code;
+
         return ForLocale(code);
     }
 

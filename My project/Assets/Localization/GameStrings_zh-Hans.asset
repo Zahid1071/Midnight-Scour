@@ -65,11 +65,11 @@ MonoBehaviour:
   - m_Id: 5707318296577
     m_Localized: "感谢您游玩《午夜搜寻》试玩版。
 
-本次试玩仅代表最终体验的一小部分。完整版游戏将把这个核心潜行与生存循环扩展到多个不同的房间和环境中，要求你不断适应新的布局、行为和威胁。
+本次试玩旨在展示最终体验的一小部分。完整版游戏将把这个核心潜行与生存循环扩展到多个不同的房间和环境中，并更充分地运用目前在单一房间内无法实现的追逐场面。
 
 《午夜搜寻》计划于2026年末发售。
 
-如果你喜欢这个试玩版，请考虑将本作加入你的Steam愿望单。这是支持项目持续开发的最有效方式。"
+请在Steam上将本作加入愿望单，体验完整内容并支持我们！"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
@@ -281,7 +281,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296630
-    m_Localized: "铁棍"
+    m_Localized: "撬棍"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296631
@@ -333,7 +333,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296643
-    m_Localized: "拾取了铁棍"
+    m_Localized: "拾取了撬棍"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296644
@@ -385,15 +385,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296656
-    m_Localized: "我觉得得用什么东西敲一下才能转动，它完全锈死了。"
+    m_Localized: "少了用来转动它的撬棍。"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296657
-    m_Localized: "把铁棍用在台钳上。"
+    m_Localized: "把撬棍用在台钳上。"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296658
-    m_Localized: "把锤子用在铁棍上。"
+    m_Localized: "把锤子用在撬棍上。"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296659
@@ -574,6 +574,10 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5707318296703
     m_Localized: G
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296704
+    m_Localized: "我觉得得用什么东西敲一下才能转动，它完全锈死了。"
     m_Metadata:
       m_Items: []
   references:

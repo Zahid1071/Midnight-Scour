@@ -65,11 +65,11 @@ MonoBehaviour:
   - m_Id: 5707318296577
     m_Localized: "Midnight Scour demosunu oynadığınız için teşekkür ederiz.
 
-Bu sürüm, nihai deneyimin yalnızca bir bölümünü temsil etmektedir. Tam oyun, bu temel gizlilik ve hayatta kalma döngüsünü birden fazla farklı oda ve ortama genişletecek ve sizi sürekli olarak yeni düzenlere, davranışlara ve tehditlere uyum sağlamaya zorlayacaktır.
+Bu sürüm, nihai deneyimin küçük bir bölümünü sergilemeye çalışıyor. Tam oyun, bu temel gizlilik ve hayatta kalma döngüsünü birden fazla farklı oda ve ortama genişletecek ve şu anda tek bir odada mümkün olmayan kovalamaca sahnelerini çok daha iyi kullanacak.
 
 Midnight Scour, 2026'nın sonlarında piyasaya sürülmesi planlanıyor.
 
-Demoyu beğendiyseniz, lütfen oyunu Steam İstek Listenize eklemeyi düşünün. Projenin gelişimini desteklemenin en etkili yolu budur."
+Tam deneyim için oyunu Steam'de İstek Listenize ekleyin ve bizi destekleyin!"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
@@ -281,7 +281,7 @@ Demoyu beğendiyseniz, lütfen oyunu Steam İstek Listenize eklemeyi düşünün
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296630
-    m_Localized: "Demir Çubuk"
+    m_Localized: "Demir Kol"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296631
@@ -333,7 +333,7 @@ Demoyu beğendiyseniz, lütfen oyunu Steam İstek Listenize eklemeyi düşünün
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296643
-    m_Localized: "Demir Çubuk alındı"
+    m_Localized: "Demir Kol alındı"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296644
@@ -385,15 +385,15 @@ Demoyu beğendiyseniz, lütfen oyunu Steam İstek Listenize eklemeyi düşünün
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296656
-    m_Localized: "Döndürmek için bir şeyle vurmam gerekiyor gibi, tamamen paslanmış"
+    m_Localized: "Bunu döndürmek için kol eksik."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296657
-    m_Localized: "Çubuğu mengeneye kullan."
+    m_Localized: "Kolu mengeneye kullan."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296658
-    m_Localized: "Çekici çubuğun üzerinde kullan."
+    m_Localized: "Çekici kolun üzerinde kullan."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296659
@@ -574,6 +574,10 @@ Demoyu beğendiyseniz, lütfen oyunu Steam İstek Listenize eklemeyi düşünün
       m_Items: []
   - m_Id: 5707318296703
     m_Localized: G
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296704
+    m_Localized: "Döndürmek için bir şeyle vurmam gerekiyor gibi, tamamen paslanmış"
     m_Metadata:
       m_Items: []
   references:

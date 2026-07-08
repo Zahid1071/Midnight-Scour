@@ -65,11 +65,11 @@ MonoBehaviour:
   - m_Id: 5707318296577
     m_Localized: "Gracias por jugar la demo de Midnight Scour.
 
-Esta versión representa solo una fracción de la experiencia final. El juego completo ampliará este ciclo central de sigilo y supervivencia a múltiples habitaciones y entornos distintos, obligándote a adaptarte constantemente a nuevos diseños, comportamientos y amenazas.
+Esta versión intenta mostrar una pequeña parte de la experiencia final. El juego completo ampliará este ciclo central de sigilo y supervivencia a múltiples habitaciones y entornos distintos, y aprovechará mucho mejor las secuencias de persecución que actualmente son imposibles dentro de una sola habitación.
 
 Se espera que Midnight Scour se lance a finales de 2026.
 
-Si disfrutaste la demo, considera agregar el juego a tu lista de deseos de Steam. Es la forma más efectiva de apoyar el desarrollo continuo del proyecto."
+¡Agrégalo a tu lista de deseos de Steam para disfrutar de la experiencia completa y apoyarnos!"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
@@ -385,7 +385,7 @@ Si disfrutaste la demo, considera agregar el juego a tu lista de deseos de Steam
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296656
-    m_Localized: "Creo que necesito golpearlo con algo para girarlo, está completamente oxidado"
+    m_Localized: "Le falta la barra para girarlo."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296657
@@ -574,6 +574,10 @@ Si disfrutaste la demo, considera agregar el juego a tu lista de deseos de Steam
       m_Items: []
   - m_Id: 5707318296703
     m_Localized: G
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296704
+    m_Localized: "Creo que necesito golpearlo con algo para girarlo, está completamente oxidado"
     m_Metadata:
       m_Items: []
   references:

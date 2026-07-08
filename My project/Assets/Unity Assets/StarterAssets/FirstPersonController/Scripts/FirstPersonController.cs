@@ -24,6 +24,9 @@ namespace StarterAssets
 		[Tooltip("Sneak speed of the character in m/s")]
 		public float SneakSpeed = 1.5f;
 
+		[Tooltip("Safety cap on how fast the CharacterController is allowed to be shoved by colliders (e.g. a door closing on the player) in a single frame. Prevents physics depenetration from ever reading as an instant 'launch' - the player still gets pushed out, just never faster than this speed.")]
+		public float MaxExternalPushSpeed = 5.0f;
+
 		private bool _isSneaking = false;
 
 		public bool IsSneaking => _isSneaking;
@@ -219,7 +222,33 @@ namespace StarterAssets
 			}
 
 			// move the player
-			_controller.Move(inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+			Vector3 horizontalMove = inputDirection.normalized * (_speed * Time.deltaTime);
+			Vector3 positionBeforeMove = transform.position;
+
+			_controller.Move(horizontalMove + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+
+			ClampSuddenPush(positionBeforeMove, horizontalMove);
+		}
+
+		// Colliders that are animated directly (e.g. a closing door) can sweep through the
+		// CharacterController without going through the physics/velocity pipeline. Unity resolves
+		// that overlap by shoving the controller out in a single Move() call, which - since it
+		// ignores frame time - can look like the player got instantly launched at absurd speed.
+		// Here we let the push happen (so the player still gets physically ejected, and never gets
+		// stuck overlapping geometry), but clamp how far it's allowed to move us in one frame so it
+		// never exceeds a sane speed.
+		private void ClampSuddenPush(Vector3 positionBeforeMove, Vector3 intendedHorizontalMove)
+		{
+			Vector3 actualDelta = transform.position - positionBeforeMove;
+			Vector3 actualHorizontal = new Vector3(actualDelta.x, 0.0f, actualDelta.z);
+
+			float maxAllowedMagnitude = intendedHorizontalMove.magnitude + MaxExternalPushSpeed * Time.deltaTime;
+
+			if (actualHorizontal.sqrMagnitude > maxAllowedMagnitude * maxAllowedMagnitude)
+			{
+				Vector3 clampedHorizontal = actualHorizontal.normalized * maxAllowedMagnitude;
+				transform.position += clampedHorizontal - actualHorizontal;
+			}
 		}
 
 		private void JumpAndGravity()

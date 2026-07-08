@@ -383,7 +383,12 @@ public class HidingSpot : MonoBehaviour, IInteractable
         if (!forCapture)
             StartCoroutine(RestoreHideLightAfterSeconds(player, restoreLightInSeconds));
 
-        if (!forCapture && restoreLayerOnExitStart)
+        // Always clear the stealth layer/hidden flag as soon as the exit begins - even when
+        // exiting for a capture. Previously this was skipped for forCapture, so if the
+        // downstream jumpscare/capture sequence ever failed or threw before it could reload
+        // the scene, the player was left permanently on the hidden layer with isHidden stuck
+        // true, making every NPC blind to them for the rest of the session.
+        if (forCapture || restoreLayerOnExitStart)
         {
             player.layer = originalLayerIndex;
             if (hider != null)

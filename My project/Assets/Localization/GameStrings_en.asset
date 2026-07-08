@@ -65,11 +65,11 @@ MonoBehaviour:
   - m_Id: 5707318296577
     m_Localized: "Thank you for playing the Midnight Scour demo.
 
-This build represents a fraction of the final experience. The full game will expand this core stealth and survival loop across multiple distinct rooms and environments, requiring you to constantly adapt to new layouts, behaviors, and threats.
+This build tries to showcase a small part of the final experience. The full game will expand this core stealth and survival loop across multiple distinct rooms and environments and make better use of chase sequences currently impossible in a single room.
 
 Midnight Scour is scheduled for release in late 2026.
 
-If you enjoyed the demo, please consider adding the game to your Steam Wishlist. It is the most effective way to support the continued development of the project."
+Wishlist it on Steam for the full experience and support us!"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
@@ -385,7 +385,7 @@ If you enjoyed the demo, please consider adding the game to your Steam Wishlist.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296656
-    m_Localized: I think I need to hit it with something to rotate, it is completely rusty
+    m_Localized: It's missing the bar to rotate it.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296657
@@ -574,6 +574,10 @@ If you enjoyed the demo, please consider adding the game to your Steam Wishlist.
       m_Items: []
   - m_Id: 5707318296703
     m_Localized: G
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296704
+    m_Localized: I think I need to hit it with something to rotate, it is completely rusty
     m_Metadata:
       m_Items: []
   references:

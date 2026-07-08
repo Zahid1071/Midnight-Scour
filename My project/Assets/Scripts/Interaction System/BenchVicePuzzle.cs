@@ -68,7 +68,7 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
         if (held == hammerItem)
             return Loc.Get("gameplay.use_hammer_bar");
 
-        return Loc.Get("gameplay.wont_budge");
+        return Loc.Get("gameplay.bar_stuck_rusty");
     }
 
     void ShowContextualHint(InventoryItem held)

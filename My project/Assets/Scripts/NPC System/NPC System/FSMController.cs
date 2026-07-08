@@ -275,7 +275,19 @@ public class FSMController
             }
         }
 
-        DoCaptureNow();
+        // Guard against any failure inside the capture sequence (missing SFX/manager refs, etc.)
+        // permanently freezing the NPC in AIState.Capture and leaking the PlayerControlGate lock.
+        try
+        {
+            DoCaptureNow();
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError($"[FSMController] DoCaptureNow threw, forcing a safe recovery: {e}");
+            PlayerControlGate.Release(PlayerControlGate.ReasonCaptured);
+            SetState(NPCController.AIState.Natural);
+        }
+
         npc.OnCaptureRoutineFinished();
     }
 
@@ -298,8 +310,13 @@ public class FSMController
 
         if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured)) return;
 
-        SoundManager.Instance.PlaySFXAt(SoundManager.Instance.tensionSFXBank[0], npc.transform.position);
-        SoundManager.Instance.PlaySFXAt(SoundManager.Instance.tensionSFXBank[1], npc.transform.position);
+        if (SoundManager.Instance != null && SoundManager.Instance.tensionSFXBank != null)
+        {
+            var bank = SoundManager.Instance.tensionSFXBank;
+            if (bank.Length > 0) SoundManager.Instance.PlaySFXAt(bank[0], npc.transform.position);
+            if (bank.Length > 1) SoundManager.Instance.PlaySFXAt(bank[1], npc.transform.position);
+        }
+
         PlayerControlGate.Acquire(PlayerControlGate.ReasonCaptured);
 
         Debug.Log("Player Caught!");
@@ -307,9 +324,14 @@ public class FSMController
         if (npc.poiLookDirector != null)
             npc.poiLookDirector.CancelHoldAndClearLook();
 
-        animator.SetTrigger("Jumpscare");
+        if (animator != null)
+            animator.SetTrigger("Jumpscare");
 
-        JumpscareManager.Instance.TriggerJumpscare(npc.jumpscarePoint, npc.transform);
+        if (JumpscareManager.Instance != null)
+            JumpscareManager.Instance.TriggerJumpscare(npc.jumpscarePoint, npc.transform);
+        else
+            Debug.LogError("[FSMController] JumpscareManager.Instance is null - cannot trigger jumpscare/scene reload.");
+
         npc.SetState(NPCController.AIState.Capture);
     }
     
@@ -627,15 +649,22 @@ public class FSMController
             yield break;
         }
 
+        // The cage exists purely to hold a captured player - it has no hiding spots and isn't a
+        // real search destination. If a noise/last-known-position resolved to it anyway, skip
+        // straight to the post-search decision instead of pathing into it and "searching" nothing.
+        if (roomAnchor.GetComponent<Cage>() != null)
+        {
+            TryAmbushOrNaturalAfterSearch();
+            yield break;
+        }
+
         RegisterSearchExposureForHiddenPlayer(roomAnchor);
 
         // ensure we actually route to the room (door-aware)
         var room = roomAnchor.GetComponent<RoomAnchor>();
         if (nav != null && room != null) nav.GoToRoom(room);
-        
-        yield return new WaitUntil(() =>
-            !npc.GetComponent<NavMeshAgent>().pathPending &&
-            npc.GetComponent<NavMeshAgent>().remainingDistance <2f);
+
+        yield return WaitForAgentArrivalOrGiveUp(agent, SearchArriveDistance, SearchStuckTimeout);
 
         var data = npc.interaction?.data;
         var allStops = roomAnchor.GetComponentsInChildren<HidingSpot>();
@@ -657,11 +686,9 @@ public class FSMController
                 continue;
 
             if (nav != null) nav.GoToPoint(searchPivot.position);
-            else npc.GetComponent<NavMeshAgent>().SetDestination(searchPivot.position);
+            else agent.SetDestination(searchPivot.position);
 
-            yield return new WaitUntil(() =>
-                !npc.GetComponent<NavMeshAgent>().pathPending &&
-                npc.GetComponent<NavMeshAgent>().remainingDistance < 2f);
+            yield return WaitForAgentArrivalOrGiveUp(agent, SearchArriveDistance, SearchStuckTimeout);
 
             if (TryBreakSearchForChase())
                 yield break;
@@ -719,6 +746,48 @@ public class FSMController
                 npc.BeginChaseFromPerception();
             else
                 TryAmbushOrNaturalAfterSearch();
+        }
+    }
+
+    const float SearchArriveDistance = 2f;
+    const float SearchStuckTimeout = 5f;
+
+    /// <summary>
+    /// Waits until the agent arrives within <paramref name="arriveDistance"/>, but gives up
+    /// after <paramref name="stuckTimeout"/> seconds of no progress (or an invalid path) instead
+    /// of waiting forever. Without this, an unreachable search target (e.g. blocked by a closed
+    /// door/cage) would freeze the NPC in the Search state permanently.
+    /// </summary>
+    static IEnumerator WaitForAgentArrivalOrGiveUp(NavMeshAgent agent, float arriveDistance, float stuckTimeout)
+    {
+        if (agent == null)
+            yield break;
+
+        float stuckTimer = 0f;
+        float lastRemaining = Mathf.Infinity;
+
+        while (true)
+        {
+            if (agent.pathStatus == NavMeshPathStatus.PathInvalid)
+                yield break;
+
+            if (!agent.pathPending && agent.remainingDistance <= arriveDistance)
+                yield break;
+
+            if (!agent.pathPending)
+            {
+                if (Mathf.Abs(agent.remainingDistance - lastRemaining) < 0.05f)
+                    stuckTimer += Time.deltaTime;
+                else
+                    stuckTimer = 0f;
+
+                lastRemaining = agent.remainingDistance;
+
+                if (stuckTimer >= stuckTimeout)
+                    yield break;
+            }
+
+            yield return null;
         }
     }
 

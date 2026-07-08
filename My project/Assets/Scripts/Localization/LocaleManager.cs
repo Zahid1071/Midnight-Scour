@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
@@ -22,16 +24,70 @@ public static class LocaleManager
     public static string GetLocaleDisplayName(int index) =>
         index >= 0 && index < LocaleNativeNames.Length ? LocaleNativeNames[index] : "";
 
+    /// <summary>
+    /// Runs <paramref name="callback"/> once localization initialization is complete.
+    /// Always deferred onto a normal Unity update tick via <see cref="Pump"/> - never invoked
+    /// synchronously from inside InitializationOperation.Completed. That event fires from within
+    /// Addressables' own ResourceManager.Update(), and localization calls that can themselves
+    /// force a synchronous WaitForCompletion (Loc.Get, or reading LocalizationSettings.SelectedLocale
+    /// before init) would otherwise try to reenter ResourceManager.Update() and crash with
+    /// "Reentering the Update method is not allowed."
+    /// </summary>
     public static void WhenReady(Action callback)
     {
         if (callback == null)
             return;
 
-        var op = LocalizationSettings.InitializationOperation;
-        if (op.IsDone)
-            callback();
-        else
-            op.Completed += _ => callback();
+        Pump.Enqueue(callback);
+    }
+
+    /// <summary>Hidden runtime object that flushes queued WhenReady callbacks from a safe context.</summary>
+    class Pump : MonoBehaviour
+    {
+        static Pump _instance;
+        static readonly List<Action> _pending = new List<Action>();
+
+        static Pump Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    var go = new GameObject("[LocaleManager.Pump]") { hideFlags = HideFlags.HideInHierarchy };
+                    UnityEngine.Object.DontDestroyOnLoad(go);
+                    _instance = go.AddComponent<Pump>();
+                }
+                return _instance;
+            }
+        }
+
+        public static void Enqueue(Action callback)
+        {
+            _pending.Add(callback);
+            if (_pending.Count == 1)
+                Instance.StartCoroutine(FlushWhenReady());
+        }
+
+        static IEnumerator FlushWhenReady()
+        {
+            var op = LocalizationSettings.InitializationOperation;
+            while (!op.IsDone)
+                yield return null;
+
+            // Always yield at least once more, so even if IsDone was already true when this
+            // coroutine started, callbacks still run on a fresh tick rather than in whatever
+            // context queued them.
+            yield return null;
+
+            var callbacks = _pending.ToArray();
+            _pending.Clear();
+
+            foreach (var cb in callbacks)
+            {
+                try { cb(); }
+                catch (Exception e) { Debug.LogException(e); }
+            }
+        }
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
