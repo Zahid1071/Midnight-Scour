@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using Unity.Cinemachine;
-using UnityEngine.SceneManagement;
 
 public class JumpscareManager : MonoBehaviour
 {
@@ -93,6 +92,6 @@ public class JumpscareManager : MonoBehaviour
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
-        SceneManager.LoadScene(menuSceneName);
+        LoadingScreenController.LoadScene(menuSceneName);
     }
 }

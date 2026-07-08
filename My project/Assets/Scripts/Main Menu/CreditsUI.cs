@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Minimal controller for the Credits scene.
@@ -11,6 +10,6 @@ public class CreditsUI : MonoBehaviour
 
     public void OnBackToMenu()
     {
-        SceneManager.LoadScene(mainMenuScene);
+        LoadingScreenController.LoadScene(mainMenuScene);
     }
 }

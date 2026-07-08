@@ -85,7 +85,9 @@ public class SaveManager : MonoBehaviour
         SaveData data = ReadFromDisk();
 
         SceneManager.sceneLoaded += ApplyAfterLoad;
-        SceneManager.LoadScene(data.sceneName);
+        // Async load behind the loading screen (also warms up shaders there)
+        // instead of an instant load that stalls on first-time shader compilation.
+        LoadingScreenController.LoadScene(data.sceneName);
 
         void ApplyAfterLoad(Scene scene, LoadSceneMode mode)
         {

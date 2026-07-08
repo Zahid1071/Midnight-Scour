@@ -29,6 +29,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
@@ -63,6 +64,13 @@ public class LoadingScreenController : MonoBehaviour
     [SerializeField] private float fadeInDuration = 0.5f;
     [SerializeField] private float fadeOutDuration = 0.5f;
     [SerializeField] private float minimumLoadTime = 1.5f; // Minimum time to show tips
+
+    [Header("Shader Warm-up (fixes first-play FPS hitches)")]
+    [Tooltip("ShaderVariantCollection assets captured via Project Settings > Graphics > " +
+             "Shader Loading > Log Shader Compilation, then 'Save to asset file'. " +
+             "They are precompiled here, behind the loading screen, instead of stalling " +
+             "gameplay the first time each shader variant is actually rendered.")]
+    [SerializeField] private ShaderVariantCollection[] shaderVariantsToWarm;
     
     [Header("Gameplay Tips")]
     static readonly string[] TipKeys =
@@ -152,7 +160,11 @@ public class LoadingScreenController : MonoBehaviour
         
         // Fade in
         yield return StartCoroutine(FadeIn());
-        
+
+        // Precompile shaders while the screen is covered, instead of stalling
+        // the first few seconds of actual gameplay.
+        WarmUpShaders();
+
         // Start async loading
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneName);
         asyncLoad.allowSceneActivation = false;
@@ -197,7 +209,9 @@ public class LoadingScreenController : MonoBehaviour
         
         SetupLoadingScreen();
         yield return StartCoroutine(FadeIn());
-        
+
+        WarmUpShaders();
+
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(sceneIndex);
         asyncLoad.allowSceneActivation = false;
         
@@ -223,6 +237,26 @@ public class LoadingScreenController : MonoBehaviour
         yield return StartCoroutine(FadeOut());
         
         _isLoading = false;
+    }
+
+    // =========================================================================
+    // SHADER WARM-UP
+    // =========================================================================
+
+    /// <summary>
+    /// Synchronously compiles every variant in the assigned collections.
+    /// Blocking is intentional: it happens while the loading panel covers the
+    /// screen, so the cost is paid here instead of as a hitch during gameplay.
+    /// </summary>
+    private void WarmUpShaders()
+    {
+        if (shaderVariantsToWarm == null) return;
+
+        foreach (ShaderVariantCollection collection in shaderVariantsToWarm)
+        {
+            if (collection != null)
+                collection.WarmUp();
+        }
     }
 
     // =========================================================================

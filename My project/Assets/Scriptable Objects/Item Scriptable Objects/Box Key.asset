@@ -17,14 +17,16 @@ MonoBehaviour:
   worldPrefab: {fileID: 7437986296918079698, guid: 27ddbb3743994934986d30e24721d0f4, type: 3}
   dropLandSFX: {fileID: 8300000, guid: ff1ed0d2fa5dcee4097605e925f0c97f, type: 3}
   canDrop: 1
-  pickUpSFX: {fileID: 8300000, guid: bf4beb9cc9f0d2c4988065da775888b6, type: 3}
+  pickUpSFX: {fileID: 8300000, guid: cbc348ec1887a00448ae87b973b4a024, type: 3}
   useSuccessSound: {fileID: 0}
   consumeOnUse: 1
   interactionReachBonus: 0
+  reachAttemptFailMessage: 
   breaksOnWrongUse: 0
   breakOnWrongUseSound: {fileID: 0}
   breakOnWrongUseMessage: 
   nameKey: item.box_key.name
   pickupKey: item.box_key.pickup
+  breakMessageKey: 
   pickUpText: Picked up small key
   description: 

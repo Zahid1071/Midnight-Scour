@@ -1,0 +1,56 @@
+MIDNIGHT SCOUR - CREDITS
+========================
+
+AUDIO
+-----
+Sound effects obtained from https://www.zapsplat.com
+
+Additional horror ambience music by N91music (https://n91music.itch.io)
+
+Additional sound effects from Pixabay (https://pixabay.com)
+
+
+3D MODELS
+---------
+"Corpse" (cadaver) by Tamal De Quezo, via Sketchfab (CC Attribution)
+https://sketchfab.com/3d-models/corpse-be9b034525c246cebab3620acb5a8027
+
+"Spark Plug" by Vaughan.Staehr, via Sketchfab (CC Attribution)
+https://sketchfab.com/3d-models/spark-plug-306c0031ba8445a79897fa060791758a
+
+"Clutch LUK" by SCANIMAT, via Sketchfab (CC Attribution)
+https://sketchfab.com/3d-models/clutch-luk-f5c6a1dd30a94d47925ce073fb041424
+
+"Rusty Locker" by D3rpmaster, via Sketchfab (CC Attribution)
+https://sketchfab.com/3d-models/rusty-locker-d9cc270d4a564fcf8fda0b7e7f16bfbb
+
+"Human bone" by Luar.Larep, via Sketchfab (CC Attribution)
+https://sketchfab.com/3d-models/human-bone-0c92f04640ba420dbb3a7d35a744a398
+
+"Wooden Closet -25MB" by Mehdi Shahsavan, via Sketchfab (CC Attribution)
+https://sketchfab.com/3d-models/wooden-closet-25mb-844e9055994d4a6fac6dca138c5839a7
+
+[PENDING] Cage model - confirmed by dev to be from Sketchfab, exact model/author link not yet retrieved
+[PENDING] Paper model - confirmed by dev to be from Sketchfab, exact model/author link not yet retrieved
+
+Adam character model and animations from Adobe Mixamo (mixamo.com) - no attribution required
+
+
+ICONS
+-----
+"Opened door aperture" icon by Freepik, via Flaticon (www.flaticon.com)
+Uicons by Flaticon (https://www.flaticon.com/uicons) - covers "Circle-dashed" icon (flaticon.com/free-icon-font/circle-dashed_9083695); Uicons are Flaticon's own interface icon set with no individual contributor, confirmed via live page (no author card shown)
+"Mouse" icon by Iconpro86, via Flaticon (www.flaticon.com)
+"Social" icon (used as design reference for a hand-made UI banner) by pocike, via Flaticon (www.flaticon.com)
+
+[PENDING] "Circle-dashed-full" icon (used for the out-of-reach crosshair) - not yet linked/confirmed. Very likely also a Flaticon Uicon (same family/style as "Circle-dashed"), but not verified against the exact file - confirm before treating as final.
+[PENDING] "Five fingers" hand icon - downloaded by a friend, source/author to be confirmed
+
+
+ENVIRONMENT ART
+---------------
+Textures and props from Poly Haven (https://polyhaven.com) - CC0, no attribution required
+
+AtmosphericHouse environment pack by Finward Studios (Unity Asset Store)
+
+"Brutal Butcher" character by ZectorLab (Unity Asset Store)

@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
 
@@ -61,7 +60,7 @@ public class CreditsScroller : MonoBehaviour
         }
         else
         {
-            SceneManager.LoadScene(menuSceneName);
+            LoadingScreenController.LoadScene(menuSceneName);
         }
     }
 
@@ -77,6 +76,6 @@ public class CreditsScroller : MonoBehaviour
             yield return null;
         }
 
-        SceneManager.LoadScene(menuSceneName);
+        LoadingScreenController.LoadScene(menuSceneName);
     }
 }

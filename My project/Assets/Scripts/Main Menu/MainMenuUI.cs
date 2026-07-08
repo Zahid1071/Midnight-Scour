@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 
 public class MainMenuUI : MonoBehaviour
 {
@@ -8,13 +7,13 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField] private GameObject mainMenuPanel;
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private SettingsMenu settingsMenu;
+    [SerializeField] private GameObject creditsPanel;
 
     [Header("Buttons")]
     [SerializeField] private Button continueButton;
 
     [Header("Scenes")]
     [SerializeField] private string gameSceneName = "Cinematics";
-    [SerializeField] private string creditsSceneName = "CreditsScene";
 
     void Awake() => ResolveReferences();
 
@@ -84,7 +83,9 @@ public class MainMenuUI : MonoBehaviour
         if (InventoryManager.Instance != null)
             InventoryManager.Instance.ClearInventory();
 
-        SceneManager.LoadScene(gameSceneName);
+        // Async load behind the loading screen (also warms up shaders there)
+        // instead of an instant load that stalls on first-time shader compilation.
+        LoadingScreenController.LoadScene(gameSceneName);
     }
 
     /// <summary>Placeholder — wire to your online / multiplayer flow later.</summary>
@@ -113,7 +114,15 @@ public class MainMenuUI : MonoBehaviour
 
     public void OpenCredits()
     {
-        SceneManager.LoadScene(creditsSceneName);
+        if (creditsPanel == null) return;
+        if (mainMenuPanel != null) mainMenuPanel.SetActive(false);
+        creditsPanel.SetActive(true);
+    }
+
+    public void CloseCredits()
+    {
+        if (creditsPanel != null) creditsPanel.SetActive(false);
+        if (mainMenuPanel != null) mainMenuPanel.SetActive(true);
     }
 
     public void QuitGame()

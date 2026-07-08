@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 
 public class PauseManager : MonoBehaviour
 {
@@ -97,7 +96,7 @@ public class PauseManager : MonoBehaviour
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
-        SceneManager.LoadScene(mainMenuSceneName);
+        LoadingScreenController.LoadScene(mainMenuSceneName);
     }
 
 
