@@ -584,6 +584,22 @@ MonoBehaviour:
     m_Localized: "这把锁看起来很容易弄坏。"
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296706
+    m_Localized: "蹲下"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296707
+    m_Localized: "奔跑"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296708
+    m_Localized: Ctrl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296709
+    m_Localized: Shift
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

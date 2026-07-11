@@ -584,6 +584,22 @@ Dodaj grę do listy życzeń na Steam, aby poznać pełne doświadczenie i wespr
     m_Localized: "Ta kłódka wygląda na łatwą do złamania."
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296706
+    m_Localized: Kucaj
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296707
+    m_Localized: Bieg
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296708
+    m_Localized: Ctrl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296709
+    m_Localized: Shift
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

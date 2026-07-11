@@ -29,6 +29,8 @@ public class ControlsPanelHint : MonoBehaviour
     [Header("Key badges")]
     [SerializeField] private TextMeshProUGUI interactKeyLabel;
     [SerializeField] private TextMeshProUGUI dropKeyLabel;
+    [SerializeField] private TextMeshProUGUI crouchKeyLabel;
+    [SerializeField] private TextMeshProUGUI runKeyLabel;
 
     Coroutine _routine;
     float _companionRestAlpha = 1f;
@@ -94,6 +96,12 @@ public class ControlsPanelHint : MonoBehaviour
 
         if (dropKeyLabel != null)
             UIFont.SetText(dropKeyLabel, Loc.Get("controls.key.drop"));
+
+        if (crouchKeyLabel != null)
+            UIFont.SetText(crouchKeyLabel, Loc.Get("controls.key.crouch"));
+
+        if (runKeyLabel != null)
+            UIFont.SetText(runKeyLabel, Loc.Get("controls.key.run"));
     }
 
     void ResolveCompanionGroup()

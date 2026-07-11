@@ -34,6 +34,7 @@ RectTransform:
   - {fileID: 1827074318137904672}
   - {fileID: 1758578792236410752}
   - {fileID: 3360475399407771433}
+  - {fileID: 880002102}
   m_Father: {fileID: 5139216045131410393}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
@@ -83,6 +84,9 @@ MonoBehaviour:
   - id: Note
     canvasGroup: {fileID: 880001009}
     priority: 0
+  - id: Drop Item
+    canvasGroup: {fileID: 880002101}
+    priority: 1
   fadeDuration: 0.25
   transientHintDurationSeconds: 10
   springStartScale: 0.6
@@ -96,7 +100,10 @@ MonoBehaviour:
   boneItem: {fileID: 11400000, guid: 45937426966d95246bf6c742a44d0697, type: 2}
   gumItem: {fileID: 11400000, guid: 1293d34a2e68cf94bb95f41fd1ac18cd, type: 2}
   gummyBoneItem: {fileID: 11400000, guid: 26d964051acdf674091c84dabc678a13, type: 2}
+  vaseItem: {fileID: 11400000, guid: 844bb3609a95d1c43b5016bdfd55e19a, type: 2}
   combineHintDelaySeconds: 5
+  vaseDropHintInitialDelaySeconds: 60
+  vaseDropHintRepeatIntervalSeconds: 60
   hidingSpotHintId: Hiding Spot
   soundHintId: Sound
   boneDropHintId: Drop Item
@@ -4873,6 +4880,73 @@ CanvasGroup:
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5464473022826616791, guid: f40c9b0bbaecd87409d1a4ccf0b0fdc3, type: 3}
   m_PrefabInstance: {fileID: 5948875958186433015}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &880002100
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 880001002}
+    m_Modifications:
+    - target: {fileID: 8100000000000000001, guid: d4e5f6a7b8c94781906f5e4d3c2b1a99, type: 3}
+      propertyPath: m_Name
+      value: Drop Item Hint
+      objectReference: {fileID: 0}
+    - target: {fileID: 8100000000000000002, guid: d4e5f6a7b8c94781906f5e4d3c2b1a99, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8100000000000000002, guid: d4e5f6a7b8c94781906f5e4d3c2b1a99, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8100000000000000002, guid: d4e5f6a7b8c94781906f5e4d3c2b1a99, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8100000000000000002, guid: d4e5f6a7b8c94781906f5e4d3c2b1a99, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8100000000000000002, guid: d4e5f6a7b8c94781906f5e4d3c2b1a99, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8100000000000000002, guid: d4e5f6a7b8c94781906f5e4d3c2b1a99, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8100000000000000002, guid: d4e5f6a7b8c94781906f5e4d3c2b1a99, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 600
+      objectReference: {fileID: 0}
+    - target: {fileID: 8100000000000000002, guid: d4e5f6a7b8c94781906f5e4d3c2b1a99, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 8100000000000000002, guid: d4e5f6a7b8c94781906f5e4d3c2b1a99, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8100000000000000002, guid: d4e5f6a7b8c94781906f5e4d3c2b1a99, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d4e5f6a7b8c94781906f5e4d3c2b1a99, type: 3}
+--- !u!225 &880002101 stripped
+CanvasGroup:
+  m_CorrespondingSourceObject: {fileID: 8100000000000000005, guid: d4e5f6a7b8c94781906f5e4d3c2b1a99, type: 3}
+  m_PrefabInstance: {fileID: 880002100}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &880002102 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8100000000000000002, guid: d4e5f6a7b8c94781906f5e4d3c2b1a99, type: 3}
+  m_PrefabInstance: {fileID: 880002100}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6125604273051274162
 PrefabInstance:

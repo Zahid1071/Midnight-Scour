@@ -584,6 +584,22 @@ Se espera que Midnight Scour se lance a finales de 2026.
     m_Localized: "El candado parece fácil de romper."
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296706
+    m_Localized: Agacharse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296707
+    m_Localized: Correr
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296708
+    m_Localized: Ctrl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296709
+    m_Localized: Shift
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

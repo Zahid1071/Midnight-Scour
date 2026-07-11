@@ -59,10 +59,19 @@ public class GameplayHintManager : MonoBehaviour
     [SerializeField] InventoryItem boneItem;
     [SerializeField] InventoryItem gumItem;
     [SerializeField] InventoryItem gummyBoneItem;
+    [SerializeField] InventoryItem vaseItem;
 
     [Header("Combine hint")]
     [Tooltip("Seconds after picking up bone + gum before the combine hint can appear.")]
     [SerializeField] float combineHintDelaySeconds = 5f;
+
+    [Header("Vase drop hint")]
+    [Tooltip("Seconds after first vase pickup before the drop hint appears.")]
+    [Min(1f)]
+    [SerializeField] float vaseDropHintInitialDelaySeconds = 60f;
+    [Tooltip("Seconds between drop hint reminders while the vase is still held.")]
+    [Min(1f)]
+    [SerializeField] float vaseDropHintRepeatIntervalSeconds = 60f;
 
     [Header("Triggered hints — Id must match a panel Id above")]
     [SerializeField] string hidingSpotHintId = "Hiding Spot";
@@ -87,8 +96,10 @@ public class GameplayHintManager : MonoBehaviour
     bool _combineHintShown;
     bool _combineFinished;
     float _combineElapsed;
-    bool _boneDropHintFinished;
-    bool _boneDropHintVisible;
+    bool _vaseDropHintFinished;
+    bool _vasePickupTracked;
+    bool _vaseDropHintShownOnce;
+    float _vaseDropHintElapsed;
     bool _hidingSpotHintShown;
     bool _soundHintShown;
 
@@ -153,6 +164,7 @@ public class GameplayHintManager : MonoBehaviour
         EvaluateFirstShiftHint();
         EvaluateCombineTimer();
         TickNoteHint();
+        TickVaseDropHint();
     }
 
     public void NotifyCageDoorOpenedFirstTime()
@@ -231,28 +243,73 @@ public class GameplayHintManager : MonoBehaviour
 
     void EvaluateHints()
     {
-        EvaluateBoneDropHint();
+        EvaluateVaseDropHintState();
         EvaluateCombineHint();
     }
 
-    void EvaluateBoneDropHint()
+    void EvaluateVaseDropHintState()
     {
-        if (_boneDropHintFinished)
+        if (_vaseDropHintFinished)
             return;
 
-        if (HasRegularBone())
+        if (HasVase())
         {
-            if (Show(boneDropHintId))
-                _boneDropHintVisible = true;
+            if (!_vasePickupTracked)
+            {
+                _vasePickupTracked = true;
+                _vaseDropHintElapsed = 0f;
+            }
+
             return;
         }
 
-        if (_boneDropHintVisible)
+        if (!_vasePickupTracked)
+            return;
+
+        _vaseDropHintFinished = true;
+        _vasePickupTracked = false;
+        Hide(boneDropHintId);
+    }
+
+    void TickVaseDropHint()
+    {
+        if (_vaseDropHintFinished || !_vasePickupTracked || !HasVase())
+            return;
+
+        _vaseDropHintElapsed += Time.unscaledDeltaTime;
+
+        float threshold = _vaseDropHintShownOnce
+            ? vaseDropHintRepeatIntervalSeconds
+            : vaseDropHintInitialDelaySeconds;
+
+        if (_vaseDropHintElapsed < threshold)
+            return;
+
+        _vaseDropHintElapsed = 0f;
+        ShowPeriodicVaseDropHint();
+        _vaseDropHintShownOnce = true;
+    }
+
+    void ShowPeriodicVaseDropHint()
+    {
+        if (string.IsNullOrEmpty(boneDropHintId) || !_groups.TryGetValue(boneDropHintId, out var group) || group == null)
+            return;
+
+        RemovePending(boneDropHintId);
+
+        if (_activeHintId == boneDropHintId)
         {
-            Hide(boneDropHintId);
-            _boneDropHintVisible = false;
-            _boneDropHintFinished = true;
+            StopTransitionRoutine();
+            CancelAutoHide(boneDropHintId);
+            StopSpring(boneDropHintId);
+            group.gameObject.SetActive(true);
+            group.alpha = 1f;
+            StartSpring(boneDropHintId, group.transform);
+            ScheduleAutoHide(boneDropHintId);
+            return;
         }
+
+        Show(boneDropHintId);
     }
 
     void EvaluateCombineHint()
@@ -328,6 +385,8 @@ public class GameplayHintManager : MonoBehaviour
             return false;
         }
 
+        RefreshLocalizedHintLabel(hintId);
+
         if (hintId == _activeHintId || IsPending(hintId))
             return true;
 
@@ -355,6 +414,14 @@ public class GameplayHintManager : MonoBehaviour
         }
 
         return true;
+    }
+
+    void RefreshLocalizedHintLabel(string hintId)
+    {
+        if (hintId != boneDropHintId || !_groups.TryGetValue(hintId, out var group) || group == null)
+            return;
+
+        group.GetComponent<DropItemHintLabel>()?.Refresh();
     }
 
     public void Hide(string hintId)
@@ -818,6 +885,24 @@ public class GameplayHintManager : MonoBehaviour
         return false;
     }
 
+    bool HasVase()
+    {
+        var inventory = InventoryManager.Instance?.GetInventory();
+        if (inventory == null)
+            return false;
+
+        if (vaseItem != null)
+            return inventory.Contains(vaseItem);
+
+        foreach (var item in inventory)
+        {
+            if (item != null && item.itemName == "Vase")
+                return true;
+        }
+
+        return false;
+    }
+
     public static void ResetAllHints()
     {
         if (Instance == null)
@@ -827,8 +912,10 @@ public class GameplayHintManager : MonoBehaviour
         Instance._combineFinished = false;
         Instance._combineTimerStarted = false;
         Instance._combineElapsed = 0f;
-        Instance._boneDropHintFinished = false;
-        Instance._boneDropHintVisible = false;
+        Instance._vaseDropHintFinished = false;
+        Instance._vasePickupTracked = false;
+        Instance._vaseDropHintShownOnce = false;
+        Instance._vaseDropHintElapsed = 0f;
         Instance._hidingSpotHintShown = false;
         Instance._soundHintShown = false;
         Instance.StopCombineTimerCoroutine();

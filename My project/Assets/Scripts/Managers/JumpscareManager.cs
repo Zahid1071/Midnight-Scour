@@ -19,18 +19,47 @@ public class JumpscareManager : MonoBehaviour
     {
         Instance = this;
 
-        if (wishlistBanner == null)
-        {
-            var found = GameObject.Find("Wishlist Banner");
-            if (found != null)
-                wishlistBanner = found;
-        }
+        ResolveWishlistBanner();
 
         if (wishlistBanner != null)
             wishlistBanner.SetActive(false);
 
         if (demoEndScreen == null)
             demoEndScreen = FindFirstObjectByType<DemoEndScreenUI>(FindObjectsInactive.Include);
+    }
+
+    void ResolveWishlistBanner()
+    {
+        if (wishlistBanner != null)
+            return;
+
+        var transforms = FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (var t in transforms)
+        {
+            if (t == null || t.name != "Wishlist Banner")
+                continue;
+
+            // Wishlist Banner lives under _UI Canvas, not under this manager.
+            if (!t.gameObject.scene.IsValid())
+                continue;
+
+            wishlistBanner = t.gameObject;
+            return;
+        }
+    }
+
+    void ShowWishlistBanner()
+    {
+        ResolveWishlistBanner();
+
+        if (wishlistBanner == null)
+            return;
+
+        wishlistBanner.SetActive(true);
+
+        var anim = wishlistBanner.GetComponent<Animation>();
+        if (anim != null && anim.clip != null)
+            anim.Play(anim.clip.name);
     }
 
     public void TriggerJumpscare(Transform jumpscarePoint, Transform npcFace)
@@ -45,9 +74,6 @@ public class JumpscareManager : MonoBehaviour
 
         jumpscareCam.transform.position = jumpscarePoint.position;
         jumpscareCam.Priority = 50;
-
-        if (wishlistBanner != null)
-            wishlistBanner.SetActive(true);
 
         if (_endGameRoutine != null)
             StopCoroutine(_endGameRoutine);
@@ -66,9 +92,7 @@ public class JumpscareManager : MonoBehaviour
 
         if (DemoEndDirector.IsDemoFinaleActive && demoEndScreen != null)
         {
-            if (wishlistBanner != null)
-                wishlistBanner.SetActive(false);
-
+            ShowWishlistBanner();
             yield return StartCoroutine(demoEndScreen.WaitForExitRoutine());
         }
 

@@ -575,6 +575,22 @@ MonoBehaviour:
     m_Key: gameplay.cage_lock_breakable
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296706
+    m_Key: hint.crouch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296707
+    m_Key: hint.run
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296708
+    m_Key: controls.key.crouch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296709
+    m_Key: controls.key.run
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

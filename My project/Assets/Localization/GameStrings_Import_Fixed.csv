@@ -189,3 +189,7 @@ Si disfrutaste la demo, considera agregar el juego a tu lista de deseos de Steam
 "hint.use_item","5707318296696","Use Item","使用物品","Utiliser l'objet","アイテムを使う","Użyj przedmiotu","Usar item","Использовать предмет","Öğeyi Kullan","Usar objeto"
 "hint.drop","5707318296697","Drop","丢弃","Lâcher","落とす","Upuść","Soltar","Выбросить","Bırak","Soltar"
 "gameplay.nothing_in_reach","5707318296698","Nothing in reach.","够不到任何东西。","Il n'y a rien à portée de main.","手の届くところに何もない。","Nie ma nic w zasięgu.","Não há nada ao alcance.","Ничего не досягается.","Erişebileceğim bir şey yok.","No hay nada a tu alcance."
+"hint.crouch","5707318296706","Crouch","蹲下","S'accroupir","しゃがむ","Kucaj","Agachar","Присесть","Çömel","Agacharse"
+"hint.run","5707318296707","Run","奔跑","Courir","走る","Bieg","Correr","Бежать","Koş","Correr"
+"controls.key.crouch","5707318296708","Ctrl","Ctrl","Ctrl","Ctrl","Ctrl","Ctrl","Ctrl","Ctrl","Ctrl"
+"controls.key.run","5707318296709","Shift","Shift","Shift","Shift","Shift","Shift","Shift","Shift","Shift"

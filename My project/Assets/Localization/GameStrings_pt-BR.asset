@@ -584,6 +584,22 @@ Adicione o jogo à sua lista de desejos da Steam para viver a experiência compl
     m_Localized: "O cadeado parece fácil de quebrar."
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296706
+    m_Localized: Agachar
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296707
+    m_Localized: Correr
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296708
+    m_Localized: Ctrl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296709
+    m_Localized: Shift
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

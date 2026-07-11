@@ -584,6 +584,22 @@ Ajoutez-le à votre liste de souhaits Steam pour profiter de l'expérience compl
     m_Localized: "Le cadenas semble facile à briser."
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296706
+    m_Localized: S'accroupir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296707
+    m_Localized: Courir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296708
+    m_Localized: Ctrl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296709
+    m_Localized: Shift
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

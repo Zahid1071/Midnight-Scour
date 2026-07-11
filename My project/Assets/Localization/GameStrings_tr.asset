@@ -584,6 +584,22 @@ Tam deneyim için oyunu Steam'de İstek Listenize ekleyin ve bizi destekleyin!"
     m_Localized: "Kilit kolayca kırılabilir gibi görünüyor."
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296706
+    m_Localized: "Çömel"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296707
+    m_Localized: "Koş"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296708
+    m_Localized: Ctrl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296709
+    m_Localized: Shift
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

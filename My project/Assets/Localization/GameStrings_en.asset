@@ -584,6 +584,22 @@ Wishlist it on Steam for the full experience and support us!"
     m_Localized: The lock seems easy to break.
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296706
+    m_Localized: Crouch
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296707
+    m_Localized: Run
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296708
+    m_Localized: Ctrl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296709
+    m_Localized: Shift
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

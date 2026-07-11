@@ -55,6 +55,15 @@ public class InventoryUI : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Alpha3)) SelectSlot(2);
         if (Input.GetKeyDown(KeyCode.Alpha4)) SelectSlot(3);
 
+        if (Mouse.current != null)
+        {
+            float scroll = Mouse.current.scroll.ReadValue().y;
+            if (scroll > 0f)
+                CycleSelectedSlot(-1);
+            else if (scroll < 0f)
+                CycleSelectedSlot(1);
+        }
+
         if (WasUseItemPressedThisFrame())
             HandleInteractPress(isPrimaryClick: true);
 
@@ -111,6 +120,22 @@ public class InventoryUI : MonoBehaviour
     {
         selectedIndex = index;
         RefreshUI();
+    }
+
+    void CycleSelectedSlot(int direction)
+    {
+        int slotCount = slotImages != null ? slotImages.Length : InventoryManager.Instance?.SlotCount() ?? 4;
+        if (slotCount <= 0)
+            return;
+
+        if (selectedIndex < 0)
+        {
+            SelectSlot(direction > 0 ? 0 : slotCount - 1);
+            return;
+        }
+
+        int next = (selectedIndex + direction + slotCount) % slotCount;
+        SelectSlot(next);
     }
 
 

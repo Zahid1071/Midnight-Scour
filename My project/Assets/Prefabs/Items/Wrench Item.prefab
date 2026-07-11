@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6267418787769968307}
   - component: {fileID: 1546217469966049127}
   m_Layer: 6
-  m_Name: Wrench Item 1
+  m_Name: Wrench Item
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -67,6 +67,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 3a73d8b63dca027459575c4abee160e9, type: 2}
+  - {fileID: 2100000, guid: e768ca64c06a4b368c60a627b0e25fd1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -105,6 +106,7 @@ MonoBehaviour:
   blockedUntilBenchViceReleased: 1
   benchViceStuckMessage: It is stuck.
   blockedMessage: I can't reach that.
+  demoEndOnPickup: {fileID: 0}
 --- !u!64 &1546217469966049127
 MeshCollider:
   m_ObjectHideFlags: 0
