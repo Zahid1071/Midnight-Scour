@@ -22,14 +22,32 @@ public class Cage : MonoBehaviour
 
     // Hardcoded layer ID as requested
     private const int CAPTIVE_LAYER = 12;
+    private static int HiddenPlayerLayer = -1;
+    private static int PlayerLayer = -1;
 
     // Variables to track player state
     private int originalLayerIndex;
     private GameObject playerRef;
     private bool _doorWasOpen;
 
+    /// <summary>
+    /// Cage/hiding-spot trigger boundaries are tight, so brief overlap flicker (root-motion during
+    /// the capture struggle, physics-step/frame-rate timing, movement speed) can fire a spurious
+    /// OnTriggerExit+OnTriggerEnter pair while the player is already on a "special" perception layer
+    /// (Captive/HiddenPlayer). If that re-Enter is ever trusted as the "original" layer, the player
+    /// gets restored to Captive/HiddenPlayer forever on exit - permanently blind/deaf to every NPC for
+    /// the rest of the session, with no scene reload to reset it. Never accept those layers as the
+    /// "original" - always fall back to the real Player layer.
+    /// </summary>
+    private static int SanitizeOriginalLayer(int layer) =>
+        (layer == CAPTIVE_LAYER || layer == HiddenPlayerLayer) ? PlayerLayer : layer;
+
     private void Awake()
     {
+        // NameToLayer can't run in a field initializer/constructor - must be resolved here.
+        if (PlayerLayer < 0) PlayerLayer = LayerMask.NameToLayer("Player");
+        if (HiddenPlayerLayer < 0) HiddenPlayerLayer = LayerMask.NameToLayer("HiddenPlayer");
+
         if (cageDoor != null)
             _doorWasOpen = cageDoor.objectOpen;
     }
@@ -181,15 +199,23 @@ public class Cage : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
-        {
-            // Capture the layer the player had when they walked in
-            originalLayerIndex = other.gameObject.layer;
+        if (!other.CompareTag("Player"))
+            return;
 
-            // Track the root so we don't accidentally toggle only a child collider.
-            playerRef = other.transform.root != null ? other.transform.root.gameObject : other.gameObject;
-            isOccupied = true;
-        }
+        GameObject root = other.transform.root != null ? other.transform.root.gameObject : other.gameObject;
+
+        // Guard against a spurious re-Enter while we're already tracking this same player as
+        // occupied (trigger-boundary flicker) - don't clobber the already-correct originalLayerIndex.
+        if (isOccupied && playerRef == root)
+            return;
+
+        // Capture the layer the player had when they walked in (sanitized so a mid-flicker
+        // re-Enter can never "learn" Captive/HiddenPlayer as the original layer).
+        originalLayerIndex = SanitizeOriginalLayer(other.gameObject.layer);
+
+        // Track the root so we don't accidentally toggle only a child collider.
+        playerRef = root;
+        isOccupied = true;
     }
 
     private void OnTriggerExit(Collider other)
@@ -201,7 +227,7 @@ public class Cage : MonoBehaviour
             // Restore the player to their original layer upon exit
             if (playerRef != null)
             {
-                playerRef.layer = originalLayerIndex;
+                playerRef.layer = SanitizeOriginalLayer(originalLayerIndex);
             }
 
             playerRef = null;
@@ -231,7 +257,7 @@ public class Cage : MonoBehaviour
 
         // Treat as captured/inside.
         playerRef = player.transform.root != null ? player.transform.root.gameObject : player;
-        originalLayerIndex = playerRef.layer;
+        originalLayerIndex = SanitizeOriginalLayer(playerRef.layer);
         isOccupied = true;
     }
 }

@@ -19,6 +19,7 @@ namespace FS_Atmo
 
         private NavMeshAgent agent;
         private InteractionController interaction;
+        private RoomAnchor _cachedCurrentRoom;
 
         public readonly List<Transform> route = new();
         private readonly List<Transform> tempPoints = new();
@@ -60,6 +61,15 @@ namespace FS_Atmo
             {
                 if (logPlannedRoute)
                     Debug.LogWarning($"[Navigator] GoToRoom failed: startRoom={startRoom?.roomID ?? "null"}, targetRoom={targetRoom?.roomID ?? "null"}");
+
+                // Same-room chase only: cached/known room matches destination — path inside room.
+                if (startRoom == null && targetRoom != null && finalPoint.HasValue
+                    && _cachedCurrentRoom == targetRoom)
+                {
+                    route.Clear();
+                    route.Add(CreateTempPoint(finalPoint.Value, destinationName, parentName));
+                    StartFollowing();
+                }
                 return;
             }
 
@@ -271,19 +281,26 @@ namespace FS_Atmo
         {
             string home = interaction?.data?.homeID ?? "";
 
+            if (NPCAnchorManager.Instance == null)
+                return _cachedCurrentRoom;
+
             // Use the refactored path-based room finding (checks all doors and prepoints)
             var t = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(
                 transform.position, home);
 
             var room = t ? t.GetComponent<RoomAnchor>() : null;
 
+            if (room != null)
+                _cachedCurrentRoom = room;
+            else if (_cachedCurrentRoom != null)
+                room = _cachedCurrentRoom;
+
             if (logPlannedRoute)
             {
                 string roomName = room?.roomID ?? room?.name ?? "null";
                 //Debug.Log($"[Navigator] FindCurrentRoom: {roomName}");
             }
-            //Debug.Log("NPC is in room: " + room);
-            return room; // No fallback - system must work correctly
+            return room;
         }
 
 

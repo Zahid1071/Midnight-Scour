@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 8.778542, y: -2.5393, z: -19.336487}
-  m_LocalScale: {x: 2.407876, y: 2.407875, z: 2.4078765}
+  m_LocalScale: {x: 2.4078798, y: 2.4078798, z: 2.4078798}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5571552262906367583}
@@ -52,7 +52,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemData: {fileID: 11400000, guid: a2ac5111d0b7f21438e805fe05202450, type: 2}
   grateGate: {fileID: 0}
+  blockedUntilBenchViceReleased: 0
+  benchViceStuckMessage: It is stuck.
   blockedMessage: I can't reach that.
+  demoEndOnPickup: {fileID: 0}
 --- !u!65 &6485984337406282183
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -188,6 +191,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: d405222cd080ab642839d44fe63da89c, type: 2}
+  - {fileID: 2100000, guid: e768ca64c06a4b368c60a627b0e25fd1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -274,6 +278,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: d405222cd080ab642839d44fe63da89c, type: 2}
+  - {fileID: 2100000, guid: e768ca64c06a4b368c60a627b0e25fd1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -360,6 +365,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: d405222cd080ab642839d44fe63da89c, type: 2}
+  - {fileID: 2100000, guid: e768ca64c06a4b368c60a627b0e25fd1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

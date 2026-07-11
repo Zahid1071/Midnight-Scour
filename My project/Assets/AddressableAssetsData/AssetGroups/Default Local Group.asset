@@ -14,7 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_GroupName: Default Local Group
   m_GUID: af7aa0b6ac82fa94c989ad48dc89877b
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: 3f8ac6bbd7982ef4d8b81b66e807341b
+    m_Address: Assets/Models/Paper/paper texture/Paper.mat
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 554f83c973dc00e48af404436369edc2, type: 2}
   m_SchemaSet:

@@ -5,12 +5,17 @@ public class HidingSpot : MonoBehaviour, IInteractable
 {
     public bool isOccupied { get; private set; }
 
+    public enum UsableSide { Both, LeftOnly, RightOnly }
+
     [Header("Setup - Sides")]
     public Transform leftPivot;
     public Animator leftAnimator;
 
     public Transform rightPivot;
     public Animator rightAnimator;
+
+    [Tooltip("Restrict which side of this hiding spot the player can enter from. Use this when one side is blocked/faces a wall and shouldn't be usable.")]
+    public UsableSide usableSide = UsableSide.Both;
 
     [Header("Settings")]
     [Tooltip("Camera crossfade duration when leaving a hide spot.")]
@@ -289,30 +294,84 @@ public class HidingSpot : MonoBehaviour, IInteractable
             return false;
         }
 
-        if (rightPivot == null)
-        {
-            activePivot = leftPivot;
-            activeAnimator = leftAnimator;
-        }
-        else
-        {
-            float distToLeft = Vector3.Distance(player.transform.position, leftPivot.parent.parent.position);
-            float distToRight = Vector3.Distance(player.transform.position, rightPivot.parent.parent.position);
-
-            if (distToLeft < distToRight)
-            {
-                activePivot = leftPivot;
-                activeAnimator = leftAnimator;
-            }
-            else
-            {
-                activePivot = rightPivot;
-                activeAnimator = rightAnimator;
-            }
-        }
+        if (!TrySelectHideSide(player.transform.position, out activePivot, out activeAnimator))
+            return false;
 
         StartCoroutine(EnterHidingRoutine(player, hider));
         return true;
+    }
+
+    static Vector3 GetSideAnchor(Transform pivot)
+    {
+        if (pivot == null)
+            return Vector3.zero;
+
+        if (pivot.parent != null && pivot.parent.parent != null)
+            return pivot.parent.parent.position;
+
+        return pivot.position;
+    }
+
+    bool TrySelectHideSide(Vector3 playerPos, out Transform pivot, out Animator animator)
+    {
+        pivot = null;
+        animator = null;
+
+        switch (usableSide)
+        {
+            case UsableSide.LeftOnly:
+                if (leftPivot == null)
+                    return false;
+
+                if (rightPivot != null && IsCloserToRightSide(playerPos))
+                    return false;
+
+                pivot = leftPivot;
+                animator = leftAnimator;
+                return true;
+
+            case UsableSide.RightOnly:
+                if (rightPivot == null)
+                    return false;
+
+                if (leftPivot != null && !IsCloserToRightSide(playerPos))
+                    return false;
+
+                pivot = rightPivot;
+                animator = rightAnimator;
+                return true;
+
+            default:
+                if (rightPivot == null)
+                {
+                    pivot = leftPivot;
+                    animator = leftAnimator;
+                }
+                else if (leftPivot == null)
+                {
+                    pivot = rightPivot;
+                    animator = rightAnimator;
+                }
+                else if (IsCloserToRightSide(playerPos))
+                {
+                    pivot = rightPivot;
+                    animator = rightAnimator;
+                }
+                else
+                {
+                    pivot = leftPivot;
+                    animator = leftAnimator;
+                }
+
+                return pivot != null;
+        }
+    }
+
+    bool IsCloserToRightSide(Vector3 playerPos)
+    {
+        float distToLeft = Vector3.Distance(playerPos, GetSideAnchor(leftPivot));
+        float distToRight = Vector3.Distance(playerPos, GetSideAnchor(rightPivot));
+        return distToRight < distToLeft;
     }
 
     private IEnumerator EnterHidingRoutine(GameObject player, PlayerHider hider)

@@ -24,6 +24,10 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
     [SerializeField] float npcSuspicionOnStrike = 300f;
     [SerializeField] float strikeSfxVolume = 1f;
 
+    [Header("Post-completion")]
+    [Tooltip("Objects moved off the Interactable layer once the wrench is released (defaults to this + bar visual).")]
+    [SerializeField] GameObject[] disableInteractLayers;
+
     bool _barInserted;
     bool _wrenchReleased;
     bool _isAnimating;
@@ -169,6 +173,7 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
 
         _wrenchReleased = true;
         _isAnimating = false;
+        ClearInteractableLayers();
 
         if (hammer.consumeOnUse)
             InventoryManager.Instance?.RemoveItem(hammer);
@@ -177,5 +182,24 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
         if (sfx != null)
             InteractionFeedback.PlaySound(sfx, transform.position);
         InteractionUIManager.Instance?.PlaySuccessShake();
+    }
+
+    void ClearInteractableLayers()
+    {
+        const int defaultLayer = 0;
+
+        if (disableInteractLayers != null && disableInteractLayers.Length > 0)
+        {
+            for (int i = 0; i < disableInteractLayers.Length; i++)
+            {
+                if (disableInteractLayers[i] != null)
+                    disableInteractLayers[i].layer = defaultLayer;
+            }
+            return;
+        }
+
+        gameObject.layer = defaultLayer;
+        if (barVisual != null)
+            barVisual.layer = defaultLayer;
     }
 }

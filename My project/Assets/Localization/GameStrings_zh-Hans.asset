@@ -580,6 +580,10 @@ MonoBehaviour:
     m_Localized: "我觉得得用什么东西敲一下才能转动，它完全锈死了。"
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296705
+    m_Localized: "这把锁看起来很容易弄坏。"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

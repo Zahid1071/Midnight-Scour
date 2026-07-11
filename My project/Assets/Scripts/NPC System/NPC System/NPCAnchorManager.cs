@@ -93,17 +93,9 @@ public class NPCAnchorManager : MonoBehaviour
         var path = new NavMeshPath();
         const float prepointThreshold = 0.5f;
         
-        // Collect all prepoints for quick lookup
-        var allPrepoints = new HashSet<Transform>();
-        foreach (var edge in RoomGraph.Instance.edges)
-        {
-            if (edge.prePointA) allPrepoints.Add(edge.prePointA);
-            if (edge.prePointB) allPrepoints.Add(edge.prePointB);
-        }
-        
         // Make sure start is on navmesh
         if (!NavMesh.SamplePosition(fromPosition, out var startHit, 1.0f, areaMask))
-            return null; // Position not on NavMesh
+            return null;
         fromPosition = startHit.position;
         
         // First pass: Look for definitive answers (only one prepoint reachable)
@@ -131,7 +123,7 @@ public class NPCAnchorManager : MonoBehaviour
                     if (path.status == NavMeshPathStatus.PathComplete)
                     {
                         // Check if path passes through any other door's prepoint
-                        if (!PathPassesThroughOtherPrepoint(path, edge.prePointA, allPrepoints, prepointThreshold))
+                        if (!PathPassesThroughOtherPrepoint(path, edge.prePointA, prepointThreshold, edge.roomA))
                         {
                             pathLengthA = GetPathLength(path);
                             canReachA = true;
@@ -154,7 +146,7 @@ public class NPCAnchorManager : MonoBehaviour
                     if (path.status == NavMeshPathStatus.PathComplete)
                     {
                         // Check if path passes through any other door's prepoint
-                        if (!PathPassesThroughOtherPrepoint(path, edge.prePointB, allPrepoints, prepointThreshold))
+                        if (!PathPassesThroughOtherPrepoint(path, edge.prePointB, prepointThreshold, edge.roomB))
                         {
                             pathLengthB = GetPathLength(path);
                             canReachB = true;
@@ -217,7 +209,7 @@ public class NPCAnchorManager : MonoBehaviour
                 {
                     if (path.status == NavMeshPathStatus.PathComplete)
                     {
-                        if (!PathPassesThroughOtherPrepoint(path, edge.prePointA, allPrepoints, prepointThreshold))
+                        if (!PathPassesThroughOtherPrepoint(path, edge.prePointA, prepointThreshold, edge.roomA))
                         {
                             pathLengthA = GetPathLength(path);
                             canReachA = true;
@@ -238,7 +230,7 @@ public class NPCAnchorManager : MonoBehaviour
                 {
                     if (path.status == NavMeshPathStatus.PathComplete)
                     {
-                        if (!PathPassesThroughOtherPrepoint(path, edge.prePointB, allPrepoints, prepointThreshold))
+                        if (!PathPassesThroughOtherPrepoint(path, edge.prePointB, prepointThreshold, edge.roomB))
                         {
                             pathLengthB = GetPathLength(path);
                             canReachB = true;
@@ -273,28 +265,24 @@ public class NPCAnchorManager : MonoBehaviour
             }
         }
         
-        // Return the room with the closest prepoint
-        if (bestRoom != null)
-        {
-            string roomName = bestRoom.roomID ?? bestRoom.name;
-            //Debug.Log($"[NPCAnchorManager] CLOSEST: Door={bestDoorName}, {bestPrepoint} closest (path={bestPathLength:F2}m) → Room={roomName}");
-            return bestRoom.transform;
-        }
-        
-        // No valid immediate door found
-        return null;
+        return bestRoom != null ? bestRoom.transform : null;
     }
 
     /// <summary>
-    /// Checks if a NavMesh path passes through any other door's opening (line between prepoints).
-    /// This is more accurate than checking proximity to prepoints, since paths go through door openings.
+    /// Checks if a NavMesh path passes through another door's opening (line between prepoints).
+    /// Only doors that are NOT connected to <paramref name="candidateRoom"/> count — sibling
+    /// doors of the same room (e.g. cage + corridor both opening into basement) must not
+    /// disqualify paths that simply cross the open floor between them.
     /// </summary>
-    private bool PathPassesThroughOtherPrepoint(NavMeshPath path, Transform targetPrepoint, HashSet<Transform> allPrepoints, float threshold)
+    private bool PathPassesThroughOtherPrepoint(
+        NavMeshPath path,
+        Transform targetPrepoint,
+        float threshold,
+        RoomAnchor candidateRoom)
     {
         if (path.corners == null || path.corners.Length < 2)
             return false;
 
-        // Get the door edge for the target prepoint (so we can exclude it)
         DoorEdge targetEdge = null;
         foreach (var edge in RoomGraph.Instance.edges)
         {
@@ -305,31 +293,29 @@ public class NPCAnchorManager : MonoBehaviour
             }
         }
 
-        // Check each segment of the path
         for (int i = 0; i < path.corners.Length - 1; i++)
         {
             Vector3 segmentStart = path.corners[i];
             Vector3 segmentEnd = path.corners[i + 1];
 
-            // Check if this path segment crosses through any other door's opening
             foreach (var edge in RoomGraph.Instance.edges)
             {
-                // Skip the target door
                 if (edge == targetEdge) continue;
                 if (!edge.prePointA || !edge.prePointB) continue;
 
-                // Check if path segment crosses the line between the two prepoints of this door
+                // Another immediate door of the same room — not evidence we left that room.
+                if (candidateRoom != null
+                    && (edge.roomA == candidateRoom || edge.roomB == candidateRoom))
+                    continue;
+
                 Vector3 doorStart = edge.prePointA.position;
                 Vector3 doorEnd = edge.prePointB.position;
-                
-                // Check if the path segment intersects the door opening (line between prepoints)
+
                 if (LineSegmentsIntersect(segmentStart, segmentEnd, doorStart, doorEnd, threshold))
-                {
-                    return true; // Path passes through another door's opening
-                }
+                    return true;
             }
         }
-        
+
         return false;
     }
 

@@ -580,6 +580,10 @@ Dodaj grę do listy życzeń na Steam, aby poznać pełne doświadczenie i wespr
     m_Localized: "Chyba muszę to uderzyć czymś, żeby obrócić — jest kompletnie zardzewiałe"
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296705
+    m_Localized: "Ta kłódka wygląda na łatwą do złamania."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

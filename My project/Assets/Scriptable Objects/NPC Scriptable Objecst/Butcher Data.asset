@@ -29,20 +29,20 @@ MonoBehaviour:
       hotspots:
       - hotspotID: Hotspot_Idle2
         weight: 1
-        duration: 3
-        actionType: 10
+        duration: 6
+        actionType: 12
         requiresVisualOffset: 0
     - roomAnchorID: Corridor-Kitchen_Room
       weight: 0.4
       hotspots:
       - hotspotID: Hotspot_Idle
         weight: 0.266
-        duration: 3
+        duration: 6
         actionType: 10
         requiresVisualOffset: 0
       - hotspotID: Hotspot_SearchPockets
         weight: 0.693
-        duration: 3
+        duration: 6
         actionType: 12
         requiresVisualOffset: 0
     - roomAnchorID: Living_room
@@ -50,17 +50,12 @@ MonoBehaviour:
       hotspots:
       - hotspotID: Hotspot_Sofa
         weight: 1
-        duration: 5
+        duration: 10
         actionType: 0
         requiresVisualOffset: 1
     - roomAnchorID: Garden_Room
-      weight: 0.2
+      weight: 0
       hotspots:
-      - hotspotID: Hotspot_Sofa
-        weight: 0.165
-        duration: 3
-        actionType: 11
-        requiresVisualOffset: 0
       - hotspotID: Hotspot_Idle
         weight: 0.165
         duration: 3

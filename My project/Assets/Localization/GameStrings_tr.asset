@@ -580,6 +580,10 @@ Tam deneyim için oyunu Steam'de İstek Listenize ekleyin ve bizi destekleyin!"
     m_Localized: "Döndürmek için bir şeyle vurmam gerekiyor gibi, tamamen paslanmış"
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296705
+    m_Localized: "Kilit kolayca kırılabilir gibi görünüyor."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

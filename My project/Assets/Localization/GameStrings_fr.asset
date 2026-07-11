@@ -580,6 +580,10 @@ Ajoutez-le à votre liste de souhaits Steam pour profiter de l'expérience compl
     m_Localized: "Je crois qu'il faut le frapper avec quelque chose pour le faire tourner, il est complètement rouillé"
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296705
+    m_Localized: "Le cadenas semble facile à briser."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -20,7 +20,11 @@ namespace FS_Atmo
         [Header("Lock Settings (Player Only)")]
         public bool isLocked = false;
         [SerializeField] private InventoryItem requiredKey;
-        [TextArea] [SerializeField] private string lockedMessage = "The door is locked.";
+        [Tooltip("Preferred: a Loc key (e.g. gameplay.locked) so the message is translated. Takes priority over Locked Message below.")]
+        [SerializeField] private string lockedMessageKey;
+        [TextArea]
+        [Tooltip("Fallback raw text used only if Locked Message Key is empty. Not localized - prefer the key above.")]
+        [SerializeField] private string lockedMessage = "The door is locked.";
         
         [Tooltip("Kilitli animasyonu kaç saniye sürüyor? Bu süre boyunca tekrar tıklanamaz.")]
         [SerializeField] private float lockedAnimationDuration = 1.0f; // YENİ: Spam engelleyici süre
@@ -90,7 +94,13 @@ namespace FS_Atmo
                     return false;
                 }
 
-                string message = string.IsNullOrWhiteSpace(lockedMessage) ? Loc.Get("gameplay.locked") : lockedMessage;
+                string message;
+                if (!string.IsNullOrWhiteSpace(lockedMessageKey))
+                    message = Loc.Get(lockedMessageKey);
+                else if (!string.IsNullOrWhiteSpace(lockedMessage))
+                    message = lockedMessage;
+                else
+                    message = Loc.Get("gameplay.locked");
                 InteractionFeedback.Fail(message, 2.5f);
 
                 Debug.Log("❌ Kapı kilitli! (Animasyon Tetikleniyor)");

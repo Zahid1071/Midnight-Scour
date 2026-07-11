@@ -580,6 +580,10 @@ Wishlist it on Steam for the full experience and support us!"
     m_Localized: I think I need to hit it with something to rotate, it is completely rusty
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296705
+    m_Localized: The lock seems easy to break.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

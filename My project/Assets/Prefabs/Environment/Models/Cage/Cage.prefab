@@ -108,6 +108,7 @@ MonoBehaviour:
   minToggleProgress: 0.1
   isLocked: 1
   requiredKey: {fileID: 11400000, guid: 2771dad0276634d4ab27043760a0bc9e, type: 2}
+  lockedMessageKey: gameplay.cage_lock_breakable
   lockedMessage: The lock seems easy to break
   lockedAnimationDuration: 0.7
   openSound: {fileID: 8300000, guid: 8113092160f2f964b999a0d90c946fec, type: 3}

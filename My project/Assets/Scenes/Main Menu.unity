@@ -2856,8 +2856,7 @@ MonoBehaviour:
   fadeInDuration: 0.5
   fadeOutDuration: 0.5
   minimumLoadTime: 1.5
-  shaderVariantsToWarm:
-  - {fileID: 20000000, guid: c41f0d5a29c79a74db2be069573c1e9d, type: 2}
+  shaderVariantsToWarm: []
 --- !u!1 &1976464281 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6309837351330383586, guid: 6f7f20b04bbae0c40a16fb1ee57273da, type: 3}
@@ -3193,6 +3192,22 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4099130966688391864, guid: b685fa85e175dbe479b7e5ed116e14a8, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4099130966688391864, guid: b685fa85e175dbe479b7e5ed116e14a8, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4099130966688391864, guid: b685fa85e175dbe479b7e5ed116e14a8, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4099130966688391864, guid: b685fa85e175dbe479b7e5ed116e14a8, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4221158394099769678, guid: b685fa85e175dbe479b7e5ed116e14a8, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -3275,7 +3290,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5118873461197498562, guid: b685fa85e175dbe479b7e5ed116e14a8, type: 3}
       propertyPath: m_fontSizeMax
-      value: 25
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 5281181556016050848, guid: b685fa85e175dbe479b7e5ed116e14a8, type: 3}
       propertyPath: m_AnchorMax.y

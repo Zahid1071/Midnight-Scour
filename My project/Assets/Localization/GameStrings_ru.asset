@@ -580,6 +580,10 @@ MonoBehaviour:
     m_Localized: "Думаю, нужно ударить чем-нибудь, чтобы провернуть — он полностью заржавел"
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296705
+    m_Localized: "Похоже, этот замок легко сломать."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

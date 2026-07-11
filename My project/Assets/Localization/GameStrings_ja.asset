@@ -580,6 +580,10 @@ MonoBehaviour:
     m_Localized: "回すには何かで叩く必要がありそうだ。完全に錆びついている。"
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296705
+    m_Localized: "この錠前は簡単に壊せそうだ。"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

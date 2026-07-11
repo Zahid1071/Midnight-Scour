@@ -68,6 +68,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 16af38222f0994040a7b85a7ba436bd3, type: 2}
+  - {fileID: 2100000, guid: e768ca64c06a4b368c60a627b0e25fd1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -155,3 +156,4 @@ MonoBehaviour:
   blockedUntilBenchViceReleased: 0
   benchViceStuckMessage: It is stuck.
   blockedMessage: I can't reach that.
+  demoEndOnPickup: {fileID: 0}
