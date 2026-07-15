@@ -600,6 +600,10 @@ Wishlist it on Steam for the full experience and support us!"
     m_Localized: Shift
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296710
+    m_Localized: I'm blocking the way.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

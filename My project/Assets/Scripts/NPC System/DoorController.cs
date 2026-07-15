@@ -48,6 +48,9 @@ namespace FS_Atmo
         [SerializeField] private DoorState state = DoorState.Closed;
 
         private bool lastOpenFlag;
+        // True while RequestOpen/RequestClose AI routines run. Player toggles sync carve only —
+        // StopAllCoroutines here would cancel the NPC onDone and break door transit.
+        private bool _requestInProgress;
 
         private void Reset()
         {
@@ -88,6 +91,19 @@ namespace FS_Atmo
             {
                 lastOpenFlag = simpleOpenClose.objectOpen;
 
+                // Player flipped the leaf while an AI request owns the carve routines —
+                // sync visual/carve state only; do not cancel the NPC coroutine.
+                if (_requestInProgress)
+                {
+                    IsOpen = lastOpenFlag;
+                    state = lastOpenFlag ? DoorState.Open : DoorState.Closed;
+                    ApplyCarveImmediate(lastOpenFlag);
+                    if (lastOpenFlag) OnOpened?.Invoke();
+                    else OnClosed?.Invoke();
+                    return;
+                }
+
+                _requestInProgress = false;
                 StopAllCoroutines();
                 if (lastOpenFlag)
                     StartCoroutine(OpenRoutine(null, triggerAnim: false, bypassLock: false));
@@ -109,6 +125,8 @@ namespace FS_Atmo
             if (isLocked && !bypassLock) { onDone?.Invoke(false); return; }
             if (state == DoorState.Open || state == DoorState.Opening) { onDone?.Invoke(true); return; }
 
+            // StopAllCoroutines does not run finally — clear the flag explicitly.
+            _requestInProgress = false;
             StopAllCoroutines();
             StartCoroutine(OpenRoutine(onDone, triggerAnim: true, bypassLock: bypassLock));
         }
@@ -119,17 +137,20 @@ namespace FS_Atmo
         {
             if (state == DoorState.Closed || state == DoorState.Closing) { onDone?.Invoke(); return; }
 
+            _requestInProgress = false;
             StopAllCoroutines();
             StartCoroutine(CloseRoutine(onDone, triggerAnim: true, bypassLock: bypassLock));
         }
 
         public void ForceOpenInstant()
         {
+            _requestInProgress = false;
             StopAllCoroutines();
 
             if (simpleOpenClose && !simpleOpenClose.objectOpen)
-                simpleOpenClose.ObjectClicked();
+                simpleOpenClose.ObjectClicked(bypassLock: true);
 
+            lastOpenFlag = true;
             ApplyCarveImmediate(true);
 
             IsOpen = true;
@@ -139,11 +160,13 @@ namespace FS_Atmo
 
         public void ForceCloseInstant()
         {
+            _requestInProgress = false;
             StopAllCoroutines();
 
             if (simpleOpenClose && simpleOpenClose.objectOpen)
-                simpleOpenClose.ObjectClicked();
+                simpleOpenClose.ObjectClicked(bypassLock: true);
 
+            lastOpenFlag = false;
             ApplyCarveImmediate(false);
 
             IsOpen = false;
@@ -155,45 +178,70 @@ namespace FS_Atmo
 
         private IEnumerator OpenRoutine(Action<bool> onDone, bool triggerAnim, bool bypassLock)
         {
+            _requestInProgress = triggerAnim;
             state = DoorState.Opening;
 
-            if (triggerAnim && simpleOpenClose && !simpleOpenClose.objectOpen)
-                simpleOpenClose.ObjectClicked(bypassLock: bypassLock);
-
-            yield return new WaitForSeconds(openCarveDelay);
-
-            SetCarve(false);
-
-            if (disableObstacleWhenOpen && carveObstacle)
+            try
             {
-                if (obstacleFailsafeDelay > 0f)
-                    yield return new WaitForSeconds(obstacleFailsafeDelay);
-                carveObstacle.enabled = false;
-            }
+                if (triggerAnim && simpleOpenClose && !simpleOpenClose.objectOpen)
+                    simpleOpenClose.ObjectClicked(bypassLock: bypassLock);
 
-            IsOpen = true;
-            state = DoorState.Open;
-            OnOpened?.Invoke();
-            onDone?.Invoke(true);
+                yield return new WaitForSeconds(openCarveDelay);
+
+                // Player may have slammed the leaf closed during the wait — re-open for AI.
+                if (bypassLock && simpleOpenClose && !simpleOpenClose.objectOpen)
+                    simpleOpenClose.ObjectClicked(bypassLock: true);
+
+                SetCarve(false);
+
+                if (disableObstacleWhenOpen && carveObstacle)
+                {
+                    if (obstacleFailsafeDelay > 0f)
+                        yield return new WaitForSeconds(obstacleFailsafeDelay);
+                    carveObstacle.enabled = false;
+                }
+
+                IsOpen = true;
+                lastOpenFlag = simpleOpenClose == null || simpleOpenClose.objectOpen;
+                state = DoorState.Open;
+                OnOpened?.Invoke();
+                onDone?.Invoke(true);
+            }
+            finally
+            {
+                _requestInProgress = false;
+            }
         }
 
         private IEnumerator CloseRoutine(Action onDone, bool triggerAnim, bool bypassLock)
         {
+            _requestInProgress = triggerAnim;
             state = DoorState.Closing;
 
-            if (carveObstacle) carveObstacle.enabled = true;
+            try
+            {
+                if (carveObstacle) carveObstacle.enabled = true;
 
-            if (triggerAnim && simpleOpenClose && simpleOpenClose.objectOpen)
-                simpleOpenClose.ObjectClicked(bypassLock: bypassLock);
+                if (triggerAnim && simpleOpenClose && simpleOpenClose.objectOpen)
+                    simpleOpenClose.ObjectClicked(bypassLock: bypassLock);
 
-            yield return new WaitForSeconds(closeCarveDelay);
+                yield return new WaitForSeconds(closeCarveDelay);
 
-            SetCarve(true);
+                if (bypassLock && simpleOpenClose && simpleOpenClose.objectOpen)
+                    simpleOpenClose.ObjectClicked(bypassLock: true);
 
-            IsOpen = false;
-            state = DoorState.Closed;
-            OnClosed?.Invoke();
-            onDone?.Invoke();
+                SetCarve(true);
+
+                IsOpen = false;
+                lastOpenFlag = simpleOpenClose != null && simpleOpenClose.objectOpen;
+                state = DoorState.Closed;
+                OnClosed?.Invoke();
+                onDone?.Invoke();
+            }
+            finally
+            {
+                _requestInProgress = false;
+            }
         }
 
         private void ApplyCarveImmediate(bool openNow)

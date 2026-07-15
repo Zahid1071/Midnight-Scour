@@ -600,6 +600,10 @@ Se espera que Midnight Scour se lance a finales de 2026.
     m_Localized: Shift
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296710
+    m_Localized: Estoy bloqueando el paso.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

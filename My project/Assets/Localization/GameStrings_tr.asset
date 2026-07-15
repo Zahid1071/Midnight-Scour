@@ -600,6 +600,10 @@ Tam deneyim için oyunu Steam'de İstek Listenize ekleyin ve bizi destekleyin!"
     m_Localized: Shift
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296710
+    m_Localized: Yolu tıkıyorum.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -342,7 +342,10 @@ public class PerceptionController : MonoBehaviour
 
         if (!soundSource) return;
 
+        // Captive layer, or inside cage while this NPC cannot see them.
         if (soundSource.gameObject.layer == 12) return;
+        if (!CanSeePlayer && Cage.IsPlayerInsideAnyCage(soundSource))
+            return;
 
         if (npc.currentState == NPCController.AIState.Ambush)
             suspicionAmount *= ambushAudioMul;

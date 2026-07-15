@@ -31,7 +31,7 @@ public class InventoryManager : MonoBehaviour
         }
 
         inventory.Add(item);
-        Debug.Log("👜 Added to inventory: " + item.itemName);
+        //Debug.Log("👜 Added to inventory: " + item.itemName);
 
         InventoryUI.Instance?.RefreshUI();
         OnInventoryChanged?.Invoke();

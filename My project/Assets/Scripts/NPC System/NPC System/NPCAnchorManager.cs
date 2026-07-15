@@ -10,6 +10,9 @@ public class NPCAnchorManager : MonoBehaviour
     [Header("Assign anchor roots here (e.g., RoomAnchors or Zone roots):")]
     [SerializeField] private Transform[] anchorRoots;
 
+    [Header("DEBUG")]
+    [SerializeField] bool logRoomVoteResult = true;
+
     private readonly Dictionary<string, Transform> anchorMap = new();
     private readonly Dictionary<string, List<RoomAnchor>> roomAnchorsByZone = new();
 
@@ -74,198 +77,117 @@ public class NPCAnchorManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Finds which room contains a position by checking immediate doors.
-    /// Returns the room anchor for the first valid immediate door found.
-    /// Logic: If only one prepoint is reachable → that's our room. If both are reachable → use the closer one (by NavMesh path distance).
-    /// Only considers rooms in the owner's zone.
+    /// Room identity = room of the closest IMMEDIATE prepoint.
+    /// Immediate = NavMesh path completes AND does not cross any other door opening
+    /// (excludes middleman/transit through other rooms). Room comes from RoomGraph edge sides.
     /// </summary>
+    /// <param name="isNpcSelf">
+    /// True when voting the NPC's own position (Butcher) — logs red.
+    /// False when voting a target/player/sound position — logs green.
+    /// </param>
     public Transform FindClosestOwnedAnchorByPath(
         Vector3 fromPosition,
         string ownerZoneID,
-        int areaMask = NavMesh.AllAreas)
+        int areaMask = NavMesh.AllAreas,
+        bool isNpcSelf = false)
     {
         if (string.IsNullOrEmpty(ownerZoneID))
-            return null;
+            return LogVoteResult(null, isNpcSelf);
 
         if (RoomGraph.Instance == null || RoomGraph.Instance.edges == null)
-            return null;
+            return LogVoteResult(null, isNpcSelf);
 
         var path = new NavMeshPath();
-        const float prepointThreshold = 0.5f;
-        
-        // Make sure start is on navmesh
+        const float crossThreshold = 0.5f;
+
         if (!NavMesh.SamplePosition(fromPosition, out var startHit, 1.0f, areaMask))
-            return null;
+            return LogVoteResult(null, isNpcSelf);
         fromPosition = startHit.position;
-        
-        // First pass: Look for definitive answers (only one prepoint reachable)
-        foreach (var edge in RoomGraph.Instance.edges)
-        {
-            if (!edge.prePointA || !edge.prePointB || !edge.door) continue;
 
-            // Filter by zone ownership - only consider doors connected to rooms in the owner's zone
-            bool roomAInZone = edge.roomA && edge.roomA.zoneID == ownerZoneID;
-            bool roomBInZone = edge.roomB && edge.roomB.zoneID == ownerZoneID;
-            
-            if (!roomAInZone && !roomBInZone) continue; // Skip doors not in owner's zone
-
-            // Check path to prepoint A
-            bool canReachA = false;
-            float pathLengthA = float.PositiveInfinity;
-            
-            Vector3 prepointA = edge.prePointA.position;
-            if (NavMesh.SamplePosition(prepointA, out var hitA, 1.0f, areaMask))
-            {
-                prepointA = hitA.position;
-                
-                if (NavMesh.CalculatePath(fromPosition, prepointA, areaMask, path))
-                {
-                    if (path.status == NavMeshPathStatus.PathComplete)
-                    {
-                        // Check if path passes through any other door's prepoint
-                        if (!PathPassesThroughOtherPrepoint(path, edge.prePointA, prepointThreshold, edge.roomA))
-                        {
-                            pathLengthA = GetPathLength(path);
-                            canReachA = true;
-                        }
-                    }
-                }
-            }
-
-            // Check path to prepoint B
-            bool canReachB = false;
-            float pathLengthB = float.PositiveInfinity;
-            
-            Vector3 prepointB = edge.prePointB.position;
-            if (NavMesh.SamplePosition(prepointB, out var hitB, 1.0f, areaMask))
-            {
-                prepointB = hitB.position;
-                
-                if (NavMesh.CalculatePath(fromPosition, prepointB, areaMask, path))
-                {
-                    if (path.status == NavMeshPathStatus.PathComplete)
-                    {
-                        // Check if path passes through any other door's prepoint
-                        if (!PathPassesThroughOtherPrepoint(path, edge.prePointB, prepointThreshold, edge.roomB))
-                        {
-                            pathLengthB = GetPathLength(path);
-                            canReachB = true;
-                        }
-                    }
-                }
-            }
-
-            // If only one prepoint is reachable → DEFINITIVE answer, return immediately
-            if (canReachA && !canReachB)
-            {
-                // Only prepointA is reachable → we're in roomA
-                if (edge.roomA != null && edge.roomA.zoneID == ownerZoneID)
-                {
-                    string doorName = edge.door ? edge.door.name : "Unknown";
-                    string roomName = edge.roomA.roomID ?? edge.roomA.name;
-                    //Debug.Log($"[NPCAnchorManager] DEFINITIVE: Door={doorName}, PrepointA reachable (path={pathLengthA:F2}m) → Room={roomName}");
-                    return edge.roomA.transform;
-                }
-            }
-            else if (canReachB && !canReachA)
-            {
-                // Only prepointB is reachable → we're in roomB
-                if (edge.roomB != null && edge.roomB.zoneID == ownerZoneID)
-                {
-                    string doorName = edge.door ? edge.door.name : "Unknown";
-                    string roomName = edge.roomB.roomID ?? edge.roomB.name;
-                    //Debug.Log($"[NPCAnchorManager] DEFINITIVE: Door={doorName}, PrepointB reachable (path={pathLengthB:F2}m) → Room={roomName}");
-                    return edge.roomB.transform;
-                }
-            }
-            // else: both reachable or both failed → continue to next door
-        }
-        
-        // Second pass: If no definitive answer, use closest prepoint from all doors
         RoomAnchor bestRoom = null;
         float bestPathLength = float.PositiveInfinity;
-        string bestDoorName = null;
-        string bestPrepoint = null;
-        
+
         foreach (var edge in RoomGraph.Instance.edges)
         {
             if (!edge.prePointA || !edge.prePointB || !edge.door) continue;
 
-            bool roomAInZone = edge.roomA && edge.roomA.zoneID == ownerZoneID;
-            bool roomBInZone = edge.roomB && edge.roomB.zoneID == ownerZoneID;
-            
-            if (!roomAInZone && !roomBInZone) continue;
-
-            // Re-check paths (we already calculated above, but keeping logic clear)
-            bool canReachA = false;
-            float pathLengthA = float.PositiveInfinity;
-            
-            Vector3 prepointA = edge.prePointA.position;
-            if (NavMesh.SamplePosition(prepointA, out var hitA, 1.0f, areaMask))
+            // PrePointA → roomA
+            if (edge.roomA != null && edge.roomA.zoneID == ownerZoneID)
             {
-                prepointA = hitA.position;
-                
-                if (NavMesh.CalculatePath(fromPosition, prepointA, areaMask, path))
+                if (TryImmediatePrepointPath(fromPosition, edge.prePointA, edge.roomA, areaMask, path, crossThreshold, out float len)
+                    && len < bestPathLength)
                 {
-                    if (path.status == NavMeshPathStatus.PathComplete)
-                    {
-                        if (!PathPassesThroughOtherPrepoint(path, edge.prePointA, prepointThreshold, edge.roomA))
-                        {
-                            pathLengthA = GetPathLength(path);
-                            canReachA = true;
-                        }
-                    }
+                    bestPathLength = len;
+                    bestRoom = edge.roomA;
                 }
             }
 
-            bool canReachB = false;
-            float pathLengthB = float.PositiveInfinity;
-            
-            Vector3 prepointB = edge.prePointB.position;
-            if (NavMesh.SamplePosition(prepointB, out var hitB, 1.0f, areaMask))
+            // PrePointB → roomB
+            if (edge.roomB != null && edge.roomB.zoneID == ownerZoneID)
             {
-                prepointB = hitB.position;
-                
-                if (NavMesh.CalculatePath(fromPosition, prepointB, areaMask, path))
+                if (TryImmediatePrepointPath(fromPosition, edge.prePointB, edge.roomB, areaMask, path, crossThreshold, out float len)
+                    && len < bestPathLength)
                 {
-                    if (path.status == NavMeshPathStatus.PathComplete)
-                    {
-                        if (!PathPassesThroughOtherPrepoint(path, edge.prePointB, prepointThreshold, edge.roomB))
-                        {
-                            pathLengthB = GetPathLength(path);
-                            canReachB = true;
-                        }
-                    }
-                }
-            }
-
-            // If both prepoints are reachable, use the closer one
-            if (canReachA && canReachB)
-            {
-                if (pathLengthA < pathLengthB && pathLengthA < bestPathLength)
-                {
-                    if (edge.roomA != null && edge.roomA.zoneID == ownerZoneID)
-                    {
-                        bestPathLength = pathLengthA;
-                        bestRoom = edge.roomA;
-                        bestDoorName = edge.door ? edge.door.name : "Unknown";
-                        bestPrepoint = "PrepointA";
-                    }
-                }
-                else if (pathLengthB < pathLengthA && pathLengthB < bestPathLength)
-                {
-                    if (edge.roomB != null && edge.roomB.zoneID == ownerZoneID)
-                    {
-                        bestPathLength = pathLengthB;
-                        bestRoom = edge.roomB;
-                        bestDoorName = edge.door ? edge.door.name : "Unknown";
-                        bestPrepoint = "PrepointB";
-                    }
+                    bestPathLength = len;
+                    bestRoom = edge.roomB;
                 }
             }
         }
-        
-        return bestRoom != null ? bestRoom.transform : null;
+
+        return LogVoteResult(bestRoom != null ? bestRoom.transform : null, isNpcSelf);
+    }
+
+    /// <summary>
+    /// True if we can path to this prepoint without crossing another door (middleman filter).
+    /// </summary>
+    bool TryImmediatePrepointPath(
+        Vector3 from,
+        Transform prepoint,
+        RoomAnchor candidateRoom,
+        int areaMask,
+        NavMeshPath path,
+        float crossThreshold,
+        out float pathLength)
+    {
+        pathLength = float.PositiveInfinity;
+        if (!prepoint) return false;
+
+        Vector3 goal = prepoint.position;
+        if (!NavMesh.SamplePosition(goal, out var hit, 1.0f, areaMask))
+            return false;
+        goal = hit.position;
+
+        if (!NavMesh.CalculatePath(from, goal, areaMask, path))
+            return false;
+        if (path.status != NavMeshPathStatus.PathComplete)
+            return false;
+
+        // Goes through another room's doorway → not immediate.
+        if (PathPassesThroughOtherPrepoint(path, prepoint, crossThreshold, candidateRoom))
+            return false;
+
+        pathLength = GetPathLength(path);
+        return true;
+    }
+
+    Transform LogVoteResult(Transform roomT, bool isNpcSelf)
+    {
+        if (logRoomVoteResult)
+        {
+            string name = "?";
+            if (roomT != null)
+            {
+                var room = roomT.GetComponent<RoomAnchor>();
+                name = room != null
+                    ? (string.IsNullOrEmpty(room.roomID) ? room.name : room.roomID)
+                    : roomT.name;
+            }
+            // Butcher (NPC self) = red, player/target/sound = green
+            string color = isNpcSelf ? "red" : "green";
+            string who = isNpcSelf ? "Butcher" : "Player";
+            Debug.Log($"<color={color}>{who}: {name}</color>");
+        }
+        return roomT;
     }
 
     /// <summary>

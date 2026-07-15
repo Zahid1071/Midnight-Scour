@@ -600,6 +600,10 @@ MonoBehaviour:
     m_Localized: Shift
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296710
+    m_Localized: 我挡着门了。
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

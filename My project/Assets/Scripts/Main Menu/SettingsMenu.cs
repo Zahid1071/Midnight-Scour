@@ -194,8 +194,8 @@ public class SettingsMenu : MonoBehaviour
         _appliedSnapshot = GameSettingsManager.Instance.CurrentSettings;
         _pending = _appliedSnapshot;
         SyncUIFrom(_appliedSnapshot);
-        Debug.Log($"[Settings] LoadSettings — Sens: {_appliedSnapshot.mouseSensitivity:F2}, " +
-                  $"Brightness: {_appliedSnapshot.brightness:F2}");
+        // Debug.Log($"[Settings] LoadSettings — Sens: {_appliedSnapshot.mouseSensitivity:F2}, " +
+        //           $"Brightness: {_appliedSnapshot.brightness:F2}");
     }
 
     /// <summary>

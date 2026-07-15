@@ -9,7 +9,8 @@ using UnityEngine.InputSystem;
 
 /// <summary>
 /// Shows pre-authored hint panels and runs inventory hint rules.
-/// Only one hint is visible at a time; higher-weight hints replace lower ones after a full fade-out.
+/// Only one hint is visible at a time.
+/// Higher priority replaces the active hint; equal priority → latest wins; lower priority fails while a higher one is showing.
 /// </summary>
 public class GameplayHintManager : MonoBehaviour
 {
@@ -21,7 +22,7 @@ public class GameplayHintManager : MonoBehaviour
         [Tooltip("Name used by Show() and the trigger fields below. Can be anything you like.")]
         public string id;
         public CanvasGroup canvasGroup;
-        [Tooltip("Higher priority replaces lower. Equal or higher cuts the current hint immediately.")]
+        [Tooltip("Higher priority replaces lower. Equal priority → latest wins. Lower while higher is active → Show fails.")]
         public int priority;
     }
 
@@ -387,15 +388,17 @@ public class GameplayHintManager : MonoBehaviour
 
         RefreshLocalizedHintLabel(hintId);
 
-        if (hintId == _activeHintId || IsPending(hintId))
+        if (hintId == _activeHintId)
             return true;
 
         if (_transitionRoutine != null)
             StopTransitionRoutine();
 
+        // Nothing showing — claim the slot immediately so a second Show this frame can't stack.
         if (_activeHintId == null)
         {
-            RemovePending(hintId);
+            EnsureOnlyHintVisible(hintId);
+            _activeHintId = hintId;
             BeginTransition(null, hintId);
             return true;
         }
@@ -403,17 +406,28 @@ public class GameplayHintManager : MonoBehaviour
         int newPriority = GetWeight(hintId);
         int activePriority = GetWeight(_activeHintId);
 
-        if (newPriority >= activePriority)
-        {
-            RemovePending(hintId);
-            BeginInstantSwap(_activeHintId, hintId);
-        }
-        else
-        {
-            InsertPending(hintId);
-        }
+        // Higher priority replaces. Equal → latest wins. Lower → fail (do not queue).
+        if (newPriority < activePriority)
+            return false;
 
+        BeginInstantSwap(_activeHintId, hintId);
         return true;
+    }
+
+    /// <summary>Force every other hint panel off so two CanvasGroups never both appear.</summary>
+    void EnsureOnlyHintVisible(string keepHintId)
+    {
+        foreach (var kv in _groups)
+        {
+            if (kv.Value == null || kv.Key == keepHintId)
+                continue;
+
+            CancelAutoHide(kv.Key);
+            StopSpring(kv.Key);
+            kv.Value.alpha = 0f;
+            kv.Value.transform.localScale = Vector3.one;
+            ResetBackgroundColor(kv.Key);
+        }
     }
 
     void RefreshLocalizedHintLabel(string hintId)
@@ -467,8 +481,9 @@ public class GameplayHintManager : MonoBehaviour
     void BeginInstantSwap(string fromHintId, string toHintId)
     {
         StopTransitionRoutine();
+        EnsureOnlyHintVisible(toHintId);
 
-        if (!string.IsNullOrEmpty(fromHintId))
+        if (!string.IsNullOrEmpty(fromHintId) && fromHintId != toHintId)
         {
             CancelAutoHide(fromHintId);
             StopSpring(fromHintId);
@@ -481,23 +496,29 @@ public class GameplayHintManager : MonoBehaviour
             }
         }
 
-        _activeHintId = null;
+        // Claim before visuals so concurrent Show() sees an active hint.
+        _activeHintId = toHintId;
 
         if (!string.IsNullOrEmpty(toHintId) && _groups.TryGetValue(toHintId, out var toGroup) && toGroup != null)
         {
             toGroup.gameObject.SetActive(true);
             toGroup.alpha = 1f;
             StartSpring(toHintId, toGroup.transform);
-            _activeHintId = toHintId;
             ScheduleAutoHide(toHintId);
         }
-
-        TryShowNextPending();
+        else
+        {
+            _activeHintId = null;
+        }
     }
 
     IEnumerator TransitionRoutine(string fromHintId, string toHintId)
     {
-        if (!string.IsNullOrEmpty(fromHintId))
+        // Claim the destination up front so another Show can't start a second fade-in.
+        if (!string.IsNullOrEmpty(toHintId))
+            _activeHintId = toHintId;
+
+        if (!string.IsNullOrEmpty(fromHintId) && fromHintId != toHintId)
         {
             CancelAutoHide(fromHintId);
             StopSpring(fromHintId);
@@ -511,10 +532,9 @@ public class GameplayHintManager : MonoBehaviour
             }
         }
 
-        _activeHintId = null;
-
         if (!string.IsNullOrEmpty(toHintId) && _groups.TryGetValue(toHintId, out var toGroup) && toGroup != null)
         {
+            EnsureOnlyHintVisible(toHintId);
             toGroup.gameObject.SetActive(true);
             StartSpring(toHintId, toGroup.transform);
             yield return FadeGroup(toGroup, 1f);
@@ -522,9 +542,12 @@ public class GameplayHintManager : MonoBehaviour
             _activeHintId = toHintId;
             ScheduleAutoHide(toHintId);
         }
+        else if (string.IsNullOrEmpty(toHintId))
+        {
+            _activeHintId = null;
+        }
 
         _transitionRoutine = null;
-        TryShowNextPending();
     }
 
     void ScheduleAutoHide(string hintId)

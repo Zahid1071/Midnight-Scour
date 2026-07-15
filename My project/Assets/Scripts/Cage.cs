@@ -9,6 +9,31 @@ public class Cage : MonoBehaviour
     public Transform basementSidePrePoint;
     public bool isOccupied = false;
 
+    /// <summary>True if this cage currently holds the given player (root or child).</summary>
+    public bool HoldsPlayer(Transform player)
+    {
+        if (!isOccupied || playerRef == null || player == null) return false;
+        Transform root = player.root != null ? player.root : player;
+        return playerRef.transform == root || playerRef == player.gameObject;
+    }
+
+    /// <summary>True if any cage in the scene currently holds this player.</summary>
+    public static bool IsPlayerInsideAnyCage(Transform player)
+    {
+        if (player == null) return false;
+#if UNITY_2023_1_OR_NEWER
+        var cages = Object.FindObjectsByType<Cage>(FindObjectsSortMode.None);
+#else
+        var cages = Object.FindObjectsOfType<Cage>();
+#endif
+        for (int i = 0; i < cages.Length; i++)
+        {
+            if (cages[i] != null && cages[i].HoldsPlayer(player))
+                return true;
+        }
+        return false;
+    }
+
     [Header("NPC Noise")]
     [Tooltip("Footstep-suspicion value added to NPCs whenever the cage door opens or closes.")]
     [Min(0f)]

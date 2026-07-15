@@ -600,6 +600,10 @@ Ajoutez-le à votre liste de souhaits Steam pour profiter de l'expérience compl
     m_Localized: Shift
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296710
+    m_Localized: Je bloque le passage.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

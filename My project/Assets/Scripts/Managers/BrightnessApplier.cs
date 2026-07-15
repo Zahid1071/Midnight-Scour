@@ -95,7 +95,7 @@ public class BrightnessApplier : MonoBehaviour
             {
                 _colorAdjustments = globalVolume.profile.Add<ColorAdjustments>();
                 _colorAdjustments.postExposure.overrideState = true;
-                Debug.Log("[BrightnessApplier] Added ColorAdjustments to Volume at runtime.");
+                //Debug.Log("[BrightnessApplier] Added ColorAdjustments to Volume at runtime.");
             }
             else
             {

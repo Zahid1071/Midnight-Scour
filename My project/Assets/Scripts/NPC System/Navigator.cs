@@ -13,6 +13,8 @@ namespace FS_Atmo
         [Header("Movement")]
         [SerializeField] float waypointTolerance = 0.2f;      // use >= agent.stoppingDistance
         [SerializeField] float stuckTimeout      = 3f;        // seconds without progress
+        [SerializeField] float doorOpenWaitTimeout = 2.5f;    // wait for carve to clear before crossing
+        [SerializeField] float doorTransitTimeout = 12f;      // abort A↔B loop if crossing stalls
 
         [Header("DEBUG")]
         [SerializeField] bool logPlannedRoute = true;
@@ -137,7 +139,7 @@ namespace FS_Atmo
             if (targetRoom == null)
             {
                 targetAnchorT = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(
-                    worldPoint, home);
+                    worldPoint, home, NavMesh.AllAreas, isNpcSelf: false);
 
                 if (targetAnchorT != null)
                 {
@@ -153,7 +155,8 @@ namespace FS_Atmo
                 if (logPlannedRoute)
                     Debug.LogWarning($"[Navigator] GoToPoint: Failed to find target room for {destinationName ?? "point"}, falling back to direct NavMesh");
                 if (followCo != null) StopCoroutine(followCo);
-                followCo = StartCoroutine(MoveTo(worldPoint));
+                isDoorTransit = false;
+                followCo = StartCoroutine(MoveToReached(worldPoint, -1f, _ => { }));
                 return;
             }
 
@@ -165,6 +168,8 @@ namespace FS_Atmo
         private void StartFollowing()
         {
             if (followCo != null) StopCoroutine(followCo);
+            // StopCoroutine skips finally blocks — clear transit so chase can replan.
+            isDoorTransit = false;
             idx = -1;
 
             if (logPlannedRoute)
@@ -187,94 +192,151 @@ namespace FS_Atmo
                 if (edge != null)
                 {
                     isDoorTransit = true;
+                    bool crossed = false;
 
-                    // 1) Approach entry prepoint
-                    yield return MoveTo(waypoint.position);
-
-                    // 2) Open and wait until actually open (avoids race with carve delay)
-                    if (!edge.door.IsOpen)
+                    try
                     {
-                        bool opened = false;
-                        // NPC should ignore locks: play Open/Close instead of Locked
-                        edge.door.RequestOpen(bypassLock: true, onDone: ok => opened = ok);
-
-                        float wait = 0f;
-                        while (!opened && wait < 0.2f) // safety cap
+                        // 1) Approach entry prepoint
+                        bool reachedEntry = false;
+                        yield return MoveToReached(waypoint.position, -1f, ok => reachedEntry = ok);
+                        if (!reachedEntry)
                         {
-                            wait += Time.deltaTime;
-                            yield return null;
+                            AbortRouteInPlace();
+                            yield break;
                         }
+
+                        // 2) Open and wait until NavMesh is actually free
+                        yield return EnsureDoorOpenForCrossing(edge.door);
+
+                        // 3) Move to the opposite prepoint
+                        int next = idx + 1;
+                        if (next < route.Count && route[next] != null)
+                            yield return MoveToReached(route[next].position, doorTransitTimeout, ok => crossed = ok);
+
+                        // 4) Only seal the door if we actually reached the far side.
+                        //    Closing after a failed cross is what locks the A↔B loop.
+                        if (crossed && edge.door != null && edge.door.AICloseAfterPassing)
+                            edge.door.RequestClose(bypassLock: true);
+
+                        if (!crossed)
+                        {
+                            AbortRouteInPlace();
+                            yield break;
+                        }
+
+                        // 5) Continue past the far prepoint
+                        idx = next;
+                    }
+                    finally
+                    {
+                        isDoorTransit = false;
                     }
 
-                    // 3) Move to the opposite prepoint (next element)
-                    int next = idx + 1;
-                    if (next < route.Count)
-                        yield return MoveTo(route[next].position);
-
-                    // 4) Close door after crossing (RequestOpen is only used here for AI; keeps rooms sealed)
-                    if (edge.door != null && edge.door.AICloseAfterPassing)
-                        edge.door.RequestClose(bypassLock: true);
-
-                    // 5) Continue from whatever follows the far prepoint
-                    idx = next;
-                    isDoorTransit = false;
                     continue;
                 }
 
-                // ✅ Anchor kontrolü - anchor'lara gitme, sadece prepoint'ler ve final point'e git
+                // Anchor waypoints are planning markers only — skip walking to them.
                 if (waypoint.TryGetComponent<RoomAnchor>(out var roomAnchor) && roomAnchor != null)
-                {
-                    // // Bu bir anchor, atla (anchor'lar sadece route planlama için kullanılıyor)
-                    // if (logPlannedRoute)
-                    //     Debug.Log($"[Navigator] Skipping anchor waypoint: {roomAnchor.roomID ?? roomAnchor.name}");
                     continue;
-                }
 
-                // Normal waypoint (prepoint veya final point)
-                yield return MoveTo(waypoint.position);
+                yield return MoveToReached(waypoint.position, -1f, _ => { });
             }
 
-            // Cleanup temp points created for this plan
-            for (int i = 0; i < tempPoints.Count; i++)
-                if (tempPoints[i]) Destroy(tempPoints[i].gameObject);
-            tempPoints.Clear();
+            CleanupTempPoints();
         }
 
-        private IEnumerator MoveTo(Vector3 pos)
+        private IEnumerator EnsureDoorOpenForCrossing(DoorController door)
         {
-            // Sample onto NavMesh to avoid invalid goals at doorway edges
+            if (door == null) yield break;
+
+            float waited = 0f;
+            int reRequests = 0;
+
+            while (waited < doorOpenWaitTimeout)
+            {
+                if (door.IsOpen)
+                    yield break;
+
+                if (reRequests == 0 || waited > 0.4f * (reRequests + 1))
+                {
+                    door.RequestOpen(bypassLock: true);
+                    reRequests++;
+                }
+
+                waited += Time.deltaTime;
+                yield return null;
+            }
+
+            if (!door.IsOpen)
+                door.ForceOpenInstant();
+        }
+
+        /// <summary>
+        /// Walk to pos. Invokes onFinished(true) only if the agent reached the goal;
+        /// false on PathInvalid, stuck timeout, or maxSeconds exceeded.
+        /// </summary>
+        private IEnumerator MoveToReached(Vector3 pos, float maxSeconds, System.Action<bool> onFinished)
+        {
+            bool arrived = false;
+
             if (NavMesh.SamplePosition(pos, out var hit, 0.75f, NavMesh.AllAreas))
                 pos = hit.position;
 
             agent.isStopped = false;
             agent.SetDestination(pos);
 
-            float timer = 0f;
+            float stuckTimer = 0f;
+            float elapsed = 0f;
             float lastRemaining = Mathf.Infinity;
+            float arriveDist = Mathf.Max(waypointTolerance, agent.stoppingDistance + 0.05f);
 
             while (true)
             {
-                if (agent.pathStatus == NavMeshPathStatus.PathInvalid) yield break;
+                elapsed += Time.deltaTime;
+                if (maxSeconds > 0f && elapsed >= maxSeconds)
+                    break;
 
-                if (!agent.pathPending &&
-                    agent.remainingDistance <= Mathf.Max(waypointTolerance, agent.stoppingDistance + 0.05f))
-                    yield break;
+                if (agent.pathStatus == NavMeshPathStatus.PathInvalid)
+                    break;
 
-                // Simple stuck detection
+                if (!agent.pathPending && agent.remainingDistance <= arriveDist)
+                {
+                    arrived = true;
+                    break;
+                }
+
                 if (!agent.pathPending)
                 {
                     if (Mathf.Abs(agent.remainingDistance - lastRemaining) < 0.01f)
-                        timer += Time.deltaTime;
+                        stuckTimer += Time.deltaTime;
                     else
-                        timer = 0f;
+                        stuckTimer = 0f;
 
                     lastRemaining = agent.remainingDistance;
 
-                    if (timer > stuckTimeout) yield break; // give up; caller re-plans soon
+                    if (stuckTimer > stuckTimeout)
+                        break;
                 }
 
                 yield return null;
             }
+
+            onFinished?.Invoke(arrived);
+        }
+
+        private void AbortRouteInPlace()
+        {
+            CleanupTempPoints();
+            route.Clear();
+            idx = -1;
+            if (agent != null) agent.ResetPath();
+        }
+
+        private void CleanupTempPoints()
+        {
+            for (int i = 0; i < tempPoints.Count; i++)
+                if (tempPoints[i]) Destroy(tempPoints[i].gameObject);
+            tempPoints.Clear();
         }
 
         private RoomAnchor FindCurrentRoom()
@@ -286,7 +348,7 @@ namespace FS_Atmo
 
             // Use the refactored path-based room finding (checks all doors and prepoints)
             var t = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(
-                transform.position, home);
+                transform.position, home, NavMesh.AllAreas, isNpcSelf: true);
 
             var room = t ? t.GetComponent<RoomAnchor>() : null;
 

@@ -107,7 +107,7 @@ public class FSMController
                 if (agent != null)
                     agent.isStopped = false;
                 npc.interaction.StartNextRoutine();
-                Debug.Log("🌿 State: NATURAL");
+                //Debug.Log("🌿 State: NATURAL");
                 break;
 
             case NPCController.AIState.Chase:
@@ -116,7 +116,7 @@ public class FSMController
                 nav?.ClearRoute();
                 if (agent != null)
                     agent.isStopped = false;
-                Debug.Log("🏃 State: CHASE");
+                //Debug.Log("🏃 State: CHASE");
                 break;
 
             case NPCController.AIState.Capture:
@@ -124,7 +124,7 @@ public class FSMController
                 StopAmbushRoutine();
                 StopAgentMovement();
                 npc.poiLookDirector?.CancelHoldAndClearLook();
-                Debug.Log("State: CAPTURE");
+                //Debug.Log("State: CAPTURE");
                 npc.BeginCapture();
                 break;
 
@@ -319,7 +319,7 @@ public class FSMController
 
         PlayerControlGate.Acquire(PlayerControlGate.ReasonCaptured);
 
-        Debug.Log("Player Caught!");
+        //Debug.Log("Player Caught!");
 
         if (npc.poiLookDirector != null)
             npc.poiLookDirector.CancelHoldAndClearLook();

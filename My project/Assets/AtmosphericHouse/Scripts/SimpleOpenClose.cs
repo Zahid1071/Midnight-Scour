@@ -43,14 +43,21 @@ namespace FS_Atmo
         public bool objectOpenAdditional;
         public GameObject animateAdditional;
 
+        [Header("Obstruction (DoorPlayerObstructionTrigger sets these)")]
+        public bool playerBlockingOpen;
+        public bool playerBlockingClose;
+
         private Animator myAnimator;
         private Animator additionalAnimator;
         private bool hasAdditional = false;
         private int openHash, closeHash, lockedHash;
         
-        // YENİ: Spam koruması için zamanlayıcı
         private float nextInteractTime = 0f;
         private Coroutine _openSfxRoutine;
+
+        bool _moving;       // mid open/close we started
+        bool _movingOpen;   // true = opening, false = closing
+        bool _reverting;
 
         void Awake()
         {
@@ -67,6 +74,113 @@ namespace FS_Atmo
                 hasAdditional = additionalAnimator != null;
                 objectOpenAdditional = animateAdditional.GetComponent<SimpleOpenClose>().objectOpen;
             }
+        }
+
+        void Update()
+        {
+            if (_reverting)
+            {
+                float a = GetOpenAmount(myAnimator);
+                bool done = objectOpen ? a >= 0.98f : a <= 0.02f;
+                if (!myAnimator.IsInTransition(0) && done)
+                    _reverting = false;
+                return;
+            }
+
+            if (!_moving)
+                return;
+
+            if (_movingOpen && playerBlockingOpen)
+            {
+                StopMotionBecauseBlocked(wasOpening: true);
+                return;
+            }
+            if (!_movingOpen && playerBlockingClose)
+            {
+                StopMotionBecauseBlocked(wasOpening: false);
+                return;
+            }
+
+            float amount = GetOpenAmount(myAnimator);
+            bool finished = _movingOpen ? amount >= 0.98f : amount <= 0.02f;
+            if (!myAnimator.IsInTransition(0) && finished)
+                _moving = false;
+        }
+
+        /// <summary>
+        /// If barely moved (≈0), cancel to rest without inventing motion.
+        /// If already partway, cross-fade back to the previous rest state.
+        /// </summary>
+        void StopMotionBecauseBlocked(bool wasOpening)
+        {
+            float amount = Mathf.Clamp01(GetOpenAmount(myAnimator));
+            _moving = false;
+
+            InteractionFeedback.Fail(Loc.Get("gameplay.blocking_way"), 2.5f);
+
+            if (wasOpening)
+            {
+                // Trying to open, blocked → end closed.
+                objectOpen = false;
+                if (amount <= 0.05f)
+                {
+                    // Never really left closed — stay at 0, do not push a partial open then fade.
+                    myAnimator.Play(closeHash, 0, 1f);
+                    if (hasAdditional && additionalAnimator != null)
+                        additionalAnimator.Play(closeHash, 0, 1f);
+                    SyncAdditionalFlags(open: false);
+                    _reverting = false;
+                }
+                else
+                {
+                    _reverting = true;
+                    myAnimator.CrossFade(closeHash, crossFadeDuration, 0, amount);
+                    if (hasAdditional && additionalAnimator != null)
+                    {
+                        float add = Mathf.Clamp01(GetOpenAmount(additionalAnimator));
+                        additionalAnimator.CrossFade(closeHash, crossFadeDuration, 0, add);
+                    }
+                    SyncAdditionalFlags(open: false);
+                }
+            }
+            else
+            {
+                // Trying to close, blocked → end open.
+                objectOpen = true;
+                if (amount >= 0.95f)
+                {
+                    myAnimator.Play(openHash, 0, 1f);
+                    if (hasAdditional && additionalAnimator != null)
+                        additionalAnimator.Play(openHash, 0, 1f);
+                    SyncAdditionalFlags(open: true);
+                    _reverting = false;
+                }
+                else
+                {
+                    _reverting = true;
+                    myAnimator.CrossFade(openHash, crossFadeDuration, 0, 1f - amount);
+                    if (hasAdditional && additionalAnimator != null)
+                    {
+                        float add = Mathf.Clamp01(GetOpenAmount(additionalAnimator));
+                        additionalAnimator.CrossFade(openHash, crossFadeDuration, 0, 1f - add);
+                    }
+                    SyncAdditionalFlags(open: true);
+                }
+            }
+
+            nextInteractTime = Time.time + 0.15f;
+        }
+
+        void SyncAdditionalFlags(bool open)
+        {
+            objectOpenAdditional = open;
+            if (!hasAdditional || animateAdditional == null)
+                return;
+            var other = animateAdditional.GetComponent<SimpleOpenClose>();
+            if (other == null)
+                return;
+            other.objectOpen = open;
+            other.objectOpenAdditional = open;
         }
 
 
@@ -114,6 +228,19 @@ namespace FS_Atmo
             if (!ShouldAllowToggle(openAmount))
             {
                 InteractionFeedback.Fail();
+                return false;
+            }
+
+            // Already standing in the path — do not start the animation at all (stay at rest 0 / open).
+            bool wantOpen = !objectOpen;
+            if (wantOpen && playerBlockingOpen)
+            {
+                InteractionFeedback.Fail(Loc.Get("gameplay.blocking_way"), 2.5f);
+                return false;
+            }
+            if (!wantOpen && playerBlockingClose)
+            {
+                InteractionFeedback.Fail(Loc.Get("gameplay.blocking_way"), 2.5f);
                 return false;
             }
 
@@ -166,7 +293,6 @@ namespace FS_Atmo
             HudManager.Instance?.ShowSubtitle(
                 Loc.Format("gameplay.item_unlocked", item.GetLocalizedName()),
                 2.5f, HudManager.Instance.SuccessColor);
-            Debug.Log($"✅ {item.itemName} ile kilit açıldı.");
 
             if (item.consumeOnUse)
             {
@@ -200,17 +326,22 @@ namespace FS_Atmo
         private void ToggleSelf(float openAmount)
         {
             openAmount = Mathf.Clamp01(openAmount);
+            _reverting = false;
 
             if (objectOpen)
             {
                 myAnimator.CrossFade(closeHash, crossFadeDuration, 0, openAmount);
                 objectOpen = false;
+                _moving = true;
+                _movingOpen = false;
                 PlayCloseSfx(transform.position);
             }
             else
             {
                 myAnimator.CrossFade(openHash, crossFadeDuration, 0, 1f - openAmount);
                 objectOpen = true;
+                _moving = true;
+                _movingOpen = true;
                 PlayOpenSfxSequence(transform.position, includeAdditionalLeaf: hasAdditional);
             }
 

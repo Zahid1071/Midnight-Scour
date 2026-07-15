@@ -591,6 +591,10 @@ MonoBehaviour:
     m_Key: controls.key.run
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296710
+    m_Key: gameplay.blocking_way
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
