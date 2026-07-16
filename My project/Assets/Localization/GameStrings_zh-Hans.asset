@@ -63,21 +63,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296577
-    m_Localized: "感谢您游玩《午夜搜寻》试玩版。
-
-本次试玩旨在展示最终体验的一小部分。完整版游戏将把这个核心潜行与生存循环扩展到多个不同的房间和环境中，并更充分地运用目前在单一房间内无法实现的追逐场面。
-
-《午夜搜寻》计划于2026年末发售。
-
-请在Steam上将本作加入愿望单，体验完整内容并支持我们！"
+    m_Localized: "感谢游玩 Midnight Scour"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
-    m_Localized: "按任意键退出"
+    m_Localized: 按 Esc 退出
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296579
-    m_Localized: "按任意键"
+    m_Localized: "按 Esc"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296580
@@ -602,6 +596,74 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5707318296710
     m_Localized: 我挡着门了。
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296711
+    m_Localized: 您如何评价这次体验？
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296712
+    m_Localized: 紧张感
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296713
+    m_Localized: 恐怖
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296714
+    m_Localized: 乐趣
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296715
+    m_Localized: *可选* 反馈区域
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296716
+    m_Localized: 提交
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296717
+    m_Localized: "你好——作为刚从 Haliç 大学毕业的软件工程师，我在这个有限版本中尽量向你展示 Midnight Scour 可能成为什么样。接下来，我希望通过扩展环境和氛围、在此打下的基础上继续发展，并增加预算，为你带来完整版。请留下反馈，帮助我们改善你的体验。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296718
+    m_Localized: ?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296719
+    m_Localized: 发送中...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296720
+    m_Localized: 已提交
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296721
+    m_Localized: 重试
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296722
+    m_Localized: 请全部评分
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296723
+    m_Localized: 需要配置
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296724
+    m_Localized: 加入愿望单！
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296725
+    m_Localized: 退出
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296726
+    m_Localized: 已经提交过了
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296727
+    m_Localized: "已更新"
     m_Metadata:
       m_Items: []
   references:

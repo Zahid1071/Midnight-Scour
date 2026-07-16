@@ -63,21 +63,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296577
-    m_Localized: "Спасибо за игру в демоверсию Midnight Scour.
-
-Эта сборка призвана показать лишь небольшую часть финального опыта. Полная игра расширит этот основной цикл скрытности и выживания на несколько разных комнат и локаций и позволит гораздо лучше использовать сцены погони, которые сейчас невозможны в пределах одной комнаты.
-
-Выход Midnight Scour запланирован на конец 2026 года.
-
-Добавьте игру в список желаемого Steam, чтобы получить полный опыт и поддержать нас!"
+    m_Localized: "Спасибо за игру в Midnight Scour"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
-    m_Localized: "нажмите любую клавишу, чтобы выйти"
+    m_Localized: нажмите esc, чтобы выйти
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296579
-    m_Localized: "нажмите любую клавишу"
+    m_Localized: "нажмите esc"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296580
@@ -602,6 +596,74 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5707318296710
     m_Localized: Я перекрываю путь.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296711
+    m_Localized: Как бы вы оценили этот опыт?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296712
+    m_Localized: Напряжение
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296713
+    m_Localized: Ужас
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296714
+    m_Localized: Веселье
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296715
+    m_Localized: *необязательно* поле отзыва
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296716
+    m_Localized: Отправить
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296717
+    m_Localized: "Привет — как инженер-программист, недавно окончивший университет Haliç, в этой ограниченной версии я постарался показать вам, чем может стать Midnight Scour. В дальнейшем я хочу принести вам полную версию, расширяя мир и атмосферу, развивая заложенные здесь основы и увеличивая бюджет. Пожалуйста, оставьте отзыв — так мы сможем улучшить ваш опыт."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296718
+    m_Localized: ?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296719
+    m_Localized: Отправка...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296720
+    m_Localized: Отправлено
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296721
+    m_Localized: Повторить
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296722
+    m_Localized: Оцените всё
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296723
+    m_Localized: Нужна настройка
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296724
+    m_Localized: В список желаемого!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296725
+    m_Localized: Выход
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296726
+    m_Localized: "Уже отправлено"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296727
+    m_Localized: "Обновлено"
     m_Metadata:
       m_Items: []
   references:

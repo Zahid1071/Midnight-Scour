@@ -27,6 +27,7 @@ public class SettingsSelector : MonoBehaviour
     [SerializeField] private string[] options = { "Option 1", "Option 2", "Option 3" };
 
     private int currentIndex;
+    TMP_FontAsset _forcedFont;
 
     void Awake()
     {
@@ -68,7 +69,28 @@ public class SettingsSelector : MonoBehaviour
     public void RefreshOptionText()
     {
         if (optionText == null) return;
-        UIFont.SetText(optionText, GetCurrentOptionString());
+
+        string value = GetCurrentOptionString();
+        if (_forcedFont != null)
+        {
+            optionText.font = _forcedFont;
+            if (_forcedFont.material != null)
+                optionText.fontSharedMaterial = _forcedFont.material;
+            optionText.text = value;
+            optionText.ForceMeshUpdate();
+            return;
+        }
+
+        UIFont.SetText(optionText, value);
+    }
+
+    /// <summary>
+    /// Keep numbers/digits on a fixed font across locales (e.g. Cubic_11 for ratings).
+    /// </summary>
+    public void SetForcedFont(TMP_FontAsset font)
+    {
+        _forcedFont = font;
+        RefreshOptionText();
     }
 
     public void SetIndex(int index)
@@ -79,6 +101,30 @@ public class SettingsSelector : MonoBehaviour
     }
 
     public int GetCurrentIndex() => currentIndex;
+
+    /// <summary>
+    /// Reuse this selector as a left/right skipper with custom options (e.g. rating 1-5).
+    /// </summary>
+    public void ConfigureAsCustom(string[] customOptions, int startIndex = 0, TextMeshProUGUI label = null)
+    {
+        settingType = SettingType.Custom;
+        options = customOptions != null && customOptions.Length > 0
+            ? customOptions
+            : new[] { "1", "2", "3", "4", "5" };
+
+        if (label != null)
+            optionText = label;
+        else if (optionText == null)
+        {
+            var named = transform.Find("OptionText");
+            optionText = named != null
+                ? named.GetComponent<TextMeshProUGUI>()
+                : GetComponentInChildren<TextMeshProUGUI>();
+        }
+
+        InitializeOptions();
+        SetIndex(startIndex);
+    }
 
     public string GetCurrentOptionString()
     {

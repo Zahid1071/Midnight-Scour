@@ -63,21 +63,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296577
-    m_Localized: "Midnight Scour demosunu oynadığınız için teşekkür ederiz.
-
-Bu sürüm, nihai deneyimin küçük bir bölümünü sergilemeye çalışıyor. Tam oyun, bu temel gizlilik ve hayatta kalma döngüsünü birden fazla farklı oda ve ortama genişletecek ve şu anda tek bir odada mümkün olmayan kovalamaca sahnelerini çok daha iyi kullanacak.
-
-Midnight Scour, 2026'nın sonlarında piyasaya sürülmesi planlanıyor.
-
-Tam deneyim için oyunu Steam'de İstek Listenize ekleyin ve bizi destekleyin!"
+    m_Localized: "Midnight Scour oynadığınız için teşekkürler"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
-    m_Localized: "çıkmak için herhangi bir tuşa basın"
+    m_Localized: "çıkmak için esc tuşuna basın"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296579
-    m_Localized: "herhangi bir tuşa basın"
+    m_Localized: "esc tuşuna basın"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296580
@@ -602,6 +596,74 @@ Tam deneyim için oyunu Steam'de İstek Listenize ekleyin ve bizi destekleyin!"
       m_Items: []
   - m_Id: 5707318296710
     m_Localized: Yolu tıkıyorum.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296711
+    m_Localized: "Bu deneyimi nasıl puanlarsınız?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296712
+    m_Localized: Gerilim
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296713
+    m_Localized: Korku
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296714
+    m_Localized: "Eğlence"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296715
+    m_Localized: "*isteğe bağlı* geri bildirim alanı"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296716
+    m_Localized: "Gönder"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296717
+    m_Localized: "Merhaba, Haliç Üniversitesinden yeni mezun olmuş bir yazılım mühendisi olarak, bu kısıtlı sürümde size Midnight Scour'un neler olabileceğini göstermeye çalıştım. Önümüzdeki süreçte çevre ve atmosfer genişletilmesi ve burada atmış olduğumuz temellerin genişletilmesi, bütçenin arttırılması ile size tam sürümü sunmak istiyorum. Deneyiminizin iyileştirilmesi adına lütfen bize geri bildiriminizi bırakın."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296718
+    m_Localized: ?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296719
+    m_Localized: "Gönderiliyor..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296720
+    m_Localized: "Gönderildi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296721
+    m_Localized: "Tekrar dene"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296722
+    m_Localized: "Hepsini puanla"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296723
+    m_Localized: Kurulum gerekli
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296724
+    m_Localized: "İstek Listesine Ekle!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296725
+    m_Localized: Çık
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296726
+    m_Localized: "Zaten yaptım"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296727
+    m_Localized: "Güncellendi"
     m_Metadata:
       m_Items: []
   references:

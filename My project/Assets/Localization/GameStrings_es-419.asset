@@ -63,21 +63,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296577
-    m_Localized: "Gracias por jugar la demo de Midnight Scour.
-
-Esta versión intenta mostrar una pequeña parte de la experiencia final. El juego completo ampliará este ciclo central de sigilo y supervivencia a múltiples habitaciones y entornos distintos, y aprovechará mucho mejor las secuencias de persecución que actualmente son imposibles dentro de una sola habitación.
-
-Se espera que Midnight Scour se lance a finales de 2026.
-
-¡Agrégalo a tu lista de deseos de Steam para disfrutar de la experiencia completa y apoyarnos!"
+    m_Localized: "Gracias por jugar Midnight Scour"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
-    m_Localized: presiona cualquier tecla para salir
+    m_Localized: "presiona esc para salir"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296579
-    m_Localized: presiona cualquier tecla
+    m_Localized: presiona esc
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296580
@@ -602,6 +596,74 @@ Se espera que Midnight Scour se lance a finales de 2026.
       m_Items: []
   - m_Id: 5707318296710
     m_Localized: Estoy bloqueando el paso.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296711
+    m_Localized: "¿Cómo calificarías esta experiencia?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296712
+    m_Localized: "Tensión"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296713
+    m_Localized: Horror
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296714
+    m_Localized: "Diversión"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296715
+    m_Localized: "*opcional* área de comentarios"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296716
+    m_Localized: "Enviar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296717
+    m_Localized: "Hola — como ingeniero de software recién graduado de la Universidad Haliç, en esta versión limitada traté de mostrarles lo que Midnight Scour podría llegar a ser. En adelante, quiero ofrecerles la versión completa ampliando el mundo y la atmósfera, desarrollando las bases que sentamos aquí y aumentando el presupuesto. Por favor, déjennos sus comentarios para que podamos mejorar su experiencia."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296718
+    m_Localized: ?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296719
+    m_Localized: "Enviando..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296720
+    m_Localized: "Enviado"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296721
+    m_Localized: "Reintentar"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296722
+    m_Localized: Califica todo
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296723
+    m_Localized: "Configuración necesaria"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296724
+    m_Localized: ¡Agregar a la lista de deseos!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296725
+    m_Localized: Salir
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296726
+    m_Localized: "Ya lo hice"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296727
+    m_Localized: Actualizado
     m_Metadata:
       m_Items: []
   references:

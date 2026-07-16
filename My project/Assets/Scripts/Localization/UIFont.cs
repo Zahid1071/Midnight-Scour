@@ -55,6 +55,9 @@ public static class UIFont
     static TMP_FontAsset Chinese => _chinese ??= ResolveFont(ChineseFontNameToken);
     static TMP_FontAsset Japanese => _japanese ??= ResolveFont(JapaneseFontNameToken);
 
+    /// <summary>Cubic_11 — used for CJK UI and digit-only skippers that should stay consistent.</summary>
+    public static TMP_FontAsset ChineseOrNull => Chinese;
+
     public static TMP_FontAsset ForLocale(string code)
     {
         if (string.IsNullOrEmpty(code))

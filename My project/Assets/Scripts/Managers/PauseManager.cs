@@ -1,24 +1,27 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PauseManager : MonoBehaviour
 {
     [Header("UI")]
-    [SerializeField] private GameObject pauseRoot;       // fullscreen overlay with Continue/Settings/Quit
-    [SerializeField] private GameObject settingsPanel;   // reuse your Settings panel prefab
-    [SerializeField] private SettingsMenu settingsMenu;  // your existing script on settings panel
+    [SerializeField] private GameObject pauseRoot;
+    [SerializeField] private GameObject settingsPanel;
+    [SerializeField] private SettingsMenu settingsMenu;
 
     [Header("Scenes")]
     [SerializeField] private string mainMenuSceneName = "Main Menu";
 
     [Header("Player Control (optional)")]
-    [Tooltip("Any scripts you want disabled while paused (e.g., look/move, PlayerInteractor, etc.).")]
     [SerializeField] private MonoBehaviour[] disableOnPause;
 
     [Header("Cursor")]
     [SerializeField] private CursorLockMode lockModeWhilePlaying = CursorLockMode.Locked;
 
     public static bool IsPaused { get; private set; }
+
+    GameObject _mainButtons;
 
     void OnDestroy()
     {
@@ -28,55 +31,128 @@ public class PauseManager : MonoBehaviour
 
     void Awake()
     {
+        ResolvePauseUi();
+        WireSettingsBackButton();
+
         if (pauseRoot) pauseRoot.SetActive(false);
         if (settingsPanel) settingsPanel.SetActive(false);
-        Resume_Internal(); // ensure correct timescale & cursor on scene load
+        if (_mainButtons) _mainButtons.SetActive(true);
+        Resume_Internal();
     }
 
-    void Update()
+    void LateUpdate()
     {
         if (Keyboard.current == null || !Keyboard.current.escapeKey.wasPressedThisFrame)
             return;
 
         var demoEnd = DemoEndScreenUI.Instance;
-        if (demoEnd != null && demoEnd.IsShowing && demoEnd.IsExitReady)
+        if (demoEnd != null && demoEnd.IsShowing)
             return;
 
         if (IsPaused)
-            OnContinue();
+        {
+            if (IsSettingsOpen())
+                OnCloseSettings();
+            else
+                OnContinue();
+        }
         else
+        {
             Pause_Internal();
+        }
     }
-    
 
-    // --- Buttons ---
+    void ResolvePauseUi()
+    {
+        if (pauseRoot == null)
+            return;
+
+        var buttons = pauseRoot.transform.Find("Main Buttons");
+        if (buttons != null)
+            _mainButtons = buttons.gameObject;
+
+        if (settingsPanel == null)
+        {
+            foreach (var t in pauseRoot.GetComponentsInChildren<Transform>(true))
+            {
+                if (t.name == "Settings  Panel" || t.name == "Settings  Panel Pause")
+                {
+                    settingsPanel = t.gameObject;
+                    break;
+                }
+            }
+        }
+
+        if (settingsMenu == null && settingsPanel != null)
+            settingsMenu = settingsPanel.GetComponent<SettingsMenu>()
+                ?? settingsPanel.GetComponentInChildren<SettingsMenu>(true);
+    }
+
+    void WireSettingsBackButton()
+    {
+        if (settingsPanel == null)
+            return;
+
+        foreach (var button in settingsPanel.GetComponentsInChildren<Button>(true))
+        {
+            if (button == null || button.gameObject.name != "Back Button")
+                continue;
+
+            button.onClick.RemoveListener(OnCloseSettings);
+            button.onClick.AddListener(OnCloseSettings);
+            break;
+        }
+    }
+
     public void OnContinue()
     {
         if (settingsPanel) settingsPanel.SetActive(false);
+        if (_mainButtons) _mainButtons.SetActive(true);
         if (pauseRoot) pauseRoot.SetActive(false);
+
+        if (EventSystem.current != null)
+            EventSystem.current.SetSelectedGameObject(null);
+
         Resume_Internal();
     }
 
     public void OnOpenSettings()
     {
-        if (settingsPanel == null) return;
+        if (settingsPanel == null)
+        {
+            ResolvePauseUi();
+            if (settingsPanel == null) return;
+        }
+
         HudManager.Instance?.ClearSubtitle();
-        if (pauseRoot) pauseRoot.SetActive(false);
+
+        if (_mainButtons != null)
+            _mainButtons.SetActive(false);
+        else if (pauseRoot != null
+                 && (settingsPanel == null || !settingsPanel.transform.IsChildOf(pauseRoot.transform)))
+            pauseRoot.SetActive(false);
+
+        if (pauseRoot != null
+            && settingsPanel != null
+            && settingsPanel.transform.IsChildOf(pauseRoot.transform)
+            && !pauseRoot.activeSelf)
+            pauseRoot.SetActive(true);
+
         settingsPanel.SetActive(true);
         settingsMenu?.BeginEditing();
     }
 
     public void OnCloseSettings()
     {
-        settingsMenu?.CancelEditing();
         if (settingsPanel) settingsPanel.SetActive(false);
-        if (pauseRoot) pauseRoot.SetActive(true);
+        if (_mainButtons != null)
+            _mainButtons.SetActive(true);
+        else if (pauseRoot)
+            pauseRoot.SetActive(true);
+
+        settingsMenu?.CancelEditing();
     }
 
-    /// <summary>
-    /// Pause menüsündeki Save Game butonu — <see cref="SaveManager.Instance"/> kullanır;
-    /// Main Menu'den gelindiğinde sahnedeki yedek <c>SaveManager</c> yok edildiği için doğrudan referans kırılır.
-    /// </summary>
     public void SaveGameFromPauseMenu()
     {
         SaveManager.Instance?.SaveGame();
@@ -99,9 +175,7 @@ public class PauseManager : MonoBehaviour
         LoadingScreenController.LoadScene(mainMenuSceneName);
     }
 
-
-    // --- Core pause/resume ---
-    private void Pause_Internal()
+    void Pause_Internal()
     {
         IsPaused = true;
         PlayerControlGate.Acquire(PlayerControlGate.ReasonPause);
@@ -110,26 +184,31 @@ public class PauseManager : MonoBehaviour
 
         HudManager.Instance?.ClearSubtitle();
 
+        if (settingsPanel) settingsPanel.SetActive(false);
+        if (_mainButtons) _mainButtons.SetActive(true);
         if (pauseRoot) pauseRoot.SetActive(true);
 
-        foreach (var mb in disableOnPause) if (mb) mb.enabled = false;
+        foreach (var mb in disableOnPause)
+            if (mb) mb.enabled = false;
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
     }
 
-    private void Resume_Internal()
+    void Resume_Internal()
     {
         IsPaused = false;
         PlayerControlGate.Release(PlayerControlGate.ReasonPause);
         Time.timeScale = 1f;
         AudioListener.pause = false;
 
-        foreach (var mb in disableOnPause) if (mb) mb.enabled = true;
+        foreach (var mb in disableOnPause)
+            if (mb) mb.enabled = true;
 
         Cursor.visible = false;
         Cursor.lockState = lockModeWhilePlaying;
     }
 
-    
+    bool IsSettingsOpen() =>
+        settingsPanel != null && settingsPanel.activeSelf && settingsPanel.activeInHierarchy;
 }

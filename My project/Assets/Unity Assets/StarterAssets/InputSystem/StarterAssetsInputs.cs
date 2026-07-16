@@ -68,12 +68,24 @@ namespace StarterAssets
 		
 		private void OnApplicationFocus(bool hasFocus)
 		{
+			// PauseManager owns cursor during gameplay and pause menus.
+			if (PauseManager.IsPaused)
+				return;
+
+			var demoEnd = DemoEndScreenUI.Instance;
+			if (demoEnd != null && demoEnd.IsShowing)
+				return;
+
+			if (!hasFocus)
+				return;
+
 			SetCursorState(cursorLocked);
 		}
 
 		private void SetCursorState(bool newState)
 		{
 			Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
+			Cursor.visible = !newState;
 		}
 	}
 	

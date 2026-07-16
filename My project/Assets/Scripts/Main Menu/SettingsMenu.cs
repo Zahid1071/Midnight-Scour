@@ -145,19 +145,30 @@ public class SettingsMenu : MonoBehaviour
     /// </summary>
     /// <summary>
     /// Back button handler for both main menu and pause menu settings panels.
+    /// Pause gameplay settings must win over any leftover MainMenuUI in the editor.
     /// </summary>
     public void ClosePanel()
     {
-        var mainMenu = Object.FindFirstObjectByType<MainMenuUI>(FindObjectsInactive.Include);
+        var pause = Object.FindFirstObjectByType<PauseManager>(FindObjectsInactive.Include);
+        if (pause != null && (PauseManager.IsPaused || gameObject.activeInHierarchy))
+        {
+            // Pause settings panel is nested under Pause Root — always go through PauseManager.
+            if (PauseManager.IsPaused
+                || pause.transform.root == transform.root)
+            {
+                pause.OnCloseSettings();
+                return;
+            }
+        }
+
+        var mainMenu = Object.FindFirstObjectByType<MainMenuUI>(FindObjectsInactive.Exclude);
         if (mainMenu != null)
         {
             mainMenu.CloseSettingsWithoutApply();
             return;
         }
 
-        var pause = Object.FindFirstObjectByType<PauseManager>(FindObjectsInactive.Include);
-        if (pause != null)
-            pause.OnCloseSettings();
+        pause?.OnCloseSettings();
     }
 
     public void ApplyAndSave()

@@ -595,6 +595,74 @@ MonoBehaviour:
     m_Key: gameplay.blocking_way
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296711
+    m_Key: demo.rate_prompt
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296712
+    m_Key: demo.rate_tension
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296713
+    m_Key: demo.rate_horror
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296714
+    m_Key: demo.rate_fun
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296715
+    m_Key: demo.feedback_optional
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296716
+    m_Key: demo.submit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296717
+    m_Key: demo.developer_note
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296718
+    m_Key: demo.rate_unset
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296719
+    m_Key: demo.submit_sending
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296720
+    m_Key: demo.submit_submitted
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296721
+    m_Key: demo.submit_retry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296722
+    m_Key: demo.submit_rate_all
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296723
+    m_Key: demo.submit_setup_needed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296724
+    m_Key: demo.wishlist_now
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296725
+    m_Key: demo.exit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296726
+    m_Key: demo.submit_already
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296727
+    m_Key: demo.submit_updated
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

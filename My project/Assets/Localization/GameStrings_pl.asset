@@ -63,21 +63,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296577
-    m_Localized: "Dziękujemy za granie w wersję demonstracyjną Midnight Scour.
-
-Ta wersja stara się pokazać niewielką część finalnego doświadczenia. Pełna gra rozszerzy ten podstawowy cykl skradania się i przetrwania o wiele różnych pomieszczeń i otoczeń oraz znacznie lepiej wykorzysta sekwencje pościgu, które obecnie są niemożliwe w obrębie jednego pomieszczenia.
-
-Premiera Midnight Scour planowana jest na koniec 2026 roku.
-
-Dodaj grę do listy życzeń na Steam, aby poznać pełne doświadczenie i wesprzeć nas!"
+    m_Localized: "Dziękujemy za granie w Midnight Scour"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
-    m_Localized: "naciśnij dowolny klawisz, aby wyjść"
+    m_Localized: "naciśnij esc, aby wyjść"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296579
-    m_Localized: "naciśnij dowolny klawisz"
+    m_Localized: "naciśnij esc"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296580
@@ -602,6 +596,74 @@ Dodaj grę do listy życzeń na Steam, aby poznać pełne doświadczenie i wespr
       m_Items: []
   - m_Id: 5707318296710
     m_Localized: Blokuję przejście.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296711
+    m_Localized: "Jak oceniłbyś to doświadczenie?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296712
+    m_Localized: Napięcie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296713
+    m_Localized: Horror
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296714
+    m_Localized: Zabawa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296715
+    m_Localized: "*opcjonalne* pole opinii"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296716
+    m_Localized: Wyślij
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296717
+    m_Localized: "Cześć — jako inżynier oprogramowania, który właśnie ukończył Uniwersytet Haliç, w tej ograniczonej wersji starałem się pokazać, czym Midnight Scour może się stać. W kolejnym etapie chcę dostarczyć wam pełną wersję, rozwijając świat i atmosferę, rozbudowując fundamenty, które tu położyliśmy, oraz zwiększając budżet. Proszę, zostawcie nam opinię, żebyśmy mogli poprawić wasze doświadczenie."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296718
+    m_Localized: ?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296719
+    m_Localized: "Wysyłanie..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296720
+    m_Localized: "Wysłano"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296721
+    m_Localized: "Ponów"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296722
+    m_Localized: Oceń wszystko
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296723
+    m_Localized: "Wymagana konfiguracja"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296724
+    m_Localized: Dodaj do listy życzeń!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296725
+    m_Localized: Wyjdź
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296726
+    m_Localized: "Już to zrobiłeś"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296727
+    m_Localized: Zaktualizowano
     m_Metadata:
       m_Items: []
   references:

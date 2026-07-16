@@ -63,21 +63,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296577
-    m_Localized: "Thank you for playing the Midnight Scour demo.
-
-This build tries to showcase a small part of the final experience. The full game will expand this core stealth and survival loop across multiple distinct rooms and environments and make better use of chase sequences currently impossible in a single room.
-
-Midnight Scour is scheduled for release in late 2026.
-
-Wishlist it on Steam for the full experience and support us!"
+    m_Localized: "Thank you for playing Midnight Scour"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
-    m_Localized: press any key to exit
+    m_Localized: press esc to exit
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296579
-    m_Localized: press any key
+    m_Localized: press esc
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296580
@@ -602,6 +596,74 @@ Wishlist it on Steam for the full experience and support us!"
       m_Items: []
   - m_Id: 5707318296710
     m_Localized: I'm blocking the way.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296711
+    m_Localized: "How would you rate this experience?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296712
+    m_Localized: "Tension"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296713
+    m_Localized: Horror
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296714
+    m_Localized: "Fun"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296715
+    m_Localized: "*optional* feedback area"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296716
+    m_Localized: Submit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296717
+    m_Localized: "Hi — as a software engineer who just graduated from Haliç University, I tried to show you in this limited release what Midnight Scour could become. Going forward, I want to bring you the full version by expanding the world and atmosphere, building on the foundations we laid here, and growing the budget. Please leave us your feedback so we can improve your experience."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296718
+    m_Localized: ?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296719
+    m_Localized: "Sending..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296720
+    m_Localized: Submitted
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296721
+    m_Localized: Retry
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296722
+    m_Localized: Rate all
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296723
+    m_Localized: "Setup needed"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296724
+    m_Localized: Wishlist Now!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296725
+    m_Localized: Exit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296726
+    m_Localized: "Already did that"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296727
+    m_Localized: Updated
     m_Metadata:
       m_Items: []
   references:

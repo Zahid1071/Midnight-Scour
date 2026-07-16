@@ -63,21 +63,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296577
-    m_Localized: "『Midnight Scour』の体験版をプレイしていただき、ありがとうございます。
-
-このビルドは、最終的な体験のほんの一部をお見せするためのものです。製品版では、この核となる潜入と生存のループを複数の異なる部屋や環境にまで拡張し、単一の部屋では実現できなかった追跡シーケンスをより効果的に活用します。
-
-『Midnight Scour』は2026年後半の発売を予定しています。
-
-ぜひSteamのウィッシュリストに追加して、完全な体験と私たちの開発を応援してください！"
+    m_Localized: "Midnight Scourをプレイしていただき、ありがとうございます"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
-    m_Localized: "何かキーを押すと終了します"
+    m_Localized: Escキーで終了
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296579
-    m_Localized: "何かキーを押してください"
+    m_Localized: "Escキー"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296580
@@ -602,6 +596,74 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5707318296710
     m_Localized: 道を塞いでいる。
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296711
+    m_Localized: この体験をどう評価しますか？
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296712
+    m_Localized: 緊張感
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296713
+    m_Localized: ホラー
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296714
+    m_Localized: 楽しさ
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296715
+    m_Localized: *任意* フィードバック欄
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296716
+    m_Localized: 送信
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296717
+    m_Localized: "こんにちは。Haliç大学を卒業したばかりのソフトウェアエンジニアとして、この限定版で Midnight Scour がどんな作品になり得るかをお伝えしようと努めました。今後は、世界観と雰囲気の拡張、ここで築いた基盤の発展、予算の拡大によって、フル版をお届けしたいと考えています。体験をより良くするために、ぜひフィードバックをお寄せください。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296718
+    m_Localized: ?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296719
+    m_Localized: 送信中...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296720
+    m_Localized: 送信済み
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296721
+    m_Localized: 再試行
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296722
+    m_Localized: すべて評価してください
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296723
+    m_Localized: 設定が必要です
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296724
+    m_Localized: ウィッシュリストに追加！
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296725
+    m_Localized: 終了
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296726
+    m_Localized: 送信済みです
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296727
+    m_Localized: "更新済み"
     m_Metadata:
       m_Items: []
   references:
