@@ -76,6 +76,7 @@ MonoBehaviour:
   tensionSFXBank:
   - {fileID: 8300000, guid: 5044f4d4737e3cb47b4ce02487db2729, type: 3}
   - {fileID: 8300000, guid: 582f50205d17f1848bf3d8912008438f, type: 3}
+  - {fileID: 8300000, guid: faf77f6b98dab4147a9305d061697b66, type: 3}
   itemDropLandClip: {fileID: 8300000, guid: a21b4179f3ffd8e4c86b7c2ddb3bf9a7, type: 3}
   musicSourceA: {fileID: 228075428072045804}
   musicSourceB: {fileID: 7535631578845724816}

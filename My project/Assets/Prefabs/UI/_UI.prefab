@@ -640,8 +640,8 @@ RectTransform:
   - {fileID: 5757797014725462252}
   - {fileID: 1163871515829681811}
   - {fileID: 1006722102016960151}
-  - {fileID: 2856593356634175681}
   - {fileID: 6666550532038301722}
+  - {fileID: 2856593356634175681}
   - {fileID: 5632689050405024072}
   - {fileID: 8865070192390077703}
   m_Father: {fileID: 5069619334127161802}
@@ -3465,7 +3465,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   panelGroup: {fileID: 8050981610920396174}
   feedbackUI: {fileID: 8776970964532868541}
-  logo: {fileID: 0}
+  logo: {fileID: 1963617195515101558}
   exitHint: {fileID: 0}
   wishlistUrl: https://store.steampowered.com/app/4725700/Midnight_Scour/?utm_source=demo&utm_medium=game&utm_campaign=demo_end_screen
   fadeInDuration: 0.1
@@ -8249,8 +8249,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 300, y: -230}
-  m_SizeDelta: {x: 300, y: 50}
+  m_AnchoredPosition: {x: 200, y: -230}
+  m_SizeDelta: {x: 600, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4182339667561685184
 CanvasRenderer:
@@ -8280,7 +8280,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: press any key
+  m_text: press anything to continue
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fca6355ee4a564c4ca900e2eeb4a9ad6, type: 2}
   m_sharedMaterial: {fileID: 1517768226830932575, guid: fca6355ee4a564c4ca900e2eeb4a9ad6, type: 2}
@@ -8289,8 +8289,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4278190335
+  m_fontColor: {r: 1, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -8314,8 +8314,8 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -9219,6 +9219,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6101417840706111398, guid: fb5a73839c1453248b03d87db6e1ae26, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6209769334783005080, guid: fb5a73839c1453248b03d87db6e1ae26, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -9332,7 +9336,9 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2705496845916832578, guid: fb5a73839c1453248b03d87db6e1ae26, type: 3}
+    - {fileID: 4134553736093630615, guid: fb5a73839c1453248b03d87db6e1ae26, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fb5a73839c1453248b03d87db6e1ae26, type: 3}

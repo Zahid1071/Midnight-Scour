@@ -71,7 +71,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296579
-    m_Localized: "naciśnij esc"
+    m_Localized: "naciśnij dowolny klawisz, aby kontynuować"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296580

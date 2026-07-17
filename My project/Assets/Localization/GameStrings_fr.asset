@@ -71,7 +71,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296579
-    m_Localized: "appuyez sur échappe"
+    m_Localized: "appuyez sur une touche pour continuer"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296580
