@@ -271,6 +271,7 @@ MonoBehaviour:
   chineseFont: {fileID: 11400000, guid: 1191fedcc45f92d449c78de134d7c6b9, type: 2}
   japaneseFont: {fileID: 11400000, guid: cdcf5e30d7a8ec249a153f3d2fc4d3e3, type: 2}
   russianFont: {fileID: 11400000, guid: 7f4fd1a59e541f440854bb866cb800fa, type: 2}
+  thaiFont: {fileID: 11400000, guid: 08e232f318efeef46925710fa82aaac0, type: 2}
   applyOnAwake: 1
   applyOnEnable: 1
 --- !u!1 &3215503553850409983

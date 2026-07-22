@@ -69,18 +69,34 @@ public class ControlsPanelHint : MonoBehaviour
     void ResolveKeyLabels()
     {
         if (interactKeyLabel == null)
-        {
-            var t = transform.Find("Rows/Interact Key/Text (TMP)");
-            if (t != null)
-                interactKeyLabel = t.GetComponent<TextMeshProUGUI>();
-        }
+            interactKeyLabel = FindKeyBadgeLabel("Interact Key");
 
         if (dropKeyLabel == null)
+            dropKeyLabel = FindKeyBadgeLabel("G Key");
+
+        if (crouchKeyLabel == null)
+            crouchKeyLabel = FindKeyBadgeLabel("CTRL key");
+
+        if (runKeyLabel == null)
+            runKeyLabel = FindKeyBadgeLabel("LShift", "Shift key", "Shift Key", "Shift");
+    }
+
+    TextMeshProUGUI FindKeyBadgeLabel(params string[] parentNames)
+    {
+        foreach (var tmp in GetComponentsInChildren<TextMeshProUGUI>(true))
         {
-            var t = transform.Find("Rows/G Key/Text (TMP)");
-            if (t != null)
-                dropKeyLabel = t.GetComponent<TextMeshProUGUI>();
+            if (tmp == null || tmp.transform.parent == null)
+                continue;
+
+            string parentName = tmp.transform.parent.name;
+            for (int i = 0; i < parentNames.Length; i++)
+            {
+                if (parentName == parentNames[i])
+                    return tmp;
+            }
         }
+
+        return null;
     }
 
     IEnumerator RefreshKeyLabelsWhenReady()
@@ -91,6 +107,9 @@ public class ControlsPanelHint : MonoBehaviour
 
     void RefreshKeyLabels()
     {
+        // Description labels (Interact / Drop / …) also need the locale font.
+        UIFont.ApplyTree(transform);
+
         if (interactKeyLabel != null)
             UIFont.SetText(interactKeyLabel, Loc.Get("controls.key.interact"));
 
@@ -102,6 +121,9 @@ public class ControlsPanelHint : MonoBehaviour
 
         if (runKeyLabel != null)
             UIFont.SetText(runKeyLabel, Loc.Get("controls.key.run"));
+
+        foreach (var label in GetComponentsInChildren<LocalizedUILabel>(true))
+            label.Refresh();
     }
 
     void ResolveCompanionGroup()

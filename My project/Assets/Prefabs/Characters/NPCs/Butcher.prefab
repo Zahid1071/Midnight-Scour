@@ -61,6 +61,11 @@ MonoBehaviour:
   poiLookDirector: {fileID: 0}
   captureDistance: 1
   hideExitSecondsBeforeCapture: 0.5
+  ambushMetalRustleSfx: {fileID: 8300000, guid: 4fc16457f3c91174c9676e76d8d96a71, type: 3}
+  ambushRustleVolume: 10
+  ambushPositionTolerance: 0.75
+  ambushTurnSpeed: 120
+  ambushTurnAngleThreshold: 45
   chaseReplanCooldown: 0.25
   chaseReplanDist: 0.75
   walkSpeed: 0.2
@@ -248,13 +253,13 @@ MonoBehaviour:
   chaseSweetenerClips:
   - {fileID: 8300000, guid: 06dfd2aeff582994ab720aa5debc9bd4, type: 3}
   - {fileID: 8300000, guid: ea945d9bc35a6d54cba29305b11d51bc, type: 3}
-  chaseSweetenerChance: 0.7
-  chaseSweetenerVolume: 0.55
+  chaseSweetenerChance: 0.8
+  chaseSweetenerVolume: 1
   mixerGroup: {fileID: 5656172210110584295, guid: d0494497af355c44f913d2de9798dce5, type: 2}
   walkReverbZoneMix: 0
   runReverbZoneMix: 0.85
-  walkVolume: 1
-  runVolume: 2
+  walkVolume: 1.5
+  runVolume: 1
   sneakVolume: 0.4
   walkPitchRange: {x: 0.97, y: 1.03}
   runPitchRange: {x: 0.6, y: 0.8}
@@ -272,6 +277,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   waypointTolerance: 0.2
   stuckTimeout: 3
+  doorOpenWaitTimeout: 2.5
+  doorTransitTimeout: 12
   logPlannedRoute: 1
 --- !u!82 &4134655764735739326
 AudioSource:
@@ -8395,7 +8402,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2288840673838058343
 Transform:
   m_ObjectHideFlags: 0

@@ -820,6 +820,7 @@ MonoBehaviour:
   chineseFont: {fileID: 11400000, guid: 1191fedcc45f92d449c78de134d7c6b9, type: 2}
   japaneseFont: {fileID: 11400000, guid: cdcf5e30d7a8ec249a153f3d2fc4d3e3, type: 2}
   russianFont: {fileID: 11400000, guid: 7f4fd1a59e541f440854bb866cb800fa, type: 2}
+  thaiFont: {fileID: 11400000, guid: 08e232f318efeef46925710fa82aaac0, type: 2}
   applyOnAwake: 1
   applyOnEnable: 1
 --- !u!1 &608906227600500912
@@ -5297,10 +5298,10 @@ MonoBehaviour:
   hideDuringHintGroup: {fileID: 0}
   companionFadeOutDuration: 0.35
   companionFadeInDuration: 0.5
-  interactKeyLabel: {fileID: 0}
-  dropKeyLabel: {fileID: 0}
-  crouchKeyLabel: {fileID: 0}
-  runKeyLabel: {fileID: 0}
+  interactKeyLabel: {fileID: 7820392820435016361}
+  dropKeyLabel: {fileID: 7524002395729145247}
+  crouchKeyLabel: {fileID: 5960163311291791265}
+  runKeyLabel: {fileID: 8753084692585207055}
 --- !u!1 &6632385363797724024
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,0 +1,671 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: GameStrings_th
+  m_EditorClassIdentifier: 
+  m_LocaleId:
+    m_Code: th
+  m_SharedData: {fileID: 11400000, guid: 23aaa987a5caa724aac997d9b6cae0ae, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 5707297325057
+    m_Localized: "ออก"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325056
+    m_Localized: "การตั้งค่า"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325058
+    m_Localized: "กลับ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325059
+    m_Localized: "ใช้"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325060
+    m_Localized: "ค่าเริ่มต้น"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1843970048000
+    m_Localized: "เล่นต่อ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325061
+    m_Localized: "เกมใหม่"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325062
+    m_Localized: "เครดิต"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325063
+    m_Localized: "บันทึกเกม"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707297325064
+    m_Localized: "หยุดชั่วคราว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296576
+    m_Localized: "เล่นต่อ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296577
+    m_Localized: "ขอบคุณที่เล่น Midnight Scour"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296578
+    m_Localized: "กด esc เพื่อออก"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296579
+    m_Localized: "กดปุ่มใดก็ได้เพื่อดำเนินการต่อ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296580
+    m_Localized: "คุณสามารถอ่านบันทึกเพื่อหาเบาะแส"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296581
+    m_Localized: "ใช้ที่ซ่อนเพื่อหลบฆาตกร"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296582
+    m_Localized: "การส่งเสียงอาจทำให้ฆาตกรรู้ตัว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296583
+    m_Localized: "กด {0} เพื่อทิ้งไอเท็มที่เลือก"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296584
+    m_Localized: "ใช้ไอเท็ม/รวมไอเท็ม"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296585
+    m_Localized: "โต้ตอบ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296586
+    m_Localized: "การตั้งค่า"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296587
+    m_Localized: "การแสดงผล"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296588
+    m_Localized: "เสียง"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296589
+    m_Localized: "การควบคุม"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296590
+    m_Localized: "การเล่นเกม"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296591
+    m_Localized: "ทั่วไป"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296592
+    m_Localized: "ระดับเสียงหลัก"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296593
+    m_Localized: "ระดับเสียงเพลง"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296594
+    m_Localized: "ระดับเสียงเอฟเฟกต์"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296595
+    m_Localized: "ความสว่าง"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296596
+    m_Localized: "ความไวเมาส์"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296597
+    m_Localized: "ความละเอียด"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296598
+    m_Localized: "เต็มจอ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296599
+    m_Localized: "โหมดการแสดงผล"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296600
+    m_Localized: "คุณภาพ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296601
+    m_Localized: VSync
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296602
+    m_Localized: "บันทึกอัตโนมัติ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296603
+    m_Localized: "ภาษา"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296604
+    m_Localized: "อันนี้ใช้ที่นี่ไม่ได้"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296605
+    m_Localized: "ล็อกอยู่"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296606
+    m_Localized: "เอื้อมไม่ถึง"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296607
+    m_Localized: "ขยับไม่ได้"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296608
+    m_Localized: "รอสักครู่"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296609
+    m_Localized: "คุณกำลังซ่อนอยู่แล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296610
+    m_Localized: "ต้องหายใจให้ทันก่อน"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296611
+    m_Localized: "เหนื่อยเกินไปที่จะซ่อน"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296612
+    m_Localized: "ฉันต้องออกจากที่นี่!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296613
+    m_Localized: "คุณต้องมี {0}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296614
+    m_Localized: "ใช้ {0} แล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296615
+    m_Localized: "{0} ปลดล็อกแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296616
+    m_Localized: "ถอดสลักออกแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296617
+    m_Localized: "ติดอยู่"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296618
+    m_Localized: "การโต้ตอบนี้ยังไม่ได้ตั้งค่า"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296619
+    m_Localized: "ไม่มีอะไรจะเก็บ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296620
+    m_Localized: "เก็บแล้ว: {0}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296621
+    m_Localized: "{0} ติดตั้งแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296622
+    m_Localized: "เลือกชิ้นส่วนรถจากกระเป๋าก่อน"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296623
+    m_Localized: "คุณไม่มี {0}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296624
+    m_Localized: "ติดตั้ง {0} แล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296625
+    m_Localized: "ช่องนี้ยังไม่ได้ตั้งค่า"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296626
+    m_Localized: "ลำดับการหลบหนียังไม่ได้ตั้งค่า"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296627
+    m_Localized: "ติดตั้งชิ้นส่วนครบแล้ว คุณหนีรอดแล้ว!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296628
+    m_Localized: "ยังขาด: {0}"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296629
+    m_Localized: "กำลังโหลด..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296630
+    m_Localized: "เหล็กเส้น"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296631
+    m_Localized: "กระดูก"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296632
+    m_Localized: "กระดูก"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296633
+    m_Localized: "กุญแจห้องใต้ดิน"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296634
+    m_Localized: "กุญแจกล่องโลหะ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296635
+    m_Localized: "หมากฝรั่ง"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296636
+    m_Localized: "คลัตช์"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296637
+    m_Localized: "ค้อน"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296638
+    m_Localized: "ที่ดูดส้วม"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296639
+    m_Localized: "ไขควง"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296640
+    m_Localized: "หัวเทียน"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296641
+    m_Localized: "แจกัน"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296642
+    m_Localized: "ประแจ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296643
+    m_Localized: "เก็บเหล็กเส้นแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296644
+    m_Localized: "เพิ่มกระดูกเข้ากระเป๋าแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296645
+    m_Localized: "เพิ่มกระดูกติดหมากฝรั่งเข้ากระเป๋าแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296646
+    m_Localized: "เก็บกุญแจแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296647
+    m_Localized: "เก็บกุญแจเล็กแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296648
+    m_Localized: "เก็บหมากฝรั่งแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296649
+    m_Localized: "เก็บค้อนแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296650
+    m_Localized: "เก็บที่ดูดส้วมแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296651
+    m_Localized: "เก็บไขควงแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296652
+    m_Localized: "ข้างในมีอะไรอยู่"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296653
+    m_Localized: "เก็บประแจแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296654
+    m_Localized: "อุดตันสนิท"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296655
+    m_Localized: "น้ำหมดไปแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296656
+    m_Localized: "คงต้องเคาะด้วยอะไรสักอย่างถึงจะหมุนได้ มันสนิมติดแน่น"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296657
+    m_Localized: "ใช้เหล็กเส้นกับปากกาจับ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296658
+    m_Localized: "ใช้ค้อนกับเหล็กเส้น"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296659
+    m_Localized: "ติดหมากฝรั่งบนกระดูกแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296660
+    m_Localized: "มันลื่นตลอด ต้องติดอะไรไว้บนกระดูก"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296661
+    m_Localized: "ไขควงหักแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296662
+    m_Localized: "เคล็ดลับ: ใช้ที่ซ่อนเพื่อหนีศัตรู"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296663
+    m_Localized: "เคล็ดลับ: สำรวจอย่างระมัดระวัง อาจพบเบาะแสสำคัญ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296664
+    m_Localized: "เคล็ดลับ: เงียบๆ ไว้ ศัตรูได้ยินคุณ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296665
+    m_Localized: "เคล็ดลับ: ไฟฉายมีแบตจำกัด ใช้อย่างฉลาด"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296666
+    m_Localized: "เคล็ดลับ: ประตูบางบานต้องใช้กุญแจพิเศษ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296667
+    m_Localized: "เคล็ดลับ: การวิ่งอาจดึงดูดความสนใจของศัตรู"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296668
+    m_Localized: "เคล็ดลับ: อ่านบันทึกและเอกสารเพื่อเปิดเผยเรื่องราว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296669
+    m_Localized: "เคล็ดลับ: ซ่อนตามมุมมืดช่วยให้พ้นจากศัตรู"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296670
+    m_Localized: "ไม่มีอะไรที่นี่"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296671
+    m_Localized: "กระเป๋าเต็มแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296672
+    m_Localized: "ตะแกรงยังถูกยึดด้วยสลักอยู่"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296673
+    m_Localized: "ยืนยัน"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296674
+    m_Localized: "ใช่"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296675
+    m_Localized: "ไม่"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296676
+    m_Localized: "แน่ใจหรือว่าต้องการออก?\n\nความคืบหน้าที่ยังไม่ได้บันทึกจะหายไป"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296677
+    m_Localized: "ออก"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296678
+    m_Localized: "ออก"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296679
+    m_Localized: "แน่ใจหรือว่าต้องการกลับเมนูหลัก?\n\nความคืบหน้าที่ยังไม่ได้บันทึกจะหายไป"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296680
+    m_Localized: "เมนูหลัก"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296681
+    m_Localized: "กลับ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296682
+    m_Localized: "คิดว่าในแจกันใบนั้นมีอะไรอยู่"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296683
+    m_Localized: "ทิ้ง {0} แล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296684
+    m_Localized: "เปิด"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296685
+    m_Localized: "ปิด"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296686
+    m_Localized: "เต็มจอ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296687
+    m_Localized: "หน้าต่าง"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296688
+    m_Localized: "มีขอบ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296689
+    m_Localized: "เต็มจอเฉพาะ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296690
+    m_Localized: "ต่ำมาก"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296691
+    m_Localized: "ต่ำ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296692
+    m_Localized: "กลาง"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296693
+    m_Localized: "สูง"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296694
+    m_Localized: "สูงมาก"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296695
+    m_Localized: "อัลตร้า"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296696
+    m_Localized: "ใช้ไอเท็ม"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296697
+    m_Localized: "ทิ้ง"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296698
+    m_Localized: "ไม่มีอะไรในระยะเอื้อม"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296699
+    m_Localized: "ส้วมตัน หาที่ดูดส้วมไม่เจอ เคยอยู่ในถังที่ไหนสักแห่ง แต่จำไม่ได้ว่าที่ไหน"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296701
+    m_Localized: "เก็บคลัตช์แล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296700
+    m_Localized: "เก็บหัวเทียนแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296702
+    m_Localized: "ำ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296703
+    m_Localized: "เ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296704
+    m_Localized: "คงต้องเคาะด้วยอะไรสักอย่างถึงจะหมุนได้ มันสนิมติดแน่น"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296705
+    m_Localized: "กุญแจล็อกนี้ดูเหมือนจะหักง่าย"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296706
+    m_Localized: "ย่อตัว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296707
+    m_Localized: "วิ่ง"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296708
+    m_Localized: Ctrl
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296709
+    m_Localized: Shift
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296710
+    m_Localized: "ฉันขวางทางอยู่"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296711
+    m_Localized: "คุณจะให้คะแนนประสบการณ์นี้อย่างไร?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296712
+    m_Localized: "ความตึงเครียด"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296713
+    m_Localized: "ความน่ากลัว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296714
+    m_Localized: "ความสนุก"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296715
+    m_Localized: "*ไม่บังคับ* พื้นที่แสดงความคิดเห็น"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296716
+    m_Localized: "ส่ง"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296717
+    m_Localized: "สวัสดี - ในฐานะวิศวกรซอฟต์แวร์ที่เพิ่งจบจากมหาวิทยาลัยฮาลิช ในเวอร์ชันจำกัดนี้ผมพยายามแสดงให้เห็นว่า Midnight Scour สามารถเป็นอะไรได้บ้าง ต่อไปผมอยากนำเวอร์ชันเต็มมาให้คุณ โดยขยายโลกและบรรยากาศ ต่อยอดจากรากฐานที่วางไว้ที่นี่ และเพิ่มงบประมาณ โปรดฝากความคิดเห็นไว้ เพื่อให้เราปรับปรุงประสบการณ์ของคุณได้"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296718
+    m_Localized: "?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296719
+    m_Localized: "กำลังส่ง..."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296720
+    m_Localized: "ส่งแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296721
+    m_Localized: "ลองใหม่"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296722
+    m_Localized: "ให้คะแนนทั้งหมด"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296723
+    m_Localized: "ต้องตั้งค่า"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296724
+    m_Localized: "เพิ่มในรายการสิ่งที่อยากได้!"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296725
+    m_Localized: "ออก"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296726
+    m_Localized: "ส่งไปแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296727
+    m_Localized: "อัปเดตแล้ว"
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

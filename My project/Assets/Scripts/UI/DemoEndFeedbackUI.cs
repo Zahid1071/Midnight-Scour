@@ -423,6 +423,10 @@ public class DemoEndFeedbackUI : MonoBehaviour
         SetLabel(feedbackHintLabel, "demo.feedback_optional", FeedbackOptionalFallback);
         SetLabel(developerNoteLabel, "demo.developer_note", DeveloperNoteFallback);
 
+        FitLabelHeight(thankYouLabel, minHeight: 45f);
+        FitLabelHeight(developerNoteLabel, minHeight: 100f);
+        RebuildFormLayout();
+
         if (_submitting)
             return;
 
@@ -440,6 +444,35 @@ public class DemoEndFeedbackUI : MonoBehaviour
         if (label == null)
             return;
         UIFont.SetText(label, GetLoc(key, fallback));
+    }
+
+    /// <summary>
+    /// Long locales (Thai etc.) need the LayoutElement height to follow wrapped text,
+    /// otherwise Overflow paints over the rows below.
+    /// </summary>
+    static void FitLabelHeight(TextMeshProUGUI label, float minHeight)
+    {
+        if (label == null)
+            return;
+
+        label.ForceMeshUpdate();
+        float height = Mathf.Max(minHeight, label.preferredHeight + 8f);
+
+        var layout = label.GetComponent<LayoutElement>();
+        if (layout != null)
+            layout.preferredHeight = height;
+
+        var rt = label.rectTransform;
+        var size = rt.sizeDelta;
+        size.y = height;
+        rt.sizeDelta = size;
+    }
+
+    void RebuildFormLayout()
+    {
+        var root = formRoot != null ? formRoot : transform as RectTransform;
+        if (root != null)
+            LayoutRebuilder.ForceRebuildLayoutImmediate(root);
     }
 
     static string GetLoc(string key, string fallback)

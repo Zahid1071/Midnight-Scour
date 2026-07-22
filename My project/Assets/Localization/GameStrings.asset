@@ -23,6 +23,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: af99cb2a397a57140b54cb83ccf78c9e, type: 2}
   - {fileID: 11400000, guid: 7910a1fb7326a0241a37bbdb94607e4a, type: 2}
   - {fileID: 11400000, guid: 472abd35d18bbdf4c96fa9aafa86e390, type: 2}
+  - {fileID: 11400000, guid: 66265e837a98466c999013645a4b8de9, type: 2}
   m_Extensions: []
   m_Group: String Table
   references:

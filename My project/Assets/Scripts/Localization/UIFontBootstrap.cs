@@ -13,6 +13,7 @@ public class UIFontBootstrap : MonoBehaviour
     [SerializeField] TMP_FontAsset chineseFont;
     [SerializeField] TMP_FontAsset japaneseFont;
     [SerializeField] TMP_FontAsset russianFont;
+    [SerializeField] TMP_FontAsset thaiFont;
 
     [Header("When to apply")]
     [SerializeField] bool applyOnAwake = true;
@@ -53,5 +54,6 @@ public class UIFontBootstrap : MonoBehaviour
         UIFont.RegisterChinese(chineseFont);
         UIFont.RegisterJapanese(japaneseFont);
         UIFont.RegisterRussian(russianFont);
+        UIFont.RegisterThai(thaiFont);
     }
 }

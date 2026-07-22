@@ -11,13 +11,13 @@ public static class LocaleManager
 
     public static readonly string[] LocaleCodes =
     {
-        "en", "ja", "ru", "zh-Hans", "tr", "pl", "fr", "es-419", "pt-BR"
+        "en", "ja", "ru", "zh-Hans", "tr", "pl", "fr", "es-419", "pt-BR", "th"
     };
 
     public static readonly string[] LocaleNativeNames =
     {
         "English", "日本語", "Русский", "简体中文", "Türkçe",
-        "Polski", "Français", "Español (LATAM)", "Português (Brasil)"
+        "Polski", "Français", "Español (LATAM)", "Português (Brasil)", "ไทย"
     };
 
     /// <summary>Native endonym for the language picker (e.g. Türkçe, not Turkish).</summary>
@@ -189,6 +189,7 @@ public static class LocaleManager
         SystemLanguage.French => "fr",
         SystemLanguage.Portuguese => "pt-BR",
         SystemLanguage.Spanish => "es-419",
+        SystemLanguage.Thai => "th",
         _ => "en"
     };
 }

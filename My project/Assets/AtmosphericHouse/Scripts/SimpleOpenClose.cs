@@ -445,14 +445,14 @@ namespace FS_Atmo
                 yield break;
 
             if (handleOpenSound != null)
-                SoundManager.Instance.PlaySFXAt(handleOpenSound, primaryPosition,.2f);
+                SoundManager.Instance.PlaySFXAt(handleOpenSound, primaryPosition,.7f);
 
             if (openSound != null)
             {
                 if (handleOpenSound != null)
                     yield return new WaitForSeconds(openSoundDelayAfterHandle);
 
-                SoundManager.Instance.PlaySFXSafe(openSound, primaryPosition);
+                SoundManager.Instance.PlaySFXSafe(openSound, primaryPosition,5);
 
                 if (additionalPosition.HasValue)
                     SoundManager.Instance.PlaySFXSafe(openSound, additionalPosition.Value);

@@ -10,11 +10,13 @@ public static class UIFont
     const string PixelFontNameToken = "Pixelify";
     const string ChineseFontNameToken = "Cubic_11";
     const string JapaneseFontNameToken = "DotGothic";
+    const string ThaiFontNameToken = "NotoSansThai-Regular";
 
     static TMP_FontAsset _pixel;
     static TMP_FontAsset _chinese;
     static TMP_FontAsset _japanese;
     static TMP_FontAsset _russian;
+    static TMP_FontAsset _thai;
 
     public static void RegisterPixel(TMP_FontAsset font)
     {
@@ -40,20 +42,37 @@ public static class UIFont
             _russian = font;
     }
 
+    public static void RegisterThai(TMP_FontAsset font)
+    {
+        if (font != null)
+            _thai = font;
+    }
+
     static TMP_FontAsset ResolveFont(string nameToken)
     {
+        TMP_FontAsset fallback = null;
         foreach (var asset in Resources.FindObjectsOfTypeAll<TMP_FontAsset>())
         {
-            if (asset != null && asset.name.Contains(nameToken))
-                return asset;
+            if (asset == null || !asset.name.Contains(nameToken))
+                continue;
+
+            // Prefer the static Regular SDF over the broken variable-font SDF.
+            if (asset.name.Contains("Variable"))
+            {
+                fallback ??= asset;
+                continue;
+            }
+
+            return asset;
         }
 
-        return null;
+        return fallback;
     }
 
     static TMP_FontAsset Pixel => _pixel ??= ResolveFont(PixelFontNameToken);
     static TMP_FontAsset Chinese => _chinese ??= ResolveFont(ChineseFontNameToken);
     static TMP_FontAsset Japanese => _japanese ??= ResolveFont(JapaneseFontNameToken);
+    static TMP_FontAsset Thai => _thai ??= ResolveFont(ThaiFontNameToken);
 
     /// <summary>Cubic_11 — used for CJK UI and digit-only skippers that should stay consistent.</summary>
     public static TMP_FontAsset ChineseOrNull => Chinese;
@@ -68,6 +87,7 @@ public static class UIFont
             "zh-Hans" => Chinese ?? Pixel,
             "ja" => Japanese ?? Pixel,
             "ru" => _russian ?? Chinese ?? Pixel,
+            "th" => Thai ?? Pixel,
             _ => Pixel
         };
     }
