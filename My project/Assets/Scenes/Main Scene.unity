@@ -991,46 +991,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6895426862770261785, guid: c113c783466b1e942997871770f5cff8, type: 3}
-      propertyPath: occludedLowpassCutoff
-      value: 4000
-      objectReference: {fileID: 0}
-    - target: {fileID: 6895426862770261785, guid: c113c783466b1e942997871770f5cff8, type: 3}
-      propertyPath: occlusionLayers.m_Bits
-      value: 17207
-      objectReference: {fileID: 0}
-    - target: {fileID: 6895426862770261785, guid: c113c783466b1e942997871770f5cff8, type: 3}
-      propertyPath: occludedVolumeMultiplier
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6895426862770261785, guid: c113c783466b1e942997871770f5cff8, type: 3}
-      propertyPath: tensionSFXBank.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 6895426862770261785, guid: c113c783466b1e942997871770f5cff8, type: 3}
-      propertyPath: 'tensionSFXBank.Array.data[2]'
-      value: 
-      objectReference: {fileID: 8300000, guid: faf77f6b98dab4147a9305d061697b66, type: 3}
-    - target: {fileID: 8021086284184574946, guid: c113c783466b1e942997871770f5cff8, type: 3}
-      propertyPath: Loop
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8021086284184574946, guid: c113c783466b1e942997871770f5cff8, type: 3}
-      propertyPath: m_Resource
-      value: 
-      objectReference: {fileID: 8300000, guid: f6217049e48b14f49a471ebd1b0fccb5, type: 3}
-    - target: {fileID: 8021086284184574946, guid: c113c783466b1e942997871770f5cff8, type: 3}
-      propertyPath: m_audioClip
-      value: 
-      objectReference: {fileID: 8300000, guid: f6217049e48b14f49a471ebd1b0fccb5, type: 3}
-    - target: {fileID: 8021086284184574946, guid: c113c783466b1e942997871770f5cff8, type: 3}
-      propertyPath: m_PlayOnAwake
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8021086284184574946, guid: c113c783466b1e942997871770f5cff8, type: 3}
-      propertyPath: reverbZoneMixCustomCurve.m_Curve.Array.data[0].value
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -63,6 +63,7 @@ MonoBehaviour:
   captiveLayerMusic: {fileID: 8300000, guid: dc1d6b96e081b4befbd033dee4730596, type: 3}
   chaseMusic: {fileID: 8300000, guid: 6f8ac1fb6c4da43309fc6f2608f82ab6, type: 3}
   captiveLayerIndex: 12
+  hiddenLayerIndex: 7
   gameplayMusicFade: 0.5
   defaultAmbience: {fileID: 8300000, guid: f6217049e48b14f49a471ebd1b0fccb5, type: 3}
   uiClickClip: {fileID: 8300000, guid: 29c9b7f66b2ae3f47882d7d526ecd150, type: 3}
@@ -89,8 +90,8 @@ MonoBehaviour:
   occlusionLayers:
     serializedVersion: 2
     m_Bits: 17207
-  occludedVolumeMultiplier: 0.5
-  occludedLowpassCutoff: 1400
+  occludedVolumeMultiplier: 1
+  occludedLowpassCutoff: 10000
   clearLowpassCutoff: 22000
 --- !u!1 &4504894872282728294
 GameObject:
@@ -392,12 +393,12 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 1301280918907549777, guid: d0494497af355c44f913d2de9798dce5, type: 2}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
-  m_PlayOnAwake: 0
+  m_audioClip: {fileID: 8300000, guid: f6217049e48b14f49a471ebd1b0fccb5, type: 3}
+  m_Resource: {fileID: 8300000, guid: f6217049e48b14f49a471ebd1b0fccb5, type: 3}
+  m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -469,7 +470,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
+      value: 0
       inSlope: 0
       outSlope: 0
       tangentMode: 0
