@@ -37,6 +37,24 @@ public class NPCController : MonoBehaviour
     public float AmbushTurnSpeed => ambushTurnSpeed;
     public float AmbushTurnAngleThreshold => ambushTurnAngleThreshold;
 
+    [Header("Hearing")]
+    [Tooltip("After entering the basement (door open SFX), ignore player footsteps for this long. Other noises still register.")]
+    [SerializeField] float ignorePlayerFootstepsDuration = 2f;
+    float _ignorePlayerFootstepsUntil = -1f;
+
+    public bool IsIgnoringPlayerFootsteps => Time.time < _ignorePlayerFootstepsUntil;
+
+    /// <summary>Mute player footsteps only for a short window (other world noises still heard).</summary>
+    public void BeginIgnorePlayerFootsteps(float durationSeconds = -1f)
+    {
+        float duration = durationSeconds >= 0f ? durationSeconds : ignorePlayerFootstepsDuration;
+        if (duration <= 0f)
+            return;
+
+        _ignorePlayerFootstepsUntil = Time.time + duration;
+        suspicion?.ClearFootstepSuspicion();
+    }
+
     [Header("Chase Replan")]
     [Tooltip("Seconds between destination replans during chase.")]
     public float chaseReplanCooldown = 0.25f;
@@ -209,6 +227,7 @@ public class NPCController : MonoBehaviour
         if (currentState == AIState.Chase || currentState == AIState.Capture || currentState == AIState.Dead)
             return;
 
+        fsm?.ClearWitnessedHideCapture();
         navigator?.ClearRoute();
         interaction?.CancelInteraction();
 
@@ -224,6 +243,32 @@ public class NPCController : MonoBehaviour
         fsm.SetState(AIState.Chase);
         ApplyLocomotionForState(AIState.Chase);
         fsm.TickChase();
+    }
+
+    /// <summary>
+    /// NPC saw the player enter this hide spot — path there and capture (same as a successful search roll).
+    /// </summary>
+    public void BeginWitnessedHideCapture(HidingSpot spot)
+    {
+        if (spot == null)
+            return;
+        if (currentState == AIState.Capture || currentState == AIState.Dead || currentState == AIState.Scripted)
+            return;
+
+        navigator?.ClearRoute();
+        interaction?.CancelInteraction();
+
+        if (poiLookDirector != null)
+        {
+            poiLookDirector.UnlockLookFromPlayer();
+            poiLookDirector.CancelHoldAndClearLook();
+        }
+
+        if (currentState != AIState.Chase)
+            fsm.SetState(AIState.Chase);
+
+        ApplyLocomotionForState(AIState.Chase);
+        fsm.BeginWitnessedHideCapture(spot);
     }
 
     private void HandleSuspicionReached()

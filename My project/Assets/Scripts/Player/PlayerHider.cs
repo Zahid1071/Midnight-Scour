@@ -89,6 +89,8 @@ public class PlayerHider : MonoBehaviour
         _searchExposureBySpot.TryGetValue(currentHidingSpot, out int count);
         count++;
         _searchExposureBySpot[currentHidingSpot] = count;
+
+        GameplayHintManager.Instance?.NotifyHideSpotSearchExposure(currentHidingSpot, count);
     }
 
     public int GetSearchExposureCount(HidingSpot spot)

@@ -666,6 +666,10 @@ MonoBehaviour:
     m_Localized: "Обновлено"
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296728
+    m_Localized: Убийца заметит ваши повторяющиеся действия и подстроится.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

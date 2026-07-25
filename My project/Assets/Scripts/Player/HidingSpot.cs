@@ -191,7 +191,11 @@ public class HidingSpot : MonoBehaviour, IInteractable
             && !IsAnyNPCTooCloseForHiddenLayer(playerPos);
     }
 
-    private void TryCaptureOnFailedHide(GameObject player)
+    /// <summary>
+    /// Player finished entering while an NPC could see it — send that NPC to this spot to capture
+    /// (guaranteed, like a successful search hide-spot roll), instead of ejecting the player.
+    /// </summary>
+    private void AlertNpcsOfWitnessedHide(GameObject player)
     {
 #if UNITY_2023_1_OR_NEWER
         var npcs = Object.FindObjectsByType<NPCController>(FindObjectsSortMode.None);
@@ -200,59 +204,70 @@ public class HidingSpot : MonoBehaviour, IInteractable
 #endif
 
         NPCController best = null;
-        float bestDist = float.MaxValue;
+        float bestScore = float.MaxValue;
+        Vector3 spotPos = GetSearchPivot() != null ? GetSearchPivot().position : transform.position;
 
         foreach (var npc in npcs)
         {
-            if (npc == null || npc.currentState != NPCController.AIState.Chase) continue;
+            if (npc == null)
+                continue;
+            if (npc.currentState == NPCController.AIState.Capture
+                || npc.currentState == NPCController.AIState.Dead
+                || npc.currentState == NPCController.AIState.Scripted)
+                continue;
 
-            float dist = Vector3.Distance(npc.transform.position, player.transform.position);
-            if (dist > npc.captureDistance || dist >= bestDist) continue;
-
+            float dist = Vector3.Distance(npc.transform.position, spotPos);
             var perception = npc.perception;
-            if (perception != null && !perception.CanSeePlayer) continue;
 
-            best = npc;
-            bestDist = dist;
+            bool chasing = npc.currentState == NPCController.AIState.Chase;
+            bool hasLos = perception != null && perception.HasDirectLineOfSightToPlayer();
+            bool close = dist < MinDistanceForHiddenLayerMeters;
+            bool inViewRange = perception != null && dist <= perception.MaxViewDistance;
+
+            if (!chasing && !hasLos && !close && !inViewRange)
+                continue;
+
+            // Prefer chasing / LOS witnesses, then closer NPCs.
+            float score = dist;
+            if (chasing) score -= 1000f;
+            if (hasLos) score -= 500f;
+            if (close) score -= 250f;
+
+            if (score < bestScore)
+            {
+                best = npc;
+                bestScore = score;
+            }
         }
 
         if (best == null)
         {
+            // Fallback: nearest eligible NPC so a witnessed enter never leaves the player stranded safe.
             foreach (var npc in npcs)
             {
-                if (npc == null || npc.currentState != NPCController.AIState.Chase) continue;
+                if (npc == null)
+                    continue;
+                if (npc.currentState == NPCController.AIState.Capture
+                    || npc.currentState == NPCController.AIState.Dead
+                    || npc.currentState == NPCController.AIState.Scripted)
+                    continue;
 
-                float dist = Vector3.Distance(npc.transform.position, player.transform.position);
-                if (dist >= MinDistanceForHiddenLayerMeters || dist >= bestDist) continue;
-
-                best = npc;
-                bestDist = dist;
+                float dist = Vector3.Distance(npc.transform.position, spotPos);
+                if (dist < bestScore)
+                {
+                    best = npc;
+                    bestScore = dist;
+                }
             }
         }
 
-        if (best != null)
-            best.fsm.SetState(NPCController.AIState.Capture);
-    }
+        if (best == null)
+            return;
 
-    private void AbortFailedHide(GameObject player, PlayerHider hider, bool captured)
-    {
-        HidingCameraSystem.Instance.SetActive(false);
-        HidingCameraSystem.Instance.Detach();
+        if (best.perception != null)
+            best.perception.RedirectLastKnownPosition(spotPos);
 
-        SetHideLighting(player, false);
-
-        hider.SetVisuals(true);
-        hider.SetHiddenState(false, null);
-        hider.SetHidingEngaged(false);
-        if (!captured)
-            hider.EnableControls();
-
-        player.layer = originalLayerIndex;
-        playerRef = null;
-        isOccupied = false;
-        isToggling = false;
-        activePivot = null;
-        activeAnimator = null;
+        best.BeginWitnessedHideCapture(this);
     }
 
     public bool Interact()
@@ -402,9 +417,15 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
         if (!CanGrantStealthAtEntry(player))
         {
-            TryCaptureOnFailedHide(player);
-            bool captured = PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured);
-            AbortFailedHide(player, hider, captured);
+            // Alert while the player is still on the visible layer so LOS scoring stays valid,
+            // then finish the hide — do not eject. Butcher paths here and captures like a
+            // successful search hide-spot roll.
+            AlertNpcsOfWitnessedHide(player);
+
+            player.layer = hiddenLayer;
+            hider.SetVisuals(false);
+            hider.SetHiddenState(true, this);
+            isToggling = false;
             yield break;
         }
 

@@ -109,6 +109,7 @@ MonoBehaviour:
   boneDropHintId: Drop Item
   boneGumCombineHintId: Bone Gum Combine
   noteHintId: Note
+  killerPatternHintId: Killer Pattern Recognition
   noteHintEnabled: 1
   noteHintIntervalSeconds: 120
 --- !u!1 &990001001

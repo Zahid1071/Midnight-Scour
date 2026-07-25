@@ -143,8 +143,11 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
         Vector3 noisePos = transform.position;
         WorldNoiseAlert.Notify(noisePos, npcSuspicionOnStrike);
 
-        if (strikeSound != null && SoundManager.Instance != null)
-            SoundManager.Instance.PlaySFXAt(strikeSound, noisePos, strikeSfxVolume);
+        // Prefer vise strikeSound; fall back to hammer useSuccessSound so the hit plays with the animation.
+        AudioClip hitSfx = strikeSound != null ? strikeSound : hammer.useSuccessSound;
+        if (hitSfx != null && SoundManager.Instance != null)
+            SoundManager.Instance.PlaySFXAt(hitSfx, noisePos, strikeSfxVolume);
+        InteractionUIManager.Instance?.PlaySuccessShake();
 
         if (animator != null)
         {
@@ -177,11 +180,6 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
 
         if (hammer.consumeOnUse)
             InventoryManager.Instance?.RemoveItem(hammer);
-
-        AudioClip sfx = hammer.useSuccessSound;
-        if (sfx != null)
-            InteractionFeedback.PlaySound(sfx, transform.position);
-        InteractionUIManager.Instance?.PlaySuccessShake();
     }
 
     void ClearInteractableLayers()

@@ -15,6 +15,8 @@ namespace FS_Atmo
         [SerializeField] float stuckTimeout      = 3f;        // seconds without progress
         [SerializeField] float doorOpenWaitTimeout = 2.5f;    // wait for carve to clear before crossing
         [SerializeField] float doorTransitTimeout = 12f;      // abort A↔B loop if crossing stalls
+        [Tooltip("Room ID that grants brief player-footstep deafness when this NPC opens a door to enter it.")]
+        [SerializeField] string footstepDeafnessEnterRoomId = "Basement_Room";
 
         [Header("DEBUG")]
         [SerializeField] bool logPlannedRoute = true;
@@ -205,8 +207,10 @@ namespace FS_Atmo
                             yield break;
                         }
 
-                        // 2) Open and wait until NavMesh is actually free
-                        yield return EnsureDoorOpenForCrossing(edge.door);
+                        // 2) Open and wait until NavMesh is actually free.
+                        // Entering the basement: start footstep deafness when the open door SFX plays.
+                        bool enteringDeafnessRoom = IsEnteringRoom(edge, waypoint, footstepDeafnessEnterRoomId);
+                        yield return EnsureDoorOpenForCrossing(edge.door, enteringDeafnessRoom);
 
                         // 3) Move to the opposite prepoint
                         int next = idx + 1;
@@ -245,30 +249,80 @@ namespace FS_Atmo
             CleanupTempPoints();
         }
 
-        private IEnumerator EnsureDoorOpenForCrossing(DoorController door)
+        private IEnumerator EnsureDoorOpenForCrossing(DoorController door, bool grantFootstepDeafnessOnOpenSound = false)
         {
             if (door == null) yield break;
 
-            float waited = 0f;
-            int reRequests = 0;
+            var npc = grantFootstepDeafnessOnOpenSound ? GetComponent<NPCController>() : null;
+            bool armed = npc != null && !door.IsOpen;
+            bool granted = false;
+            System.Action onOpenSound = null;
 
-            while (waited < doorOpenWaitTimeout)
+            if (armed)
             {
-                if (door.IsOpen)
-                    yield break;
-
-                if (reRequests == 0 || waited > 0.4f * (reRequests + 1))
+                onOpenSound = () =>
                 {
-                    door.RequestOpen(bypassLock: true);
-                    reRequests++;
-                }
-
-                waited += Time.deltaTime;
-                yield return null;
+                    if (granted) return;
+                    granted = true;
+                    npc.BeginIgnorePlayerFootsteps();
+                };
+                door.OnOpenSoundPlayed += onOpenSound;
             }
 
-            if (!door.IsOpen)
-                door.ForceOpenInstant();
+            try
+            {
+                float waited = 0f;
+                int reRequests = 0;
+
+                while (waited < doorOpenWaitTimeout)
+                {
+                    if (door.IsOpen)
+                        break;
+
+                    if (reRequests == 0 || waited > 0.4f * (reRequests + 1))
+                    {
+                        door.RequestOpen(bypassLock: true);
+                        reRequests++;
+                    }
+
+                    waited += Time.deltaTime;
+                    yield return null;
+                }
+
+                if (!door.IsOpen)
+                    door.ForceOpenInstant();
+
+                // Open SFX can fire after carve marks IsOpen (handle → open delay). Keep listening briefly.
+                if (armed && !granted)
+                {
+                    float sfxWait = 0f;
+                    const float sfxWaitTimeout = 1f;
+                    while (!granted && sfxWait < sfxWaitTimeout)
+                    {
+                        sfxWait += Time.deltaTime;
+                        yield return null;
+                    }
+                }
+            }
+            finally
+            {
+                if (onOpenSound != null)
+                    door.OnOpenSoundPlayed -= onOpenSound;
+            }
+        }
+
+        static bool IsEnteringRoom(DoorEdge edge, Transform entryPrepoint, string roomId)
+        {
+            if (edge == null || entryPrepoint == null || string.IsNullOrEmpty(roomId))
+                return false;
+
+            RoomAnchor destination = null;
+            if (entryPrepoint == edge.prePointA)
+                destination = edge.roomB;
+            else if (entryPrepoint == edge.prePointB)
+                destination = edge.roomA;
+
+            return destination != null && destination.roomID == roomId;
         }
 
         /// <summary>

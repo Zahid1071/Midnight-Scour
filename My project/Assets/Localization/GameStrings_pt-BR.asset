@@ -666,6 +666,10 @@ MonoBehaviour:
     m_Localized: Atualizado
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296728
+    m_Localized: O assassino vai reconhecer seus movimentos repetidos e se adaptar.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

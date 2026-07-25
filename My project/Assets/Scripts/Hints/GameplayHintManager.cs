@@ -80,6 +80,8 @@ public class GameplayHintManager : MonoBehaviour
     [SerializeField] string boneDropHintId = "Drop Item";
     [SerializeField] string boneGumCombineHintId = "Bone Gum Combine";
     [SerializeField] string noteHintId = "Note";
+    [Tooltip("Shown once when the butcher searches the same hide spot a second time while the player is still in it.")]
+    [SerializeField] string killerPatternHintId = "Killer Pattern Recognition";
 
     readonly Dictionary<string, CanvasGroup> _groups = new();
     readonly Dictionary<string, int> _priorities = new();
@@ -103,6 +105,7 @@ public class GameplayHintManager : MonoBehaviour
     float _vaseDropHintElapsed;
     bool _hidingSpotHintShown;
     bool _soundHintShown;
+    bool _killerPatternHintShown;
 
     [Header("Note hint (optional)")]
     [Tooltip("If enabled, shows the note hint every N seconds.")]
@@ -175,6 +178,23 @@ public class GameplayHintManager : MonoBehaviour
 
         if (Show(hidingSpotHintId))
             _hidingSpotHintShown = true;
+    }
+
+    /// <summary>
+    /// Call when search exposure for the player's current hide spot increments.
+    /// Shows the pattern hint on the second search of that same spot (when capture odds start rising).
+    /// </summary>
+    public void NotifyHideSpotSearchExposure(HidingSpot spot, int exposureCount)
+    {
+        if (_killerPatternHintShown || spot == null || spot.searchCheckpointOnly)
+            return;
+
+        // Exposure 2 = second butcher check of this spot; further searches raise capture chance.
+        if (exposureCount < 2)
+            return;
+
+        if (Show(killerPatternHintId))
+            _killerPatternHintShown = true;
     }
 
     void EvaluateFirstShiftHint()
@@ -941,6 +961,7 @@ public class GameplayHintManager : MonoBehaviour
         Instance._vaseDropHintElapsed = 0f;
         Instance._hidingSpotHintShown = false;
         Instance._soundHintShown = false;
+        Instance._killerPatternHintShown = false;
         Instance.StopCombineTimerCoroutine();
         Instance.HideAll();
     }

@@ -54,6 +54,12 @@ public class SuspicionSystem : MonoBehaviour
         suspicionLevel = 0f;
     }
 
+    /// <summary>Clears only the footstep meter (e.g. brief post-door deafness to player steps).</summary>
+    public void ClearFootstepSuspicion()
+    {
+        footstepSuspicion = 0f;
+    }
+
     void HandleFootstepSuspicion()
     {
         if (footstepSuspicion > 0f)

@@ -36,7 +36,10 @@ namespace FS_Atmo
         [SerializeField] private AudioClip handleOpenSound;
         [SerializeField] private float openSoundDelayAfterHandle = 0.1f;
         [SerializeField] private AudioClip unlockSound; 
-        [SerializeField] private AudioClip lockedSound; 
+        [SerializeField] private AudioClip lockedSound;
+
+        /// <summary>Fired when the open door SFX actually plays (after optional handle delay).</summary>
+        public event System.Action OnOpenSoundPlayed; 
 
         [Header("Runtime Setup")]
         public bool objectOpen;
@@ -442,7 +445,11 @@ namespace FS_Atmo
         IEnumerator OpenSfxSequenceRoutine(Vector3 primaryPosition, Vector3? additionalPosition)
         {
             if (SoundManager.Instance == null)
+            {
+                OnOpenSoundPlayed?.Invoke();
+                _openSfxRoutine = null;
                 yield break;
+            }
 
             if (handleOpenSound != null)
                 SoundManager.Instance.PlaySFXAt(handleOpenSound, primaryPosition,.7f);
@@ -456,6 +463,15 @@ namespace FS_Atmo
 
                 if (additionalPosition.HasValue)
                     SoundManager.Instance.PlaySFXSafe(openSound, additionalPosition.Value);
+
+                OnOpenSoundPlayed?.Invoke();
+            }
+            else
+            {
+                // No open clip — fire at the same timing open would have played (after handle delay).
+                if (handleOpenSound != null)
+                    yield return new WaitForSeconds(openSoundDelayAfterHandle);
+                OnOpenSoundPlayed?.Invoke();
             }
 
             _openSfxRoutine = null;

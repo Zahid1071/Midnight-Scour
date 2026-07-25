@@ -666,6 +666,10 @@ MonoBehaviour:
     m_Localized: "已更新"
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296728
+    m_Localized: 杀手会注意到你反复的行动并做出应对。
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

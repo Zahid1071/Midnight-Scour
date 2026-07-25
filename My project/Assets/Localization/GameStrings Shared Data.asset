@@ -663,6 +663,10 @@ MonoBehaviour:
     m_Key: demo.submit_updated
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296728
+    m_Key: hint.killer_pattern
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -666,6 +666,10 @@ MonoBehaviour:
     m_Localized: "Mis à jour"
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296728
+    m_Localized: "Le tueur remarquera vos gestes répétés et s'adaptera."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

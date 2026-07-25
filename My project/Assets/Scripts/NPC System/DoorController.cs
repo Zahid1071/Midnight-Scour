@@ -43,6 +43,8 @@ namespace FS_Atmo
 
         public event Action OnOpened;
         public event Action OnClosed;
+        /// <summary>Forwarded from SimpleOpenClose when the open door SFX plays.</summary>
+        public event Action OnOpenSoundPlayed;
 
         private enum DoorState { Closed, Opening, Open, Closing }
         [SerializeField] private DoorState state = DoorState.Closed;
@@ -72,6 +74,7 @@ namespace FS_Atmo
                 lastOpenFlag = simpleOpenClose.objectOpen;
                 IsOpen = lastOpenFlag;
                 state = IsOpen ? DoorState.Open : DoorState.Closed;
+                simpleOpenClose.OnOpenSoundPlayed += HandleOpenSoundPlayed;
             }
             else
             {
@@ -82,6 +85,14 @@ namespace FS_Atmo
 
             ApplyCarveImmediate(IsOpen);
         }
+
+        void OnDestroy()
+        {
+            if (simpleOpenClose != null)
+                simpleOpenClose.OnOpenSoundPlayed -= HandleOpenSoundPlayed;
+        }
+
+        void HandleOpenSoundPlayed() => OnOpenSoundPlayed?.Invoke();
 
         private void Update()
         {

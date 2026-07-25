@@ -20,6 +20,8 @@ public class FSMController
 
     Coroutine _searchRoutineCo;
     Coroutine _ambushRoutineCo;
+    Coroutine _witnessedHideCaptureCo;
+    HidingSpot _witnessedHideSpot;
 
     Transform _lastAmbushSpot;
     int _consecutiveSameAmbushCount;
@@ -88,11 +90,13 @@ public class FSMController
 
 
             case NPCController.AIState.Search:
+                ClearWitnessedHideCapture();
                 StartSearchRoutine();
                 break;
 
             case NPCController.AIState.Ambush:
                 Debug.Log("😈 State: AMBUSH");
+                ClearWitnessedHideCapture();
                 StartAmbushRoutine();
                 break;
 
@@ -104,6 +108,7 @@ public class FSMController
             case NPCController.AIState.Natural:
                 StopSearchRoutine();
                 StopAmbushRoutine();
+                ClearWitnessedHideCapture();
                 if (agent != null)
                     agent.isStopped = false;
                 npc.interaction.StartNextRoutine();
@@ -113,7 +118,9 @@ public class FSMController
             case NPCController.AIState.Chase:
                 StopSearchRoutine();
                 StopAmbushRoutine();
-                nav?.ClearRoute();
+                // Witnessed-hide capture owns chase movement when active — don't clear it here.
+                if (_witnessedHideSpot == null)
+                    nav?.ClearRoute();
                 if (agent != null)
                     agent.isStopped = false;
                 //Debug.Log("🏃 State: CHASE");
@@ -122,6 +129,7 @@ public class FSMController
             case NPCController.AIState.Capture:
                 StopSearchRoutine();
                 StopAmbushRoutine();
+                ClearWitnessedHideCapture();
                 StopAgentMovement();
                 npc.poiLookDirector?.CancelHoldAndClearLook();
                 //Debug.Log("State: CAPTURE");
@@ -131,6 +139,7 @@ public class FSMController
             case NPCController.AIState.Scripted:
                 StopSearchRoutine();
                 StopAmbushRoutine();
+                ClearWitnessedHideCapture();
                 npc.poiLookDirector?.CancelHoldAndClearLook();
                 break;
         }
@@ -171,6 +180,98 @@ public class FSMController
         npc.StopCoroutine(_ambushRoutineCo);
         _ambushRoutineCo = null;
         EndAmbushPresentation();
+    }
+
+    public void ClearWitnessedHideCapture()
+    {
+        if (_witnessedHideCaptureCo != null)
+        {
+            npc.StopCoroutine(_witnessedHideCaptureCo);
+            _witnessedHideCaptureCo = null;
+        }
+
+        _witnessedHideSpot = null;
+    }
+
+    /// <summary>
+    /// Path to a hide spot the NPC witnessed the player enter, then capture if still occupied.
+    /// </summary>
+    public void BeginWitnessedHideCapture(HidingSpot spot)
+    {
+        if (spot == null)
+            return;
+
+        ClearWitnessedHideCapture();
+        _witnessedHideSpot = spot;
+
+        Vector3 dest = spot.GetSearchPivot() != null
+            ? spot.GetSearchPivot().position
+            : spot.transform.position;
+
+        if (npc.perception != null)
+            npc.perception.RedirectLastKnownPosition(dest);
+
+        EnsureLocomotion();
+        if (agent != null)
+        {
+            agent.isStopped = false;
+            agent.speed = runningSpeed;
+        }
+
+        _witnessedHideCaptureCo = npc.StartCoroutine(WitnessedHideCaptureRoutine(spot, dest));
+    }
+
+    IEnumerator WitnessedHideCaptureRoutine(HidingSpot spot, Vector3 dest)
+    {
+        if (nav != null)
+            nav.GoToPoint(dest);
+        else if (agent != null)
+            agent.SetDestination(dest);
+
+        yield return WaitForAgentArrivalOrGiveUp(agent, SearchArriveDistance, SearchStuckTimeout);
+
+        if (npc.currentState != NPCController.AIState.Chase
+            || _witnessedHideSpot != spot)
+        {
+            _witnessedHideCaptureCo = null;
+            yield break;
+        }
+
+        var lookDirector = npc.poiLookDirector;
+        Transform searchPoi = spot != null ? spot.ResolveSearchLookTarget() : null;
+        if (lookDirector != null && searchPoi != null)
+        {
+            lookDirector.SnapPOITo(searchPoi);
+            lookDirector.TriggerLookHold();
+        }
+
+        // Same outcome as a successful search hide-spot capture roll.
+        bool stillOccupied = spot != null && spot.isOccupied && !spot.searchCheckpointOnly;
+
+        _witnessedHideCaptureCo = null;
+        _witnessedHideSpot = null;
+
+        if (stillOccupied)
+        {
+            Debug.Log($"🎯 Player caught after witnessed hide enter: {spot.name}");
+            SetState(NPCController.AIState.Capture);
+            yield break;
+        }
+
+        // Player left before arrival — search the room around last known.
+        if (lookDirector != null)
+            lookDirector.CancelHoldAndClearLook();
+
+        string homeID = npc.interaction != null && npc.interaction.data != null
+            ? npc.interaction.data.homeID
+            : string.Empty;
+        var anchor = NPCAnchorManager.Instance != null
+            ? NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(dest, homeID)
+            : null;
+        if (anchor != null && npc.perception != null)
+            npc.perception.searchTarget = anchor;
+
+        SetState(NPCController.AIState.Search);
     }
 
     void ResetAmbushRustleState()
@@ -936,6 +1037,10 @@ public class FSMController
     {
         var agent = npc.interaction.agent;
         if (npc.perception == null || nav == null || agent == null) return;
+
+        // Witnessed hide-enter capture owns pathing until arrival.
+        if (_witnessedHideSpot != null)
+            return;
 
         // 1. Durum Tespiti — locker hide stays valid even if NPC walks up later
         bool isHidden = IsPlayerStealthHidden();

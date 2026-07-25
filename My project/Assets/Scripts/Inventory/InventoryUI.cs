@@ -194,9 +194,18 @@ public class InventoryUI : MonoBehaviour
             interactor.RegisterInteractForFrame(hit.collider);
             if (receiver.ReceiveItem(selected))
             {
-                if (receiver is ItemCombineReceiver)
+                // Receivers that own their success SFX/shake (avoid held-item useSuccessSound).
+                if (receiver is ItemCombineReceiver
+                    || receiver is BenchVicePuzzle
+                    || receiver is ToiletWaterFlush)
                 {
-                    // Subtitle, SFX, and shake handled inside ItemCombineReceiver.
+                    // Handled inside the receiver.
+                }
+                else if (receiver is InteractableItem)
+                {
+                    // World pickup: plays pickUpSFX only — not the held item's useSuccessSound
+                    // (e.g. hammer hit must not fire when picking up a vase while hammer is selected).
+                    InteractionUIManager.Instance?.PlaySuccessShake();
                 }
                 else if (receiver is SimpleOpenClose || receiver is LockedOpenClose)
                 {

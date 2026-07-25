@@ -340,6 +340,9 @@ public class PerceptionController : MonoBehaviour
         if (npc != null && npc.HearingDisabled)
             return;
 
+        if (npc != null && npc.IsIgnoringPlayerFootsteps)
+            return;
+
         if (!soundSource) return;
 
         // Captive layer, or inside cage while this NPC cannot see them.

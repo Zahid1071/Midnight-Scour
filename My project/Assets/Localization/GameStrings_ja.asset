@@ -666,6 +666,10 @@ MonoBehaviour:
     m_Localized: "更新済み"
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296728
+    m_Localized: 殺人鬼はあなたの繰り返しの行動に気づき、対応してきます。
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
