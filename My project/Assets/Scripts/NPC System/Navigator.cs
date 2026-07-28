@@ -17,6 +17,8 @@ namespace FS_Atmo
         [SerializeField] float doorTransitTimeout = 12f;      // abort A↔B loop if crossing stalls
         [Tooltip("Room ID that grants brief player-footstep deafness when this NPC opens a door to enter it.")]
         [SerializeField] string footstepDeafnessEnterRoomId = "Basement_Room";
+        [Tooltip("Seconds to linger after the door is open when entering footstepDeafnessEnterRoomId (basement). Other doors are unaffected.")]
+        [SerializeField] float basementDoorPostOpenHold = 2f;
 
         [Header("DEBUG")]
         [SerializeField] bool logPlannedRoute = true;
@@ -209,8 +211,13 @@ namespace FS_Atmo
 
                         // 2) Open and wait until NavMesh is actually free.
                         // Entering the basement: start footstep deafness when the open door SFX plays.
-                        bool enteringDeafnessRoom = IsEnteringRoom(edge, waypoint, footstepDeafnessEnterRoomId);
-                        yield return EnsureDoorOpenForCrossing(edge.door, enteringDeafnessRoom);
+                        bool enteringBasement = IsEnteringRoom(edge, waypoint, footstepDeafnessEnterRoomId);
+                        yield return EnsureDoorOpenForCrossing(edge.door, enteringBasement);
+
+                        // Linger at the basement doorway before crossing (other doors skip this).
+                        // Abort early only if the player is actually visible — chase-from-noise still waits.
+                        if (enteringBasement && basementDoorPostOpenHold > 0f)
+                            yield return BasementDoorPostOpenHoldRoutine();
 
                         // 3) Move to the opposite prepoint
                         int next = idx + 1;
@@ -323,6 +330,28 @@ namespace FS_Atmo
                 destination = edge.roomA;
 
             return destination != null && destination.roomID == roomId;
+        }
+
+        IEnumerator BasementDoorPostOpenHoldRoutine()
+        {
+            float held = 0f;
+            while (held < basementDoorPostOpenHold)
+            {
+                if (ShouldSkipBasementDoorHold())
+                    yield break;
+
+                held += Time.deltaTime;
+                yield return null;
+            }
+        }
+
+        bool ShouldSkipBasementDoorHold()
+        {
+            var npc = GetComponent<NPCController>();
+            if (npc == null || npc.perception == null)
+                return false;
+
+            return npc.perception.CanSeePlayer;
         }
 
         /// <summary>

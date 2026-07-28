@@ -333,7 +333,12 @@ public class FSMController
                 break;
 
             case NPCController.AIState.Chase:
-                agent.speed = runningSpeed;
+                // Visible player during chase: push harder. Lost LoS falls back to normal run.
+                bool chaseCanSee = !IsPlayerStealthHidden()
+                    && npc.perception != null
+                    && npc.perception.CanSeePlayer;
+                float chaseMult = Mathf.Max(1f, npc.chaseVisibleSpeedMultiplier);
+                agent.speed = chaseCanSee ? runningSpeed * chaseMult : runningSpeed;
                 if (lookDirector != null)
                 {
                     lookDirector.SetLookWeight(1f);

@@ -60,6 +60,9 @@ public class NPCController : MonoBehaviour
     public float chaseReplanCooldown = 0.25f;
     [Tooltip("Replan if the target moved more than this distance since last plan.")]
     public float chaseReplanDist = 0.75f;
+    [Tooltip("NavMeshAgent speed multiplier while chasing AND seeing the player (1 = normal run).")]
+    [Min(1f)]
+    public float chaseVisibleSpeedMultiplier = 1.25f;
 
     [Header("Speeds (override from NPCData if present)")]
     [HideInInspector] public float walkSpeed = 2.5f;

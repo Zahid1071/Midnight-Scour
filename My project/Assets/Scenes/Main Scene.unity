@@ -17203,7 +17203,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8100000000338674688, guid: 16e3dff79b452490a989645aa094bfe3, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 217.48
       objectReference: {fileID: 0}
     - target: {fileID: 8100000000338674688, guid: 16e3dff79b452490a989645aa094bfe3, type: 3}
       propertyPath: m_SizeDelta.y
@@ -17243,7 +17243,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8100000000338674722, guid: 16e3dff79b452490a989645aa094bfe3, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 58.6
       objectReference: {fileID: 0}
     - target: {fileID: 8100000000338674722, guid: 16e3dff79b452490a989645aa094bfe3, type: 3}
       propertyPath: m_SizeDelta.y
@@ -18227,6 +18227,10 @@ PrefabInstance:
       propertyPath: poiLookDirector
       value: 
       objectReference: {fileID: 824396281}
+    - target: {fileID: 1469066018935350255, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
+      propertyPath: chaseVisibleSpeedMultiplier
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1469066018935350255, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
       propertyPath: ignorePlayerFootstepsDuration
       value: 2.5

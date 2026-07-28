@@ -85,7 +85,7 @@ MonoBehaviour:
     footstepDecayPerSecond: 10
   locomotion:
     walkingSpeed: 2.5
-    runningSpeed: 3.8
+    runningSpeed: 4
   chaseRetention:
     gracePeriod: 3
     keepChasingDistance: 5

@@ -113,8 +113,18 @@ public class PlayerHider : MonoBehaviour
 
     public float GetSearchPickWeight(HidingSpot spot) => GetSearchExposureMultiplier(spot);
 
-    public float GetCaptureChance(HidingSpot spot, float baseChance) =>
-        Mathf.Min(1f, baseChance * GetSearchExposureMultiplier(spot));
+    /// <summary>
+    /// First two searches of the same spot never capture. From the 3rd onward,
+    /// <paramref name="baseChance"/> (e.g. 10% on Butcher Data) is scaled by exposure.
+    /// </summary>
+    public float GetCaptureChance(HidingSpot spot, float baseChance)
+    {
+        int count = GetSearchExposureCount(spot);
+        if (count <= 2)
+            return 0f;
+
+        return Mathf.Min(1f, baseChance * GetSearchExposureMultiplier(spot));
+    }
 
     static bool IsSpotInSearchedRoom(HidingSpot spot, Transform roomAnchor)
     {
