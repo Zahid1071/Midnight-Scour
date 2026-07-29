@@ -11,6 +11,8 @@ public class PlayerHider : MonoBehaviour
     private HidingSpot currentHidingSpot;
     private HidingSpot _lastOccupiedSpot;
     private readonly Dictionary<HidingSpot, int> _searchExposureBySpot = new();
+    HidingSpot _micCaptureOverrideSpot;
+    float _micCaptureOverrideChance = -1f;
 
     [Header("Visuals")]
     public GameObject visualRoot;
@@ -68,6 +70,7 @@ public class PlayerHider : MonoBehaviour
         else if (!hidden && currentHidingSpot != null)
         {
             _lastOccupiedSpot = currentHidingSpot;
+            ClearMicCaptureOverride();
         }
 
         isHidden = hidden;
@@ -111,14 +114,48 @@ public class PlayerHider : MonoBehaviour
         return Mathf.Pow(2f, count - 2);
     }
 
-    public float GetSearchPickWeight(HidingSpot spot) => GetSearchExposureMultiplier(spot);
+    public float GetSearchPickWeight(HidingSpot spot)
+    {
+        if (spot != null && spot == _micCaptureOverrideSpot && _micCaptureOverrideChance >= 0f)
+            return 1000f;
+
+        return GetSearchExposureMultiplier(spot);
+    }
 
     /// <summary>
-    /// First two searches of the same spot never capture. From the 3rd onward,
-    /// <paramref name="baseChance"/> (e.g. 10% on Butcher Data) is scaled by exposure.
+    /// Mic noise while hidden sets a one-shot capture chance for the next search check of that spot.
+    /// </summary>
+    public void SetMicCaptureOverride(HidingSpot spot, float chance)
+    {
+        if (spot == null)
+            return;
+
+        _micCaptureOverrideSpot = spot;
+        _micCaptureOverrideChance = Mathf.Clamp01(chance);
+    }
+
+    public void ClearMicCaptureOverride()
+    {
+        _micCaptureOverrideSpot = null;
+        _micCaptureOverrideChance = -1f;
+    }
+
+    public bool TryGetMicCaptureOverrideSpot(out HidingSpot spot)
+    {
+        spot = _micCaptureOverrideSpot;
+        return spot != null && _micCaptureOverrideChance >= 0f;
+    }
+
+    /// <summary>
+    /// Mic override (if any) wins for that spot. Otherwise: first two searches never capture;
+    /// from the 3rd onward <paramref name="baseChance"/> is scaled by exposure.
+    /// Does not consume the mic override — call <see cref="ClearMicCaptureOverride"/> after the roll.
     /// </summary>
     public float GetCaptureChance(HidingSpot spot, float baseChance)
     {
+        if (spot != null && spot == _micCaptureOverrideSpot && _micCaptureOverrideChance >= 0f)
+            return _micCaptureOverrideChance;
+
         int count = GetSearchExposureCount(spot);
         if (count <= 2)
             return 0f;

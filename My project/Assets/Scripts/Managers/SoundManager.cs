@@ -378,6 +378,36 @@ public class SoundManager : MonoBehaviour
         StartCoroutine(Return3DWhenDone(src, clip.length / Mathf.Abs(pitch)));
     }
 
+    /// <summary>
+    /// 3D one-shot that sticks to a moving transform (e.g. a bark that follows an NPC)
+    /// instead of being left behind at the spawn position.
+    /// </summary>
+    public void PlaySFXFollowing(AudioClip clip, Transform follow, float volume = 1f, float pitch = 1f)
+    {
+        if (!clip || follow == null || threeDPool.Count == 0) return;
+
+        WorldSfxOcclusion.Result occlusion = WorldSfxOcclusion.Evaluate(
+            follow.position,
+            occlusionLayers,
+            occludedVolumeMultiplier,
+            occludedLowpassCutoff,
+            clearLowpassCutoff,
+            follow);
+
+        var src = threeDPool.Dequeue();
+        var go = src.gameObject;
+        go.transform.position = follow.position;
+        go.SetActive(true);
+
+        ApplyOcclusionToSource(src, occlusion, reverbZoneMix: -1f);
+
+        src.pitch = pitch;
+        src.clip = clip;
+        src.volume = Mathf.Clamp01(volume * occlusion.VolumeMultiplier);
+        src.Play();
+        StartCoroutine(FollowAndReturn3DWhenDone(src, follow, clip.length / Mathf.Abs(pitch)));
+    }
+
     public void PlaySFXSafe(AudioClip clip, Vector3 position, float volume = 1f, float pitch = 1f)
     {
         if (clip == null) return;
@@ -466,6 +496,23 @@ public class SoundManager : MonoBehaviour
 
 
     // ---------- INTERNALS ----------
+
+    private IEnumerator FollowAndReturn3DWhenDone(AudioSource src, Transform follow, float seconds)
+    {
+        float end = Time.time + seconds;
+        while (Time.time < end)
+        {
+            if (follow != null)
+                src.transform.position = follow.position;
+            yield return null;
+        }
+
+        src.Stop();
+        src.clip = null;
+        ResetPooledSource(src);
+        src.gameObject.SetActive(false);
+        threeDPool.Enqueue(src);
+    }
 
     private IEnumerator Return3DWhenDone(AudioSource src, float seconds)
     {

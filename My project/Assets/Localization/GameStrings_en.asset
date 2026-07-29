@@ -142,6 +142,10 @@ MonoBehaviour:
     m_Localized: Mouse Sensitivity
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296800
+    m_Localized: Microphone Sensitivity
+    m_Metadata:
+      m_Items: []
   - m_Id: 5707318296597
     m_Localized: Resolution
     m_Metadata:
@@ -192,18 +196,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5707318296609
     m_Localized: You are already hiding.
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296610
-    m_Localized: I have to catch my breath first.
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296611
-    m_Localized: I am too exhausted to hide.
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296612
-    m_Localized: I have to get out of here!
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296613

@@ -142,6 +142,10 @@ MonoBehaviour:
     m_Localized: "ความไวเมาส์"
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296800
+    m_Localized: ความไวไมโครโฟน
+    m_Metadata:
+      m_Items: []
   - m_Id: 5707318296597
     m_Localized: "ความละเอียด"
     m_Metadata:
@@ -192,18 +196,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5707318296609
     m_Localized: "คุณกำลังซ่อนอยู่แล้ว"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296610
-    m_Localized: "ต้องหายใจให้ทันก่อน"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296611
-    m_Localized: "เหนื่อยเกินไปที่จะซ่อน"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296612
-    m_Localized: "ฉันต้องออกจากที่นี่!"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296613

@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 4134655764735739326}
   - component: {fileID: 5458437940652445483}
   - component: {fileID: 6054754956762797053}
+  - component: {fileID: 8822441100112233502}
   m_Layer: 13
   m_Name: Butcher 1
   m_TagString: Untagged
@@ -58,6 +59,8 @@ MonoBehaviour:
   interaction: {fileID: 3090453657295839001}
   perception: {fileID: 72859471452438870}
   captureDistance: 1
+  chaseEnterSfx: {fileID: 8300000, guid: c1c6021de7aa4ac41956662c3435aaa1, type: 3}
+  chaseEnterVolume: 1
   chaseReplanCooldown: 0.25
   chaseReplanDist: 0.75
   walkSpeed: 0.2
@@ -66,6 +69,30 @@ MonoBehaviour:
   _nextChaseReplanTime: 0
   jumpscarePoint: {fileID: 8806521733736325648}
   footstepCooldown: 0.18
+--- !u!114 &8822441100112233502
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4884186263421869}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8e4f2a91c7d4e5f8a0b1c2d3e4f5a6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minDistance: 2
+  maxDistance: 5
+  requireThreatState: 1
+  maxScanLineJitter: 0.05
+  maxHorizontalShake: 0.05
+  maxColorDrift: 0.05
+  maxHorizontalRipple: 0.05
+  maxVerticalJump: 0
+  maxWhisperIntensity: 1
+  intensitySmoothing: 5
+  hiddenLayer: 7
+  captiveLayer: 12
 --- !u!195 &4052662691887626456
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -11568,6 +11595,9 @@ PrefabInstance:
       addedObject: {fileID: 8313952950503179284}
     - targetCorrespondingSourceObject: {fileID: 6335359160998601750, guid: 2fd11e932fb152a4b961e5a72d453648, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 8822441100112233446}
+    - targetCorrespondingSourceObject: {fileID: 6335359160998601750, guid: 2fd11e932fb152a4b961e5a72d453648, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1056905571514928472}
     - targetCorrespondingSourceObject: {fileID: 6335359160998601750, guid: 2fd11e932fb152a4b961e5a72d453648, type: 3}
       insertIndex: -1
@@ -11601,6 +11631,26 @@ MonoBehaviour:
   footstepController: {fileID: 1007146295468474448}
   runSpeedThreshold: 3.25
   forceRunClipsDuringChase: 1
+--- !u!114 &8822441100112233446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1004580478737993587}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c4e9a1b2d8f4e6a9b0c1d2e3f4a5b6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  swingSfx: {fileID: 8300000, guid: a44360584284eef41a5873d93d601e37, type: 3}
+  slashSfx: {fileID: 8300000, guid: 5bf1c91b5f252b24fb24d0b67fa09cba, type: 3}
+  gruntSfx: {fileID: 8300000, guid: f55dde2f30057ec48b6883b0816277c0, type: 3}
+  sitSfx: {fileID: 8300000, guid: 49ed54035d1ce674dad6912eee3049d3, type: 3}
+  swingVolume: 1
+  slashVolume: 1
+  gruntVolume: 1
+  sitVolume: 1
 --- !u!114 &1056905571514928472
 MonoBehaviour:
   m_ObjectHideFlags: 0

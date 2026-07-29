@@ -150,7 +150,8 @@ public class InteractionUIManager : MonoBehaviour
         if (_cachedPlayerHider == null || !_cachedPlayerHider.isHidden)
             return false;
 
-        ShowInRangeUI(null, null);
+        // Exit hide is still E/Space on PlayerHider — don't show center interact UI while hidden.
+        ClearDetection(true);
         return true;
     }
 

@@ -142,6 +142,10 @@ MonoBehaviour:
     m_Localized: "Sensibilité de la souris"
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296800
+    m_Localized: Sensibilité du micro
+    m_Metadata:
+      m_Items: []
   - m_Id: 5707318296597
     m_Localized: "Résolution"
     m_Metadata:
@@ -192,18 +196,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5707318296609
     m_Localized: "Tu es déjà caché."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296610
-    m_Localized: Je dois d'abord reprendre mon souffle.
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296611
-    m_Localized: "Je suis trop épuisé pour me cacher."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296612
-    m_Localized: Je dois sortir d'ici !
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296613

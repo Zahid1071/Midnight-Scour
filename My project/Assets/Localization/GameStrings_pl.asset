@@ -142,6 +142,10 @@ MonoBehaviour:
     m_Localized: "Czułość myszy"
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296800
+    m_Localized: Czułość mikrofonu
+    m_Metadata:
+      m_Items: []
   - m_Id: 5707318296597
     m_Localized: "Rozdzielczość"
     m_Metadata:
@@ -192,18 +196,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5707318296609
     m_Localized: "Już się ukrywasz."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296610
-    m_Localized: "Muszę najpierw złapać oddech."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296611
-    m_Localized: "Jestem zbyt wyczerpany, by się ukryć."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296612
-    m_Localized: "Muszę się stąd wydostać!"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296613

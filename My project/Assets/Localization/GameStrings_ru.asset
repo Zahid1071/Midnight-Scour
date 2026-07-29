@@ -142,6 +142,10 @@ MonoBehaviour:
     m_Localized: "Чувствительность мыши"
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296800
+    m_Localized: Чувствительность микрофона
+    m_Metadata:
+      m_Items: []
   - m_Id: 5707318296597
     m_Localized: "Разрешение"
     m_Metadata:
@@ -192,18 +196,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5707318296609
     m_Localized: "Ты уже прячешься."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296610
-    m_Localized: "Сначала нужно отдышаться."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296611
-    m_Localized: "Я слишком измотан, чтобы прятаться."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296612
-    m_Localized: "Мне нужно выбраться отсюда!"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296613

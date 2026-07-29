@@ -37,12 +37,23 @@ public class NPCController : MonoBehaviour
     public float AmbushTurnSpeed => ambushTurnSpeed;
     public float AmbushTurnAngleThreshold => ambushTurnAngleThreshold;
 
+    [Header("Chase SFX")]
+    [Tooltip("3D one-shot played at the butcher when entering Chase.")]
+    [SerializeField] AudioClip chaseEnterSfx;
+    [SerializeField] float chaseEnterVolume = 1f;
+
+    public AudioClip ChaseEnterSfx => chaseEnterSfx;
+    public float ChaseEnterVolume => chaseEnterVolume;
+
     [Header("Hearing")]
     [Tooltip("After entering the basement (door open SFX), ignore player footsteps for this long. Other noises still register.")]
     [SerializeField] float ignorePlayerFootstepsDuration = 2f;
     float _ignorePlayerFootstepsUntil = -1f;
 
     public bool IsIgnoringPlayerFootsteps => Time.time < _ignorePlayerFootstepsUntil;
+
+    /// <summary>Best current-room estimate from the navigator's path-based room vote.</summary>
+    public RoomAnchor GetCurrentRoom() => navigator != null ? navigator.GetCurrentRoom() : null;
 
     /// <summary>Mute player footsteps only for a short window (other world noises still heard).</summary>
     public void BeginIgnorePlayerFootsteps(float durationSeconds = -1f)
@@ -118,7 +129,13 @@ public class NPCController : MonoBehaviour
 
     void Start()
     {
-        fsm.SetState(AIState.Scripted);
+        // Prefab default is already Natural (enum 0). SetState early-outs on same state and
+        // would skip StartNextRoutine — so kick the natural loop explicitly in that case.
+        if (currentState == AIState.Natural)
+            interaction?.StartNextRoutine();
+        else
+            fsm.SetState(AIState.Natural);
+
         ApplyLocomotionForState(currentState);
     }
 
@@ -224,15 +241,22 @@ public class NPCController : MonoBehaviour
 
     /// <summary>
     /// Drop routine, door routes, and POI — run straight at the player.
+    /// Stands up from a hotspot first so he doesn't float-sit toward the player.
     /// </summary>
     public void BeginChaseFromPerception()
     {
         if (currentState == AIState.Chase || currentState == AIState.Capture || currentState == AIState.Dead)
             return;
 
+        // Mid stand-up already headed to Chase (or upgrading Search → Chase).
+        if (interaction != null && interaction.IsStandingUpFromHotspot)
+        {
+            interaction.StandUpFromHotspotThenSetState(AIState.Chase);
+            return;
+        }
+
         fsm?.ClearWitnessedHideCapture();
         navigator?.ClearRoute();
-        interaction?.CancelInteraction();
 
         if (poiLookDirector != null)
         {
@@ -243,13 +267,20 @@ public class NPCController : MonoBehaviour
         _lastChaseTarget = new Vector3(float.PositiveInfinity, 0f, 0f);
         _nextChaseReplanTime = 0f;
 
-        fsm.SetState(AIState.Chase);
+        if (interaction != null
+            && interaction.StandUpFromHotspotThenSetState(AIState.Chase))
+            return; // Still standing up — chase starts after SetState(Chase).
+
+        if (currentState != AIState.Chase)
+            fsm.SetState(AIState.Chase);
+
         ApplyLocomotionForState(AIState.Chase);
         fsm.TickChase();
     }
 
     /// <summary>
     /// NPC saw the player enter this hide spot — path there and capture (same as a successful search roll).
+    /// Also used by hide-mic alerts in the same room.
     /// </summary>
     public void BeginWitnessedHideCapture(HidingSpot spot)
     {
@@ -259,7 +290,6 @@ public class NPCController : MonoBehaviour
             return;
 
         navigator?.ClearRoute();
-        interaction?.CancelInteraction();
 
         if (poiLookDirector != null)
         {
@@ -267,11 +297,18 @@ public class NPCController : MonoBehaviour
             poiLookDirector.CancelHoldAndClearLook();
         }
 
+        // Arm hide-spot lock BEFORE Chase so TickChase cannot proximity-capture mid-path.
+        // Pathing waits until Chase + stand-up finish (see WitnessedHideCaptureRoutine).
+        fsm.BeginWitnessedHideCapture(spot);
+
+        if (interaction != null
+            && interaction.StandUpFromHotspotThenSetState(AIState.Chase))
+            return;
+
         if (currentState != AIState.Chase)
             fsm.SetState(AIState.Chase);
 
         ApplyLocomotionForState(AIState.Chase);
-        fsm.BeginWitnessedHideCapture(spot);
     }
 
     private void HandleSuspicionReached()
@@ -279,7 +316,7 @@ public class NPCController : MonoBehaviour
         if (HearingDisabled) return;
         if (currentState == AIState.Chase || currentState == AIState.Capture || currentState == AIState.Dead) return;
         navigator.ClearRoute();
-        interaction?.CancelAndExitGracefully(AIState.Chase);
+        interaction?.StandUpFromHotspotThenSetState(AIState.Chase);
     }
 
     private void HandleVisionConfirmed()
@@ -288,16 +325,7 @@ public class NPCController : MonoBehaviour
             || currentState == AIState.Dead || currentState == AIState.Scripted)
             return;
 
-        if (currentState == AIState.Natural)
-        {
-            BeginChaseFromPerception();
-            return;
-        }
-
-        navigator?.ClearRoute();
-        interaction?.CancelAndExitGracefully(AIState.Chase);
-        ApplyLocomotionForState(AIState.Chase);
-        fsm.TickChase();
+        BeginChaseFromPerception();
     }
 
 

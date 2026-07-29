@@ -10,11 +10,18 @@ public class NPCAnchorManager : MonoBehaviour
     [Header("Assign anchor roots here (e.g., RoomAnchors or Zone roots):")]
     [SerializeField] private Transform[] anchorRoots;
 
+    [Header("Player room vote")]
+    [Tooltip("Player/target votes only: ignore room anchors whose Y differs from the grounded floor by more than this. Separates Basement≈-2.6 from Corridor-Kitchen≈0.")]
+    [SerializeField] float maxFloorYDelta = 1.0f;
+
     [Header("DEBUG")]
     [SerializeField] bool logRoomVoteResult = true;
 
     private readonly Dictionary<string, Transform> anchorMap = new();
     private readonly Dictionary<string, List<RoomAnchor>> roomAnchorsByZone = new();
+
+    Transform _lastRoomNpc;
+    Transform _lastRoomPlayer;
 
     private void Awake()
     {
@@ -28,6 +35,8 @@ public class NPCAnchorManager : MonoBehaviour
 
         anchorMap.Clear();
         roomAnchorsByZone.Clear();
+        _lastRoomNpc = null;
+        _lastRoomPlayer = null;
 
         foreach (var root in anchorRoots)
             RegisterHierarchy(root);
@@ -100,6 +109,14 @@ public class NPCAnchorManager : MonoBehaviour
         var path = new NavMeshPath();
         const float crossThreshold = 0.5f;
 
+        // Player/target only: grounded collision floor. Open doors must not let an upstairs
+        // room win just because a through-door NavMesh path became complete.
+        // Not applied to the butcher — doorway Y is ambiguous and caused open/close thrash.
+        float playerFloorY = 0f;
+        bool clampToPlayerFloor = !isNpcSelf;
+        if (clampToPlayerFloor)
+            playerFloorY = ProjectToFloor(fromPosition).y;
+
         if (!NavMesh.SamplePosition(fromPosition, out var startHit, 1.0f, areaMask))
             return LogVoteResult(null, isNpcSelf);
         fromPosition = startHit.position;
@@ -112,7 +129,8 @@ public class NPCAnchorManager : MonoBehaviour
             if (!edge.prePointA || !edge.prePointB || !edge.door) continue;
 
             // PrePointA → roomA
-            if (edge.roomA != null && edge.roomA.zoneID == ownerZoneID)
+            if (edge.roomA != null && edge.roomA.zoneID == ownerZoneID
+                && (!clampToPlayerFloor || IsSameFloor(edge.roomA.transform.position.y, playerFloorY)))
             {
                 if (TryImmediatePrepointPath(fromPosition, edge.prePointA, edge.roomA, areaMask, path, crossThreshold, out float len)
                     && len < bestPathLength)
@@ -123,7 +141,8 @@ public class NPCAnchorManager : MonoBehaviour
             }
 
             // PrePointB → roomB
-            if (edge.roomB != null && edge.roomB.zoneID == ownerZoneID)
+            if (edge.roomB != null && edge.roomB.zoneID == ownerZoneID
+                && (!clampToPlayerFloor || IsSameFloor(edge.roomB.transform.position.y, playerFloorY)))
             {
                 if (TryImmediatePrepointPath(fromPosition, edge.prePointB, edge.roomB, areaMask, path, crossThreshold, out float len)
                     && len < bestPathLength)
@@ -137,8 +156,19 @@ public class NPCAnchorManager : MonoBehaviour
         return LogVoteResult(bestRoom != null ? bestRoom.transform : null, isNpcSelf);
     }
 
+    static Vector3 ProjectToFloor(Vector3 origin)
+    {
+        return Physics.Raycast(origin + Vector3.up * 0.3f, Vector3.down, out var hit, 5f,
+                   Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore)
+            ? hit.point
+            : origin;
+    }
+
+    bool IsSameFloor(float a, float b) => Mathf.Abs(a - b) <= maxFloorYDelta;
+
     /// <summary>
-    /// True if we can path to this prepoint without crossing another door (middleman filter).
+    /// Immediate = complete path to this prepoint, already on this prepoint's side of its door
+    /// (not through it), and does not cross any other doorway. Shortest path wins.
     /// </summary>
     bool TryImmediatePrepointPath(
         Vector3 from,
@@ -162,6 +192,11 @@ public class NPCAnchorManager : MonoBehaviour
         if (path.status != NavMeshPathStatus.PathComplete)
             return false;
 
+        // Must be clearly on this prepoint's side of its door. Open doors used to make the
+        // far-side room look immediate (path only crossed the skipped target door).
+        if (!IsClearlySameSideOfPrepointDoor(from, prepoint))
+            return false;
+
         // Goes through another room's doorway → not immediate.
         if (PathPassesThroughOtherPrepoint(path, prepoint, crossThreshold, candidateRoom))
             return false;
@@ -170,8 +205,53 @@ public class NPCAnchorManager : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// preA/preB sit on opposite sides of a door; (preB-preA) points through the doorway.
+    /// True only when <paramref name="from"/> is strictly on the prepoint's room-side
+    /// (opposite signs or Dot≈0 on the door plane both fail).
+    /// </summary>
+    static bool IsClearlySameSideOfPrepointDoor(Vector3 from, Transform prepoint)
+    {
+        if (RoomGraph.Instance == null || RoomGraph.Instance.edges == null)
+            return true;
+
+        DoorEdge edge = null;
+        foreach (var e in RoomGraph.Instance.edges)
+        {
+            if (e.prePointA == prepoint || e.prePointB == prepoint)
+            {
+                edge = e;
+                break;
+            }
+        }
+
+        if (edge == null || !edge.prePointA || !edge.prePointB)
+            return true;
+
+        Vector3 a = edge.prePointA.position;
+        Vector3 b = edge.prePointB.position;
+        Vector3 mid = (a + b) * 0.5f;
+        Vector3 through = b - a;
+        if (through.sqrMagnitude < 0.0001f)
+            return true;
+
+        float sideFrom = Vector3.Dot(from - mid, through);
+        float sidePrep = Vector3.Dot(prepoint.position - mid, through);
+        return sideFrom * sidePrep > 0f;
+    }
+
     Transform LogVoteResult(Transform roomT, bool isNpcSelf)
     {
+        if (roomT != null)
+        {
+            if (isNpcSelf) _lastRoomNpc = roomT;
+            else _lastRoomPlayer = roomT;
+        }
+        else
+        {
+            roomT = isNpcSelf ? _lastRoomNpc : _lastRoomPlayer;
+        }
+
         if (logRoomVoteResult)
         {
             string name = "?";

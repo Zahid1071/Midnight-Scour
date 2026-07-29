@@ -15,7 +15,7 @@ MonoBehaviour:
   npcName: Butcher
   npcPrefab: {fileID: 4884186263421869, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
   homeID: House_001
-  captureChance: 0.1
+  captureChance: 0
   searchPositionWaitRange: {x: 2, y: 3}
   searchExtraSpotChances:
   - 0.35
@@ -25,15 +25,20 @@ MonoBehaviour:
     weight: 1
     roomPlans:
     - roomAnchorID: Basement_Room
-      weight: 0.3
+      weight: 0.2
       hotspots:
-      - hotspotID: Hotspot_Idle2
+      - hotspotID: hotspot_bed
         weight: 1
+        duration: 8
+        actionType: 0
+        requiresVisualOffset: 1
+      - hotspotID: hotspot_bench
+        weight: 0
         duration: 6
-        actionType: 12
+        actionType: 10
         requiresVisualOffset: 0
     - roomAnchorID: Corridor-Kitchen_Room
-      weight: 0.4
+      weight: 0.3
       hotspots:
       - hotspotID: Hotspot_Idle
         weight: 0.266
@@ -46,10 +51,10 @@ MonoBehaviour:
         actionType: 12
         requiresVisualOffset: 0
     - roomAnchorID: Living_room
-      weight: 0.4
+      weight: 0.3
       hotspots:
       - hotspotID: Hotspot_Sofa
-        weight: 1
+        weight: 0.605
         duration: 10
         actionType: 0
         requiresVisualOffset: 1
@@ -64,7 +69,7 @@ MonoBehaviour:
   patrolChance: 0
   patrolDuration: 20
   ambushChance: 0.3
-  ambushWaitRange: {x: 15, y: 30}
+  ambushWaitRange: {x: 10, y: 15}
   footstepVolume: 1
   vision:
     maxViewDistance: 10

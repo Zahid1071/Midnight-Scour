@@ -60,6 +60,11 @@ public class GameSettingsManager : MonoBehaviour
     public const string MOUSE_SENSITIVITY_KEY = "MouseSensitivity";
 
     /// <summary>
+    /// PlayerPrefs key for hide-spot microphone sensitivity (normalized 0-1).
+    /// </summary>
+    public const string MIC_SENSITIVITY_KEY = "MicSensitivity";
+
+    /// <summary>
     /// Single source-of-truth PlayerPrefs key for brightness.
     /// Stored as a NORMALIZED 0-1 value (== slider value directly).
     /// </summary>
@@ -84,6 +89,12 @@ public class GameSettingsManager : MonoBehaviour
     public const float MAX_SENSITIVITY_MULTIPLIER = 5f;
 
     /// <summary>
+    /// Hide mic sensitivity multiplier range. Slider 0.5 maps to 1× (neutral).
+    /// </summary>
+    public const float MIN_MIC_SENSITIVITY_MULTIPLIER = 0.25f;
+    public const float MAX_MIC_SENSITIVITY_MULTIPLIER = 3f;
+
+    /// <summary>
     /// URP ColorAdjustments postExposure range that <see cref="Brightness"/>
     /// (0..1) is mapped to. Negative = darker, positive = brighter.
     /// Scene components (e.g. BrightnessApplier) consume <see cref="BrightnessExposure"/>.
@@ -101,6 +112,11 @@ public class GameSettingsManager : MonoBehaviour
     /// instantly without polling.
     /// </summary>
     public static event Action<float> OnMouseSensitivityChanged;
+
+    /// <summary>
+    /// Fired whenever MicSensitivity changes. Subscribers get the new normalized [0,1] value.
+    /// </summary>
+    public static event Action<float> OnMicSensitivityChanged;
 
     /// <summary>
     /// Fired whenever InvertYAxis changes.
@@ -151,6 +167,7 @@ public class GameSettingsManager : MonoBehaviour
         
         // Controls
         public float mouseSensitivity;    // NORMALIZED 0.0 - 1.0 (slider value directly)
+        public float micSensitivity;      // NORMALIZED 0.0 - 1.0 (hide mic loudness gain)
         public bool invertYAxis;
 
         // Display (continued) — brightness is stored alongside graphics conceptually
@@ -218,6 +235,7 @@ public class GameSettingsManager : MonoBehaviour
             musicVolume = 0.8f,
             sfxVolume = 0.8f,
             mouseSensitivity = 0.5f,
+            micSensitivity = 0.5f,
             invertYAxis = false,
             brightness = 0.5f,
             difficultyIndex = 1,
@@ -356,6 +374,37 @@ public class GameSettingsManager : MonoBehaviour
     /// </summary>
     public float MouseSensitivityMultiplier =>
         Mathf.Lerp(MIN_SENSITIVITY_MULTIPLIER, MAX_SENSITIVITY_MULTIPLIER, _currentSettings.mouseSensitivity);
+
+    /// <summary>
+    /// Hide microphone sensitivity as a NORMALIZED [0, 1] value (== slider value).
+    /// Use <see cref="MicSensitivityMultiplier"/> in gameplay (0.5 → 1×).
+    /// </summary>
+    public float MicSensitivity
+    {
+        get => _currentSettings.micSensitivity;
+        set
+        {
+            float clamped = Mathf.Clamp01(value);
+            if (Mathf.Approximately(_currentSettings.micSensitivity, clamped)) return;
+            _currentSettings.micSensitivity = clamped;
+            OnMicSensitivityChanged?.Invoke(clamped);
+        }
+    }
+
+    /// <summary>
+    /// Multiplier applied to hide-spot mic loudness. Slider 0.5 maps to 1×;
+    /// low end → <see cref="MIN_MIC_SENSITIVITY_MULTIPLIER"/>, high end → max.
+    /// </summary>
+    public float MicSensitivityMultiplier
+    {
+        get
+        {
+            float t = _currentSettings.micSensitivity;
+            if (t <= 0.5f)
+                return Mathf.Lerp(MIN_MIC_SENSITIVITY_MULTIPLIER, 1f, t * 2f);
+            return Mathf.Lerp(1f, MAX_MIC_SENSITIVITY_MULTIPLIER, (t - 0.5f) * 2f);
+        }
+    }
 
     /// <summary>
     /// If true, Y-axis mouse input should be inverted.
@@ -589,6 +638,7 @@ public class GameSettingsManager : MonoBehaviour
         PlayerPrefs.SetFloat(MOUSE_SENSITIVITY_KEY, _currentSettings.mouseSensitivity);
         PlayerPrefs.SetFloat("mouseSensitivity", _currentSettings.mouseSensitivity);
         PlayerPrefs.DeleteKey("settings_mouseSensitivity"); // remove stale [0.1..10] format
+        PlayerPrefs.SetFloat(MIC_SENSITIVITY_KEY, _currentSettings.micSensitivity);
         PlayerPrefs.SetInt("settings_invertY", _currentSettings.invertYAxis ? 1 : 0);
         
         PlayerPrefs.SetInt("settings_difficulty", _currentSettings.difficultyIndex);
@@ -629,6 +679,7 @@ public class GameSettingsManager : MonoBehaviour
                 PlayerPrefs.GetFloat("sfxVol", DefaultSettings.sfxVolume)),
             
             mouseSensitivity = LoadMouseSensitivityFromPrefs(),
+            micSensitivity = Mathf.Clamp01(PlayerPrefs.GetFloat(MIC_SENSITIVITY_KEY, DefaultSettings.micSensitivity)),
             invertYAxis = PlayerPrefs.GetInt("settings_invertY", DefaultSettings.invertYAxis ? 1 : 0) == 1,
 
             brightness = LoadBrightnessFromPrefs(),
@@ -644,6 +695,7 @@ public class GameSettingsManager : MonoBehaviour
         _currentSettings.resolutionIndex = ResolveResolutionIndex(_currentSettings.resolutionIndex);
         _currentSettings.qualityIndex = Mathf.Clamp(_currentSettings.qualityIndex, 0, QualitySettings.names.Length - 1);
         _currentSettings.mouseSensitivity = Mathf.Clamp01(_currentSettings.mouseSensitivity);
+        _currentSettings.micSensitivity = Mathf.Clamp01(_currentSettings.micSensitivity);
         _currentSettings.brightness = Mathf.Clamp01(_currentSettings.brightness);
     }
 
@@ -759,6 +811,7 @@ public class GameSettingsManager : MonoBehaviour
     public void SetSettings(SettingsData newSettings)
     {
         float prevSensitivity = _currentSettings.mouseSensitivity;
+        float prevMicSensitivity = _currentSettings.micSensitivity;
         bool prevInvertY = _currentSettings.invertYAxis;
         float prevBrightness = _currentSettings.brightness;
 
@@ -770,6 +823,7 @@ public class GameSettingsManager : MonoBehaviour
         _currentSettings.displayModeIndex = Mathf.Clamp(_currentSettings.displayModeIndex, 0, 2);
         _currentSettings.difficultyIndex = Mathf.Clamp(_currentSettings.difficultyIndex, 0, 2);
         _currentSettings.mouseSensitivity = Mathf.Clamp01(_currentSettings.mouseSensitivity);
+        _currentSettings.micSensitivity = Mathf.Clamp01(_currentSettings.micSensitivity);
         _currentSettings.masterVolume = Mathf.Clamp01(_currentSettings.masterVolume);
         _currentSettings.musicVolume = Mathf.Clamp01(_currentSettings.musicVolume);
         _currentSettings.sfxVolume = Mathf.Clamp01(_currentSettings.sfxVolume);
@@ -779,6 +833,8 @@ public class GameSettingsManager : MonoBehaviour
         // react immediately.
         if (!Mathf.Approximately(prevSensitivity, _currentSettings.mouseSensitivity))
             OnMouseSensitivityChanged?.Invoke(_currentSettings.mouseSensitivity);
+        if (!Mathf.Approximately(prevMicSensitivity, _currentSettings.micSensitivity))
+            OnMicSensitivityChanged?.Invoke(_currentSettings.micSensitivity);
         if (prevInvertY != _currentSettings.invertYAxis)
             OnInvertYAxisChanged?.Invoke(_currentSettings.invertYAxis);
         if (!Mathf.Approximately(prevBrightness, _currentSettings.brightness))

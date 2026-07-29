@@ -146,7 +146,12 @@ public class Cage : MonoBehaviour
 #endif
         {
             if (perception != null)
-                perception.HearNoiseAt(soundPosition, doorSoundSuspicion, doorSoundMaxHearDistance, doorSoundMinHearDistance);
+                perception.HearNoiseAt(
+                    soundPosition,
+                    doorSoundSuspicion,
+                    doorSoundMaxHearDistance,
+                    doorSoundMinHearDistance,
+                    playInvestigateSfx: false);
         }
     }
 

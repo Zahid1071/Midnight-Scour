@@ -321,7 +321,8 @@ public class PerceptionController : MonoBehaviour
         Vector3 worldPosition,
         float baseSuspicion,
         float maxHearingDistance = DefaultMaxHearingDistance,
-        float minHearingDistance = DefaultMinHearingDistance)
+        float minHearingDistance = DefaultMinHearingDistance,
+        bool playInvestigateSfx = true)
     {
         if (npc != null && npc.HearingDisabled)
             return;
@@ -332,7 +333,7 @@ public class PerceptionController : MonoBehaviour
         if (scaled <= 0f)
             return;
 
-        HearLoudWorldNoise(worldPosition, scaled);
+        HearLoudWorldNoise(worldPosition, scaled, playInvestigateSfx);
     }
 
     public void HearPlayerFootstep(Transform soundSource, float suspicionAmount)
@@ -367,7 +368,10 @@ public class PerceptionController : MonoBehaviour
     /// Loud one-shot at a world position (e.g. body bag impact). Unlike <see cref="HearPlayerFootstep"/>,
     /// does not abort when no anchor is found — NPC still gets footstep suspicion and last-known point.
     /// </summary>
-    public void HearLoudWorldNoise(Vector3 worldPosition, float footstepSuspicionToAdd = 300f)
+    public void HearLoudWorldNoise(
+        Vector3 worldPosition,
+        float footstepSuspicionToAdd = 300f,
+        bool playInvestigateSfx = true)
     {
         if (npc != null && npc.HearingDisabled)
             return;
@@ -384,6 +388,15 @@ public class PerceptionController : MonoBehaviour
         searchTarget = anchor;
 
         npc.GetComponent<SuspicionSystem>()?.AddFootstepSuspicion(footstepSuspicionToAdd);
+
+        // Global / world noise while idle — pig bark as he commits to investigate.
+        // Cage door open passes false so the bark waits for the escape-sight reaction instead.
+        if (playInvestigateSfx
+            && (npc.currentState == NPCController.AIState.Natural
+                || npc.currentState == NPCController.AIState.Ambush))
+        {
+            npc.fsm?.TryPlayInvestigateSfx();
+        }
     }
 
     /// <summary>
@@ -467,13 +480,13 @@ public class PerceptionController : MonoBehaviour
                 {
                     Debug.Log($"⚠️ NPC: Player Escaped! (isEmpty: {isEmpty}, isOpen: {isOpen})");
 
+                    cageAlertTriggered = true;
+
                     if (npc.currentState != NPCController.AIState.Chase
                         && npc.currentState != NPCController.AIState.Capture)
                     {
-                        npc.fsm.SetState(NPCController.AIState.Search);
+                        npc.fsm?.BeginCageEscapeReaction();
                     }
-
-                    cageAlertTriggered = true;
                 }
             }
         }

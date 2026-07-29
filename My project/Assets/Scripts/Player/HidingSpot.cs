@@ -299,16 +299,6 @@ public class HidingSpot : MonoBehaviour, IInteractable
             return false;
         }
 
-        var hidingStamina = player.GetComponent<HidingStamina>();
-        if (hidingStamina != null && !hidingStamina.CanEnterHide)
-        {
-            if (hidingStamina.IsOnCooldown)
-                HudManager.Instance?.ShowSubtitle(Loc.Get("gameplay.catch_breath"), 2.5f);
-            else
-                HudManager.Instance?.ShowSubtitle(Loc.Get("gameplay.too_exhausted"), 2.5f);
-            return false;
-        }
-
         if (!TrySelectHideSide(player.transform.position, out activePivot, out activeAnimator))
             return false;
 

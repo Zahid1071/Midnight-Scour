@@ -31,6 +31,13 @@ public class LocalizedUILabel : MonoBehaviour
 
     void OnLocaleChanged(UnityEngine.Localization.Locale _) => Refresh();
 
+    public void SetEntryKey(string key)
+    {
+        entryKey = key;
+        if (isActiveAndEnabled)
+            Refresh();
+    }
+
     public void Refresh()
     {
         if (_label == null || string.IsNullOrWhiteSpace(entryKey))

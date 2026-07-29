@@ -22,10 +22,6 @@ public class DemoEndDirector : MonoBehaviour
     [SerializeField] float arriveDistance = 0.4f;
     [SerializeField] float alignRotationDuration = 0.4f;
 
-    [Header("Post-key tension")]
-    [Tooltip("Child trigger on this object — enabled when the basement key is picked up.")]
-    [SerializeField] ButcherProximityTensionZone tensionZone;
-
     bool _started;
     Coroutine _ambushRoutine;
 
@@ -55,7 +51,6 @@ public class DemoEndDirector : MonoBehaviour
 
         _started = true;
         butcher.SetHearingDisabled(true);
-        EnableTensionZone();
 
         if (_ambushRoutine != null)
             StopCoroutine(_ambushRoutine);
@@ -67,9 +62,9 @@ public class DemoEndDirector : MonoBehaviour
     {
         var interaction = butcher.interaction;
 
-        // CancelAndExitGracefully must run before fsm.SetState — SetState always calls
-        // CancelInteraction() and would skip the stand-up / smooth exit while sitting.
-        interaction?.CancelAndExitGracefully(NPCController.AIState.Scripted);
+        // StandUpFromHotspotThenSetState must run before fsm.SetState — SetState always calls
+        // CancelInteraction() and would skip the stand-up while sitting (float-sit).
+        interaction?.StandUpFromHotspotThenSetState(NPCController.AIState.Scripted);
 
         while (interaction != null && interaction.IsBusyWithRoutine())
             yield return null;
@@ -140,7 +135,6 @@ public class DemoEndDirector : MonoBehaviour
 
             if (IsPlayerVisible(perception))
             {
-                StopTensionZone();
                 butcher.BeginChaseFromPerception();
                 yield break;
             }
@@ -163,23 +157,5 @@ public class DemoEndDirector : MonoBehaviour
 
         var hider = player.GetComponent<PlayerHider>();
         return hider == null || !hider.isHidden;
-    }
-
-    void EnableTensionZone()
-    {
-        if (tensionZone == null)
-            return;
-
-        tensionZone.gameObject.SetActive(true);
-        tensionZone.Activate(butcher != null ? butcher.transform : null);
-    }
-
-    void StopTensionZone()
-    {
-        if (tensionZone == null)
-            return;
-
-        tensionZone.Deactivate();
-        tensionZone.gameObject.SetActive(false);
     }
 }

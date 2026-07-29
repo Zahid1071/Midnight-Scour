@@ -142,6 +142,10 @@ MonoBehaviour:
     m_Localized: Sensibilidade do Mouse
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296800
+    m_Localized: Sensibilidade do Microfone
+    m_Metadata:
+      m_Items: []
   - m_Id: 5707318296597
     m_Localized: "Resolução"
     m_Metadata:
@@ -192,18 +196,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5707318296609
     m_Localized: "Você já está se escondendo."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296610
-    m_Localized: "Preciso recuperar o fôlego primeiro."
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296611
-    m_Localized: Estou exausto demais para me esconder.
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296612
-    m_Localized: Eu preciso sair daqui!
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296613

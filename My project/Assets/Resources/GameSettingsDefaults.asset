@@ -21,6 +21,7 @@ MonoBehaviour:
     musicVolume: 0.2
     sfxVolume: 0.8
     mouseSensitivity: 0.1
+    micSensitivity: 0.5
     invertYAxis: 0
     brightness: 3
     difficultyIndex: 1

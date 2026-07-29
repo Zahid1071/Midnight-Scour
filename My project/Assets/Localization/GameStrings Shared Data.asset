@@ -139,6 +139,10 @@ MonoBehaviour:
     m_Key: ui.settings.mouse_sensitivity
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296800
+    m_Key: ui.settings.mic_sensitivity
+    m_Metadata:
+      m_Items: []
   - m_Id: 5707318296597
     m_Key: ui.settings.resolution
     m_Metadata:
@@ -189,18 +193,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5707318296609
     m_Key: gameplay.already_hiding
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296610
-    m_Key: gameplay.catch_breath
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296611
-    m_Key: gameplay.too_exhausted
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296612
-    m_Key: gameplay.stamina_exit
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296613

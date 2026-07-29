@@ -33,6 +33,7 @@ public class SettingsMenu : MonoBehaviour
 
     [Header("Sliders (0-1 normalized)")]
     [SerializeField] private Slider mouseSensitivitySlider;
+    [SerializeField] private Slider micSensitivitySlider;
     [SerializeField] private Slider masterVolSlider;
     [SerializeField] private Slider musicVolSlider;
     [SerializeField] private Slider sfxVolSlider;
@@ -94,6 +95,49 @@ public class SettingsMenu : MonoBehaviour
                 break;
             }
         }
+
+        EnsureMicSensitivityRow();
+    }
+
+    /// <summary>
+    /// Clones the mouse-sensitivity row into a mic-sensitivity control when the prefab
+    /// does not already have one assigned. Works for main-menu and pause settings panels.
+    /// </summary>
+    void EnsureMicSensitivityRow()
+    {
+        if (micSensitivitySlider != null)
+            return;
+
+        Transform mouseRow = null;
+        foreach (var tr in GetComponentsInChildren<Transform>(true))
+        {
+            if (tr.name != "Row_MouseSensitivity")
+                continue;
+            mouseRow = tr;
+            break;
+        }
+
+        if (mouseRow == null || mouseRow.parent == null)
+            return;
+
+        Transform existing = mouseRow.parent.Find("Row_MicSensitivity");
+        GameObject rowGo;
+        if (existing != null)
+        {
+            rowGo = existing.gameObject;
+        }
+        else
+        {
+            rowGo = Instantiate(mouseRow.gameObject, mouseRow.parent);
+            rowGo.name = "Row_MicSensitivity";
+            rowGo.transform.SetSiblingIndex(mouseRow.GetSiblingIndex() + 1);
+        }
+
+        micSensitivitySlider = rowGo.GetComponentInChildren<Slider>(true);
+
+        var label = rowGo.GetComponentInChildren<LocalizedUILabel>(true);
+        if (label != null)
+            label.SetEntryKey("ui.settings.mic_sensitivity");
     }
 
     private void Start()
@@ -280,6 +324,7 @@ public class SettingsMenu : MonoBehaviour
         if (musicVolSlider)         musicVolSlider.onValueChanged.AddListener(OnMusicVolChanged);
         if (sfxVolSlider)           sfxVolSlider.onValueChanged.AddListener(OnSFXVolChanged);
         if (mouseSensitivitySlider) mouseSensitivitySlider.onValueChanged.AddListener(OnMouseSensChanged);
+        if (micSensitivitySlider)   micSensitivitySlider.onValueChanged.AddListener(OnMicSensChanged);
         if (brightnessSlider)       brightnessSlider.onValueChanged.AddListener(OnBrightnessChanged);
     }
 
@@ -292,6 +337,7 @@ public class SettingsMenu : MonoBehaviour
         if (musicVolSlider)         musicVolSlider.onValueChanged.RemoveListener(OnMusicVolChanged);
         if (sfxVolSlider)           sfxVolSlider.onValueChanged.RemoveListener(OnSFXVolChanged);
         if (mouseSensitivitySlider) mouseSensitivitySlider.onValueChanged.RemoveListener(OnMouseSensChanged);
+        if (micSensitivitySlider)   micSensitivitySlider.onValueChanged.RemoveListener(OnMicSensChanged);
         if (brightnessSlider)       brightnessSlider.onValueChanged.RemoveListener(OnBrightnessChanged);
     }
 
@@ -325,6 +371,13 @@ public class SettingsMenu : MonoBehaviour
             GameSettingsManager.Instance.MouseSensitivity = _pending.mouseSensitivity;
     }
 
+    private void OnMicSensChanged(float v)
+    {
+        _pending.micSensitivity = Mathf.Clamp01(v);
+        if (GameSettingsManager.Instance != null)
+            GameSettingsManager.Instance.MicSensitivity = _pending.micSensitivity;
+    }
+
     private void OnBrightnessChanged(float v)
     {
         _pending.brightness = Mathf.Clamp01(v);
@@ -341,6 +394,7 @@ public class SettingsMenu : MonoBehaviour
         // Sliders use SetValueWithoutNotify so mirroring data into the UI
         // doesn't fire our live-preview callbacks (would otherwise loop).
         if (mouseSensitivitySlider) mouseSensitivitySlider.SetValueWithoutNotify(s.mouseSensitivity);
+        if (micSensitivitySlider)   micSensitivitySlider.SetValueWithoutNotify(s.micSensitivity);
         if (masterVolSlider)        masterVolSlider.SetValueWithoutNotify(s.masterVolume);
         if (musicVolSlider)         musicVolSlider.SetValueWithoutNotify(s.musicVolume);
         if (sfxVolSlider)           sfxVolSlider.SetValueWithoutNotify(s.sfxVolume);
@@ -372,6 +426,7 @@ public class SettingsMenu : MonoBehaviour
     private void ReadUIInto(ref GameSettingsManager.SettingsData s)
     {
         s.mouseSensitivity = mouseSensitivitySlider ? mouseSensitivitySlider.value : s.mouseSensitivity;
+        s.micSensitivity   = micSensitivitySlider   ? micSensitivitySlider.value   : s.micSensitivity;
         s.masterVolume     = masterVolSlider        ? masterVolSlider.value        : s.masterVolume;
         s.musicVolume      = musicVolSlider         ? musicVolSlider.value         : s.musicVolume;
         s.sfxVolume        = sfxVolSlider           ? sfxVolSlider.value           : s.sfxVolume;

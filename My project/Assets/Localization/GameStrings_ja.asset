@@ -142,6 +142,10 @@ MonoBehaviour:
     m_Localized: "マウス感度"
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296800
+    m_Localized: マイク感度
+    m_Metadata:
+      m_Items: []
   - m_Id: 5707318296597
     m_Localized: "解像度"
     m_Metadata:
@@ -192,18 +196,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5707318296609
     m_Localized: "もう隠れている。"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296610
-    m_Localized: "まず息を整えないと。"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296611
-    m_Localized: "疲れすぎて隠れられない。"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296612
-    m_Localized: "ここから出ないと！"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296613

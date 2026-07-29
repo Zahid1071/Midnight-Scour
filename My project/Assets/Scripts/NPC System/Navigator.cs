@@ -57,6 +57,9 @@ namespace FS_Atmo
 
         // === Public APIs ===
 
+        /// <summary>Best current-room estimate (path-based room vote, cached).</summary>
+        public RoomAnchor GetCurrentRoom() => FindCurrentRoom();
+
         public void GoToRoom(RoomAnchor targetRoom, Vector3? finalPoint = null, string destinationName = null, string parentName = null)
         {
             if (isDoorTransit) return;

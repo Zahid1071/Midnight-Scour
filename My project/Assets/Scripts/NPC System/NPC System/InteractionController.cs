@@ -298,35 +298,97 @@ public class InteractionController : MonoBehaviour
         hasVisualOffset = false;
     }
 
-    private IEnumerator GracefulExitRoutine(NPCController.AIState nextState)
+    /// <summary>
+    /// Pending AI state while we abort a sit/hotspot and put the visual root back on the agent.
+    /// Non-null means <see cref="StandUpFromHotspotThenSetState"/> is in progress.
+    /// </summary>
+    NPCController.AIState? _stateAfterStandUp;
+
+    /// <summary>
+    /// True while leaving a seated hotspot (stand-up anim + visual lerp) before the AI state changes.
+    /// </summary>
+    public bool IsStandingUpFromHotspot => _stateAfterStandUp.HasValue;
+
+    /// <summary>
+    /// Abort the current hotspot (bed/sofa/etc.), stand up and lerp the visual root back onto the
+    /// NavMeshAgent, THEN change AI state. Use this instead of <see cref="CancelInteraction"/> +
+    /// SetState when he might be sitting — otherwise the agent runs while the mesh stays in the
+    /// sit pose (float-sit toward the player).
+    /// </summary>
+    /// <returns>True if stand-up is still running (do not start chase movement yet).</returns>
+    public bool StandUpFromHotspotThenSetState(NPCController.AIState nextState)
     {
-        if (hasVisualOffset)
+        if (_stateAfterStandUp.HasValue)
         {
-            animator.SetTrigger("StandUp");
-            yield return InterpolateBackToStandingPosition();
+            // Already standing up — keep the more urgent destination (e.g. Search → Chase).
+            _stateAfterStandUp = PreferStateAfterStandUp(_stateAfterStandUp.Value, nextState);
+            return true;
         }
 
-        interactionRoutine = null;
-        IsPerformingHotspotAction = false;
-        animator.SetInteger("Behaviour", -1);
-        npc.fsm.SetState(nextState);
-    }
-
-    public void CancelAndExitGracefully(NPCController.AIState nextState)
-    {
         if (interactionRoutine != null)
+        {
             StopCoroutine(interactionRoutine);
+            interactionRoutine = null;
+        }
 
         if (IsPerformingHotspotAction || hasVisualOffset)
         {
             isCancelled = true;
-            interactionRoutine = StartCoroutine(GracefulExitRoutine(nextState));
+            _stateAfterStandUp = nextState;
+            interactionRoutine = StartCoroutine(StandUpFromHotspotThenSetStateRoutine());
+            return true;
         }
-        else
+
+        CancelInteraction();
+        npc.fsm.SetState(nextState);
+        return false;
+    }
+
+    static NPCController.AIState PreferStateAfterStandUp(
+        NPCController.AIState current, NPCController.AIState incoming)
+    {
+        int Rank(NPCController.AIState s)
         {
-            CancelInteraction();
-            npc.fsm.SetState(nextState);
+            switch (s)
+            {
+                case NPCController.AIState.Capture: return 3;
+                case NPCController.AIState.Chase: return 2;
+                case NPCController.AIState.Search: return 1;
+                default: return 0;
+            }
         }
+
+        return Rank(incoming) >= Rank(current) ? incoming : current;
+    }
+
+    IEnumerator StandUpFromHotspotThenSetStateRoutine()
+    {
+        if (navigator != null)
+            navigator.ClearRoute();
+
+        if (agent != null)
+        {
+            agent.ResetPath();
+            agent.isStopped = true;
+            agent.velocity = Vector3.zero;
+        }
+
+        if (hasVisualOffset)
+        {
+            if (animator != null)
+                animator.SetTrigger("StandUp");
+            yield return InterpolateBackToStandingPosition();
+        }
+
+        IsPerformingHotspotAction = false;
+        if (animator != null)
+            animator.SetInteger("Behaviour", -1);
+
+        NPCController.AIState nextState = _stateAfterStandUp
+            ?? NPCController.AIState.Natural;
+        _stateAfterStandUp = null;
+        interactionRoutine = null;
+        npc.fsm.SetState(nextState);
     }
 
     private void PlayHotspotAnimation(WeightedHotspot hotspot)
@@ -346,12 +408,27 @@ public class InteractionController : MonoBehaviour
     public void CancelInteraction()
     {
         isCancelled = true;
+        _stateAfterStandUp = null;
         if (interactionRoutine != null)
         {
             StopCoroutine(interactionRoutine);
             interactionRoutine = null;
         }
         IsPerformingHotspotAction = false;
-        animator.SetInteger("Behaviour", -1);
+        if (animator != null)
+            animator.SetInteger("Behaviour", -1);
+
+        // Hard cancel without stand-up left him offset on the seat forever in Natural.
+        SnapVisualRootToAgent();
+    }
+
+    void SnapVisualRootToAgent()
+    {
+        if (!hasVisualOffset || visualRoot == null)
+            return;
+
+        visualRoot.localPosition = Vector3.zero;
+        visualRoot.localRotation = Quaternion.identity;
+        hasVisualOffset = false;
     }
 }

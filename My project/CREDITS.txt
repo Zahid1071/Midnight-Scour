@@ -48,6 +48,9 @@ Uicons by Flaticon (https://www.flaticon.com/uicons) - covers "Circle-dashed" ic
 "Five fingers" icon by Kalashnyk, via Flaticon (www.flaticon.com)
 https://www.flaticon.com/free-icon/five-fingers_9971672
 
+"Microphone" icon by Kiranshastry, via Flaticon (www.flaticon.com)
+https://www.flaticon.com/free-icon/microphone_833389
+
 "Circle-dashed-full" icon (used for the out-of-reach crosshair) - confirmed by dev to have no visible creator/author card on its Flaticon page, same as "Circle-dashed" - treated as a Flaticon Uicon, covered by the "Uicons by Flaticon" credit above
 
 

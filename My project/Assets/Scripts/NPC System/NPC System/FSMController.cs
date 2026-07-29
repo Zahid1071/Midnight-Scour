@@ -3,7 +3,6 @@ using UnityEngine.AI;
 using System.Collections;
 using FS_Atmo;
 using System.Collections.Generic;
-using KinoGlitch;
 
 
 public class FSMController
@@ -21,6 +20,7 @@ public class FSMController
     Coroutine _searchRoutineCo;
     Coroutine _ambushRoutineCo;
     Coroutine _witnessedHideCaptureCo;
+    Coroutine _cageEscapeReactionCo;
     HidingSpot _witnessedHideSpot;
 
     Transform _lastAmbushSpot;
@@ -123,6 +123,11 @@ public class FSMController
                     nav?.ClearRoute();
                 if (agent != null)
                     agent.isStopped = false;
+                // Pig sfx only when he breaks from idle/ambush into chase — not Search→Chase
+                // (mic / suspicion redirects) which would spam it.
+                if (prev == NPCController.AIState.Ambush
+                    || prev == NPCController.AIState.Natural)
+                    TryPlayInvestigateSfx();
                 //Debug.Log("🏃 State: CHASE");
                 break;
 
@@ -143,6 +148,69 @@ public class FSMController
                 npc.poiLookDirector?.CancelHoldAndClearLook();
                 break;
         }
+    }
+
+    void PlayChaseEnterSfx()
+    {
+        if (npc.ChaseEnterSfx == null || SoundManager.Instance == null)
+            return;
+
+        SoundManager.Instance.PlaySFXFollowing(
+            npc.ChaseEnterSfx,
+            npc.transform,
+            npc.ChaseEnterVolume);
+    }
+
+    float _lastInvestigateSfxTime = -999f;
+    const float InvestigateSfxCooldown = 4f;
+
+    /// <summary>
+    /// Pig / chase-enter bark when he breaks from idle to investigate a loud noise.
+    /// Cooldown prevents double-fire if Chase enter also plays right after.
+    /// </summary>
+    public void TryPlayInvestigateSfx()
+    {
+        if (Time.time - _lastInvestigateSfxTime < InvestigateSfxCooldown)
+            return;
+
+        _lastInvestigateSfxTime = Time.time;
+        PlayChaseEnterSfx();
+    }
+
+    /// <summary>
+    /// First time he sees the cage empty/open: pig bark, freeze briefly, then search.
+    /// </summary>
+    public void BeginCageEscapeReaction()
+    {
+        if (_cageEscapeReactionCo != null)
+            return;
+
+        _cageEscapeReactionCo = npc.StartCoroutine(CageEscapeReactionRoutine());
+    }
+
+    IEnumerator CageEscapeReactionRoutine()
+    {
+        TryPlayInvestigateSfx();
+
+        StopSearchRoutine();
+        StopAmbushRoutine();
+        nav?.ClearRoute();
+        StopAgentMovement();
+
+        _cageEscapeReactionCo = null;
+
+        if (npc.currentState == NPCController.AIState.Chase
+            || npc.currentState == NPCController.AIState.Capture)
+            yield break;
+
+        // Stand up if mid-sit, then Search. SearchRoutine already waits 2s at the start.
+        // SetState alone CancelInteraction()s and leaves him floating in the sit pose.
+        if (npc.interaction != null)
+            npc.interaction.StandUpFromHotspotThenSetState(NPCController.AIState.Search);
+        else
+            SetState(NPCController.AIState.Search);
+
+        yield break;
     }
 
     void StartSearchRoutine()
@@ -195,10 +263,15 @@ public class FSMController
 
     /// <summary>
     /// Path to a hide spot the NPC witnessed the player enter, then capture if still occupied.
+    /// Arms the hide-spot lock immediately so Chase ticks cannot capture mid-path.
     /// </summary>
     public void BeginWitnessedHideCapture(HidingSpot spot)
     {
         if (spot == null)
+            return;
+
+        // Already committed to this spot — don't restart.
+        if (_witnessedHideCaptureCo != null && _witnessedHideSpot == spot)
             return;
 
         ClearWitnessedHideCapture();
@@ -212,29 +285,102 @@ public class FSMController
             npc.perception.RedirectLastKnownPosition(dest);
 
         EnsureLocomotion();
+        _witnessedHideCaptureCo = npc.StartCoroutine(WitnessedHideCaptureRoutine(spot, dest));
+    }
+
+    public bool IsHideSpotCheckActive => _witnessedHideSpot != null;
+
+    IEnumerator WitnessedHideCaptureRoutine(HidingSpot spot, Vector3 dest)
+    {
+        // Mic / witnessed-hide can fire while he's still on a sit hotspot. Stand-up must finish
+        // and Chase must be active before we path — otherwise we "arrive" at the nearby hide
+        // while still Natural, exit early, and leave _witnessedHideSpot set which blocks TickChase forever.
+        float standDeadline = Time.time + 12f;
+        while (Time.time < standDeadline)
+        {
+            if (_witnessedHideSpot != spot)
+            {
+                _witnessedHideCaptureCo = null;
+                yield break;
+            }
+
+            bool standingUp = npc.interaction != null && npc.interaction.IsStandingUpFromHotspot;
+            if (npc.currentState == NPCController.AIState.Chase && !standingUp)
+                break;
+
+            yield return null;
+        }
+
+        if (npc.currentState != NPCController.AIState.Chase || _witnessedHideSpot != spot)
+        {
+            _witnessedHideCaptureCo = null;
+            if (_witnessedHideSpot == spot)
+                _witnessedHideSpot = null;
+            yield break;
+        }
+
         if (agent != null)
         {
             agent.isStopped = false;
             agent.speed = runningSpeed;
         }
 
-        _witnessedHideCaptureCo = npc.StartCoroutine(WitnessedHideCaptureRoutine(spot, dest));
-    }
+        // Retry pathing if Navigator is mid-door and ignores the first GoToPoint.
+        float pathStart = Time.time;
+        float startDist = agent != null
+            ? Vector3.Distance(agent.transform.position, dest)
+            : float.MaxValue;
 
-    IEnumerator WitnessedHideCaptureRoutine(HidingSpot spot, Vector3 dest)
-    {
+        while (Time.time - pathStart < 2f)
+        {
+            if (nav != null && !nav.IsInDoorTransit)
+                nav.GoToPoint(dest);
+            else if (nav == null && agent != null)
+                agent.SetDestination(dest);
+
+            yield return null;
+
+            if (nav == null || !nav.IsInDoorTransit)
+                break;
+        }
+
         if (nav != null)
             nav.GoToPoint(dest);
         else if (agent != null)
             agent.SetDestination(dest);
 
-        yield return WaitForAgentArrivalOrGiveUp(agent, SearchArriveDistance, SearchStuckTimeout);
+        // Longer timeout — door routes to another floor can take a while; stuck must NEVER capture.
+        bool arrived = false;
+        yield return WaitForAgentArrivalOrGiveUp(
+            agent, dest, SearchArriveDistance, WitnessedHideStuckTimeout, ok => arrived = ok);
 
         if (npc.currentState != NPCController.AIState.Chase
             || _witnessedHideSpot != spot)
         {
             _witnessedHideCaptureCo = null;
+            if (_witnessedHideSpot == spot)
+                _witnessedHideSpot = null;
             yield break;
+        }
+
+        // Final hard gate: must be at the spot right now. Never capture from a stale/false arrive.
+        bool reallyThere = false;
+        if (arrived && agent != null)
+        {
+            Vector3 pos = agent.transform.position;
+            float dist = Vector3.Distance(pos, dest);
+            float yDelta = Mathf.Abs(pos.y - dest.y);
+            reallyThere = dist <= SearchArriveDistance + ArriveRecheckSlack
+                && yDelta <= SearchArriveMaxYDelta;
+
+            // Started far away but "arrived" too fast to have walked it — reject.
+            if (reallyThere && startDist > SearchArriveDistance + 1.5f)
+            {
+                float elapsed = Time.time - pathStart;
+                float minWalkTime = (startDist - SearchArriveDistance) / Mathf.Max(runningSpeed, 1f);
+                if (elapsed < minWalkTime * 0.4f)
+                    reallyThere = false;
+            }
         }
 
         var lookDirector = npc.poiLookDirector;
@@ -245,20 +391,21 @@ public class FSMController
             lookDirector.TriggerLookHold();
         }
 
-        // Same outcome as a successful search hide-spot capture roll.
         bool stillOccupied = spot != null && spot.isOccupied && !spot.searchCheckpointOnly;
 
-        _witnessedHideCaptureCo = null;
-        _witnessedHideSpot = null;
-
-        if (stillOccupied)
+        if (reallyThere && stillOccupied)
         {
             Debug.Log($"🎯 Player caught after witnessed hide enter: {spot.name}");
+            // Keep _witnessedHideSpot set until Capture state takes over (blocks TickChase).
+            _witnessedHideCaptureCo = null;
             SetState(NPCController.AIState.Capture);
             yield break;
         }
 
-        // Player left before arrival — search the room around last known.
+        _witnessedHideCaptureCo = null;
+        _witnessedHideSpot = null;
+
+        // Player left, or we never reached the spot — search the room around last known.
         if (lookDirector != null)
             lookDirector.CancelHoldAndClearLook();
 
@@ -374,6 +521,27 @@ public class FSMController
             var hider = playerT.GetComponent<PlayerHider>();
             if (hider != null && hider.isHidden && hider.CurrentHidingSpot != null)
             {
+                var spot = hider.CurrentHidingSpot;
+                Vector3 spotPos = spot.GetSearchPivot() != null
+                    ? spot.GetSearchPivot().position
+                    : spot.transform.position;
+
+                Vector3 npcPos = npc.transform.position;
+                float distToSpot = Vector3.Distance(npcPos, spotPos);
+                float yDelta = Mathf.Abs(npcPos.y - spotPos.y);
+
+                // HARD RULE: a hidden player can only be grabbed when the NPC is physically at
+                // the hiding spot. Anywhere else — cancel this capture, run there first, and
+                // the arrival re-triggers capture properly.
+                if (distToSpot > SearchArriveDistance + ArriveRecheckSlack || yDelta > SearchArriveMaxYDelta)
+                {
+                    Debug.Log($"🚫 Capture blocked — {distToSpot:0.0}m from {spot.name}. Running there first.");
+                    npc.OnCaptureRoutineFinished();
+                    SetState(NPCController.AIState.Chase);
+                    BeginWitnessedHideCapture(spot);
+                    yield break;
+                }
+
                 hider.CurrentHidingSpot.RevealPlayerForCapture(playerT.gameObject);
                 float wait = Mathf.Max(0f, npc.hideExitSecondsBeforeCapture);
                 if (wait > 0f)
@@ -766,11 +934,30 @@ public class FSMController
 
         RegisterSearchExposureForHiddenPlayer(roomAnchor);
 
-        // ensure we actually route to the room (door-aware)
-        var room = roomAnchor.GetComponent<RoomAnchor>();
-        if (nav != null && room != null) nav.GoToRoom(room);
+        // Already standing at the hear/LKP near this room — don't freeze on a room-anchor wait.
+        Vector3 roomPos = roomAnchor.position;
+        float distToRoom = agent != null
+            ? Vector3.Distance(agent.transform.position, roomPos)
+            : float.MaxValue;
+        float yDeltaToRoom = agent != null
+            ? Mathf.Abs(agent.transform.position.y - roomPos.y)
+            : 0f;
+        bool alreadyAtRoom = distToRoom <= SearchArriveDistance + ArriveRecheckSlack
+            && yDeltaToRoom <= SearchArriveMaxYDelta;
 
-        yield return WaitForAgentArrivalOrGiveUp(agent, SearchArriveDistance, SearchStuckTimeout);
+        if (!alreadyAtRoom)
+        {
+            var room = roomAnchor.GetComponent<RoomAnchor>();
+            // Pass room anchor as final point so same-room GoToRoom actually moves
+            // (without it, same-room + no finalPoint can leave him idle until stuck timeout).
+            if (nav != null && room != null)
+                nav.GoToRoom(room, roomPos);
+            else if (agent != null)
+                agent.SetDestination(roomPos);
+
+            yield return WaitForAgentArrivalOrGiveUp(
+                agent, roomPos, SearchArriveDistance, SearchStuckTimeout);
+        }
 
         var data = npc.interaction?.data;
         var allStops = roomAnchor.GetComponentsInChildren<HidingSpot>();
@@ -791,13 +978,20 @@ public class FSMController
             if (searchPivot == null)
                 continue;
 
-            if (nav != null) nav.GoToPoint(searchPivot.position);
-            else agent.SetDestination(searchPivot.position);
+            Vector3 spotDest = searchPivot.position;
+            if (nav != null) nav.GoToPoint(spotDest);
+            else agent.SetDestination(spotDest);
 
-            yield return WaitForAgentArrivalOrGiveUp(agent, SearchArriveDistance, SearchStuckTimeout);
+            bool reachedSpot = false;
+            yield return WaitForAgentArrivalOrGiveUp(
+                agent, spotDest, SearchArriveDistance, SearchStuckTimeout, ok => reachedSpot = ok);
 
             if (TryBreakSearchForChase())
                 yield break;
+
+            // Stuck / unreachable — do not "check" (and possibly capture) from across the map.
+            if (!reachedSpot)
+                continue;
 
             Transform searchPoi = spot.ResolveSearchLookTarget();
             float waitTime = spot.GetSearchWaitSeconds(data);
@@ -815,8 +1009,6 @@ public class FSMController
                 if (TryBreakSearchForChase())
                     yield break;
 
-                ApplySearchGlitch(spot, data, elapsed, waitTime);
-
                 if (lookDirector != null)
                 {
                     lookDirector.SnapPOITo(searchPoi);
@@ -827,20 +1019,18 @@ public class FSMController
                 elapsed += checkEvery;
             }
 
-            ApplySearchGlitch(spot, data, waitTime, waitTime);
-
             if (lookDirector != null)
                 lookDirector.CancelHoldAndClearLook();
-
-            ResetGlitch();
 
             if (!spot.searchCheckpointOnly && data != null && spot.isOccupied)
             {
                 float captureChance = spot.GetCaptureChance(data.captureChance);
+                var occupyingHider = spot.ResolveOccupyingHider();
+                occupyingHider?.ClearMicCaptureOverride();
+
                 if (UnityEngine.Random.value < captureChance)
                 {
                     Debug.Log($"🎯 Player Caught in: {spot.name}");
-                    ResetGlitch();
                     SetState(NPCController.AIState.Capture);
                     yield break;
                 }
@@ -855,42 +1045,73 @@ public class FSMController
         }
     }
 
-    const float SearchArriveDistance = 2f;
+    // SINGLE SOURCE OF TRUTH for "am I at the spot" — used by every arrival wait,
+    // arrival re-check, and the hidden-player capture gate.
+    const float SearchArriveDistance = 1f;
+    // Tiny tolerance for re-checks that happen a few frames after the arrival wait
+    // (the agent can drift slightly while decelerating). Never used to arrive early.
+    const float ArriveRecheckSlack = 0.35f;
     const float SearchStuckTimeout = 5f;
+    const float WitnessedHideStuckTimeout = 25f;
+    const float SearchArriveMaxYDelta = 1.5f;
 
     /// <summary>
-    /// Waits until the agent arrives within <paramref name="arriveDistance"/>, but gives up
-    /// after <paramref name="stuckTimeout"/> seconds of no progress (or an invalid path) instead
-    /// of waiting forever. Without this, an unreachable search target (e.g. blocked by a closed
-    /// door/cage) would freeze the NPC in the Search state permanently.
+    /// Waits until the agent is within <paramref name="arriveDistance"/> of <paramref name="dest"/>
+    /// on roughly the same floor. Gives up after <paramref name="stuckTimeout"/> of no progress
+    /// (or invalid path). <paramref name="onFinished"/> gets true only on a real arrive — never
+    /// on give-up — so callers must not capture unless that flag is true.
     /// </summary>
-    static IEnumerator WaitForAgentArrivalOrGiveUp(NavMeshAgent agent, float arriveDistance, float stuckTimeout)
+    static IEnumerator WaitForAgentArrivalOrGiveUp(
+        NavMeshAgent agent,
+        Vector3 dest,
+        float arriveDistance,
+        float stuckTimeout,
+        System.Action<bool> onFinished = null)
     {
         if (agent == null)
+        {
+            onFinished?.Invoke(false);
             yield break;
+        }
+
+        // Let Navigator/SetDestination start before we sample distance.
+        yield return null;
+        yield return null;
 
         float stuckTimer = 0f;
-        float lastRemaining = Mathf.Infinity;
+        float lastDist = Vector3.Distance(agent.transform.position, dest);
 
         while (true)
         {
             if (agent.pathStatus == NavMeshPathStatus.PathInvalid)
-                yield break;
-
-            if (!agent.pathPending && agent.remainingDistance <= arriveDistance)
-                yield break;
-
-            if (!agent.pathPending)
             {
-                if (Mathf.Abs(agent.remainingDistance - lastRemaining) < 0.05f)
-                    stuckTimer += Time.deltaTime;
-                else
-                    stuckTimer = 0f;
+                onFinished?.Invoke(false);
+                yield break;
+            }
 
-                lastRemaining = agent.remainingDistance;
+            Vector3 pos = agent.transform.position;
+            float dist = Vector3.Distance(pos, dest);
+            float yDelta = Mathf.Abs(pos.y - dest.y);
 
-                if (stuckTimer >= stuckTimeout)
-                    yield break;
+            // World arrive on the same floor — remainingDistance alone can false-trigger on a
+            // leftover path, and raw 3D distance can pass between stacked floors.
+            if (dist <= arriveDistance && yDelta <= SearchArriveMaxYDelta)
+            {
+                onFinished?.Invoke(true);
+                yield break;
+            }
+
+            if (Mathf.Abs(dist - lastDist) < 0.05f)
+                stuckTimer += Time.deltaTime;
+            else
+                stuckTimer = 0f;
+
+            lastDist = dist;
+
+            if (stuckTimer >= stuckTimeout)
+            {
+                onFinished?.Invoke(false);
+                yield break;
             }
 
             yield return null;
@@ -901,53 +1122,11 @@ public class FSMController
     {
         if (!IsPlayerStealthHidden() && npc.perception != null && npc.perception.CanSeePlayer)
         {
-            ResetGlitch();
             SetState(NPCController.AIState.Chase);
             return true;
         }
 
         return false;
-    }
-
-    const float MaxSearchGlitch = 0.05f;
-
-    static void ApplySearchGlitch(HidingSpot spot, NPCData data, float elapsed, float waitTime)
-    {
-        if (spot == null || !spot.isOccupied || spot.searchCheckpointOnly)
-        {
-            ResetGlitch();
-            return;
-        }
-
-        float baseChance = data != null ? data.captureChance : 0f;
-        float captureChance = spot.GetCaptureChance(baseChance);
-        float chanceScale = Mathf.Lerp(1f, 2f, Mathf.Clamp01(captureChance));
-        float maxGlitch = MaxSearchGlitch * chanceScale;
-
-        float progress = waitTime > 0f ? Mathf.Clamp01(elapsed / waitTime) : 1f;
-        SetGlitch(Mathf.Lerp(0f, maxGlitch, progress));
-
-        float audioIntensity = progress * (chanceScale / 2f);
-        SoundManager.Instance?.SetSearchTension(audioIntensity);
-    }
-
-    static void ResetGlitch()
-    {
-        SetGlitch(0f);
-        SoundManager.Instance?.StopSearchTension();
-    }
-
-    static void SetGlitch(float value)
-    {
-        var glitch = Camera.main != null ? Camera.main.GetComponent<AnalogGlitchController>() : null;
-        if (glitch == null)
-            return;
-
-        glitch.ScanLineJitter = value;
-        glitch.HorizontalShake = value;
-        glitch.ColorDrift = value;
-        glitch.HorizontalRipple = value;
-        glitch.VerticalJump = 0f;
     }
 
     static void RegisterSearchExposureForHiddenPlayer(Transform roomAnchor)
@@ -1003,9 +1182,25 @@ public class FSMController
         if (pool.Count == 0)
             return picked;
 
-        int first = PickWeightedSearchSpotIndex(pool);
-        picked.Add(pool[first]);
-        pool.RemoveAt(first);
+        // Mic-alerted hide spot should be checked first so the override capture roll can fire.
+        var player = GameObject.FindWithTag("Player");
+        var hider = player != null ? player.GetComponent<PlayerHider>() : null;
+        if (hider != null && hider.TryGetMicCaptureOverrideSpot(out var micSpot))
+        {
+            int micIdx = pool.IndexOf(micSpot);
+            if (micIdx >= 0)
+            {
+                picked.Add(pool[micIdx]);
+                pool.RemoveAt(micIdx);
+            }
+        }
+
+        if (picked.Count == 0)
+        {
+            int first = PickWeightedSearchSpotIndex(pool);
+            picked.Add(pool[first]);
+            pool.RemoveAt(first);
+        }
 
         if (extraSpotChances == null)
             return picked;
@@ -1043,15 +1238,15 @@ public class FSMController
         var agent = npc.interaction.agent;
         if (npc.perception == null || nav == null || agent == null) return;
 
-        // Witnessed hide-enter capture owns pathing until arrival.
-        if (_witnessedHideSpot != null)
+        // Witnessed hide-enter capture owns pathing until arrival — never proximity-capture.
+        if (_witnessedHideSpot != null || _witnessedHideCaptureCo != null)
             return;
 
         // 1. Durum Tespiti — locker hide stays valid even if NPC walks up later
         bool isHidden = IsPlayerStealthHidden();
         bool canSee   = !isHidden && npc.perception.CanSeePlayer;
 
-        // 2. Yakalama Kontrolü (Sadece Görüyor ve Yakınsa)
+        // 2. Yakalama Kontrolü (Sadece Görüyor ve Yakınsa — never while player is hidden)
         if (canSee && npc.perception.PlayerTransform != null)
         {
             float dist = Vector3.Distance(npc.transform.position, npc.perception.PlayerTransform.position);

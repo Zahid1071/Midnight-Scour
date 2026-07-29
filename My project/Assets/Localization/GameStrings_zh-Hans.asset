@@ -142,6 +142,10 @@ MonoBehaviour:
     m_Localized: "鼠标灵敏度"
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296800
+    m_Localized: 麦克风灵敏度
+    m_Metadata:
+      m_Items: []
   - m_Id: 5707318296597
     m_Localized: "分辨率"
     m_Metadata:
@@ -192,18 +196,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5707318296609
     m_Localized: "你已经在躲藏了。"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296610
-    m_Localized: "我得先喘口气。"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296611
-    m_Localized: "我太累了，没法躲藏。"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5707318296612
-    m_Localized: "我得离开这里！"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296613

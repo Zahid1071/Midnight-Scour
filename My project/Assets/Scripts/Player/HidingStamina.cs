@@ -4,16 +4,30 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Drains while the player is hidden, refills after a short cooldown, and drives the stamina bar.
-/// Plays an out-of-breath one-shot on exit when stamina is low, then restores the default breathing loop.
+/// While hidden, samples the microphone and drives the hide meter from loudness
+/// (Fear to Fathom–style). Loud spikes / sustained noise send nearby NPCs to the
+/// hide spot for a guaranteed capture (same path as being seen entering a hide).
 /// </summary>
 [DisallowMultipleComponent]
 public class HidingStamina : MonoBehaviour
 {
-    [Header("Timing")]
-    [SerializeField] float maxHideSeconds = 20f;
-    [SerializeField] float cooldownSeconds = 3f;
-    [SerializeField] float regenSeconds = 8f;
+    [Header("Microphone")]
+    [SerializeField] int sampleRate = 44100;
+    [SerializeField] int sampleWindow = 256;
+    [Tooltip("Mic level at or below this dB counts as silence.")]
+    [SerializeField] float noiseFloorDb = -55f;
+    [Tooltip("Mic level at or above this dB counts as fully loud.")]
+    [SerializeField] float peakDb = -15f;
+    [SerializeField, Range(0.1f, 5f)] float sensitivity = 1f;
+    [SerializeField] float loudnessSmoothSpeed = 10f;
+
+    [Header("Detection")]
+    [Tooltip("Loudness above this starts building a sustained alert.")]
+    [SerializeField, Range(0f, 1f)] float sustainedLoudnessThreshold = 0.45f;
+    [SerializeField] float sustainedSecondsToAlert = 0.85f;
+    [Tooltip("Instant alert when smoothed loudness crosses this.")]
+    [SerializeField, Range(0f, 1f)] float spikeLoudnessThreshold = 0.75f;
+    [SerializeField] float alertCooldownSeconds = 2.5f;
 
     [Header("UI")]
     [SerializeField] GameObject staminaPanel;
@@ -26,7 +40,8 @@ public class HidingStamina : MonoBehaviour
 
     [Header("Bar shake")]
     [SerializeField] float maxBarShakeStrength = 7f;
-    [SerializeField] float shakeStartStamina = 0.5f;
+    [Tooltip("Shake / cam stress begins once loudness exceeds this.")]
+    [SerializeField, Range(0f, 1f)] float shakeStartLoudness = 0.35f;
 
     [Header("Hiding camera noise")]
     [SerializeField] CinemachineBasicMultiChannelPerlin hidingCameraNoise;
@@ -34,36 +49,31 @@ public class HidingStamina : MonoBehaviour
     [SerializeField] float maxFrequencyMultiplier = 2.5f;
     [SerializeField] float noiseFadeSeconds = 1.5f;
 
-    [Header("Out of breath")]
-    [SerializeField] AudioSource breathingSource;
-    [SerializeField] AudioClip outOfBreathClip;
-    [SerializeField] float outOfBreathStaminaThreshold = 0.1f;
-
-    [Header("Bar fade")]
-    [SerializeField] float barFadeOutStartStamina = 0.15f;
-
     PlayerHider hider;
-    AudioClip normalBreathingClip;
-    float normalBreathingVolume;
-    float normalBreathingPitch;
     float defaultAmplitudeGain;
     float defaultFrequencyGain;
     RectTransform barRect;
     Vector2 barRestPos;
     CanvasGroup panelCanvasGroup;
-    Coroutine recoveryRoutine;
     Coroutine noiseFadeRoutine;
-    float stamina = 1f;
-    float cooldownRemaining;
-    bool forcedExitPending;
-    bool wasHidden;
 
-    public bool CanEnterHide => stamina > 0f && cooldownRemaining <= 0f;
-    public bool IsOnCooldown => cooldownRemaining > 0f;
+    string micDevice;
+    AudioClip micClip;
+    float[] sampleBuffer;
+    float smoothedLoudness;
+    float sustainedTimer;
+    float alertCooldownRemaining;
+    bool wasHidden;
+    bool micUnavailableWarned;
+
+    /// <summary>0 = silent, 1 = loud (smoothed). Also drives the bar fill.</summary>
+    public float Loudness => smoothedLoudness;
 
     void Awake()
     {
         hider = GetComponent<PlayerHider>();
+        sampleWindow = Mathf.Max(64, sampleWindow);
+        sampleBuffer = new float[sampleWindow];
 
         if (staminaSlider != null)
         {
@@ -79,13 +89,6 @@ public class HidingStamina : MonoBehaviour
             if (panelCanvasGroup == null)
                 panelCanvasGroup = staminaPanel.AddComponent<CanvasGroup>();
         }
-
-        if (breathingSource != null)
-        {
-            normalBreathingClip = breathingSource.clip;
-            normalBreathingVolume = breathingSource.volume;
-            normalBreathingPitch = breathingSource.pitch;
-        }
     }
 
     void Start()
@@ -93,6 +96,16 @@ public class HidingStamina : MonoBehaviour
         ResolveHidingCameraNoise();
         SetPanelVisible(false);
         RefreshUI();
+    }
+
+    void OnDestroy()
+    {
+        StopMicrophone();
+    }
+
+    void OnApplicationQuit()
+    {
+        StopMicrophone();
     }
 
     void ResolveHidingCameraNoise()
@@ -123,44 +136,199 @@ public class HidingStamina : MonoBehaviour
 
         if (hidden)
             TickWhileHidden();
-        else if (hider == null || !hider.IsHidingEngaged)
-            TickWhileNotHidden();
+        else
+            smoothedLoudness = Mathf.MoveTowards(smoothedLoudness, 0f, Time.deltaTime * loudnessSmoothSpeed);
+
+        if (alertCooldownRemaining > 0f)
+            alertCooldownRemaining -= Time.deltaTime;
 
         RefreshUI();
     }
 
     void OnEnterHide()
     {
-        CancelBreathRecovery();
         CancelNoiseFade();
+        sustainedTimer = 0f;
+        smoothedLoudness = 0f;
+        ResetMicAlertEscalation();
+        StartMicrophone();
     }
 
     void OnExitHide()
     {
+        StopMicrophone();
         StartNoiseFadeOut();
-
-        if (stamina < outOfBreathStaminaThreshold)
-        {
-            foreach (var perception in Object.FindObjectsByType<PerceptionController>(FindObjectsSortMode.None))
-                perception?.HearNoiseAt(transform.position, 300f);
-        }
-
-        if (breathingSource == null)
-            return;
-
-        CancelBreathRecovery();
-
-        if (stamina < outOfBreathStaminaThreshold)
-            recoveryRoutine = StartCoroutine(PlayOutOfBreathRoutine());
+        ResetMicAlertEscalation();
     }
 
-    void CancelBreathRecovery()
+    void TickWhileHidden()
     {
-        if (recoveryRoutine != null)
+        float raw = SampleMicrophoneLoudness();
+        float sens = sensitivity;
+        if (GameSettingsManager.Instance != null)
+            sens *= GameSettingsManager.Instance.MicSensitivityMultiplier;
+        float target = Mathf.Clamp01(raw * sens);
+        float t = 1f - Mathf.Exp(-loudnessSmoothSpeed * Time.deltaTime);
+        smoothedLoudness = Mathf.Lerp(smoothedLoudness, target, t);
+
+        EvaluateAlerts();
+    }
+
+    void EvaluateAlerts()
+    {
+        if (alertCooldownRemaining > 0f)
+            return;
+
+        if (smoothedLoudness >= spikeLoudnessThreshold)
         {
-            StopCoroutine(recoveryRoutine);
-            recoveryRoutine = null;
+            TriggerButcherHideCheck();
+            sustainedTimer = 0f;
+            return;
         }
+
+        if (smoothedLoudness >= sustainedLoudnessThreshold)
+        {
+            sustainedTimer += Time.deltaTime;
+            if (sustainedTimer >= sustainedSecondsToAlert)
+            {
+                TriggerButcherHideCheck();
+                sustainedTimer = 0f;
+            }
+        }
+        else
+        {
+            sustainedTimer = Mathf.Max(0f, sustainedTimer - Time.deltaTime * 2f);
+        }
+    }
+
+    void TriggerButcherHideCheck()
+    {
+        alertCooldownRemaining = alertCooldownSeconds;
+
+        HidingSpot spot = hider != null ? hider.CurrentHidingSpot : null;
+        if (spot == null || spot.searchCheckpointOnly)
+            return;
+
+        Vector3 noisePos = spot.GetSearchPivot() != null
+            ? spot.GetSearchPivot().position
+            : spot.transform.position;
+
+        // Only an NPC standing in the SAME ROOM as the hiding spot can hear the mic —
+        // noise never carries through walls, other rooms, or floors. Ambush is exempt.
+        RoomAnchor spotRoom = spot.GetComponentInParent<RoomAnchor>();
+        if (spotRoom == null)
+            return;
+
+        // Same path as "NPC saw you enter hide": run to the spot, then capture on arrival.
+        NPCController best = null;
+        float bestDist = float.MaxValue;
+
+        foreach (var npc in Object.FindObjectsByType<NPCController>(FindObjectsSortMode.None))
+        {
+            if (npc == null)
+                continue;
+            if (npc.HearingDisabled)
+                continue;
+            if (npc.currentState == NPCController.AIState.Ambush
+                || npc.currentState == NPCController.AIState.Capture
+                || npc.currentState == NPCController.AIState.Dead
+                || npc.currentState == NPCController.AIState.Scripted)
+                continue;
+
+            if (npc.GetCurrentRoom() != spotRoom)
+                continue;
+
+            float dist = Vector3.Distance(npc.transform.position, noisePos);
+            if (dist < bestDist)
+            {
+                best = npc;
+                bestDist = dist;
+            }
+        }
+
+        if (best == null)
+            return;
+
+        if (best.perception != null)
+            best.perception.RedirectLastKnownPosition(noisePos);
+
+        best.BeginWitnessedHideCapture(spot);
+    }
+
+    void ResetMicAlertEscalation()
+    {
+        hider?.ClearMicCaptureOverride();
+    }
+
+    void StartMicrophone()
+    {
+        if (micClip != null)
+            return;
+
+        if (Microphone.devices == null || Microphone.devices.Length == 0)
+        {
+            if (!micUnavailableWarned)
+            {
+                micUnavailableWarned = true;
+                Debug.LogWarning("HidingStamina: no microphone found — hide meter stays quiet.");
+            }
+            return;
+        }
+
+        micDevice = Microphone.devices[0];
+        micClip = Microphone.Start(micDevice, true, 1, sampleRate);
+
+        if (micClip == null)
+        {
+            micDevice = null;
+            Debug.LogWarning("HidingStamina: failed to start microphone.");
+        }
+    }
+
+    void StopMicrophone()
+    {
+        if (!string.IsNullOrEmpty(micDevice))
+        {
+            if (Microphone.IsRecording(micDevice))
+                Microphone.End(micDevice);
+        }
+
+        micDevice = null;
+        micClip = null;
+    }
+
+    float SampleMicrophoneLoudness()
+    {
+        if (micClip == null || string.IsNullOrEmpty(micDevice))
+            return 0f;
+
+        int micPos = Microphone.GetPosition(micDevice);
+        if (micPos <= 0 || sampleBuffer == null || sampleBuffer.Length == 0)
+            return 0f;
+
+        int start = micPos - sampleBuffer.Length;
+        if (start < 0)
+            start += micClip.samples;
+
+        try
+        {
+            micClip.GetData(sampleBuffer, start);
+        }
+        catch
+        {
+            return 0f;
+        }
+
+        float sum = 0f;
+        for (int i = 0; i < sampleBuffer.Length; i++)
+        {
+            float s = sampleBuffer[i];
+            sum += s * s;
+        }
+
+        float rms = Mathf.Sqrt(sum / sampleBuffer.Length);
+        float db = 20f * Mathf.Log10(Mathf.Max(rms, 1e-7f));
+        return Mathf.InverseLerp(noiseFloorDb, peakDb, db);
     }
 
     void CancelNoiseFade()
@@ -170,36 +338,6 @@ public class HidingStamina : MonoBehaviour
             StopCoroutine(noiseFadeRoutine);
             noiseFadeRoutine = null;
         }
-    }
-
-    IEnumerator PlayOutOfBreathRoutine()
-    {
-        breathingSource.Stop();
-
-        if (outOfBreathClip != null)
-        {
-            breathingSource.clip = outOfBreathClip;
-            breathingSource.loop = false;
-            breathingSource.volume = normalBreathingVolume;
-            breathingSource.pitch = 1f;
-            breathingSource.Play();
-            yield return new WaitForSeconds(outOfBreathClip.length);
-        }
-
-        RestoreDefaultBreathing();
-        recoveryRoutine = null;
-    }
-
-    void RestoreDefaultBreathing()
-    {
-        if (breathingSource == null || normalBreathingClip == null)
-            return;
-
-        breathingSource.clip = normalBreathingClip;
-        breathingSource.loop = true;
-        breathingSource.volume = normalBreathingVolume;
-        breathingSource.pitch = normalBreathingPitch;
-        breathingSource.Play();
     }
 
     void StartNoiseFadeOut()
@@ -232,64 +370,22 @@ public class HidingStamina : MonoBehaviour
         noiseFadeRoutine = null;
     }
 
-    void TickWhileHidden()
-    {
-        if (maxHideSeconds <= 0f)
-            return;
-
-        stamina -= Time.deltaTime / maxHideSeconds;
-
-        if (stamina <= 0f && !forcedExitPending)
-        {
-            stamina = 0f;
-            forcedExitPending = true;
-            cooldownRemaining = cooldownSeconds;
-            ForceExitHide();
-        }
-    }
-
-    void TickWhileNotHidden()
-    {
-        forcedExitPending = false;
-
-        if (cooldownRemaining > 0f)
-        {
-            cooldownRemaining -= Time.deltaTime;
-            return;
-        }
-
-        if (stamina >= 1f || regenSeconds <= 0f)
-            return;
-
-        stamina = Mathf.Min(1f, stamina + Time.deltaTime / regenSeconds);
-    }
-
-    void ForceExitHide()
-    {
-        if (hider == null || !hider.isHidden || hider.CurrentHidingSpot == null)
-            return;
-
-        hider.CurrentHidingSpot.RevealPlayer(gameObject);
-        HudManager.Instance?.ShowSubtitle(Loc.Get("gameplay.stamina_exit"), 2.5f, HudManager.Instance.WarningColor);
-    }
-
     void RefreshUI()
     {
         bool hidden = hider != null && hider.isHidden;
         SetPanelVisible(hidden);
 
+        float loudness = smoothedLoudness;
+
         if (staminaSlider != null)
-            staminaSlider.value = stamina;
+            staminaSlider.value = loudness;
 
         if (panelCanvasGroup != null)
-        {
-            panelCanvasGroup.alpha = stamina >= barFadeOutStartStamina
-                ? 1f
-                : Mathf.Clamp01(stamina / barFadeOutStartStamina);
-        }
+            panelCanvasGroup.alpha = 1f;
 
+        // Empty while quiet; fills toward red as noise rises.
         if (staminaFillImage != null)
-            staminaFillImage.color = Color.Lerp(emptyColor, fullColor, stamina);
+            staminaFillImage.color = Color.Lerp(fullColor, emptyColor, loudness);
 
         ApplyBarShake(hidden);
         ApplyCameraNoise(hidden);
@@ -329,19 +425,19 @@ public class HidingStamina : MonoBehaviour
         if (hidingCameraNoise == null || !hidden || noiseFadeRoutine != null)
             return;
 
-        float stress = GetStaminaStress();
+        float stress = GetLoudnessStress();
         hidingCameraNoise.AmplitudeGain = Mathf.Lerp(defaultAmplitudeGain, defaultAmplitudeGain * maxAmplitudeMultiplier, stress);
         hidingCameraNoise.FrequencyGain = Mathf.Lerp(defaultFrequencyGain, defaultFrequencyGain * maxFrequencyMultiplier, stress);
     }
 
-    float GetStaminaStress()
+    float GetLoudnessStress()
     {
-        if (stamina >= shakeStartStamina)
+        if (smoothedLoudness <= shakeStartLoudness)
             return 0f;
 
-        float t = (shakeStartStamina - stamina) / shakeStartStamina;
+        float t = (smoothedLoudness - shakeStartLoudness) / Mathf.Max(0.01f, 1f - shakeStartLoudness);
         return t * t;
     }
 
-    float GetBarShakeStrength() => maxBarShakeStrength * GetStaminaStress();
+    float GetBarShakeStrength() => maxBarShakeStrength * GetLoudnessStress();
 }
