@@ -316,7 +316,7 @@ public class NPCAnchorManager : MonoBehaviour
             // Butcher (NPC self) = red, player/target/sound = green
             string color = isNpcSelf ? "red" : "green";
             string who = isNpcSelf ? "Butcher" : "Player";
-            Debug.Log($"<color={color}>{who}: {name}</color>");
+            //Debug.Log($"<color={color}>{who}: {name}</color>");
         }
         return roomT;
     }

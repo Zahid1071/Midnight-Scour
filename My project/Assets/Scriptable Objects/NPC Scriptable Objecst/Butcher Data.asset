@@ -76,7 +76,7 @@ MonoBehaviour:
     maxViewAngle: 75
     ignoreLayer:
       serializedVersion: 2
-      m_Bits: 13444
+      m_Bits: 144516
     confirmSeconds: 1
     buildRate: 1
     decayRate: 0.1

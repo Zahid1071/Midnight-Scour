@@ -16708,7 +16708,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 11914625447880499, guid: ed043a00e1043044a9a19ad2e9b44aa2, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11914625447880499, guid: ed043a00e1043044a9a19ad2e9b44aa2, type: 3}
       propertyPath: m_IsTrigger
@@ -16736,7 +16736,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 517294775576602028, guid: ed043a00e1043044a9a19ad2e9b44aa2, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 517294775576602028, guid: ed043a00e1043044a9a19ad2e9b44aa2, type: 3}
       propertyPath: m_IsTrigger
@@ -16756,7 +16756,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1798971623818130412, guid: ed043a00e1043044a9a19ad2e9b44aa2, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1798971623818130412, guid: ed043a00e1043044a9a19ad2e9b44aa2, type: 3}
       propertyPath: m_IsTrigger
@@ -16803,6 +16803,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4101492480443246727, guid: ed043a00e1043044a9a19ad2e9b44aa2, type: 3}
+      propertyPath: isLocked
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4101492480443246727, guid: ed043a00e1043044a9a19ad2e9b44aa2, type: 3}
       propertyPath: lockBreakMinigame
       value: 
       objectReference: {fileID: 1977233057}
@@ -16828,7 +16832,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6643407808740859646, guid: ed043a00e1043044a9a19ad2e9b44aa2, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6643407808740859646, guid: ed043a00e1043044a9a19ad2e9b44aa2, type: 3}
       propertyPath: m_IsTrigger
@@ -16836,7 +16840,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8827765831739186487, guid: ed043a00e1043044a9a19ad2e9b44aa2, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8827765831739186487, guid: ed043a00e1043044a9a19ad2e9b44aa2, type: 3}
       propertyPath: m_IsTrigger

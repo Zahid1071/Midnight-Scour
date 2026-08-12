@@ -672,7 +672,7 @@ MonoBehaviour:
   interactRange: 1.5
   interactLayer:
     serializedVersion: 2
-    m_Bits: 49728
+    m_Bits: 180800
   cameraTransform: {fileID: 0}
   outOfReachMessage: It is too far
 --- !u!114 &4452460983465209085

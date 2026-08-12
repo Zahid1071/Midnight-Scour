@@ -5,8 +5,6 @@ public class Cage : MonoBehaviour
 {
     [Header("References")]
     public SimpleOpenClose cageDoor;
-    [Tooltip("Basement-side pre-point for the cage door. Auto-finds DoorController.prePointA if unset.")]
-    public Transform basementSidePrePoint;
     public bool isOccupied = false;
 
     /// <summary>
@@ -39,6 +37,33 @@ public class Cage : MonoBehaviour
             if (cages[i] != null && cages[i].HoldsPlayer(player))
                 return true;
         }
+        return false;
+    }
+
+    /// <summary>True if this world point sits in any cage's floor footprint (standing height counts).</summary>
+    public static bool ContainsWorldPoint(Vector3 worldPoint)
+    {
+#if UNITY_2023_1_OR_NEWER
+        var cages = Object.FindObjectsByType<Cage>(FindObjectsSortMode.None);
+#else
+        var cages = Object.FindObjectsOfType<Cage>();
+#endif
+        for (int i = 0; i < cages.Length; i++)
+        {
+            var cage = cages[i];
+            if (cage == null)
+                continue;
+
+            Collider triggerCol = cage.GetComponent<Collider>();
+            if (triggerCol == null || !triggerCol.isTrigger)
+                continue;
+
+            Bounds b = triggerCol.bounds;
+            if (worldPoint.x >= b.min.x && worldPoint.x <= b.max.x
+                && worldPoint.z >= b.min.z && worldPoint.z <= b.max.z)
+                return true;
+        }
+
         return false;
     }
 
@@ -123,13 +148,7 @@ public class Cage : MonoBehaviour
 
         // Only assign if different to avoid overhead
         if (playerRef.layer != targetLayer)
-        {
-            bool becameCaptive = targetLayer == CAPTIVE_LAYER && playerRef.layer != CAPTIVE_LAYER;
             playerRef.layer = targetLayer;
-
-            if (becameCaptive)
-                RedirectNpcHearingAwayFromCage();
-        }
     }
 
     /// <summary>
@@ -171,13 +190,7 @@ public class Cage : MonoBehaviour
         if (doorSoundSuspicion <= 0f)
             return;
 
-        // Emit from just outside the cage (basement side) rather than the door/cage interior itself -
-        // the cage isn't a real searchable room, so we don't want NPC anchor resolution latching onto
-        // it as the "closest room" to investigate.
-        Transform prePoint = ResolveBasementSidePrePoint();
-        Vector3 soundPosition = prePoint != null
-            ? prePoint.position
-            : (cageDoor != null ? cageDoor.transform.position : transform.position);
+        Vector3 soundPosition = cageDoor != null ? cageDoor.transform.position : transform.position;
 
 #if UNITY_2023_1_OR_NEWER
         foreach (var perception in Object.FindObjectsByType<PerceptionController>(FindObjectsSortMode.None))
@@ -195,42 +208,6 @@ public class Cage : MonoBehaviour
         }
     }
 
-    void RedirectNpcHearingAwayFromCage()
-    {
-        Transform prePoint = ResolveBasementSidePrePoint();
-        if (prePoint == null)
-            return;
-
-        PerceptionController.RedirectAllLastKnownPositions(prePoint.position);
-    }
-
-    Transform ResolveBasementSidePrePoint()
-    {
-        if (basementSidePrePoint != null)
-            return basementSidePrePoint;
-
-        if (cageDoor != null)
-        {
-            var doorController = cageDoor.GetComponentInParent<DoorController>();
-            if (doorController != null && doorController.prePointA != null)
-                return doorController.prePointA;
-        }
-
-        var transforms = GetComponentsInChildren<Transform>(true);
-        for (int i = 0; i < transforms.Length; i++)
-        {
-            Transform t = transforms[i];
-            if (t == null)
-                continue;
-
-            string name = t.name.Trim();
-            if (name.Equals("PrePointA", System.StringComparison.OrdinalIgnoreCase))
-                return t;
-        }
-
-        return null;
-    }
-
     private bool IsCageVisibleToAnyNPC()
     {
 #if UNITY_2023_1_OR_NEWER
@@ -239,28 +216,11 @@ public class Cage : MonoBehaviour
         var perceivers = Object.FindObjectsOfType<PerceptionController>();
 #endif
 
-        Vector3 cageCenter = transform.position + Vector3.up * 1.5f;
-        Collider myCol = GetComponent<Collider>();
-        if (myCol != null) cageCenter = myCol.bounds.center;
-
-        foreach (var p in perceivers)
+        for (int i = 0; i < perceivers.Length; i++)
         {
-            if (p == null) continue;
-
-            Vector3 eye = p.transform.position + Vector3.up * 1.7f;
-            Vector3 dir = (cageCenter - eye).normalized;
-            float dist = Vector3.Distance(eye, cageCenter);
-
-            if (dist > p.MaxViewDistance) continue;
-
-            float angle = Vector3.Angle(p.transform.forward, dir);
-            if (angle > p.MaxViewHalfAngle) continue;
-
-            if (Physics.Raycast(eye, dir, out RaycastHit hit, p.MaxViewDistance, ~p.IgnoreLayer, QueryTriggerInteraction.Ignore))
-            {
-                if (hit.collider != null && hit.collider.GetComponentInParent<Cage>() == this)
-                    return true;
-            }
+            var p = perceivers[i];
+            if (p != null && p.HasDirectLineOfSightToPlayer())
+                return true;
         }
 
         return false;
@@ -334,7 +294,7 @@ public class Cage : MonoBehaviour
         if (triggerCol == null || !triggerCol.isTrigger)
             return;
 
-        if (!triggerCol.bounds.Contains(root.transform.position))
+        if (!IsPlayerInsideTrigger(triggerCol, root))
             return;
 
         // Landed in the cage (normal Continue spawn) — treat as held, original = Player.
@@ -380,8 +340,7 @@ public class Cage : MonoBehaviour
             return;
 
         GameObject root = player.transform.root != null ? player.transform.root.gameObject : player;
-        Vector3 p = root.transform.position;
-        bool inside = triggerCol.bounds.Contains(p);
+        bool inside = IsPlayerInsideTrigger(triggerCol, root);
 
         if (inside)
         {
@@ -403,5 +362,36 @@ public class Cage : MonoBehaviour
             // Same as a real exit: start basement grace if it was armed for cage-exit.
             InteractionController.NotifyPlayerLeftCage();
         }
+    }
+
+    /// <summary>
+    /// Floor-slab triggers are short in Y; the player pivot sits above them so
+    /// bounds.Contains(pivot) always fails and clears occupancy every frame.
+    /// Prefer capsule/CC overlap; fall back to XZ footprint for standing players.
+    /// </summary>
+    static bool IsPlayerInsideTrigger(Collider triggerCol, GameObject root)
+    {
+        if (triggerCol == null || root == null)
+            return false;
+
+        Bounds triggerBounds = triggerCol.bounds;
+
+        var cc = root.GetComponent<CharacterController>();
+        if (cc != null && cc.enabled && triggerBounds.Intersects(cc.bounds))
+            return true;
+
+        var col = root.GetComponent<Collider>();
+        if (col != null && col.enabled && !col.isTrigger && triggerBounds.Intersects(col.bounds))
+            return true;
+
+        // CapsuleCollider on the player is a trigger — still use its world bounds for overlap.
+        var capsule = root.GetComponent<CapsuleCollider>();
+        if (capsule != null && capsule.enabled && triggerBounds.Intersects(capsule.bounds))
+            return true;
+
+        // Standing on a floor slab: horizontal footprint is enough.
+        Vector3 p = root.transform.position;
+        return p.x >= triggerBounds.min.x && p.x <= triggerBounds.max.x
+            && p.z >= triggerBounds.min.z && p.z <= triggerBounds.max.z;
     }
 }

@@ -1652,6 +1652,11 @@ public class FSMController
         {
             // Görmüyorum (Ya saklandı ya da kaçtı): Son bilinen yere git
             targetPosition = npc.perception.LastKnownPlayerPosition;
+            if (Cage.ContainsWorldPoint(targetPosition))
+            {
+                SetState(NPCController.AIState.Search);
+                return;
+            }
 
             // --- VAZGEÇME MANTIĞI (Burada birleştirdik) ---
             // Eğer oyuncuyu göremiyorsam VE gitmem gereken yere (LSP) vardıysam:

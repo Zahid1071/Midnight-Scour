@@ -81,6 +81,9 @@ public class PerceptionController : MonoBehaviour
         keepChaseDist    = data.chaseRetention.keepChasingDistance;
 
         ignoreLayer      = data.vision.ignoreLayer;
+        int cageDoorLayer = LayerMask.NameToLayer("CageDoor");
+        if (cageDoorLayer >= 0)
+            ignoreLayer |= 1 << cageDoorLayer;
     }
 
     void Update()
@@ -234,7 +237,8 @@ public class PerceptionController : MonoBehaviour
         {
             if (hit.collider.transform.root == player.root)
             {
-                LastKnownPlayerPosition = aim;
+                if (!Cage.ContainsWorldPoint(aim))
+                    LastKnownPlayerPosition = aim;
                 CanSeePlayer = true;
                 return;
             }
@@ -356,10 +360,8 @@ public class PerceptionController : MonoBehaviour
 
         if (!soundSource) return;
 
-        // Captive layer, or inside cage while this NPC cannot see them.
         if (soundSource.gameObject.layer == 12) return;
-        if (!CanSeePlayer && Cage.IsPlayerInsideAnyCage(soundSource))
-            return;
+        if (Cage.ContainsWorldPoint(soundSource.position)) return;
 
         if (npc.currentState == NPCController.AIState.Ambush)
             suspicionAmount *= ambushAudioMul;
@@ -391,6 +393,12 @@ public class PerceptionController : MonoBehaviour
         if (npc.currentState == NPCController.AIState.Ambush)
             footstepSuspicionToAdd *= ambushAudioMul;
 
+        if (Cage.ContainsWorldPoint(worldPosition))
+        {
+            npc.GetComponent<SuspicionSystem>()?.AddFootstepSuspicion(footstepSuspicionToAdd);
+            return;
+        }
+
         string home = npc.interaction?.data?.homeID ?? string.Empty;
         Transform anchor = NPCAnchorManager.Instance != null
             ? NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(worldPosition, home)
@@ -410,6 +418,9 @@ public class PerceptionController : MonoBehaviour
     /// </summary>
     public void RedirectLastKnownPosition(Vector3 worldPosition)
     {
+        if (Cage.ContainsWorldPoint(worldPosition))
+            return;
+
         LastKnownPlayerPosition = worldPosition;
 
         string home = npc?.interaction?.data?.homeID ?? string.Empty;
@@ -422,20 +433,6 @@ public class PerceptionController : MonoBehaviour
 
         if (npc != null)
             npc._lastChaseTarget = new Vector3(float.PositiveInfinity, 0f, 0f);
-    }
-
-    public static void RedirectAllLastKnownPositions(Vector3 worldPosition)
-    {
-#if UNITY_2023_1_OR_NEWER
-        var perceivers = UnityEngine.Object.FindObjectsByType<PerceptionController>(FindObjectsSortMode.None);
-#else
-        var perceivers = UnityEngine.Object.FindObjectsOfType<PerceptionController>();
-#endif
-        foreach (var perception in perceivers)
-        {
-            if (perception != null)
-                perception.RedirectLastKnownPosition(worldPosition);
-        }
     }
 
     private void HandleVisionLoss()
@@ -487,7 +484,7 @@ public class PerceptionController : MonoBehaviour
 
         if (distToCage > maxViewDistance) return;
 
-        if (Physics.Raycast(eye, dirToCage, out RaycastHit hit, maxViewDistance))
+        if (Physics.Raycast(eye, dirToCage, out RaycastHit hit, maxViewDistance, ~ignoreLayer, QueryTriggerInteraction.Ignore))
         {
             Cage hitCage = hit.transform.GetComponentInParent<Cage>();
 

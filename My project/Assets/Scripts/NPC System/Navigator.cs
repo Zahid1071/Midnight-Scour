@@ -88,7 +88,7 @@ namespace FS_Atmo
             string targetRoomName = targetRoom.roomID ?? targetRoom.name;
 
             if (logPlannedRoute)
-                //Debug.Log($"[Navigator] GoToRoom: {startRoomName} -> {targetRoomName}");
+                Debug.Log($"{startRoomName}>{targetRoomName}");
 
             // 1) ODA AYNIYSA ve finalPoint VARSA: anchor waypointe hiç gerek yok → direkt final point
             if (startRoom == targetRoom && finalPoint.HasValue)
