@@ -6,11 +6,20 @@ public class JumpscareManager : MonoBehaviour
 {
     public static JumpscareManager Instance;
 
+    /// <summary>True after <see cref="BeginCaptureUi"/> until game-over / reload.</summary>
+    public static bool CaptureUiActive { get; private set; }
+
+    /// <summary>True once the jumpscare camera / end-game wait has started.</summary>
+    public bool IsJumpscarePlaying =>
+        _endGameRoutine != null
+        || (jumpscareCam != null && jumpscareCam.Priority.Value > 0);
+
     public CinemachineCamera jumpscareCam;
 
     [SerializeField] private GameObject wishlistBanner;
     [SerializeField] private DemoEndScreenUI demoEndScreen;
     [SerializeField] private string reloadSceneName = "Main Scene";
+    [SerializeField] private string mainMenuSceneName = "Main Menu";
     [SerializeField] private float endGameDelaySeconds = 4f;
 
     [Header("Impact punch (axe hit)")]
@@ -70,14 +79,22 @@ public class JumpscareManager : MonoBehaviour
             return;
 
         wishlistBanner.SetActive(true);
+        SteamStoreLink.EnsureOn(wishlistBanner);
 
         var anim = wishlistBanner.GetComponent<Animation>();
-        if (anim != null && anim.clip != null)
-            anim.Play(anim.clip.name);
+        if (anim != null)
+        {
+            anim.enabled = true;
+            anim.playAutomatically = false;
+            if (anim.clip != null)
+                anim.Play(anim.clip.name);
+        }
     }
 
     public void TriggerJumpscare(Transform jumpscarePoint, Transform npcFace)
     {
+        BeginCaptureUi();
+
         if (npcFace != null)
         {
             var lookDirector = npcFace.GetComponent<POILookDirector>()
@@ -99,6 +116,43 @@ public class JumpscareManager : MonoBehaviour
             StopCoroutine(_endGameRoutine);
 
         _endGameRoutine = StartCoroutine(EndGameAfterDelay());
+    }
+
+    /// <summary>
+    /// Strip gameplay HUD, hints, subtitles, and cursor for capture / jumpscare.
+    /// Safe to call before the hide-exit wait so UI never flashes on screen.
+    /// </summary>
+    public static void BeginCaptureUi()
+    {
+        CaptureUiActive = true;
+
+        // Block inventory / interact for the whole capture (including hide-exit wait).
+        if (!PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured))
+            PlayerControlGate.Acquire(PlayerControlGate.ReasonCaptured);
+
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+
+        GameplayHudVisibility.Instance?.HideGameplayHud();
+        GameplayHintManager.Instance?.HideAll();
+        HudManager.Instance?.ClearSubtitle(HudManager.PriorityHigh);
+
+        var controlsHint = Object.FindFirstObjectByType<ControlsPanelHint>(FindObjectsInactive.Include);
+        controlsHint?.ForceHide();
+
+        if (ReadPanelUI.Instance != null && ReadPanelUI.Instance.IsOpen)
+            ReadPanelUI.Instance.Close();
+
+        Object.FindFirstObjectByType<PauseManager>(FindObjectsInactive.Include)?.DismissForGameOver();
+    }
+
+    /// <summary>Undo <see cref="BeginCaptureUi"/> when capture was aborted (e.g. not at hide spot yet).</summary>
+    public static void CancelCaptureUi()
+    {
+        CaptureUiActive = false;
+        PlayerControlGate.Release(PlayerControlGate.ReasonCaptured);
+        GameplayHudVisibility.Instance?.ClearHidingLatch();
+        GameplayHudVisibility.Instance?.ShowGameplayHud();
     }
 
     /// <summary>
@@ -178,16 +232,41 @@ public class JumpscareManager : MonoBehaviour
 
         EndJumpscare();
 
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
         if (demoEndScreen == null)
             demoEndScreen = FindFirstObjectByType<DemoEndScreenUI>(FindObjectsInactive.Include);
 
         if (DemoEndDirector.IsDemoFinaleActive && demoEndScreen != null)
         {
+            CaptureContext.Clear();
             ShowWishlistBanner();
             yield return StartCoroutine(demoEndScreen.WaitForExitRoutine());
+
+            if (DemoEndScreenUI.TryFinishWithApplicationQuit())
+            {
+                _endGameRoutine = null;
+                yield break;
+            }
+
+            LoadMenuScene();
+        }
+        else
+        {
+            CaptureReason reason = CaptureContext.Consume();
+            var gameOver = GameOverUI.Instance;
+            if (gameOver == null)
+                gameOver = FindFirstObjectByType<GameOverUI>(FindObjectsInactive.Include);
+            if (gameOver == null)
+            {
+                var go = new GameObject("GameOverUI");
+                gameOver = go.AddComponent<GameOverUI>();
+            }
+
+            yield return StartCoroutine(gameOver.WaitForChoiceRoutine(reason));
         }
 
-        LoadReloadScene();
         _endGameRoutine = null;
     }
 
@@ -204,11 +283,23 @@ public class JumpscareManager : MonoBehaviour
             SetLens(_impactBaseFov, _impactBaseDutch);
             jumpscareCam.Priority = 0;
         }
+
+        CaptureUiActive = false;
+
+        // Drop hide-spot latch; keep gameplay HUD off until game-over owns presentation.
+        GameplayHudVisibility.Instance?.ClearHidingLatch();
+        GameplayHudVisibility.Instance?.HideGameplayHud();
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     public void LoadReloadScene()
     {
+        CaptureUiActive = false;
         PlayerControlGate.Clear();
+        InventoryManager.ResetForNewGame();
+        GameplayHintManager.ResetAllHints();
 
         Time.timeScale = 1f;
         AudioListener.pause = false;
@@ -216,6 +307,19 @@ public class JumpscareManager : MonoBehaviour
         LoadingScreenController.LoadScene(reloadSceneName);
     }
 
-    /// <summary>Legacy name — same as reloading the gameplay scene after capture.</summary>
-    public void LoadMenuScene() => LoadReloadScene();
+    public void LoadMenuScene()
+    {
+        CaptureUiActive = false;
+        PlayerControlGate.Clear();
+        InventoryManager.ResetForNewGame();
+        GameplayHintManager.ResetAllHints();
+
+        Time.timeScale = 1f;
+        AudioListener.pause = false;
+
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        LoadingScreenController.LoadScene(mainMenuSceneName);
+    }
 }

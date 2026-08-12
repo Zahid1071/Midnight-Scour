@@ -659,6 +659,122 @@ MonoBehaviour:
     m_Key: hint.killer_pattern
     m_Metadata:
       m_Items: []
+  - m_Id: 5707318296729
+    m_Key: gameplay.hammer_perfect_timing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296730
+    m_Key: gameplay.hammer_time_with_thunder
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296731
+    m_Key: gameplay.hammer_too_loud_now
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296732
+    m_Key: gameplay.hammer_missed_timing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296733
+    m_Key: gameplay.screwdriver_aim
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296734
+    m_Key: gameplay.screwdriver_shake
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296735
+    m_Key: gameplay.hammer_hit_too_early
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296736
+    m_Key: gameplay.hammer_hit_too_late
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296737
+    m_Key: gameplay.screwdriver_stuck
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296738
+    m_Key: gameover.witnessed_hide
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296739
+    m_Key: gameover.hide_noise
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296740
+    m_Key: gameover.same_hide_spot
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296741
+    m_Key: gameover.hammer_timing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296742
+    m_Key: gameover.caught_open
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296743
+    m_Key: gameover.unknown
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296744
+    m_Key: gameover.restart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296745
+    m_Key: gameover.main_menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296746
+    m_Key: gameover.ambush
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296747
+    m_Key: hint.lockpick
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296748
+    m_Key: item.lockpick.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296749
+    m_Key: item.lockpick.pickup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296750
+    m_Key: gameover.continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296751
+    m_Key: gameplay.lockpick_guide_pressure
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296752
+    m_Key: gameplay.lockpick_guide_find_pins
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296753
+    m_Key: gameplay.lockpick_pin_set
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296754
+    m_Key: gameplay.lockpick_pins_set
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296755
+    m_Key: gameplay.door_chained
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296756
+    m_Key: letter.padlock_hairpin
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296757
+    m_Key: gameplay.lockpick_watch_for_more
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

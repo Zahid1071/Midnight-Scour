@@ -24,7 +24,12 @@ public class UIFontBootstrap : MonoBehaviour
         RegisterFonts();
 
         if (applyOnAwake)
-            LocaleManager.WhenReady(ApplyFonts);
+        {
+            if (LocaleManager.IsReady)
+                ApplyFonts();
+            else
+                LocaleManager.WhenReady(ApplyFonts);
+        }
     }
 
     void OnEnable()
@@ -32,7 +37,12 @@ public class UIFontBootstrap : MonoBehaviour
         LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
 
         if (applyOnEnable)
-            LocaleManager.WhenReady(ApplyFonts);
+        {
+            if (LocaleManager.IsReady)
+                ApplyFonts();
+            else
+                LocaleManager.WhenReady(ApplyFonts);
+        }
     }
 
     void OnDisable() => LocalizationSettings.SelectedLocaleChanged -= OnLocaleChanged;

@@ -294,11 +294,36 @@ public class ControlsPanelHint : MonoBehaviour
             || Mouse.current.middleButton.wasPressedThisFrame;
     }
 
+    /// <summary>Abort any in-progress show (e.g. jumpscare / capture cinematic).</summary>
+    public void ForceHide()
+    {
+        if (_routine != null)
+        {
+            StopCoroutine(_routine);
+            _routine = null;
+        }
+
+        HideImmediate();
+        RestoreCompanionImmediate();
+    }
+
     void HideImmediate()
     {
         IsShowing = false;
 
         if (canvasGroup != null)
             canvasGroup.alpha = 0f;
+    }
+
+    void RestoreCompanionImmediate()
+    {
+        if (_companionHiddenWithSetActive && hideDuringHint != null)
+        {
+            hideDuringHint.gameObject.SetActive(true);
+            _companionHiddenWithSetActive = false;
+        }
+
+        if (hideDuringHintGroup != null)
+            hideDuringHintGroup.alpha = _companionRestAlpha;
     }
 }

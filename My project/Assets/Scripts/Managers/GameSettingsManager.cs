@@ -70,9 +70,6 @@ public class GameSettingsManager : MonoBehaviour
     /// </summary>
     public const string BRIGHTNESS_KEY = "Brightness";
 
-    /// <summary>PlayerPrefs key: 1 = auto-save hooks enabled, 0 = disabled.</summary>
-    public const string AUTO_SAVE_PREFS_KEY = "settings_autoSave";
-
     /// <summary>PlayerPrefs flag set after migrating resolution indices to descending order.</summary>
     private const string RESOLUTION_INDEX_DESC_KEY = "settings_resolutionIndexDesc";
 
@@ -178,12 +175,6 @@ public class GameSettingsManager : MonoBehaviour
         // Gameplay
         public int difficultyIndex;       // 0=Easy, 1=Normal, 2=Hard
         public bool subtitlesEnabled;
-
-        /// <summary>
-        /// When false, <see cref="SaveManager"/> skips automatic saves (quit / scene unload).
-        /// Manual saves (e.g. pause flow) are unchanged.
-        /// </summary>
-        public bool autoSaveEnabled;
     }
 
     // =========================================================================
@@ -239,8 +230,7 @@ public class GameSettingsManager : MonoBehaviour
             invertYAxis = false,
             brightness = 0.5f,
             difficultyIndex = 1,
-            subtitlesEnabled = true,
-            autoSaveEnabled = true
+            subtitlesEnabled = true
         };
         return fallback;
     }
@@ -466,29 +456,6 @@ public class GameSettingsManager : MonoBehaviour
         set => _currentSettings.subtitlesEnabled = value;
     }
 
-    /// <summary>
-    /// When false, automatic persistence in <see cref="SaveManager"/> is skipped.
-    /// </summary>
-    public bool AutoSaveEnabled
-    {
-        get => _currentSettings.autoSaveEnabled;
-        set => _currentSettings.autoSaveEnabled = value;
-    }
-
-    /// <summary>
-    /// True when the player has auto-save style persistence enabled: used by
-    /// <see cref="SaveManager"/> hooks and pause quit-to-menu. When <see cref="Instance"/>
-    /// is null (e.g. destroyed during shutdown), reads <see cref="AUTO_SAVE_PREFS_KEY"/>.
-    /// </summary>
-    public static bool IsAutoSavePersistenceEnabled()
-    {
-        if (Instance != null)
-            return Instance.AutoSaveEnabled;
-
-        int fallbackDefault = DefaultSettings.autoSaveEnabled ? 1 : 0;
-        return PlayerPrefs.GetInt(AUTO_SAVE_PREFS_KEY, fallbackDefault) == 1;
-    }
-
     // =========================================================================
     // UNITY LIFECYCLE
     // =========================================================================
@@ -643,7 +610,6 @@ public class GameSettingsManager : MonoBehaviour
         
         PlayerPrefs.SetInt("settings_difficulty", _currentSettings.difficultyIndex);
         PlayerPrefs.SetInt("settings_subtitles", _currentSettings.subtitlesEnabled ? 1 : 0);
-        PlayerPrefs.SetInt(AUTO_SAVE_PREFS_KEY, _currentSettings.autoSaveEnabled ? 1 : 0);
 
         // Brightness: single source of truth key (normalized 0-1) plus legacy
         // mirror so the old "brightness" key stays in sync if anything still
@@ -685,8 +651,7 @@ public class GameSettingsManager : MonoBehaviour
             brightness = LoadBrightnessFromPrefs(),
 
             difficultyIndex = PlayerPrefs.GetInt("settings_difficulty", DefaultSettings.difficultyIndex),
-            subtitlesEnabled = PlayerPrefs.GetInt("settings_subtitles", DefaultSettings.subtitlesEnabled ? 1 : 0) == 1,
-            autoSaveEnabled = PlayerPrefs.GetInt(AUTO_SAVE_PREFS_KEY, DefaultSettings.autoSaveEnabled ? 1 : 0) == 1
+            subtitlesEnabled = PlayerPrefs.GetInt("settings_subtitles", DefaultSettings.subtitlesEnabled ? 1 : 0) == 1
         };
         
         MigrateResolutionIndexFromAscendingOrder(ref _currentSettings.resolutionIndex);

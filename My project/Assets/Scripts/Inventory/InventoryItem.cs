@@ -22,6 +22,11 @@ public class InventoryItem : ScriptableObject
 
     public bool consumeOnUse = true;
 
+    [Header("Stacking")]
+    [Tooltip("How many of this item can share one inventory slot. 1 = no stacking.")]
+    [Min(1)]
+    public int maxStack = 1;
+
     [Header("Interaction")]
     [Tooltip("Added to the player's interact range while this item is selected (e.g. bone to reach through a grate).")]
     public float interactionReachBonus;

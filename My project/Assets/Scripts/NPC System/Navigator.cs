@@ -215,12 +215,35 @@ namespace FS_Atmo
                         // 2) Open and wait until NavMesh is actually free.
                         // Entering the basement: start footstep deafness when the open door SFX plays.
                         bool enteringBasement = IsEnteringRoom(edge, waypoint, footstepDeafnessEnterRoomId);
+
+                        // Grace: Natural must not enter basement. Chase / Search / noise response may.
+                        if (enteringBasement && InteractionController.IsBasementRoutineDelayed)
+                        {
+                            var npcCtrl = GetComponent<NPCController>();
+                            if (npcCtrl == null || npcCtrl.currentState == NPCController.AIState.Natural)
+                            {
+                                AbortRouteInPlace();
+                                yield break;
+                            }
+                        }
+
+                        // Stand still at the entry prepoint so opening the carve can't slide him through.
+                        if (agent != null)
+                        {
+                            agent.ResetPath();
+                            agent.isStopped = true;
+                            agent.velocity = Vector3.zero;
+                        }
+
                         yield return EnsureDoorOpenForCrossing(edge.door, enteringBasement);
 
                         // Linger at the basement doorway before crossing (other doors skip this).
-                        // Abort early only if the player is actually visible — chase-from-noise still waits.
+                        // Abort early if the player is actually visible — chase-from-noise still waits.
                         if (enteringBasement && basementDoorPostOpenHold > 0f)
                             yield return BasementDoorPostOpenHoldRoutine();
+
+                        if (agent != null)
+                            agent.isStopped = false;
 
                         // 3) Move to the opposite prepoint
                         int next = idx + 1;
@@ -332,11 +355,29 @@ namespace FS_Atmo
             else if (entryPrepoint == edge.prePointB)
                 destination = edge.roomA;
 
-            return destination != null && destination.roomID == roomId;
+            return RoomMatchesId(destination, roomId);
+        }
+
+        static bool RoomMatchesId(RoomAnchor room, string roomId)
+        {
+            if (room == null || string.IsNullOrEmpty(roomId))
+                return false;
+
+            if (!string.IsNullOrEmpty(room.roomID) && room.roomID == roomId)
+                return true;
+
+            return room.name == roomId || room.gameObject.name == roomId;
         }
 
         IEnumerator BasementDoorPostOpenHoldRoutine()
         {
+            if (agent != null)
+            {
+                agent.ResetPath();
+                agent.isStopped = true;
+                agent.velocity = Vector3.zero;
+            }
+
             float held = 0f;
             while (held < basementDoorPostOpenHold)
             {
@@ -415,7 +456,15 @@ namespace FS_Atmo
             CleanupTempPoints();
             route.Clear();
             idx = -1;
-            if (agent != null) agent.ResetPath();
+            if (agent != null)
+            {
+                agent.isStopped = false;
+                agent.ResetPath();
+            }
+
+            // Any aborted Natural walk (door fail, basement grace, stuck cross) used to leave
+            // InteractionController.WaitForArrival spinning forever → no sit, no next hotspot.
+            interaction?.NotifyRouteAbortedNeedNewRoutine();
         }
 
         private void CleanupTempPoints()
@@ -543,7 +592,11 @@ namespace FS_Atmo
             route.Clear();
             idx = -1;
             isDoorTransit = false;
-            agent.ResetPath();
+            if (agent != null)
+            {
+                agent.isStopped = false;
+                agent.ResetPath();
+            }
         }
 
         /// <summary>

@@ -23,6 +23,8 @@ public class LockedOpenClose : MonoBehaviour, IInteractable, IItemReceiver
     [Header("Lock")]
     public bool isLocked = true;
     [SerializeField] InventoryItem requiredKey;
+    [Tooltip("If set, using the required key starts this minigame instead of unlocking instantly.")]
+    [SerializeField] ScrewdriverLockBreakMinigame lockBreakMinigame;
     [SerializeField] float lockedFeedbackCooldown = 1f;
     [SerializeField] string lockedMessage = "It's locked.";
     [SerializeField] string wrongItemMessage = "That won't work here.";
@@ -110,6 +112,23 @@ public class LockedOpenClose : MonoBehaviour, IInteractable, IItemReceiver
             return false;
         }
 
+        if (lockBreakMinigame != null)
+        {
+            return lockBreakMinigame.TryBegin(
+                item,
+                onSuccess: CompleteUnlockFromMinigame,
+                onCancel: null);
+        }
+
+        CompleteUnlockFromMinigame(item);
+        return true;
+    }
+
+    void CompleteUnlockFromMinigame(InventoryItem item)
+    {
+        if (item == null)
+            return;
+
         isLocked = false;
         HudManager.Instance?.ShowSubtitle(
             Loc.Format("gameplay.item_unlocked", item.GetLocalizedName()), 2.5f, HudManager.Instance.SuccessColor);
@@ -122,7 +141,9 @@ public class LockedOpenClose : MonoBehaviour, IInteractable, IItemReceiver
 
         AudioClip sfx = unlockSound != null ? unlockSound : item.useSuccessSound;
         InteractionFeedback.PlaySound(sfx, transform.position);
-        return true;
+
+        if (!objectOpen)
+            ToggleOpenClose();
     }
 
     bool ToggleOpenClose()

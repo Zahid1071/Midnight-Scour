@@ -93,4 +93,10 @@ public class CinemachineMouseLook : MonoBehaviour
         transform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
     }
 
+    /// <summary>Sets camera-root local rotation to (0,0,0) and clears stored pitch.</summary>
+    public void ResetLocalRotation()
+    {
+        pitch = 0f;
+        transform.localRotation = Quaternion.identity;
+    }
 }

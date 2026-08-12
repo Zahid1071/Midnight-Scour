@@ -1,4 +1,5 @@
 using FS_Atmo;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
@@ -22,11 +23,13 @@ public class InventoryUI : MonoBehaviour
     private Color defaultColor = Color.white;
 
     private int selectedIndex = -1;
+    TextMeshProUGUI[] _stackLabels;
 
     private void Awake()
     {
         Instance = this;
         defaultColor = slotBackgrounds[0].color;
+        EnsureStackLabels();
     }
 
     private void Start()
@@ -47,7 +50,10 @@ public class InventoryUI : MonoBehaviour
 
     private void Update()
     {
-        if (PlayerControlGate.IsInputBlocked || ReadPanelUI.IsBlockingPlayerInput)
+        if (PlayerControlGate.IsInputBlocked
+            || ReadPanelUI.IsBlockingPlayerInput
+            || JumpscareManager.CaptureUiActive
+            || (GameOverUI.Instance != null && GameOverUI.Instance.IsShowing))
             return;
 
         if (Input.GetKeyDown(KeyCode.Alpha1)) SelectSlot(0);
@@ -78,6 +84,7 @@ public class InventoryUI : MonoBehaviour
         if (!this || InventoryManager.Instance == null) return;
         if (slotImages == null || slotBackgrounds == null) return;
 
+        EnsureStackLabels();
         var items = InventoryManager.Instance.GetInventory();
 
         for (int i = 0; i < slotImages.Length; i++)
@@ -87,13 +94,71 @@ public class InventoryUI : MonoBehaviour
             if (i >= slotBackgrounds.Length)
                 break;
 
-            bool hasItem = i < items.Count && items[i] != null && items[i].icon != null;
+            InventoryItem item = i < items.Count ? items[i] : null;
+            bool hasItem = item != null;
+            bool hasIcon = hasItem && item.icon != null;
 
-            slotImages[i].sprite = hasItem ? items[i].icon : null;
+            slotImages[i].sprite = hasIcon ? item.icon : null;
+            // Keep Image enabled when stacked with no sprite yet so the slot still selects.
             slotImages[i].enabled = hasItem;
+            if (hasItem && !hasIcon)
+                slotImages[i].color = new Color(1f, 1f, 1f, 0.15f);
+            else
+                slotImages[i].color = Color.white;
 
             if (slotBackgrounds[i] != null)
                 slotBackgrounds[i].color = (i == selectedIndex) ? selectedColor : defaultColor;
+
+            int count = hasItem ? InventoryManager.Instance.GetCountAt(i) : 0;
+            if (_stackLabels != null && i < _stackLabels.Length && _stackLabels[i] != null)
+            {
+                bool showCount = count > 1;
+                _stackLabels[i].enabled = showCount;
+                if (showCount)
+                    _stackLabels[i].text = count.ToString();
+            }
+        }
+    }
+
+    void EnsureStackLabels()
+    {
+        if (slotImages == null || slotImages.Length == 0)
+            return;
+        if (_stackLabels != null && _stackLabels.Length == slotImages.Length)
+            return;
+
+        _stackLabels = new TextMeshProUGUI[slotImages.Length];
+        for (int i = 0; i < slotImages.Length; i++)
+        {
+            if (slotImages[i] == null)
+                continue;
+
+            var existing = slotImages[i].GetComponentInChildren<TextMeshProUGUI>(true);
+            if (existing != null && existing.name == "Stack Count")
+            {
+                _stackLabels[i] = existing;
+                continue;
+            }
+
+            var go = new GameObject("Stack Count", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+            go.transform.SetParent(slotImages[i].transform, false);
+            var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(1f, 0f);
+            rt.anchorMax = new Vector2(1f, 0f);
+            rt.pivot = new Vector2(1f, 0f);
+            rt.anchoredPosition = new Vector2(-4f, 4f);
+            rt.sizeDelta = new Vector2(48f, 28f);
+
+            var tmp = go.GetComponent<TextMeshProUGUI>();
+            tmp.text = "";
+            tmp.fontSize = 22f;
+            tmp.fontStyle = FontStyles.Bold;
+            tmp.alignment = TextAlignmentOptions.BottomRight;
+            tmp.color = Color.white;
+            tmp.raycastTarget = false;
+            tmp.enabled = false;
+            UIFont.ApplyTree(go.transform);
+            _stackLabels[i] = tmp;
         }
     }
 
@@ -110,6 +175,13 @@ public class InventoryUI : MonoBehaviour
 
     void HandleInteractPress(bool isPrimaryClick)
     {
+        // Exit hide is handled by PlayerHider (E/Space) — no world/item use while hidden.
+        var hider = PlayerInteractor.Instance != null
+            ? PlayerInteractor.Instance.GetComponent<PlayerHider>()
+            : null;
+        if (hider != null && hider.isHidden)
+            return;
+
         if (GetSelectedItem() != null)
             TryUseSelectedItem(isPrimaryClick);
         else
@@ -141,7 +213,13 @@ public class InventoryUI : MonoBehaviour
 
     public InventoryItem GetSelectedItem()
     {
+        if (InventoryManager.Instance == null)
+            return null;
+
         var inventory = InventoryManager.Instance.GetInventory();
+        if (inventory == null)
+            return null;
+
         if (selectedIndex >= 0 && selectedIndex < inventory.Count)
             return inventory[selectedIndex];
         return null;
@@ -207,7 +285,9 @@ public class InventoryUI : MonoBehaviour
                     // (e.g. hammer hit must not fire when picking up a vase while hammer is selected).
                     InteractionUIManager.Instance?.PlaySuccessShake();
                 }
-                else if (receiver is SimpleOpenClose || receiver is LockedOpenClose)
+                else if (receiver is SimpleOpenClose
+                    || receiver is LockedOpenClose
+                    || receiver is PadlockLockpickMinigame)
                 {
                     InteractionUIManager.Instance?.PlaySuccessShake();
                 }
@@ -260,6 +340,12 @@ public class InventoryUI : MonoBehaviour
 
     private void TryDropSelectedItem()
     {
+        var hider = PlayerInteractor.Instance != null
+            ? PlayerInteractor.Instance.GetComponent<PlayerHider>()
+            : null;
+        if (hider != null && hider.isHidden)
+            return;
+
         if (InventoryManager.Instance == null)
             return;
 

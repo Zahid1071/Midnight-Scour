@@ -63,7 +63,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296577
-    m_Localized: "Thank you for playing Midnight Scour"
+    m_Localized: Thank you for playing Midnight Scour
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
@@ -87,7 +87,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296583
-    m_Localized: "Press {0} to drop selected item"
+    m_Localized: Press {0} to drop selected item
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296584
@@ -183,7 +183,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296606
-    m_Localized: I can't reach that.
+    m_Localized: "It is too far."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296607
@@ -199,15 +199,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296613
-    m_Localized: "You need {0}."
+    m_Localized: You need {0}.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296614
-    m_Localized: "{0} was used."
+    m_Localized: '{0} was used.'
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296615
-    m_Localized: "{0} unlocked it."
+    m_Localized: '{0} unlocked it.'
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296616
@@ -227,11 +227,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296620
-    m_Localized: "Stored: {0}."
+    m_Localized: 'Stored: {0}.'
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296621
-    m_Localized: "{0} is already installed."
+    m_Localized: '{0} is already installed.'
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296622
@@ -239,11 +239,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296623
-    m_Localized: "You do not have {0}."
+    m_Localized: You do not have {0}.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296624
-    m_Localized: "{0} installed."
+    m_Localized: '{0} installed.'
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296625
@@ -259,7 +259,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296628
-    m_Localized: "Still missing: {0}."
+    m_Localized: 'Still missing: {0}.'
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296629
@@ -395,35 +395,35 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296662
-    m_Localized: TIP: Use hiding spots to escape enemies.
+    m_Localized: 
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296663
-    m_Localized: TIP: Explore carefully, you might find important clues.
+    m_Localized: 
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296664
-    m_Localized: TIP: Keep quiet, enemies can hear you.
+    m_Localized: 
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296665
-    m_Localized: TIP: Your flashlight has limited battery, use it wisely.
+    m_Localized: 
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296666
-    m_Localized: TIP: Some doors require special keys.
+    m_Localized: 
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296667
-    m_Localized: TIP: Running can attract enemies' attention.
+    m_Localized: 
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296668
-    m_Localized: TIP: Read notes and documents to uncover the story.
+    m_Localized: 
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296669
-    m_Localized: TIP: Hiding in dark corners helps protect you from enemies.
+    m_Localized: 
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296670
@@ -451,7 +451,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296676
-    m_Localized: "Are you sure you want to quit?\n\nUnsaved progress will be lost."
+    m_Localized: 'Are you sure you want to quit?
+
+
+      Unsaved progress will be
+      lost.'
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296677
@@ -463,7 +467,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296679
-    m_Localized: "Are you sure you want to return to the main menu?\n\nUnsaved progress will be lost."
+    m_Localized: 'Are you sure you want to return to the main menu?
+
+
+      Unsaved
+      progress will be lost.'
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296680
@@ -479,7 +487,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296683
-    m_Localized: "Dropped {0}."
+    m_Localized: Dropped {0}.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296684
@@ -543,7 +551,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296699
-    m_Localized: The toilet is clogged, I can't find the plunger. It was somewhere inside a bucket, but I don't remember where.
+    m_Localized: The toilet is clogged, I can't find the plunger. It was somewhere
+      inside a bucket, but I don't remember where.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296701
@@ -563,7 +572,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296704
-    m_Localized: I think I need to hit it with something to rotate, it is completely rusty
+    m_Localized: I think I need to hit it with something to rotate, it is completely
+      rusty
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296705
@@ -591,11 +601,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296711
-    m_Localized: "How would you rate this experience?"
+    m_Localized: How would you rate this experience?
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296712
-    m_Localized: "Tension"
+    m_Localized: Tension
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296713
@@ -603,11 +613,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296714
-    m_Localized: "Fun"
+    m_Localized: Fun
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296715
-    m_Localized: "*optional* feedback area"
+    m_Localized: '*optional* feedback area'
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296716
@@ -615,15 +625,16 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296717
-    m_Localized: "Hi — as a software engineer who just graduated from Haliç University, I tried to show you in this limited release what Midnight Scour could become. Going forward, I want to bring you the full version by expanding the world and atmosphere, building on the foundations we laid here, and growing the budget. Please leave us your feedback so we can improve your experience."
+    m_Localized: "Hi \u2014 We're looking to grow the budget and scope for the full
+      game, and your feedback is the most important guide for how we move forward."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296718
-    m_Localized: ?
+    m_Localized: '?'
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296719
-    m_Localized: "Sending..."
+    m_Localized: Sending...
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296720
@@ -639,7 +650,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296723
-    m_Localized: "Setup needed"
+    m_Localized: Setup needed
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296724
@@ -651,7 +662,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296726
-    m_Localized: "Already did that"
+    m_Localized: Already did that
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296727
@@ -660,6 +671,122 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 5707318296728
     m_Localized: The killer will notice your repeated moves and adapt.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296729
+    m_Localized: I did it, perfect timing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296730
+    m_Localized: I can time the hammer strike with the thunder
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296731
+    m_Localized: This will be loud, I can't hit it right now
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296732
+    m_Localized: "I hit it too late, I'll get caught"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296733
+    m_Localized: "Shove the screwdriver in."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296734
+    m_Localized: "Shake violently to break it."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296735
+    m_Localized: "I hit it too early, I'll get caught"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296736
+    m_Localized: "I hit it too late, I'll get caught"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296737
+    m_Localized: "It's stuck, try again."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296738
+    m_Localized: "Butcher saw you hiding."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296739
+    m_Localized: "You made too much noise."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296740
+    m_Localized: "You kept hiding in the same spot."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296741
+    m_Localized: "You failed to mask Hammer noise with thunder."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296742
+    m_Localized: "Butcher saw you."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296743
+    m_Localized: "You were caught."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296744
+    m_Localized: "Restart"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296745
+    m_Localized: "Main Menu"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296746
+    m_Localized: "Butcher ambushed you."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296747
+    m_Localized: "Lockpicks let you keep your progress after getting caught."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296748
+    m_Localized: "Lockpick"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296749
+    m_Localized: "Picked up Lockpick"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296750
+    m_Localized: "Continue"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296751
+    m_Localized: "Hold right mouse click to apply pressure"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296752
+    m_Localized: "Use your mouse to move the lockpick and press left mouse button to pick pins"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296753
+    m_Localized: "Pin set"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296754
+    m_Localized: "Unlocked key"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296755
+    m_Localized: "The door is chained."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296756
+    m_Localized: "When I got caught the first time, he chained the door with a padlock. I wish I had taken that hairpin on top of that toilet. Maybe I could've used it as a lockpick."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296757
+    m_Localized: "I must keep an eye out to find more lockpicks"
     m_Metadata:
       m_Items: []
   references:

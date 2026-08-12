@@ -8,7 +8,9 @@ public class CinematicPlayerControlLock : MonoBehaviour
 {
     public void LockCinematic()
     {
-        PlayerControlGate.Acquire(PlayerControlGate.ReasonCinematic);
+        // Continue Apply may already hold this — don't double-acquire (Unlock only Releases once).
+        if (!PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic))
+            PlayerControlGate.Acquire(PlayerControlGate.ReasonCinematic);
         GameplayHudVisibility.Instance?.HideGameplayHud();
     }
 
@@ -16,6 +18,13 @@ public class CinematicPlayerControlLock : MonoBehaviour
     {
         PlayerControlGate.Release(PlayerControlGate.ReasonCinematic);
         GameplayHudVisibility.Instance?.ShowGameplayHud();
+
+        // Continue: after intro, same leave-cage grace as a fresh start (not a free 30s from unlock).
+        InteractionController.ArmBasementGraceAfterContinueIntro();
+
+        // Same kick as NPCController.Start() — Continue replays the intro, so Natural must
+        // be started again when the player unlocks (no LeaveBasement / deleted signal path).
+        KickNpcNaturalRoutines();
     }
 
     /// <summary>Timeline signal entry point — always-active relay to the UI prefab.</summary>
@@ -29,5 +38,12 @@ public class CinematicPlayerControlLock : MonoBehaviour
         }
 
         hint.Show();
+    }
+
+    public static void KickNpcNaturalRoutines()
+    {
+        var npcs = FindObjectsByType<NPCController>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        for (int i = 0; i < npcs.Length; i++)
+            npcs[i]?.EnsureNaturalRoutineStarted();
     }
 }

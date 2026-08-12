@@ -9,6 +9,14 @@ public class Cage : MonoBehaviour
     public Transform basementSidePrePoint;
     public bool isOccupied = false;
 
+    /// <summary>
+    /// Set when the player leaves after actually being held. NPCs use this so an empty/open
+    /// cage during normal play does not look like an escape.
+    /// </summary>
+    public bool PendingEscapeSighting { get; private set; }
+
+    public void ConsumeEscapeSighting() => PendingEscapeSighting = false;
+
     /// <summary>True if this cage currently holds the given player (root or child).</summary>
     public bool HoldsPlayer(Transform player)
     {
@@ -90,6 +98,8 @@ public class Cage : MonoBehaviour
             {
                 if (isOpenNow)
                     GameplayHintManager.Instance?.NotifyCageDoorOpenedFirstTime();
+                else if (isOccupied)
+                    PunishWatchedDoorClose();
 
                 NotifyNpcsOfDoorSound();
             }
@@ -100,18 +110,14 @@ public class Cage : MonoBehaviour
         // Safety check
         if (!isOccupied || playerRef == null || cageDoor == null) return;
 
-        // Logic:
-        // Door OPEN   -> Use Original Layer (Visible)
-        // Door CLOSED -> Use Captive Layer (Hidden/ID 12)
+        // Door OPEN   -> original layer (visible)
+        // Door CLOSED -> Captive only if no NPC can see the cage. If they can see you
+        // slam it, stay visible and PunishWatchedDoorClose starts a relentless hunt.
         int targetLayer = originalLayerIndex;
-
-        bool cageVisible = false;
 
         if (!cageDoor.objectOpen)
         {
-            // Captive layer only if no LOS to cage and door closed.
-            cageVisible = IsCageVisibleToAnyNPC();
-            if (!cageVisible)
+            if (!IsCageVisibleToAnyNPC())
                 targetLayer = CAPTIVE_LAYER;
         }
 
@@ -123,6 +129,40 @@ public class Cage : MonoBehaviour
 
             if (becameCaptive)
                 RedirectNpcHearingAwayFromCage();
+        }
+    }
+
+    /// <summary>
+    /// Slam the cage shut while an NPC can see you → relentless capture (no Captive hide).
+    /// </summary>
+    void PunishWatchedDoorClose()
+    {
+        if (playerRef == null)
+            return;
+        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic))
+            return;
+
+#if UNITY_2023_1_OR_NEWER
+        var perceivers = Object.FindObjectsByType<PerceptionController>(FindObjectsSortMode.None);
+#else
+        var perceivers = Object.FindObjectsOfType<PerceptionController>();
+#endif
+
+        for (int i = 0; i < perceivers.Length; i++)
+        {
+            var perception = perceivers[i];
+            if (perception == null)
+                continue;
+
+            // Must actually see the player (not just hear the door).
+            if (!perception.HasDirectLineOfSightToPlayer())
+                continue;
+
+            var npc = perception.GetComponent<NPCController>();
+            if (npc == null)
+                continue;
+
+            npc.ForceRelentlessHunt(CaptureReason.Spotted);
         }
     }
 
@@ -199,7 +239,6 @@ public class Cage : MonoBehaviour
         var perceivers = Object.FindObjectsOfType<PerceptionController>();
 #endif
 
-        // cage center target for raycasts
         Vector3 cageCenter = transform.position + Vector3.up * 1.5f;
         Collider myCol = GetComponent<Collider>();
         if (myCol != null) cageCenter = myCol.bounds.center;
@@ -246,12 +285,17 @@ public class Cage : MonoBehaviour
         // Track the root so we don't accidentally toggle only a child collider.
         playerRef = root;
         isOccupied = true;
+        PendingEscapeSighting = false;
     }
 
     private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Player"))
         {
+            // Only arm the escape cue if they were actually inside — empty cages are the default.
+            if (isOccupied && playerRef != null)
+                PendingEscapeSighting = true;
+
             isOccupied = false;
 
             // Restore the player to their original layer upon exit
@@ -261,14 +305,68 @@ public class Cage : MonoBehaviour
             }
 
             playerRef = null;
+
+            // Basement grace: timer starts only after leaving the cage (same gate idea as thunder).
+            InteractionController.NotifyPlayerLeftCage();
+        }
+    }
+
+    /// <summary>
+    /// Continue teleports the player without reliable OnTriggerExit/Enter.
+    /// Clear stale occupancy, then rebind if they landed inside the cage volume.
+    /// Does not fire escape sighting; grace Notify is handled by exit / Arm TryStart.
+    /// </summary>
+    public void RebindAfterContinueTeleport(GameObject player)
+    {
+        if (player == null)
+            return;
+
+        GameObject root = player.transform.root != null ? player.transform.root.gameObject : player;
+
+        // Drop stale "still inside" from before the teleport.
+        isOccupied = false;
+        playerRef = null;
+        PendingEscapeSighting = false;
+
+        Physics.SyncTransforms();
+
+        Collider triggerCol = GetComponent<Collider>();
+        if (triggerCol == null || !triggerCol.isTrigger)
+            return;
+
+        if (!triggerCol.bounds.Contains(root.transform.position))
+            return;
+
+        // Landed in the cage (normal Continue spawn) — treat as held, original = Player.
+        int playerLayer = PlayerLayer >= 0 ? PlayerLayer : LayerMask.NameToLayer("Player");
+        originalLayerIndex = SanitizeOriginalLayer(playerLayer >= 0 ? playerLayer : root.layer);
+        playerRef = root;
+        isOccupied = true;
+
+        // Door closed → Captive this frame so perception matches a fresh start.
+        if (cageDoor != null && !cageDoor.objectOpen && playerLayer >= 0)
+            root.layer = CAPTIVE_LAYER;
+        else if (playerLayer >= 0)
+            root.layer = playerLayer;
+    }
+
+    /// <summary>Rebind every cage after a Continue teleport.</summary>
+    public static void RebindAllAfterContinueTeleport(GameObject player)
+    {
+#if UNITY_2023_1_OR_NEWER
+        var cages = Object.FindObjectsByType<Cage>(FindObjectsSortMode.None);
+#else
+        var cages = Object.FindObjectsOfType<Cage>();
+#endif
+        for (int i = 0; i < cages.Length; i++)
+        {
+            if (cages[i] != null)
+                cages[i].RebindAfterContinueTeleport(player);
         }
     }
 
     void EnsureOccupancy()
     {
-        if (isOccupied && playerRef != null)
-            return;
-
         Collider triggerCol = GetComponent<Collider>();
         if (triggerCol == null)
             return;
@@ -281,13 +379,29 @@ public class Cage : MonoBehaviour
         if (player == null)
             return;
 
-        Vector3 p = player.transform.position;
-        if (!triggerCol.bounds.Contains(p))
-            return;
+        GameObject root = player.transform.root != null ? player.transform.root.gameObject : player;
+        Vector3 p = root.transform.position;
+        bool inside = triggerCol.bounds.Contains(p);
 
-        // Treat as captured/inside.
-        playerRef = player.transform.root != null ? player.transform.root.gameObject : player;
-        originalLayerIndex = SanitizeOriginalLayer(playerRef.layer);
-        isOccupied = true;
+        if (inside)
+        {
+            if (isOccupied && playerRef == root)
+                return;
+
+            playerRef = root;
+            originalLayerIndex = SanitizeOriginalLayer(playerRef.layer);
+            isOccupied = true;
+            return;
+        }
+
+        // Player teleported / forced out without OnTriggerExit — clear stale hold.
+        if (isOccupied && playerRef == root)
+        {
+            isOccupied = false;
+            playerRef.layer = SanitizeOriginalLayer(originalLayerIndex);
+            playerRef = null;
+            // Same as a real exit: start basement grace if it was armed for cage-exit.
+            InteractionController.NotifyPlayerLeftCage();
+        }
     }
 }

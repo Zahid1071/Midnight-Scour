@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class HidingSpot : MonoBehaviour, IInteractable
@@ -29,9 +30,15 @@ public class HidingSpot : MonoBehaviour, IInteractable
     public float stealthLayerDelay = 1f;
     [Tooltip("Restore the player layer immediately when exit begins (before the exit animation finishes).")]
     public bool restoreLayerOnExitStart = true;
+    [Tooltip("Seconds after hide starts before the player spotlight starts fading out. Tune per hide spot.")]
+    [Min(0f)]
+    public float suppressLightInSeconds = 0f;
     [Tooltip("Seconds after exit starts before the player spotlight fades back in. Tune per hide spot.")]
     [Min(0f)]
     public float restoreLightInSeconds = 1.5f;
+    [Tooltip("Seconds to ease player XZ to the hide pivot when leaving. Runs under the hide cam so it is not visible. Y unchanged.")]
+    [Min(0.05f)]
+    [SerializeField] float exitSlideDuration = 0.35f;
 
     [Header("Door SFX")]
     [SerializeField] AudioClip doorOpenSfx;
@@ -53,6 +60,9 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
     private int originalLayerIndex;
     private GameObject playerRef;
+
+    readonly List<Collider> _suppressedSolids = new();
+    readonly List<bool> _suppressedSolidWasEnabled = new();
 
     public Transform PivotForNPCSearchRoutine;
 
@@ -267,6 +277,7 @@ public class HidingSpot : MonoBehaviour, IInteractable
         if (best.perception != null)
             best.perception.RedirectLastKnownPosition(spotPos);
 
+        CaptureContext.Set(CaptureReason.WitnessedHide);
         best.BeginWitnessedHideCapture(this);
     }
 
@@ -388,11 +399,19 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
         hider.SetHidingEngaged(true);
 
-        SetHideLighting(player, true);
+        if (suppressLightInSeconds <= 0f)
+            SetHideLighting(player, true);
+        else
+            StartCoroutine(SuppressHideLightAfterSeconds(player, suppressLightInSeconds));
 
         HidingCameraSystem.Instance.AttachToPivot(activePivot);
         HidingCameraSystem.Instance.SetActive(true);
         hider.DisableControlsOnly();
+
+        // One frame after hide-cam kickoff so CC disable does not hitch with the blend.
+        yield return null;
+        hider.SuspendCollision();
+        SuppressSolidColliders();
 
         if (activeAnimator != null)
         {
@@ -449,6 +468,18 @@ public class HidingSpot : MonoBehaviour, IInteractable
         playerRef = null;
 
         PlayerHider hider = player.GetComponent<PlayerHider>();
+
+        // Body stays out of physics until after the XZ slide. Spot solids stay off until
+        // controls return so a closed door cannot shove the first Move through the floor.
+        if (hider != null)
+            hider.SuspendCollision();
+
+        if (hider != null && activePivot != null)
+        {
+            Vector3 standPos = GetSideAnchor(activePivot);
+            float slide = forCapture ? 0.05f : exitSlideDuration;
+            yield return hider.SmoothMoveToXZ(standPos.x, standPos.z, slide);
+        }
 
         if (!forCapture)
             StartCoroutine(RestoreHideLightAfterSeconds(player, restoreLightInSeconds));
@@ -518,6 +549,19 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
         if (forCapture)
         {
+            // Capture path used to leave the hide cam live until DoCaptureNow — if anything
+            // aborted before that, the player stayed stuck in the locker lens with no UI.
+            if (HidingCameraSystem.Instance != null)
+            {
+                HidingCameraSystem.Instance.SetActive(false);
+                HidingCameraSystem.Instance.Detach();
+            }
+
+            // Keep CC off for jumpscare/reload, but restore spot solids and clear engaged
+            // so a failed capture cannot leave the world in a broken collision state.
+            RestoreSolidColliders();
+            if (hider != null)
+                hider.SetHidingEngaged(false);
             isOccupied = false;
             isToggling = false;
             yield break;
@@ -538,11 +582,15 @@ public class HidingSpot : MonoBehaviour, IInteractable
             yield return new WaitForSeconds(blendDuration);
         }
 
+        // Wake the body at Pivot Root while spot solids are still off, then bring solids back.
         if (hider != null)
+        {
+            hider.RestoreCollision();
             hider.EnableControls();
-
-        if (hider != null)
             hider.SetHidingEngaged(false);
+        }
+
+        RestoreSolidColliders();
 
         HidingCameraSystem.Instance.Detach();
 
@@ -550,6 +598,44 @@ public class HidingSpot : MonoBehaviour, IInteractable
         isToggling = false;
         activePivot = null;
         activeAnimator = null;
+    }
+
+    void SuppressSolidColliders()
+    {
+        RestoreSolidColliders();
+
+        var cols = GetComponentsInChildren<Collider>(true);
+        for (int i = 0; i < cols.Length; i++)
+        {
+            Collider col = cols[i];
+            if (col == null || col.isTrigger)
+                continue;
+
+            _suppressedSolids.Add(col);
+            _suppressedSolidWasEnabled.Add(col.enabled);
+            col.enabled = false;
+        }
+    }
+
+    void RestoreSolidColliders()
+    {
+        for (int i = 0; i < _suppressedSolids.Count; i++)
+        {
+            Collider col = _suppressedSolids[i];
+            if (col != null)
+                col.enabled = _suppressedSolidWasEnabled[i];
+        }
+
+        _suppressedSolids.Clear();
+        _suppressedSolidWasEnabled.Clear();
+    }
+
+    private IEnumerator SuppressHideLightAfterSeconds(GameObject player, float seconds)
+    {
+        if (seconds > 0f)
+            yield return new WaitForSeconds(seconds);
+        if (isOccupied && playerRef == player)
+            SetHideLighting(player, true);
     }
 
     private IEnumerator RestoreHideLightAfterSeconds(GameObject player, float seconds)
@@ -562,9 +648,25 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
     public static void EndHidingCameraForCapture()
     {
-        if (HidingCameraSystem.Instance == null) return;
-        HidingCameraSystem.Instance.SetActive(false);
-        HidingCameraSystem.Instance.Detach();
+        if (HidingCameraSystem.Instance != null)
+        {
+            HidingCameraSystem.Instance.SetActive(false);
+            HidingCameraSystem.Instance.Detach();
+        }
+
+        // Hide peek / locker aim must not leave the gameplay camera tilted after capture.
+        ResetGameplayLook();
+    }
+
+    /// <summary>Clear peek + mouse-look pitch so Continue / post-capture camera is upright.</summary>
+    public static void ResetGameplayLook()
+    {
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null)
+            return;
+
+        var look = player.GetComponentInChildren<CinemachineMouseLook>(true);
+        look?.ResetLocalRotation();
     }
 
     static void SetHideLighting(GameObject player, bool suppressed)

@@ -87,8 +87,8 @@ public class NPCAnchorManager : MonoBehaviour
 
     /// <summary>
     /// Room identity = room of the closest IMMEDIATE prepoint.
-    /// Immediate = NavMesh path completes AND does not cross any other door opening
-    /// (excludes middleman/transit through other rooms). Room comes from RoomGraph edge sides.
+    /// Immediate = NavMesh path completes, does not pass the opposite PrePoint on that door,
+    /// and does not cross any other door opening. Room comes from RoomGraph edge sides.
     /// </summary>
     /// <param name="isNpcSelf">
     /// True when voting the NPC's own position (Butcher) — logs red.
@@ -167,8 +167,8 @@ public class NPCAnchorManager : MonoBehaviour
     bool IsSameFloor(float a, float b) => Mathf.Abs(a - b) <= maxFloorYDelta;
 
     /// <summary>
-    /// Immediate = complete path to this prepoint, already on this prepoint's side of its door
-    /// (not through it), and does not cross any other doorway. Shortest path wins.
+    /// Immediate = complete path to this prepoint without going through its opposite PrePoint
+    /// (same door) or any other doorway, and already on this prepoint's side. Shortest wins.
     /// </summary>
     bool TryImmediatePrepointPath(
         Vector3 from,
@@ -197,12 +197,63 @@ public class NPCAnchorManager : MonoBehaviour
         if (!IsClearlySameSideOfPrepointDoor(from, prepoint))
             return false;
 
+        // Same door: path that goes past the opposite PrePoint means we crossed the doorway
+        // (e.g. basement → Cage PrePointB via PrePointA). Do NOT use the A–B door line —
+        // every path ends on that line and would reject all candidates.
+        if (PathPassesNearOppositePrepoint(path, prepoint, crossThreshold))
+            return false;
+
         // Goes through another room's doorway → not immediate.
         if (PathPassesThroughOtherPrepoint(path, prepoint, crossThreshold, candidateRoom))
             return false;
 
         pathLength = GetPathLength(path);
         return true;
+    }
+
+    /// <summary>
+    /// True if the path comes within <paramref name="threshold"/> of the other PrePoint on the
+    /// same door edge. That means reaching the target required crossing through the doorway.
+    /// </summary>
+    bool PathPassesNearOppositePrepoint(NavMeshPath path, Transform targetPrepoint, float threshold)
+    {
+        if (path.corners == null || path.corners.Length < 2)
+            return false;
+        if (RoomGraph.Instance == null || RoomGraph.Instance.edges == null)
+            return false;
+
+        Transform opposite = null;
+        foreach (var edge in RoomGraph.Instance.edges)
+        {
+            if (edge.prePointA == targetPrepoint)
+            {
+                opposite = edge.prePointB;
+                break;
+            }
+            if (edge.prePointB == targetPrepoint)
+            {
+                opposite = edge.prePointA;
+                break;
+            }
+        }
+
+        if (!opposite)
+            return false;
+
+        Vector2 opp = new Vector2(opposite.position.x, opposite.position.z);
+
+        // Skip the final corner (the target). Only earlier geometry counts as "passing through".
+        for (int i = 0; i < path.corners.Length - 1; i++)
+        {
+            Vector2 a = new Vector2(path.corners[i].x, path.corners[i].z);
+            Vector2 b = new Vector2(path.corners[i + 1].x, path.corners[i + 1].z);
+
+            // Last segment ends at the target — still check it, but the opposite is not the end.
+            if (PointToLineSegmentDistance(opp, a, b) < threshold)
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>

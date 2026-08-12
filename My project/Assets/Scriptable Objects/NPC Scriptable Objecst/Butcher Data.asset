@@ -51,7 +51,7 @@ MonoBehaviour:
         actionType: 12
         requiresVisualOffset: 0
     - roomAnchorID: Living_room
-      weight: 0.3
+      weight: 0.2
       hotspots:
       - hotspotID: Hotspot_Sofa
         weight: 0.605
@@ -67,9 +67,9 @@ MonoBehaviour:
         actionType: 10
         requiresVisualOffset: 0
   patrolChance: 0
-  patrolDuration: 20
-  ambushChance: 0.3
-  ambushWaitRange: {x: 10, y: 15}
+  patrolDuration: 10
+  ambushChance: 0.2
+  ambushWaitRange: {x: 10, y: 13}
   footstepVolume: 1
   vision:
     maxViewDistance: 10

@@ -9,7 +9,7 @@
  * - Quitting the game
  * - Returning to main menu (losing progress)
  * - Resetting settings to defaults
- * - Deleting save files
+ * - Deleting files / irreversible actions
  * 
  * USAGE:
  * ------

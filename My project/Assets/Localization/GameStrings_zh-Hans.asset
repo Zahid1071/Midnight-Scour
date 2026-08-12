@@ -19,539 +19,539 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 5707297325056
-    m_Localized: "设置"
+    m_Localized: "\u8BBE\u7F6E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325057
-    m_Localized: "退出"
+    m_Localized: "\u9000\u51FA"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325058
-    m_Localized: "返回"
+    m_Localized: "\u8FD4\u56DE"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325059
-    m_Localized: "应用"
+    m_Localized: "\u5E94\u7528"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325060
-    m_Localized: "默认"
+    m_Localized: "\u9ED8\u8BA4"
     m_Metadata:
       m_Items: []
   - m_Id: 1843970048000
-    m_Localized: "继续"
+    m_Localized: "\u7EE7\u7EED"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325061
-    m_Localized: "新游戏"
+    m_Localized: "\u65B0\u6E38\u620F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325062
-    m_Localized: "制作人员"
+    m_Localized: "\u5236\u4F5C\u4EBA\u5458"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325063
-    m_Localized: "保存游戏"
+    m_Localized: "\u4FDD\u5B58\u6E38\u620F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325064
-    m_Localized: "暂停"
+    m_Localized: "\u6682\u505C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296576
-    m_Localized: "继续"
+    m_Localized: "\u7EE7\u7EED"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296577
-    m_Localized: "感谢游玩 Midnight Scour"
+    m_Localized: "\u611F\u8C22\u6E38\u73A9 Midnight Scour"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
-    m_Localized: 按 Esc 退出
+    m_Localized: "\u6309 Esc \u9000\u51FA"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296579
-    m_Localized: "按任意键继续"
+    m_Localized: "\u6309\u4EFB\u610F\u952E\u7EE7\u7EED"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296580
-    m_Localized: "你可以阅读纸条来获取线索"
+    m_Localized: "\u4F60\u53EF\u4EE5\u9605\u8BFB\u7EB8\u6761\u6765\u83B7\u53D6\u7EBF\u7D22"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296581
-    m_Localized: "利用藏身点躲避杀手"
+    m_Localized: "\u5229\u7528\u85CF\u8EAB\u70B9\u8EB2\u907F\u6740\u624B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296582
-    m_Localized: "发出声响可能会引起杀手的注意"
+    m_Localized: "\u53D1\u51FA\u58F0\u54CD\u53EF\u80FD\u4F1A\u5F15\u8D77\u6740\u624B\u7684\u6CE8\u610F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296583
-    m_Localized: "按 {0} 丢弃选中的物品"
+    m_Localized: "\u6309 {0} \u4E22\u5F03\u9009\u4E2D\u7684\u7269\u54C1"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296584
-    m_Localized: "使用/组合物品"
+    m_Localized: "\u4F7F\u7528/\u7EC4\u5408\u7269\u54C1"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296585
-    m_Localized: "互动"
+    m_Localized: "\u4E92\u52A8"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296586
-    m_Localized: "设置"
+    m_Localized: "\u8BBE\u7F6E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296587
-    m_Localized: "画面"
+    m_Localized: "\u753B\u9762"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296588
-    m_Localized: "音频"
+    m_Localized: "\u97F3\u9891"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296589
-    m_Localized: "操作"
+    m_Localized: "\u64CD\u4F5C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296590
-    m_Localized: "游戏玩法"
+    m_Localized: "\u6E38\u620F\u73A9\u6CD5"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296591
-    m_Localized: "通用"
+    m_Localized: "\u901A\u7528"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296592
-    m_Localized: "主音量"
+    m_Localized: "\u4E3B\u97F3\u91CF"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296593
-    m_Localized: "音乐音量"
+    m_Localized: "\u97F3\u4E50\u97F3\u91CF"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296594
-    m_Localized: "音效音量"
+    m_Localized: "\u97F3\u6548\u97F3\u91CF"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296595
-    m_Localized: "亮度"
+    m_Localized: "\u4EAE\u5EA6"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296596
-    m_Localized: "鼠标灵敏度"
+    m_Localized: "\u9F20\u6807\u7075\u654F\u5EA6"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296800
-    m_Localized: 麦克风灵敏度
+    m_Localized: "\u9EA6\u514B\u98CE\u7075\u654F\u5EA6"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296597
-    m_Localized: "分辨率"
+    m_Localized: "\u5206\u8FA8\u7387"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296598
-    m_Localized: "全屏"
+    m_Localized: "\u5168\u5C4F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296599
-    m_Localized: "显示模式"
+    m_Localized: "\u663E\u793A\u6A21\u5F0F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296600
-    m_Localized: "画质"
+    m_Localized: "\u753B\u8D28"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296601
-    m_Localized: "垂直同步"
+    m_Localized: "\u5782\u76F4\u540C\u6B65"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296602
-    m_Localized: "自动保存"
+    m_Localized: "\u81EA\u52A8\u4FDD\u5B58"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296603
-    m_Localized: "语言"
+    m_Localized: "\u8BED\u8A00"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296604
-    m_Localized: "这个在这里没用。"
+    m_Localized: "\u8FD9\u4E2A\u5728\u8FD9\u91CC\u6CA1\u7528\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296605
-    m_Localized: "锁住了。"
+    m_Localized: "\u9501\u4F4F\u4E86\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296606
-    m_Localized: "我够不到那个。"
+    m_Localized: "\u592A\u8FDC\u4E86\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296607
-    m_Localized: "它纹丝不动。"
+    m_Localized: "\u5B83\u7EB9\u4E1D\u4E0D\u52A8\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296608
-    m_Localized: "稍等一下。"
+    m_Localized: "\u7A0D\u7B49\u4E00\u4E0B\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296609
-    m_Localized: "你已经在躲藏了。"
+    m_Localized: "\u4F60\u5DF2\u7ECF\u5728\u8EB2\u85CF\u4E86\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296613
-    m_Localized: "需要{0}。"
+    m_Localized: "\u9700\u8981{0}\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296614
-    m_Localized: "使用了{0}。"
+    m_Localized: "\u4F7F\u7528\u4E86{0}\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296615
-    m_Localized: "{0}把它打开了。"
+    m_Localized: "{0}\u628A\u5B83\u6253\u5F00\u4E86\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296616
-    m_Localized: "螺栓已拆下。"
+    m_Localized: "\u87BA\u6813\u5DF2\u62C6\u4E0B\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296617
-    m_Localized: "卡住了。"
+    m_Localized: "\u5361\u4F4F\u4E86\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296618
-    m_Localized: "这个互动尚未配置。"
+    m_Localized: "\u8FD9\u4E2A\u4E92\u52A8\u5C1A\u672A\u914D\u7F6E\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296619
-    m_Localized: "你没有东西可以存放。"
+    m_Localized: "\u4F60\u6CA1\u6709\u4E1C\u897F\u53EF\u4EE5\u5B58\u653E\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296620
-    m_Localized: "已存放：{0}。"
+    m_Localized: "\u5DF2\u5B58\u653E\uFF1A{0}\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296621
-    m_Localized: "{0}已经安装好了。"
+    m_Localized: "{0}\u5DF2\u7ECF\u5B89\u88C5\u597D\u4E86\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296622
-    m_Localized: "先从背包里选择一个汽车零件。"
+    m_Localized: "\u5148\u4ECE\u80CC\u5305\u91CC\u9009\u62E9\u4E00\u4E2A\u6C7D\u8F66\u96F6\u4EF6\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296623
-    m_Localized: "你没有{0}。"
+    m_Localized: "\u4F60\u6CA1\u6709{0}\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296624
-    m_Localized: "{0}已安装。"
+    m_Localized: "{0}\u5DF2\u5B89\u88C5\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296625
-    m_Localized: "这个插槽尚未配置。"
+    m_Localized: "\u8FD9\u4E2A\u63D2\u69FD\u5C1A\u672A\u914D\u7F6E\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296626
-    m_Localized: "逃脱流程尚未设置。"
+    m_Localized: "\u9003\u8131\u6D41\u7A0B\u5C1A\u672A\u8BBE\u7F6E\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296627
-    m_Localized: "所有零件都已安装。你逃出去了！"
+    m_Localized: "\u6240\u6709\u96F6\u4EF6\u90FD\u5DF2\u5B89\u88C5\u3002\u4F60\u9003\u51FA\u53BB\u4E86\uFF01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296628
-    m_Localized: "仍然缺少：{0}。"
+    m_Localized: "\u4ECD\u7136\u7F3A\u5C11\uFF1A{0}\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296629
-    m_Localized: "加载中..."
+    m_Localized: "\u52A0\u8F7D\u4E2D..."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296630
-    m_Localized: "撬棍"
+    m_Localized: "\u64AC\u68CD"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296631
-    m_Localized: "骨头"
+    m_Localized: "\u9AA8\u5934"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296632
-    m_Localized: "骨头"
+    m_Localized: "\u9AA8\u5934"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296633
-    m_Localized: "地下室钥匙"
+    m_Localized: "\u5730\u4E0B\u5BA4\u94A5\u5319"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296634
-    m_Localized: "金属箱钥匙"
+    m_Localized: "\u91D1\u5C5E\u7BB1\u94A5\u5319"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296635
-    m_Localized: "口香糖"
+    m_Localized: "\u53E3\u9999\u7CD6"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296636
-    m_Localized: "离合器"
+    m_Localized: "\u79BB\u5408\u5668"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296637
-    m_Localized: "锤子"
+    m_Localized: "\u9524\u5B50"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296638
-    m_Localized: "搋子"
+    m_Localized: "\u640B\u5B50"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296639
-    m_Localized: "螺丝刀"
+    m_Localized: "\u87BA\u4E1D\u5200"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296640
-    m_Localized: "火花塞"
+    m_Localized: "\u706B\u82B1\u585E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296641
-    m_Localized: "花瓶"
+    m_Localized: "\u82B1\u74F6"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296642
-    m_Localized: "扳手"
+    m_Localized: "\u6273\u624B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296643
-    m_Localized: "拾取了撬棍"
+    m_Localized: "\u62FE\u53D6\u4E86\u64AC\u68CD"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296644
-    m_Localized: "骨头已加入背包"
+    m_Localized: "\u9AA8\u5934\u5DF2\u52A0\u5165\u80CC\u5305"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296645
-    m_Localized: "粘着口香糖的骨头已加入背包"
+    m_Localized: "\u7C98\u7740\u53E3\u9999\u7CD6\u7684\u9AA8\u5934\u5DF2\u52A0\u5165\u80CC\u5305"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296646
-    m_Localized: "拾取了钥匙"
+    m_Localized: "\u62FE\u53D6\u4E86\u94A5\u5319"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296647
-    m_Localized: "拾取了小钥匙"
+    m_Localized: "\u62FE\u53D6\u4E86\u5C0F\u94A5\u5319"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296648
-    m_Localized: "拾取了口香糖"
+    m_Localized: "\u62FE\u53D6\u4E86\u53E3\u9999\u7CD6"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296649
-    m_Localized: "拾取了锤子"
+    m_Localized: "\u62FE\u53D6\u4E86\u9524\u5B50"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296650
-    m_Localized: "拾取了搋子"
+    m_Localized: "\u62FE\u53D6\u4E86\u640B\u5B50"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296651
-    m_Localized: "拾取了螺丝刀"
+    m_Localized: "\u62FE\u53D6\u4E86\u87BA\u4E1D\u5200"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296652
-    m_Localized: "里面好像有什么东西"
+    m_Localized: "\u91CC\u9762\u597D\u50CF\u6709\u4EC0\u4E48\u4E1C\u897F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296653
-    m_Localized: "拾取了扳手"
+    m_Localized: "\u62FE\u53D6\u4E86\u6273\u624B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296654
-    m_Localized: "完全堵住了。"
+    m_Localized: "\u5B8C\u5168\u5835\u4F4F\u4E86\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296655
-    m_Localized: "水已经排空了。"
+    m_Localized: "\u6C34\u5DF2\u7ECF\u6392\u7A7A\u4E86\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296656
-    m_Localized: "少了用来转动它的撬棍。"
+    m_Localized: "\u5C11\u4E86\u7528\u6765\u8F6C\u52A8\u5B83\u7684\u64AC\u68CD\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296657
-    m_Localized: "把撬棍用在台钳上。"
+    m_Localized: "\u628A\u64AC\u68CD\u7528\u5728\u53F0\u94B3\u4E0A\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296658
-    m_Localized: "把锤子用在撬棍上。"
+    m_Localized: "\u628A\u9524\u5B50\u7528\u5728\u64AC\u68CD\u4E0A\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296659
-    m_Localized: "把口香糖粘在了骨头上。"
+    m_Localized: "\u628A\u53E3\u9999\u7CD6\u7C98\u5728\u4E86\u9AA8\u5934\u4E0A\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296660
-    m_Localized: "它一直打滑，我需要把什么东西粘到骨头上"
+    m_Localized: "\u5B83\u4E00\u76F4\u6253\u6ED1\uFF0C\u6211\u9700\u8981\u628A\u4EC0\u4E48\u4E1C\u897F\u7C98\u5230\u9AA8\u5934\u4E0A"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296661
-    m_Localized: "螺丝刀断了。"
+    m_Localized: "\u87BA\u4E1D\u5200\u65AD\u4E86\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296662
-    m_Localized: "提示：利用藏身点躲避敌人。"
+    m_Localized: "\u63D0\u793A\uFF1A\u5229\u7528\u85CF\u8EAB\u70B9\u8EB2\u907F\u654C\u4EBA\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296663
-    m_Localized: "提示：仔细探索四周，你可能会找到重要线索。"
+    m_Localized: "\u63D0\u793A\uFF1A\u4ED4\u7EC6\u63A2\u7D22\u56DB\u5468\uFF0C\u4F60\u53EF\u80FD\u4F1A\u627E\u5230\u91CD\u8981\u7EBF\u7D22\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296664
-    m_Localized: "提示：保持安静，敌人能听到你的声音。"
+    m_Localized: "\u63D0\u793A\uFF1A\u4FDD\u6301\u5B89\u9759\uFF0C\u654C\u4EBA\u80FD\u542C\u5230\u4F60\u7684\u58F0\u97F3\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296665
-    m_Localized: "提示：手电筒电量有限，请谨慎使用。"
+    m_Localized: "\u63D0\u793A\uFF1A\u624B\u7535\u7B52\u7535\u91CF\u6709\u9650\uFF0C\u8BF7\u8C28\u614E\u4F7F\u7528\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296666
-    m_Localized: "提示：有些门需要特殊钥匙。"
+    m_Localized: "\u63D0\u793A\uFF1A\u6709\u4E9B\u95E8\u9700\u8981\u7279\u6B8A\u94A5\u5319\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296667
-    m_Localized: "提示：奔跑可能会引起敌人的注意。"
+    m_Localized: "\u63D0\u793A\uFF1A\u5954\u8DD1\u53EF\u80FD\u4F1A\u5F15\u8D77\u654C\u4EBA\u7684\u6CE8\u610F\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296668
-    m_Localized: "提示：阅读纸条和文件来揭开故事。"
+    m_Localized: "\u63D0\u793A\uFF1A\u9605\u8BFB\u7EB8\u6761\u548C\u6587\u4EF6\u6765\u63ED\u5F00\u6545\u4E8B\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296669
-    m_Localized: "提示：躲在阴暗角落有助于避开敌人。"
+    m_Localized: "\u63D0\u793A\uFF1A\u8EB2\u5728\u9634\u6697\u89D2\u843D\u6709\u52A9\u4E8E\u907F\u5F00\u654C\u4EBA\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296670
-    m_Localized: "这里什么都没有。"
+    m_Localized: "\u8FD9\u91CC\u4EC0\u4E48\u90FD\u6CA1\u6709\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296671
-    m_Localized: "你的背包已满。"
+    m_Localized: "\u4F60\u7684\u80CC\u5305\u5DF2\u6EE1\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296672
-    m_Localized: "格栅仍然被螺栓固定着。"
+    m_Localized: "\u683C\u6805\u4ECD\u7136\u88AB\u87BA\u6813\u56FA\u5B9A\u7740\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296673
-    m_Localized: "确认"
+    m_Localized: "\u786E\u8BA4"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296674
-    m_Localized: "是"
+    m_Localized: "\u662F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296675
-    m_Localized: "否"
+    m_Localized: "\u5426"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296676
-    m_Localized: "确定要退出吗？\n\n未保存的进度将会丢失。"
+    m_Localized: "\u786E\u5B9A\u8981\u9000\u51FA\u5417\uFF1F\n\n\u672A\u4FDD\u5B58\u7684\u8FDB\u5EA6\u5C06\u4F1A\u4E22\u5931\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296677
-    m_Localized: "退出"
+    m_Localized: "\u9000\u51FA"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296678
-    m_Localized: "退出"
+    m_Localized: "\u9000\u51FA"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296679
-    m_Localized: "确定要返回主菜单吗？\n\n未保存的进度将会丢失。"
+    m_Localized: "\u786E\u5B9A\u8981\u8FD4\u56DE\u4E3B\u83DC\u5355\u5417\uFF1F\n\n\u672A\u4FDD\u5B58\u7684\u8FDB\u5EA6\u5C06\u4F1A\u4E22\u5931\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296680
-    m_Localized: "主菜单"
+    m_Localized: "\u4E3B\u83DC\u5355"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296681
-    m_Localized: "返回"
+    m_Localized: "\u8FD4\u56DE"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296682
-    m_Localized: "我觉得那个花瓶里有什么东西。"
+    m_Localized: "\u6211\u89C9\u5F97\u90A3\u4E2A\u82B1\u74F6\u91CC\u6709\u4EC0\u4E48\u4E1C\u897F\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296683
-    m_Localized: "已丢弃 {0}。"
+    m_Localized: "\u5DF2\u4E22\u5F03 {0}\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296684
-    m_Localized: "启用"
+    m_Localized: "\u542F\u7528"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296685
-    m_Localized: "禁用"
+    m_Localized: "\u7981\u7528"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296686
-    m_Localized: "全屏"
+    m_Localized: "\u5168\u5C4F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296687
-    m_Localized: "窗口"
+    m_Localized: "\u7A97\u53E3"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296688
-    m_Localized: "带边框"
+    m_Localized: "\u5E26\u8FB9\u6846"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296689
-    m_Localized: "独占全屏"
+    m_Localized: "\u72EC\u5360\u5168\u5C4F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296690
-    m_Localized: "极低"
+    m_Localized: "\u6781\u4F4E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296691
-    m_Localized: "低"
+    m_Localized: "\u4F4E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296692
-    m_Localized: "中"
+    m_Localized: "\u4E2D"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296693
-    m_Localized: "高"
+    m_Localized: "\u9AD8"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296694
-    m_Localized: "极高"
+    m_Localized: "\u6781\u9AD8"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296695
-    m_Localized: "超高"
+    m_Localized: "\u8D85\u9AD8"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296696
-    m_Localized: "使用物品"
+    m_Localized: "\u4F7F\u7528\u7269\u54C1"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296697
-    m_Localized: "丢弃"
+    m_Localized: "\u4E22\u5F03"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296698
-    m_Localized: "够不到任何东西。"
+    m_Localized: "\u591F\u4E0D\u5230\u4EFB\u4F55\u4E1C\u897F\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296699
-    m_Localized: "马桶堵了，我找不到搋子。它在一个桶里的某个地方，但我不记得在哪里了。"
+    m_Localized: "\u9A6C\u6876\u5835\u4E86\uFF0C\u6211\u627E\u4E0D\u5230\u640B\u5B50\u3002\u5B83\u5728\u4E00\u4E2A\u6876\u91CC\u7684\u67D0\u4E2A\u5730\u65B9\uFF0C\u4F46\u6211\u4E0D\u8BB0\u5F97\u5728\u54EA\u91CC\u4E86\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296701
-    m_Localized: "拾取了离合器"
+    m_Localized: "\u62FE\u53D6\u4E86\u79BB\u5408\u5668"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296700
-    m_Localized: "拾取了火花塞"
+    m_Localized: "\u62FE\u53D6\u4E86\u706B\u82B1\u585E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296702
@@ -563,19 +563,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296704
-    m_Localized: "我觉得得用什么东西敲一下才能转动，它完全锈死了。"
+    m_Localized: "\u6211\u89C9\u5F97\u5F97\u7528\u4EC0\u4E48\u4E1C\u897F\u6572\u4E00\u4E0B\u624D\u80FD\u8F6C\u52A8\uFF0C\u5B83\u5B8C\u5168\u9508\u6B7B\u4E86\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296705
-    m_Localized: "这把锁看起来很容易弄坏。"
+    m_Localized: "\u8FD9\u628A\u9501\u770B\u8D77\u6765\u5F88\u5BB9\u6613\u5F04\u574F\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296706
-    m_Localized: "蹲下"
+    m_Localized: "\u8E72\u4E0B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296707
-    m_Localized: "奔跑"
+    m_Localized: "\u5954\u8DD1"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296708
@@ -587,79 +587,195 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296710
-    m_Localized: 我挡着门了。
+    m_Localized: "\u6211\u6321\u7740\u95E8\u4E86\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296711
-    m_Localized: 您如何评价这次体验？
+    m_Localized: "\u60A8\u5982\u4F55\u8BC4\u4EF7\u8FD9\u6B21\u4F53\u9A8C\uFF1F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296712
-    m_Localized: 紧张感
+    m_Localized: "\u7D27\u5F20\u611F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296713
-    m_Localized: 恐怖
+    m_Localized: "\u6050\u6016"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296714
-    m_Localized: 乐趣
+    m_Localized: "\u4E50\u8DA3"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296715
-    m_Localized: *可选* 反馈区域
+    m_Localized: "*\u53EF\u9009* \u53CD\u9988\u533A\u57DF"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296716
-    m_Localized: 提交
+    m_Localized: "\u63D0\u4EA4"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296717
-    m_Localized: "你好——作为刚从 Haliç 大学毕业的软件工程师，我在这个有限版本中尽量向你展示 Midnight Scour 可能成为什么样。接下来，我希望通过扩展环境和氛围、在此打下的基础上继续发展，并增加预算，为你带来完整版。请留下反馈，帮助我们改善你的体验。"
+    m_Localized: "\u4F60\u597D\u2014\u2014\u6211\u4EEC\u5E0C\u671B\u4E3A\u5B8C\u6574\u7248\u6269\u5927\u9884\u7B97\u4E0E\u89C4\u6A21\uFF0C\u800C\u4F60\u7684\u53CD\u9988\u662F\u6211\u4EEC\u524D\u8FDB\u6700\u91CD\u8981\u7684\u6307\u5F15\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296718
-    m_Localized: ?
+    m_Localized: '?'
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296719
-    m_Localized: 发送中...
+    m_Localized: "\u53D1\u9001\u4E2D..."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296720
-    m_Localized: 已提交
+    m_Localized: "\u5DF2\u63D0\u4EA4"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296721
-    m_Localized: 重试
+    m_Localized: "\u91CD\u8BD5"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296722
-    m_Localized: 请全部评分
+    m_Localized: "\u8BF7\u5168\u90E8\u8BC4\u5206"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296723
-    m_Localized: 需要配置
+    m_Localized: "\u9700\u8981\u914D\u7F6E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296724
-    m_Localized: 加入愿望单！
+    m_Localized: "\u52A0\u5165\u613F\u671B\u5355\uFF01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296725
-    m_Localized: 退出
+    m_Localized: "\u9000\u51FA"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296726
-    m_Localized: 已经提交过了
+    m_Localized: "\u5DF2\u7ECF\u63D0\u4EA4\u8FC7\u4E86"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296727
-    m_Localized: "已更新"
+    m_Localized: "\u5DF2\u66F4\u65B0"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296728
-    m_Localized: 杀手会注意到你反复的行动并做出应对。
+    m_Localized: "\u6740\u624B\u4F1A\u6CE8\u610F\u5230\u4F60\u53CD\u590D\u7684\u884C\u52A8\u5E76\u505A\u51FA\u5E94\u5BF9\u3002"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296729
+    m_Localized: "\u6210\u529F\u4E86\uFF0C\u65F6\u673A\u5B8C\u7F8E"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296730
+    m_Localized: "\u6211\u53EF\u4EE5\u8D81\u7740\u6253\u96F7\u65F6\u7528\u9524\u5B50\u6572"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296731
+    m_Localized: "\u8FD9\u592A\u5435\u4E86\uFF0C\u73B0\u5728\u4E0D\u80FD\u6572"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296732
+    m_Localized: "我打晚了，他会抓住我"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296733
+    m_Localized: "把螺丝刀推进去。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296734
+    m_Localized: "用力晃动来撬开锁。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296735
+    m_Localized: "我打早了，我会被抓住"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296736
+    m_Localized: "我打晚了，我会被抓住"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296737
+    m_Localized: "卡住了，再试一次。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296738
+    m_Localized: "Butcher看见你躲起来了。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296739
+    m_Localized: "你发出了太多声音。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296740
+    m_Localized: "你反复躲在同一个地方。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296741
+    m_Localized: "你没能用雷声掩盖锤击声。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296742
+    m_Localized: "Butcher看见了你。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296743
+    m_Localized: "你被抓住了。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296744
+    m_Localized: "重新开始"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296745
+    m_Localized: "主菜单"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296746
+    m_Localized: "Butcher伏击了你。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296747
+    m_Localized: "开锁器能让你在被抓住后保留进度。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296748
+    m_Localized: "开锁器"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296749
+    m_Localized: "拾取了开锁器"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296750
+    m_Localized: "??"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296751
+    m_Localized: "\u6309\u4F4F\u9F20\u6807\u53F3\u952E\u65BD\u52A0\u538B\u529B"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296752
+    m_Localized: "\u7528\u9F20\u6807\u79FB\u52A8\u5F00\u9501\u5668\u5E76\u6309\u9F20\u6807\u5DE6\u952E\u62E8\u9488"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296753
+    m_Localized: "\u9488\u5DF2\u5230\u4F4D"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296754
+    m_Localized: "\u9501\u5DF2\u6253\u5F00"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296755
+    m_Localized: "门被铁链锁住了。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296756
+    m_Localized: "我第一次被抓住时，他用挂锁把门锁住了。真希望我当时拿走了马桶上面的那根发夹。也许我能用它当开锁器。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296757
+    m_Localized: "我必须留意去找更多开锁器"
     m_Metadata:
       m_Items: []
   references:

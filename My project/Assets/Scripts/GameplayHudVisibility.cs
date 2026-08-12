@@ -1,7 +1,9 @@
 using UnityEngine;
 
 /// <summary>
-/// Hides gameplay HUD (crosshair, inventory slots) during cinematics while leaving other canvas UI (e.g. logo) visible.
+/// Hides gameplay HUD (crosshair, inventory slots) during cinematics / capture / hiding
+/// while leaving other canvas UI (e.g. logo) visible.
+/// Crosshair visibility tracks player control: on when cinematic lock is released.
 /// </summary>
 public class GameplayHudVisibility : MonoBehaviour
 {
@@ -9,6 +11,11 @@ public class GameplayHudVisibility : MonoBehaviour
 
     [SerializeField] private GameObject interactionRoot;
     [SerializeField] private GameObject inventoryRoot;
+
+    bool _hiddenForCinematic;
+    bool _hiddenForHiding;
+    CanvasGroup _interactionGroup;
+    CanvasGroup _inventoryGroup;
 
     private void Awake()
     {
@@ -20,12 +27,21 @@ public class GameplayHudVisibility : MonoBehaviour
 
         Instance = this;
         ResolveRoots();
+        CacheGroups();
+        SyncCinematicFromGate();
+        Apply();
     }
 
     private void Start()
     {
-        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic))
-            HideGameplayHud();
+        SyncCinematicFromGate();
+        Apply();
+    }
+
+    private void LateUpdate()
+    {
+        SyncCinematicFromGate();
+        Apply();
     }
 
     private void OnDestroy()
@@ -36,18 +52,107 @@ public class GameplayHudVisibility : MonoBehaviour
 
     public void HideGameplayHud()
     {
-        if (interactionRoot != null)
-            interactionRoot.SetActive(false);
-        if (inventoryRoot != null)
-            inventoryRoot.SetActive(false);
+        _hiddenForCinematic = true;
+        Apply();
     }
 
     public void ShowGameplayHud()
     {
-        if (interactionRoot != null)
-            interactionRoot.SetActive(true);
-        if (inventoryRoot != null)
-            inventoryRoot.SetActive(true);
+        _hiddenForCinematic = false;
+        Apply();
+    }
+
+    /// <summary>Hide crosshair + inventory while the player is in a hiding spot.</summary>
+    public void SetHiddenDuringHiding(bool hidden)
+    {
+        _hiddenForHiding = hidden;
+        Apply();
+    }
+
+    /// <summary>
+    /// Clears the hide-spot latch only. Capture / jumpscare / game-over must keep the HUD
+    /// down via <see cref="HideGameplayHud"/> or gate flags — never by leaving this stuck true.
+    /// </summary>
+    public void ClearHidingLatch()
+    {
+        if (!_hiddenForHiding)
+            return;
+
+        _hiddenForHiding = false;
+        Apply();
+    }
+
+    /// <summary>
+    /// Game-over / post-jumpscare: drop every sticky hide reason so Continue / Restart
+    /// do not inherit a permanent blank inventory/crosshair from a hide capture.
+    /// Keeps HUD visually off while <see cref="JumpscareManager.CaptureUiActive"/> or
+    /// <see cref="PlayerControlGate.ReasonCaptured"/> still apply; callers should
+    /// re-<see cref="HideGameplayHud"/> if they need HUD off after those clear.
+    /// </summary>
+    public void ClearAllStickyHides()
+    {
+        _hiddenForHiding = false;
+        _hiddenForCinematic = false;
+        Apply();
+    }
+
+    bool SyncCinematicFromGate()
+    {
+        // Only force-hide when cinematic is locked. Never clear a manual HideGameplayHud()
+        // (capture / jumpscare) just because ReasonCinematic is not held.
+        if (!PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic))
+            return false;
+
+        if (_hiddenForCinematic)
+            return false;
+
+        _hiddenForCinematic = true;
+        return true;
+    }
+
+    void Apply()
+    {
+        bool lockpick = PlayerControlGate.IsAcquired(PlayerControlGate.ReasonLockpick);
+        bool captured = PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured);
+        bool reading = PlayerControlGate.IsAcquired(PlayerControlGate.ReasonReading);
+        bool show = !_hiddenForCinematic && !_hiddenForHiding && !lockpick && !captured && !reading
+            && !JumpscareManager.CaptureUiActive;
+        SetGroupVisible(_interactionGroup, interactionRoot, show);
+        SetGroupVisible(_inventoryGroup, inventoryRoot, show);
+    }
+
+    static void SetGroupVisible(CanvasGroup group, GameObject root, bool show)
+    {
+        if (show && root != null && !root.activeSelf)
+            root.SetActive(true);
+
+        if (group != null)
+        {
+            group.alpha = show ? 1f : 0f;
+            group.interactable = show;
+            group.blocksRaycasts = show;
+            return;
+        }
+
+        if (root != null)
+            root.SetActive(show);
+    }
+
+    void CacheGroups()
+    {
+        _interactionGroup = EnsureCanvasGroup(interactionRoot);
+        _inventoryGroup = EnsureCanvasGroup(inventoryRoot);
+    }
+
+    static CanvasGroup EnsureCanvasGroup(GameObject root)
+    {
+        if (root == null)
+            return null;
+
+        var group = root.GetComponent<CanvasGroup>();
+        if (group == null)
+            group = root.AddComponent<CanvasGroup>();
+        return group;
     }
 
     private void ResolveRoots()

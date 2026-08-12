@@ -28,7 +28,7 @@ public class DemoEndFeedbackUI : MonoBehaviour
     public const string FeedbackOptionalFallback = "*optional* feedback area";
     public const string SubmitFallback = "Submit";
     public const string DeveloperNoteFallback =
-        "Hi — as a software engineer who just graduated from Haliç University, I tried to show you in this limited release what Midnight Scour could become. Going forward, I want to bring you the full version by expanding the world and atmosphere, building on the foundations we laid here, and growing the budget. Please leave us your feedback so we can improve your experience.";
+        "Hi — We're looking to grow the budget and scope for the full game, and your feedback is the most important guide for how we move forward.";
 
     const int RatingUnsetIndex = 0;
     const string PrefsHasSubmitted = "demo_feedback_has_submitted";
@@ -96,6 +96,17 @@ public class DemoEndFeedbackUI : MonoBehaviour
         feedbackInput != null ? feedbackInput.text?.Trim() ?? string.Empty : string.Empty;
 
     public bool HasSubmitted => _submitted;
+
+#if UNITY_EDITOR
+    [ContextMenu("DEV: Reset Demo End / Feedback Prefs")]
+    void ContextResetDemoProgressPrefs()
+    {
+        DemoEndScreenUI.ResetDemoProgressPrefs();
+        _submitted = false;
+        ResetFormState();
+        RefreshLocalizedTexts();
+    }
+#endif
 
     void Awake()
     {

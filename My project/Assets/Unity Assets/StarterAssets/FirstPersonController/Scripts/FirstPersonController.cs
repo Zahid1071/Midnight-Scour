@@ -118,6 +118,8 @@ namespace StarterAssets
 			// reset our timeouts on start
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
+
+			CaptureContinue.RememberPlayerSpawn(transform);
 		}
 
 		private void Update()
@@ -242,13 +244,30 @@ namespace StarterAssets
 			Vector3 actualDelta = transform.position - positionBeforeMove;
 			Vector3 actualHorizontal = new Vector3(actualDelta.x, 0.0f, actualDelta.z);
 
-			float maxAllowedMagnitude = intendedHorizontalMove.magnitude + MaxExternalPushSpeed * Time.deltaTime;
+			float maxHorizontal = intendedHorizontalMove.magnitude + MaxExternalPushSpeed * Time.deltaTime;
+			float maxVertical = Mathf.Abs(_verticalVelocity) * Time.deltaTime + MaxExternalPushSpeed * Time.deltaTime;
 
-			if (actualHorizontal.sqrMagnitude > maxAllowedMagnitude * maxAllowedMagnitude)
+			Vector3 clamped = actualDelta;
+
+			if (actualHorizontal.sqrMagnitude > maxHorizontal * maxHorizontal)
 			{
-				Vector3 clampedHorizontal = actualHorizontal.normalized * maxAllowedMagnitude;
-				transform.position += clampedHorizontal - actualHorizontal;
+				Vector3 limitedH = actualHorizontal.normalized * maxHorizontal;
+				clamped.x = limitedH.x;
+				clamped.z = limitedH.z;
 			}
+
+			if (Mathf.Abs(actualDelta.y) > maxVertical)
+				clamped.y = Mathf.Sign(actualDelta.y) * maxVertical;
+
+			if ((clamped - actualDelta).sqrMagnitude <= 0.0000001f)
+				return;
+
+			// Never write transform.position on a live CharacterController — that itself can floor-punch.
+			bool wasEnabled = _controller.enabled;
+			_controller.enabled = false;
+			transform.position = positionBeforeMove + clamped;
+			Physics.SyncTransforms();
+			_controller.enabled = wasEnabled;
 		}
 
 		private void JumpAndGravity()

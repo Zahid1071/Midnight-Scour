@@ -19,563 +19,563 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 5707297325056
-    m_Localized: "設定"
+    m_Localized: "\u8A2D\u5B9A"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325057
-    m_Localized: "終了"
+    m_Localized: "\u7D42\u4E86"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325058
-    m_Localized: "戻る"
+    m_Localized: "\u623B\u308B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325059
-    m_Localized: "適用"
+    m_Localized: "\u9069\u7528"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325060
-    m_Localized: "デフォルト"
+    m_Localized: "\u30C7\u30D5\u30A9\u30EB\u30C8"
     m_Metadata:
       m_Items: []
   - m_Id: 1843970048000
-    m_Localized: "続ける"
+    m_Localized: "\u7D9A\u3051\u308B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325061
-    m_Localized: "ニューゲーム"
+    m_Localized: "\u30CB\u30E5\u30FC\u30B2\u30FC\u30E0"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325062
-    m_Localized: "クレジット"
+    m_Localized: "\u30AF\u30EC\u30B8\u30C3\u30C8"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325063
-    m_Localized: "セーブ"
+    m_Localized: "\u30BB\u30FC\u30D6"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325064
-    m_Localized: "ポーズ"
+    m_Localized: "\u30DD\u30FC\u30BA"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296576
-    m_Localized: "再開"
+    m_Localized: "\u518D\u958B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296577
-    m_Localized: "Midnight Scourをプレイしていただき、ありがとうございます"
+    m_Localized: "Midnight Scour\u3092\u30D7\u30EC\u30A4\u3057\u3066\u3044\u305F\u3060\u304D\u3001\u3042\u308A\u304C\u3068\u3046\u3054\u3056\u3044\u307E\u3059"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
-    m_Localized: Escキーで終了
+    m_Localized: "Esc\u30AD\u30FC\u3067\u7D42\u4E86"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296579
-    m_Localized: "何かキーを押して続行"
+    m_Localized: "\u4F55\u304B\u30AD\u30FC\u3092\u62BC\u3057\u3066\u7D9A\u884C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296580
-    m_Localized: "メモを読むと手がかりが見つかります"
+    m_Localized: "\u30E1\u30E2\u3092\u8AAD\u3080\u3068\u624B\u304C\u304B\u308A\u304C\u898B\u3064\u304B\u308A\u307E\u3059"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296581
-    m_Localized: "隠れ場所を使って殺人鬼から逃れよう"
+    m_Localized: "\u96A0\u308C\u5834\u6240\u3092\u4F7F\u3063\u3066\u6BBA\u4EBA\u9B3C\u304B\u3089\u9003\u308C\u3088\u3046"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296582
-    m_Localized: "音を立てると殺人鬼に気づかれるかもしれません"
+    m_Localized: "\u97F3\u3092\u7ACB\u3066\u308B\u3068\u6BBA\u4EBA\u9B3C\u306B\u6C17\u3065\u304B\u308C\u308B\u304B\u3082\u3057\u308C\u307E\u305B\u3093"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296583
-    m_Localized: "{0}を押すと選択中のアイテムを落とします"
+    m_Localized: "{0}\u3092\u62BC\u3059\u3068\u9078\u629E\u4E2D\u306E\u30A2\u30A4\u30C6\u30E0\u3092\u843D\u3068\u3057\u307E\u3059"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296584
-    m_Localized: "アイテムを使う／組み合わせる"
+    m_Localized: "\u30A2\u30A4\u30C6\u30E0\u3092\u4F7F\u3046\uFF0F\u7D44\u307F\u5408\u308F\u305B\u308B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296585
-    m_Localized: "インタラクト"
+    m_Localized: "\u30A4\u30F3\u30BF\u30E9\u30AF\u30C8"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296586
-    m_Localized: "設定"
+    m_Localized: "\u8A2D\u5B9A"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296587
-    m_Localized: "画面"
+    m_Localized: "\u753B\u9762"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296588
-    m_Localized: "音声"
+    m_Localized: "\u97F3\u58F0"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296589
-    m_Localized: "操作"
+    m_Localized: "\u64CD\u4F5C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296590
-    m_Localized: "ゲームプレイ"
+    m_Localized: "\u30B2\u30FC\u30E0\u30D7\u30EC\u30A4"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296591
-    m_Localized: "一般"
+    m_Localized: "\u4E00\u822C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296592
-    m_Localized: "マスター音量"
+    m_Localized: "\u30DE\u30B9\u30BF\u30FC\u97F3\u91CF"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296593
-    m_Localized: "音楽音量"
+    m_Localized: "\u97F3\u697D\u97F3\u91CF"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296594
-    m_Localized: "効果音音量"
+    m_Localized: "\u52B9\u679C\u97F3\u97F3\u91CF"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296595
-    m_Localized: "明るさ"
+    m_Localized: "\u660E\u308B\u3055"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296596
-    m_Localized: "マウス感度"
+    m_Localized: "\u30DE\u30A6\u30B9\u611F\u5EA6"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296800
-    m_Localized: マイク感度
+    m_Localized: "\u30DE\u30A4\u30AF\u611F\u5EA6"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296597
-    m_Localized: "解像度"
+    m_Localized: "\u89E3\u50CF\u5EA6"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296598
-    m_Localized: "フルスクリーン"
+    m_Localized: "\u30D5\u30EB\u30B9\u30AF\u30EA\u30FC\u30F3"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296599
-    m_Localized: "表示モード"
+    m_Localized: "\u8868\u793A\u30E2\u30FC\u30C9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296600
-    m_Localized: "画質"
+    m_Localized: "\u753B\u8CEA"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296601
-    m_Localized: "垂直同期"
+    m_Localized: "\u5782\u76F4\u540C\u671F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296602
-    m_Localized: "オートセーブ"
+    m_Localized: "\u30AA\u30FC\u30C8\u30BB\u30FC\u30D6"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296603
-    m_Localized: "言語"
+    m_Localized: "\u8A00\u8A9E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296604
-    m_Localized: "ここでは使えない。"
+    m_Localized: "\u3053\u3053\u3067\u306F\u4F7F\u3048\u306A\u3044\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296605
-    m_Localized: "鍵がかかっている。"
+    m_Localized: "\u9375\u304C\u304B\u304B\u3063\u3066\u3044\u308B\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296606
-    m_Localized: "あれには手が届かない。"
+    m_Localized: "\u9060\u3059\u304E\u308B\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296607
-    m_Localized: "びくともしない。"
+    m_Localized: "\u3073\u304F\u3068\u3082\u3057\u306A\u3044\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296608
-    m_Localized: "少し待って。"
+    m_Localized: "\u5C11\u3057\u5F85\u3063\u3066\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296609
-    m_Localized: "もう隠れている。"
+    m_Localized: "\u3082\u3046\u96A0\u308C\u3066\u3044\u308B\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296613
-    m_Localized: "{0}が必要だ。"
+    m_Localized: "{0}\u304C\u5FC5\u8981\u3060\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296614
-    m_Localized: "{0}を使った。"
+    m_Localized: "{0}\u3092\u4F7F\u3063\u305F\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296615
-    m_Localized: "{0}で開いた。"
+    m_Localized: "{0}\u3067\u958B\u3044\u305F\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296616
-    m_Localized: "ボルトを外した。"
+    m_Localized: "\u30DC\u30EB\u30C8\u3092\u5916\u3057\u305F\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296617
-    m_Localized: "動かない。"
+    m_Localized: "\u52D5\u304B\u306A\u3044\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296618
-    m_Localized: "このインタラクションは設定されていません。"
+    m_Localized: "\u3053\u306E\u30A4\u30F3\u30BF\u30E9\u30AF\u30B7\u30E7\u30F3\u306F\u8A2D\u5B9A\u3055\u308C\u3066\u3044\u307E\u305B\u3093\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296619
-    m_Localized: "しまうものが何もない。"
+    m_Localized: "\u3057\u307E\u3046\u3082\u306E\u304C\u4F55\u3082\u306A\u3044\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296620
-    m_Localized: "収納した：{0}"
+    m_Localized: "\u53CE\u7D0D\u3057\u305F\uFF1A{0}"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296621
-    m_Localized: "{0}はすでに取り付けられている。"
+    m_Localized: "{0}\u306F\u3059\u3067\u306B\u53D6\u308A\u4ED8\u3051\u3089\u308C\u3066\u3044\u308B\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296622
-    m_Localized: "まずインベントリから車のパーツを選んで。"
+    m_Localized: "\u307E\u305A\u30A4\u30F3\u30D9\u30F3\u30C8\u30EA\u304B\u3089\u8ECA\u306E\u30D1\u30FC\u30C4\u3092\u9078\u3093\u3067\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296623
-    m_Localized: "{0}を持っていない。"
+    m_Localized: "{0}\u3092\u6301\u3063\u3066\u3044\u306A\u3044\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296624
-    m_Localized: "{0}を取り付けた。"
+    m_Localized: "{0}\u3092\u53D6\u308A\u4ED8\u3051\u305F\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296625
-    m_Localized: "このスロットは設定されていません。"
+    m_Localized: "\u3053\u306E\u30B9\u30ED\u30C3\u30C8\u306F\u8A2D\u5B9A\u3055\u308C\u3066\u3044\u307E\u305B\u3093\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296626
-    m_Localized: "脱出シーケンスが設定されていません。"
+    m_Localized: "\u8131\u51FA\u30B7\u30FC\u30B1\u30F3\u30B9\u304C\u8A2D\u5B9A\u3055\u308C\u3066\u3044\u307E\u305B\u3093\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296627
-    m_Localized: "すべてのパーツを取り付けた。脱出成功！"
+    m_Localized: "\u3059\u3079\u3066\u306E\u30D1\u30FC\u30C4\u3092\u53D6\u308A\u4ED8\u3051\u305F\u3002\u8131\u51FA\u6210\u529F\uFF01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296628
-    m_Localized: "まだ足りないもの：{0}"
+    m_Localized: "\u307E\u3060\u8DB3\u308A\u306A\u3044\u3082\u306E\uFF1A{0}"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296629
-    m_Localized: "読み込み中..."
+    m_Localized: "\u8AAD\u307F\u8FBC\u307F\u4E2D..."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296630
-    m_Localized: "鉄梃子"
+    m_Localized: "\u9244\u6883\u5B50"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296631
-    m_Localized: "骨"
+    m_Localized: "\u9AA8"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296632
-    m_Localized: "骨"
+    m_Localized: "\u9AA8"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296633
-    m_Localized: "地下室の鍵"
+    m_Localized: "\u5730\u4E0B\u5BA4\u306E\u9375"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296634
-    m_Localized: "金属箱の鍵"
+    m_Localized: "\u91D1\u5C5E\u7BB1\u306E\u9375"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296635
-    m_Localized: "ガム"
+    m_Localized: "\u30AC\u30E0"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296636
-    m_Localized: "クラッチ"
+    m_Localized: "\u30AF\u30E9\u30C3\u30C1"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296637
-    m_Localized: "ハンマー"
+    m_Localized: "\u30CF\u30F3\u30DE\u30FC"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296638
-    m_Localized: "ラバーカップ"
+    m_Localized: "\u30E9\u30D0\u30FC\u30AB\u30C3\u30D7"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296639
-    m_Localized: "ドライバー"
+    m_Localized: "\u30C9\u30E9\u30A4\u30D0\u30FC"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296640
-    m_Localized: "スパークプラグ"
+    m_Localized: "\u30B9\u30D1\u30FC\u30AF\u30D7\u30E9\u30B0"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296641
-    m_Localized: "花瓶"
+    m_Localized: "\u82B1\u74F6"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296642
-    m_Localized: "レンチ"
+    m_Localized: "\u30EC\u30F3\u30C1"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296643
-    m_Localized: "鉄梃子を入手した"
+    m_Localized: "\u9244\u6883\u5B50\u3092\u5165\u624B\u3057\u305F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296644
-    m_Localized: "骨をインベントリに追加した"
+    m_Localized: "\u9AA8\u3092\u30A4\u30F3\u30D9\u30F3\u30C8\u30EA\u306B\u8FFD\u52A0\u3057\u305F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296645
-    m_Localized: "ガム付きの骨をインベントリに追加した"
+    m_Localized: "\u30AC\u30E0\u4ED8\u304D\u306E\u9AA8\u3092\u30A4\u30F3\u30D9\u30F3\u30C8\u30EA\u306B\u8FFD\u52A0\u3057\u305F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296646
-    m_Localized: "鍵を入手した"
+    m_Localized: "\u9375\u3092\u5165\u624B\u3057\u305F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296647
-    m_Localized: "小さな鍵を入手した"
+    m_Localized: "\u5C0F\u3055\u306A\u9375\u3092\u5165\u624B\u3057\u305F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296648
-    m_Localized: "ガムを入手した"
+    m_Localized: "\u30AC\u30E0\u3092\u5165\u624B\u3057\u305F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296649
-    m_Localized: "ハンマーを入手した"
+    m_Localized: "\u30CF\u30F3\u30DE\u30FC\u3092\u5165\u624B\u3057\u305F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296650
-    m_Localized: "ラバーカップを入手した"
+    m_Localized: "\u30E9\u30D0\u30FC\u30AB\u30C3\u30D7\u3092\u5165\u624B\u3057\u305F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296651
-    m_Localized: "ドライバーを入手した"
+    m_Localized: "\u30C9\u30E9\u30A4\u30D0\u30FC\u3092\u5165\u624B\u3057\u305F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296652
-    m_Localized: "中に何か入っている"
+    m_Localized: "\u4E2D\u306B\u4F55\u304B\u5165\u3063\u3066\u3044\u308B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296653
-    m_Localized: "レンチを入手した"
+    m_Localized: "\u30EC\u30F3\u30C1\u3092\u5165\u624B\u3057\u305F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296654
-    m_Localized: "完全に詰まっている。"
+    m_Localized: "\u5B8C\u5168\u306B\u8A70\u307E\u3063\u3066\u3044\u308B\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296655
-    m_Localized: "水はもう流れてしまった。"
+    m_Localized: "\u6C34\u306F\u3082\u3046\u6D41\u308C\u3066\u3057\u307E\u3063\u305F\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296656
-    m_Localized: "回すための鉄梃子が足りない。"
+    m_Localized: "\u56DE\u3059\u305F\u3081\u306E\u9244\u6883\u5B50\u304C\u8DB3\u308A\u306A\u3044\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296657
-    m_Localized: "鉄梃子を万力に使う。"
+    m_Localized: "\u9244\u6883\u5B50\u3092\u4E07\u529B\u306B\u4F7F\u3046\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296658
-    m_Localized: "ハンマーを鉄梃子に使う。"
+    m_Localized: "\u30CF\u30F3\u30DE\u30FC\u3092\u9244\u6883\u5B50\u306B\u4F7F\u3046\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296659
-    m_Localized: "ガムを骨にくっつけた。"
+    m_Localized: "\u30AC\u30E0\u3092\u9AA8\u306B\u304F\u3063\u3064\u3051\u305F\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296660
-    m_Localized: "ずっと滑る、骨に何か貼り付けないと"
+    m_Localized: "\u305A\u3063\u3068\u6ED1\u308B\u3001\u9AA8\u306B\u4F55\u304B\u8CBC\u308A\u4ED8\u3051\u306A\u3044\u3068"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296661
-    m_Localized: "ドライバーが折れた。"
+    m_Localized: "\u30C9\u30E9\u30A4\u30D0\u30FC\u304C\u6298\u308C\u305F\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296662
-    m_Localized: "ヒント：隠れ場所を使って敵から逃れよう。"
+    m_Localized: "\u30D2\u30F3\u30C8\uFF1A\u96A0\u308C\u5834\u6240\u3092\u4F7F\u3063\u3066\u6575\u304B\u3089\u9003\u308C\u3088\u3046\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296663
-    m_Localized: "ヒント：周囲を注意深く調べると、重要な手がかりが見つかるかもしれない。"
+    m_Localized: "\u30D2\u30F3\u30C8\uFF1A\u5468\u56F2\u3092\u6CE8\u610F\u6DF1\u304F\u8ABF\u3079\u308B\u3068\u3001\u91CD\u8981\u306A\u624B\u304C\u304B\u308A\u304C\u898B\u3064\u304B\u308B\u304B\u3082\u3057\u308C\u306A\u3044\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296664
-    m_Localized: "ヒント：静かにしていないと、敵に気づかれてしまう。"
+    m_Localized: "\u30D2\u30F3\u30C8\uFF1A\u9759\u304B\u306B\u3057\u3066\u3044\u306A\u3044\u3068\u3001\u6575\u306B\u6C17\u3065\u304B\u308C\u3066\u3057\u307E\u3046\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296665
-    m_Localized: "ヒント：懐中電灯のバッテリーには限りがあるので、大切に使おう。"
+    m_Localized: "\u30D2\u30F3\u30C8\uFF1A\u61D0\u4E2D\u96FB\u706F\u306E\u30D0\u30C3\u30C6\u30EA\u30FC\u306B\u306F\u9650\u308A\u304C\u3042\u308B\u306E\u3067\u3001\u5927\u5207\u306B\u4F7F\u304A\u3046\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296666
-    m_Localized: "ヒント：特別な鍵が必要なドアもある。"
+    m_Localized: "\u30D2\u30F3\u30C8\uFF1A\u7279\u5225\u306A\u9375\u304C\u5FC5\u8981\u306A\u30C9\u30A2\u3082\u3042\u308B\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296667
-    m_Localized: "ヒント：走ると敵に気づかれることがある。"
+    m_Localized: "\u30D2\u30F3\u30C8\uFF1A\u8D70\u308B\u3068\u6575\u306B\u6C17\u3065\u304B\u308C\u308B\u3053\u3068\u304C\u3042\u308B\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296668
-    m_Localized: "ヒント：メモや書類を読んで物語を明らかにしよう。"
+    m_Localized: "\u30D2\u30F3\u30C8\uFF1A\u30E1\u30E2\u3084\u66F8\u985E\u3092\u8AAD\u3093\u3067\u7269\u8A9E\u3092\u660E\u3089\u304B\u306B\u3057\u3088\u3046\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296669
-    m_Localized: "ヒント：暗い隅に隠れると敵から身を守りやすくなる。"
+    m_Localized: "\u30D2\u30F3\u30C8\uFF1A\u6697\u3044\u9685\u306B\u96A0\u308C\u308B\u3068\u6575\u304B\u3089\u8EAB\u3092\u5B88\u308A\u3084\u3059\u304F\u306A\u308B\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296670
-    m_Localized: "ここには何もない。"
+    m_Localized: "\u3053\u3053\u306B\u306F\u4F55\u3082\u306A\u3044\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296671
-    m_Localized: "インベントリがいっぱいです。"
+    m_Localized: "\u30A4\u30F3\u30D9\u30F3\u30C8\u30EA\u304C\u3044\u3063\u3071\u3044\u3067\u3059\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296672
-    m_Localized: "格子はまだボルトで固定されている。"
+    m_Localized: "\u683C\u5B50\u306F\u307E\u3060\u30DC\u30EB\u30C8\u3067\u56FA\u5B9A\u3055\u308C\u3066\u3044\u308B\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296673
-    m_Localized: "確認"
+    m_Localized: "\u78BA\u8A8D"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296674
-    m_Localized: "はい"
+    m_Localized: "\u306F\u3044"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296675
-    m_Localized: "いいえ"
+    m_Localized: "\u3044\u3044\u3048"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296676
-    m_Localized: "本当に終了しますか？\n\n未保存の進行状況は失われます。"
+    m_Localized: "\u672C\u5F53\u306B\u7D42\u4E86\u3057\u307E\u3059\u304B\uFF1F\n\n\u672A\u4FDD\u5B58\u306E\u9032\u884C\u72B6\u6CC1\u306F\u5931\u308F\u308C\u307E\u3059\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296677
-    m_Localized: "終了"
+    m_Localized: "\u7D42\u4E86"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296678
-    m_Localized: "終了"
+    m_Localized: "\u7D42\u4E86"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296679
-    m_Localized: "本当にメインメニューに戻りますか？\n\n未保存の進行状況は失われます。"
+    m_Localized: "\u672C\u5F53\u306B\u30E1\u30A4\u30F3\u30E1\u30CB\u30E5\u30FC\u306B\u623B\u308A\u307E\u3059\u304B\uFF1F\n\n\u672A\u4FDD\u5B58\u306E\u9032\u884C\u72B6\u6CC1\u306F\u5931\u308F\u308C\u307E\u3059\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296680
-    m_Localized: "メインメニュー"
+    m_Localized: "\u30E1\u30A4\u30F3\u30E1\u30CB\u30E5\u30FC"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296681
-    m_Localized: "戻る"
+    m_Localized: "\u623B\u308B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296682
-    m_Localized: "あの花瓶の中に何かあったと思う。"
+    m_Localized: "\u3042\u306E\u82B1\u74F6\u306E\u4E2D\u306B\u4F55\u304B\u3042\u3063\u305F\u3068\u601D\u3046\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296683
-    m_Localized: "{0} を落とした。"
+    m_Localized: "{0} \u3092\u843D\u3068\u3057\u305F\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296684
-    m_Localized: "有効"
+    m_Localized: "\u6709\u52B9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296685
-    m_Localized: "無効"
+    m_Localized: "\u7121\u52B9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296686
-    m_Localized: "フルスクリーン"
+    m_Localized: "\u30D5\u30EB\u30B9\u30AF\u30EA\u30FC\u30F3"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296687
-    m_Localized: "ウィンドウ"
+    m_Localized: "\u30A6\u30A3\u30F3\u30C9\u30A6"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296688
-    m_Localized: "枠付き"
+    m_Localized: "\u67A0\u4ED8\u304D"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296689
-    m_Localized: "排他フルスクリーン"
+    m_Localized: "\u6392\u4ED6\u30D5\u30EB\u30B9\u30AF\u30EA\u30FC\u30F3"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296690
-    m_Localized: "非常に低"
+    m_Localized: "\u975E\u5E38\u306B\u4F4E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296691
-    m_Localized: "低"
+    m_Localized: "\u4F4E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296692
-    m_Localized: "中"
+    m_Localized: "\u4E2D"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296693
-    m_Localized: "高"
+    m_Localized: "\u9AD8"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296694
-    m_Localized: "非常に高"
+    m_Localized: "\u975E\u5E38\u306B\u9AD8"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296695
-    m_Localized: "ウルトラ"
+    m_Localized: "\u30A6\u30EB\u30C8\u30E9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296696
-    m_Localized: "アイテムを使う"
+    m_Localized: "\u30A2\u30A4\u30C6\u30E0\u3092\u4F7F\u3046"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296697
-    m_Localized: "落とす"
+    m_Localized: "\u843D\u3068\u3059"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296698
-    m_Localized: "手の届くところに何もない。"
+    m_Localized: "\u624B\u306E\u5C4A\u304F\u3068\u3053\u308D\u306B\u4F55\u3082\u306A\u3044\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296699
-    m_Localized: "トイレが詰まっている。ラバーカップが見つからない。桶の中のどこかにあったはずだが、どこだったか思い出せない。"
+    m_Localized: "\u30C8\u30A4\u30EC\u304C\u8A70\u307E\u3063\u3066\u3044\u308B\u3002\u30E9\u30D0\u30FC\u30AB\u30C3\u30D7\u304C\u898B\u3064\u304B\u3089\u306A\u3044\u3002\u6876\u306E\u4E2D\u306E\u3069\u3053\u304B\u306B\u3042\u3063\u305F\u306F\u305A\u3060\u304C\u3001\u3069\u3053\u3060\u3063\u305F\u304B\u601D\u3044\u51FA\u305B\u306A\u3044\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296701
-    m_Localized: "クラッチを入手した"
+    m_Localized: "\u30AF\u30E9\u30C3\u30C1\u3092\u5165\u624B\u3057\u305F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296700
-    m_Localized: "スパークプラグを入手した"
+    m_Localized: "\u30B9\u30D1\u30FC\u30AF\u30D7\u30E9\u30B0\u3092\u5165\u624B\u3057\u305F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296702
-    m_Localized: う
+    m_Localized: "\u3046"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296703
-    m_Localized: け
+    m_Localized: "\u3051"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296704
-    m_Localized: "回すには何かで叩く必要がありそうだ。完全に錆びついている。"
+    m_Localized: "\u56DE\u3059\u306B\u306F\u4F55\u304B\u3067\u53E9\u304F\u5FC5\u8981\u304C\u3042\u308A\u305D\u3046\u3060\u3002\u5B8C\u5168\u306B\u9306\u3073\u3064\u3044\u3066\u3044\u308B\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296705
-    m_Localized: "この錠前は簡単に壊せそうだ。"
+    m_Localized: "\u3053\u306E\u9320\u524D\u306F\u7C21\u5358\u306B\u58CA\u305B\u305D\u3046\u3060\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296706
-    m_Localized: "しゃがむ"
+    m_Localized: "\u3057\u3083\u304C\u3080"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296707
-    m_Localized: "走る"
+    m_Localized: "\u8D70\u308B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296708
@@ -587,79 +587,195 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296710
-    m_Localized: 道を塞いでいる。
+    m_Localized: "\u9053\u3092\u585E\u3044\u3067\u3044\u308B\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296711
-    m_Localized: この体験をどう評価しますか？
+    m_Localized: "\u3053\u306E\u4F53\u9A13\u3092\u3069\u3046\u8A55\u4FA1\u3057\u307E\u3059\u304B\uFF1F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296712
-    m_Localized: 緊張感
+    m_Localized: "\u7DCA\u5F35\u611F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296713
-    m_Localized: ホラー
+    m_Localized: "\u30DB\u30E9\u30FC"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296714
-    m_Localized: 楽しさ
+    m_Localized: "\u697D\u3057\u3055"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296715
-    m_Localized: *任意* フィードバック欄
+    m_Localized: "*\u4EFB\u610F* \u30D5\u30A3\u30FC\u30C9\u30D0\u30C3\u30AF\u6B04"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296716
-    m_Localized: 送信
+    m_Localized: "\u9001\u4FE1"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296717
-    m_Localized: "こんにちは。Haliç大学を卒業したばかりのソフトウェアエンジニアとして、この限定版で Midnight Scour がどんな作品になり得るかをお伝えしようと努めました。今後は、世界観と雰囲気の拡張、ここで築いた基盤の発展、予算の拡大によって、フル版をお届けしたいと考えています。体験をより良くするために、ぜひフィードバックをお寄せください。"
+    m_Localized: "\u3053\u3093\u306B\u3061\u306F\u2014\u2014\u30D5\u30EB\u7248\u306E\u4E88\u7B97\u3068\u898F\u6A21\u3092\u5E83\u3052\u3066\u3044\u304D\u305F\u3044\u3068\u8003\u3048\u3066\u3044\u307E\u3059\u3002\u7686\u3055\u3093\u306E\u30D5\u30A3\u30FC\u30C9\u30D0\u30C3\u30AF\u304C\u3001\u4ECA\u5F8C\u306E\u4E00\u756A\u306E\u6307\u91DD\u3067\u3059\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296718
-    m_Localized: ?
+    m_Localized: '?'
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296719
-    m_Localized: 送信中...
+    m_Localized: "\u9001\u4FE1\u4E2D..."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296720
-    m_Localized: 送信済み
+    m_Localized: "\u9001\u4FE1\u6E08\u307F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296721
-    m_Localized: 再試行
+    m_Localized: "\u518D\u8A66\u884C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296722
-    m_Localized: すべて評価してください
+    m_Localized: "\u3059\u3079\u3066\u8A55\u4FA1\u3057\u3066\u304F\u3060\u3055\u3044"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296723
-    m_Localized: 設定が必要です
+    m_Localized: "\u8A2D\u5B9A\u304C\u5FC5\u8981\u3067\u3059"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296724
-    m_Localized: ウィッシュリストに追加！
+    m_Localized: "\u30A6\u30A3\u30C3\u30B7\u30E5\u30EA\u30B9\u30C8\u306B\u8FFD\u52A0\uFF01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296725
-    m_Localized: 終了
+    m_Localized: "\u7D42\u4E86"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296726
-    m_Localized: 送信済みです
+    m_Localized: "\u9001\u4FE1\u6E08\u307F\u3067\u3059"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296727
-    m_Localized: "更新済み"
+    m_Localized: "\u66F4\u65B0\u6E08\u307F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296728
-    m_Localized: 殺人鬼はあなたの繰り返しの行動に気づき、対応してきます。
+    m_Localized: "\u6BBA\u4EBA\u9B3C\u306F\u3042\u306A\u305F\u306E\u7E70\u308A\u8FD4\u3057\u306E\u884C\u52D5\u306B\u6C17\u3065\u304D\u3001\u5BFE\u5FDC\u3057\u3066\u304D\u307E\u3059\u3002"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296729
+    m_Localized: "\u3084\u3063\u305F\u3001\u5B8C\u74A7\u306A\u30BF\u30A4\u30DF\u30F3\u30B0\u3060"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296730
+    m_Localized: "\u96F7\u306B\u5408\u308F\u305B\u3066\u30CF\u30F3\u30DE\u30FC\u3092\u632F\u308A\u4E0B\u308D\u305B\u308B"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296731
+    m_Localized: "\u3046\u308B\u3055\u3059\u304E\u308B\u3001\u4ECA\u306F\u6253\u3066\u306A\u3044"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296732
+    m_Localized: "遅く叩きすぎた、捕まる"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296733
+    m_Localized: "ドライバーを差し込め。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296734
+    m_Localized: "激しく振って錠を壊せ。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296735
+    m_Localized: "早く叩きすぎた、捕まる"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296736
+    m_Localized: "遅く叩きすぎた、捕まる"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296737
+    m_Localized: "引っかかった。もう一度。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296738
+    m_Localized: "Butcherに隠れるところを見られた。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296739
+    m_Localized: "音を出しすぎた。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296740
+    m_Localized: "同じ隠れ場所を使いすぎた。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296741
+    m_Localized: "ハンマーの音を雷で隠せなかった。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296742
+    m_Localized: "Butcherに見られた。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296743
+    m_Localized: "捕まった。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296744
+    m_Localized: "やり直す"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296745
+    m_Localized: "メインメニュー"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296746
+    m_Localized: "Butcherに奇襲された。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296747
+    m_Localized: "ロックピックがあれば捕まった後も進行を保てる。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296748
+    m_Localized: "ロックピック"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296749
+    m_Localized: "ロックピックを入手した"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296750
+    m_Localized: "???"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296751
+    m_Localized: "\u53F3\u30AF\u30EA\u30C3\u30AF\u3092\u62BC\u3057\u7D9A\u3051\u3066\u30C6\u30F3\u30B7\u30E7\u30F3\u3092\u304B\u3051\u308B"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296752
+    m_Localized: "\u30DE\u30A6\u30B9\u3067\u30ED\u30C3\u30AF\u30D4\u30C3\u30AF\u3092\u52D5\u304B\u3057\u3001\u5DE6\u30AF\u30EA\u30C3\u30AF\u3067\u30D4\u30F3\u3092\u4E0A\u3052\u308B"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296753
+    m_Localized: "\u30D4\u30F3\u30BB\u30C3\u30C8\u5B8C\u4E86"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296754
+    m_Localized: "\u89E3\u9320\u5B8C\u4E86"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296755
+    m_Localized: "ドアは鎖で縛られている。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296756
+    m_Localized: "最初に捕まったとき、奴は南京錠でドアを鎖で封じた。あのトイレの上のヘアピンを取っておけばよかった。ロックピックとして使えたかもしれない。"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296757
+    m_Localized: "もっとロックピックを見つけておかなければ"
     m_Metadata:
       m_Items: []
   references:

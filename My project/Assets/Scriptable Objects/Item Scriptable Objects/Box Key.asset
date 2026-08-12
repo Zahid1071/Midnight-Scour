@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: Box Key
   m_EditorClassIdentifier: 
   itemName: Metal Box Key
-  icon: {fileID: 21300000, guid: 3d07e0f9f611764489fdc84e6ddb9711, type: 3}
+  icon: {fileID: 21300000, guid: 498f42843dbcc244d99e03d7e775c213, type: 3}
   worldPrefab: {fileID: 7437986296918079698, guid: 27ddbb3743994934986d30e24721d0f4, type: 3}
   dropLandSFX: {fileID: 8300000, guid: ff1ed0d2fa5dcee4097605e925f0c97f, type: 3}
   canDrop: 1
   pickUpSFX: {fileID: 8300000, guid: cbc348ec1887a00448ae87b973b4a024, type: 3}
   useSuccessSound: {fileID: 0}
   consumeOnUse: 1
+  maxStack: 1
   interactionReachBonus: 0
   reachAttemptFailMessage: 
   breaksOnWrongUse: 0

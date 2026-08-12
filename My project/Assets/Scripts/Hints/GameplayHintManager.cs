@@ -61,6 +61,10 @@ public class GameplayHintManager : MonoBehaviour
     [SerializeField] InventoryItem gumItem;
     [SerializeField] InventoryItem gummyBoneItem;
     [SerializeField] InventoryItem vaseItem;
+    [Tooltip("Granted to inventory at run start if the player earned it last run.")]
+    [SerializeField] InventoryItem lockpickItem;
+
+    public InventoryItem LockpickItem => lockpickItem;
 
     [Header("Combine hint")]
     [Tooltip("Seconds after picking up bone + gum before the combine hint can appear.")]
@@ -82,6 +86,10 @@ public class GameplayHintManager : MonoBehaviour
     [SerializeField] string noteHintId = "Note";
     [Tooltip("Shown once when the butcher searches the same hide spot a second time while the player is still in it.")]
     [SerializeField] string killerPatternHintId = "Killer Pattern Recognition";
+    [Tooltip("Shown on lockpick pickup, or the first time the player dies.")]
+    [SerializeField] string lockpickHintId = "Lockpick";
+    [SerializeField] string lockpickWatchSubtitleKey = "gameplay.lockpick_watch_for_more";
+    [SerializeField] float lockpickWatchSubtitleSeconds = 6f;
 
     readonly Dictionary<string, CanvasGroup> _groups = new();
     readonly Dictionary<string, int> _priorities = new();
@@ -106,9 +114,25 @@ public class GameplayHintManager : MonoBehaviour
     bool _hidingSpotHintShown;
     bool _soundHintShown;
     bool _killerPatternHintShown;
+    bool _lockpickHintShown;
+    bool _lockpickHintRequested;
+    bool _lockpickLetterFollowupDone;
+    bool _lockpickDeathHintQueued;
 
-    [Header("Note hint (optional)")]
-    [Tooltip("If enabled, shows the note hint every N seconds.")]
+    /// <summary>Survives scene reload so first-death hint can show after Restart.</summary>
+    static bool s_pendingLockpickHintAfterReload;
+
+    [Header("Note / lockpick rotating hints")]
+    [Tooltip("If enabled, alternates note and lockpick hint panels on an interval.")]
+    [SerializeField] bool rotatingHintsEnabled = true;
+    [Tooltip("Seconds between rotating hint reminders.")]
+    [Min(1f)]
+    [SerializeField] float rotatingHintIntervalSeconds = 75f;
+    float _rotatingHintElapsed;
+    bool _nextRotatingHintIsLockpick;
+
+    [Header("Note hint (legacy — prefer rotating hints above)")]
+    [Tooltip("If enabled and rotating hints are off, shows the note hint every N seconds.")]
     [SerializeField] bool noteHintEnabled = true;
     [Tooltip("Seconds between note hint reminders.")]
     [Min(1f)]
@@ -165,8 +189,10 @@ public class GameplayHintManager : MonoBehaviour
             return;
         }
 
+        TryShowRequestedLockpickHint();
         EvaluateFirstShiftHint();
         EvaluateCombineTimer();
+        TickRotatingHints();
         TickNoteHint();
         TickVaseDropHint();
     }
@@ -180,6 +206,75 @@ public class GameplayHintManager : MonoBehaviour
             _hidingSpotHintShown = true;
     }
 
+    /// <summary>Closed the padlock/hairpin letter — subtitle only (hint is on lockpick pickup / first death).</summary>
+    public void NotifyPadlockHairpinLetterClosed()
+    {
+        if (_lockpickLetterFollowupDone)
+            return;
+
+        _lockpickLetterFollowupDone = true;
+        string msg = Loc.Get(lockpickWatchSubtitleKey);
+        if (string.IsNullOrEmpty(msg) || msg == lockpickWatchSubtitleKey)
+            msg = "I must keep an eye out to find more lockpicks";
+        HudManager.Instance?.ShowSubtitle(msg, lockpickWatchSubtitleSeconds);
+    }
+
+    /// <summary>First capture/game-over — teach lockpicks.</summary>
+    public void NotifyFirstPlayerDeath()
+    {
+        if (_lockpickHintShown || _lockpickDeathHintQueued)
+            return;
+
+        _lockpickDeathHintQueued = true;
+        // Game-over blocks input / hides HUD — show when gameplay is free (Continue)
+        // or after Restart reload via static flag.
+        s_pendingLockpickHintAfterReload = true;
+        RequestLockpickHint();
+    }
+
+    void RequestLockpickHint()
+    {
+        if (_lockpickHintShown)
+            return;
+        _lockpickHintRequested = true;
+    }
+
+    void TryShowRequestedLockpickHint()
+    {
+        if (s_pendingLockpickHintAfterReload)
+        {
+            s_pendingLockpickHintAfterReload = false;
+            _lockpickHintRequested = true;
+        }
+
+        if (!_lockpickHintRequested || _lockpickHintShown)
+            return;
+
+        if (Show(lockpickHintId))
+        {
+            _lockpickHintShown = true;
+            _lockpickHintRequested = false;
+            s_pendingLockpickHintAfterReload = false;
+        }
+    }
+
+    /// <summary>World lockpick collected — show the lockpick hint panel.</summary>
+    public void NotifyLockpickPickedUp()
+    {
+        RequestLockpickHint();
+        // Pickup can happen while free; try immediately as well as next Update.
+        TryShowRequestedLockpickHint();
+    }
+
+    public void NotifyItemPickedUp(InventoryItem item)
+    {
+        if (item == null)
+            return;
+
+        if (lockpickItem != null && item == lockpickItem)
+            NotifyLockpickPickedUp();
+    }
+
     /// <summary>
     /// Call when search exposure for the player's current hide spot increments.
     /// Shows the pattern hint on the second search of that same spot (when capture odds start rising).
@@ -189,7 +284,7 @@ public class GameplayHintManager : MonoBehaviour
         if (_killerPatternHintShown || spot == null || spot.searchCheckpointOnly)
             return;
 
-        // Exposure 2 = second butcher check of this spot; further searches raise capture chance.
+        // Exposure 1+ = room pressure / spot checks building; hint when capture odds are about to rise.
         if (exposureCount < 2)
             return;
 
@@ -651,11 +746,21 @@ public class GameplayHintManager : MonoBehaviour
 
         while (Mathf.Abs(scale - 1f) > 0.001f || Mathf.Abs(velocity) > 0.001f)
         {
-            float dt = Time.unscaledDeltaTime;
+            // Alt-tab / focus regain can deliver a multi-second unscaledDeltaTime that
+            // explodes this spring and stretches the hint across the screen.
+            if (!Application.isFocused)
+            {
+                yield return null;
+                continue;
+            }
+
+            float dt = Mathf.Min(Time.unscaledDeltaTime, 1f / 30f);
             float acceleration = -springStiffness * (scale - 1f) - springDamping * velocity;
             float prevVelocity = velocity;
             velocity += acceleration * dt;
             scale += velocity * dt;
+            velocity = Mathf.Clamp(velocity, -40f, 40f);
+            scale = Mathf.Clamp(scale, 0.25f, 1.75f);
             target.localScale = Vector3.one * scale;
 
             if (background != null)
@@ -819,9 +924,44 @@ public class GameplayHintManager : MonoBehaviour
         return 0;
     }
 
+    void TickRotatingHints()
+    {
+        if (!rotatingHintsEnabled)
+            return;
+
+        bool hasNote = !string.IsNullOrEmpty(noteHintId) && _groups.ContainsKey(noteHintId);
+        bool hasLockpick = !string.IsNullOrEmpty(lockpickHintId) && _groups.ContainsKey(lockpickHintId);
+        if (!hasNote && !hasLockpick)
+            return;
+
+        _rotatingHintElapsed += Time.unscaledDeltaTime;
+        if (_rotatingHintElapsed < rotatingHintIntervalSeconds)
+            return;
+
+        _rotatingHintElapsed = 0f;
+
+        if (PlayerControlGate.IsInputBlocked)
+            return;
+
+        // Note first, then lockpick, then repeat — always, so players don't miss the lockpick.
+        string id;
+        if (hasNote && hasLockpick)
+        {
+            id = _nextRotatingHintIsLockpick ? lockpickHintId : noteHintId;
+            _nextRotatingHintIsLockpick = !_nextRotatingHintIsLockpick;
+        }
+        else
+        {
+            id = hasNote ? noteHintId : lockpickHintId;
+        }
+
+        ShowPeriodicHint(id);
+    }
+
     void TickNoteHint()
     {
-        if (!noteHintEnabled || string.IsNullOrEmpty(noteHintId))
+        // Rotating loop owns both note + lockpick when enabled.
+        if (rotatingHintsEnabled || !noteHintEnabled || string.IsNullOrEmpty(noteHintId))
             return;
 
         _noteHintElapsed += Time.unscaledDeltaTime;
@@ -833,33 +973,35 @@ public class GameplayHintManager : MonoBehaviour
         if (PlayerControlGate.IsInputBlocked)
             return;
 
-        ShowPeriodicNote();
+        ShowPeriodicHint(noteHintId);
     }
 
-    void ShowPeriodicNote()
+    void ShowPeriodicHint(string hintId)
     {
-        if (string.IsNullOrEmpty(noteHintId) || !_groups.TryGetValue(noteHintId, out var group) || group == null)
+        if (string.IsNullOrEmpty(hintId) || !_groups.TryGetValue(hintId, out var group) || group == null)
         {
-            Debug.LogWarning($"[GameplayHintManager] No panel registered for note hint id '{noteHintId}'.");
+            Debug.LogWarning($"[GameplayHintManager] No panel registered for periodic hint id '{hintId}'.");
             return;
         }
 
-        RemovePending(noteHintId);
+        RemovePending(hintId);
 
-        if (_activeHintId == noteHintId)
+        if (_activeHintId == hintId)
         {
             StopTransitionRoutine();
-            CancelAutoHide(noteHintId);
-            StopSpring(noteHintId);
+            CancelAutoHide(hintId);
+            StopSpring(hintId);
             group.gameObject.SetActive(true);
             group.alpha = 1f;
-            StartSpring(noteHintId, group.transform);
-            ScheduleAutoHide(noteHintId);
+            StartSpring(hintId, group.transform);
+            ScheduleAutoHide(hintId);
             return;
         }
 
-        Show(noteHintId);
+        Show(hintId);
     }
+
+    void ShowPeriodicNote() => ShowPeriodicHint(noteHintId);
 
     void StopTransitionRoutine()
     {
@@ -949,7 +1091,11 @@ public class GameplayHintManager : MonoBehaviour
     public static void ResetAllHints()
     {
         if (Instance == null)
+        {
+            // New game from menu before instance exists — drop death-hint carryover.
+            s_pendingLockpickHintAfterReload = false;
             return;
+        }
 
         Instance._combineHintShown = false;
         Instance._combineFinished = false;
@@ -962,6 +1108,14 @@ public class GameplayHintManager : MonoBehaviour
         Instance._hidingSpotHintShown = false;
         Instance._soundHintShown = false;
         Instance._killerPatternHintShown = false;
+        Instance._lockpickHintShown = false;
+        Instance._lockpickHintRequested = false;
+        Instance._lockpickLetterFollowupDone = false;
+        Instance._lockpickDeathHintQueued = false;
+        // Keep s_pendingLockpickHintAfterReload — Restart sets it so the hint can show in the new load.
+        Instance._noteHintElapsed = 0f;
+        Instance._rotatingHintElapsed = 0f;
+        Instance._nextRotatingHintIsLockpick = false;
         Instance.StopCombineTimerCoroutine();
         Instance.HideAll();
     }

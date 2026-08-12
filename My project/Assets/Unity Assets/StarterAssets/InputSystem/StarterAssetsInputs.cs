@@ -72,6 +72,12 @@ namespace StarterAssets
 			if (PauseManager.IsPaused)
 				return;
 
+			if (GameOverUI.Instance != null && GameOverUI.Instance.IsShowing)
+				return;
+
+			if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured))
+				return;
+
 			var demoEnd = DemoEndScreenUI.Instance;
 			if (demoEnd != null && demoEnd.IsShowing)
 				return;

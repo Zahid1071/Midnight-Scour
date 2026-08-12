@@ -6,7 +6,7 @@ public class InteractableItem : MonoBehaviour, IInteractable, IItemReceiver
     [SerializeField] GrateSystem grateGate;
     [SerializeField] bool blockedUntilBenchViceReleased;
     [SerializeField] string benchViceStuckMessage = "It is stuck.";
-    [SerializeField] string blockedMessage = "I can't reach that.";
+    [SerializeField] string blockedMessage = "It is too far.";
     [SerializeField] DemoEndDirector demoEndOnPickup;
 
     bool _consumed;
@@ -82,7 +82,7 @@ public class InteractableItem : MonoBehaviour, IInteractable, IItemReceiver
             string msg = !string.IsNullOrWhiteSpace(itemData.GetLocalizedPickupText())
                 ? itemData.GetLocalizedPickupText()
                 : Loc.Format("gameplay.item_used", itemData.GetLocalizedName());
-            HudManager.Instance?.ShowSubtitle(msg, 3f);
+            HudManager.Instance?.ShowSubtitle(msg);
             SoundManager.Instance.PlaySFXAt(itemData.pickUpSFX, transform.position);
 
             if (InventoryUI.Instance != null)
@@ -96,6 +96,8 @@ public class InteractableItem : MonoBehaviour, IInteractable, IItemReceiver
             demoEndOnPickup?.NotifyItemPickedUp(itemData);
             if (demoEndOnPickup == null)
                 FindFirstObjectByType<DemoEndDirector>()?.NotifyItemPickedUp(itemData);
+
+            GameplayHintManager.Instance?.NotifyItemPickedUp(itemData);
 
             Destroy(gameObject);
             return true;

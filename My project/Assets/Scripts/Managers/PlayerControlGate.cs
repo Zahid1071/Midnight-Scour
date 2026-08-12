@@ -12,6 +12,7 @@ public static class PlayerControlGate
     public const string ReasonCaptured = "captured";
     public const string ReasonCinematic = "cinematic";
     public const string ReasonReading = "reading";
+    public const string ReasonLockpick = "lockpick";
 
     static readonly Dictionary<string, int> Counts = new();
 

@@ -674,7 +674,6 @@ MonoBehaviour:
   settingsPanel: {fileID: 4964380222593726888}
   settingsMenu: {fileID: 3134859446041087628}
   creditsPanel: {fileID: 7244247626408767064}
-  continueButton: {fileID: 3793014782408639864}
   gameSceneName: Main Scene
 --- !u!1 &6231795670802862541
 GameObject:

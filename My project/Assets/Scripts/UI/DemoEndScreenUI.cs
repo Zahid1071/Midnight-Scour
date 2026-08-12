@@ -4,6 +4,7 @@ using UnityEngine;
 /// <summary>
 /// Fades in the demo end panel (scrollable feedback form), ducks music/SFX, unlocks the cursor.
 /// Leaves only when something calls <see cref="OnExitClicked"/> (wire your Exit button to it).
+/// Also intercepts Alt+F4 / window close in builds so players still see this panel once.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(CanvasGroup))]
@@ -28,10 +29,139 @@ public class DemoEndScreenUI : MonoBehaviour
 
     bool _showing;
     bool _exitRequested;
+    Coroutine _forceQuitDemoEndCo;
+
+    const string SeenPrefKey = "demo_end_screen_seen";
+
+    static bool _allowApplicationQuit;
+    static bool _pendingAppQuitAfterDemoEnd;
+    static bool _quitGuardRegistered;
 
     public static DemoEndScreenUI Instance { get; private set; }
     public bool IsShowing => _showing;
     public bool IsExitReady => _showing;
+
+    public static bool HasBeenSeen => PlayerPrefs.GetInt(SeenPrefKey, 0) == 1;
+
+    public static void MarkSeen()
+    {
+        PlayerPrefs.SetInt(SeenPrefKey, 1);
+        PlayerPrefs.Save();
+    }
+
+    /// <summary>
+    /// Clears "seen end screen" + "feedback submitted" prefs so quit/finale can be retested.
+    /// </summary>
+    public static void ResetDemoProgressPrefs()
+    {
+        PlayerPrefs.DeleteKey(SeenPrefKey);
+        PlayerPrefs.DeleteKey("demo_feedback_has_submitted");
+        PlayerPrefs.Save();
+        Debug.Log("[DemoEndScreenUI] Cleared demo_end_screen_seen + demo_feedback_has_submitted.");
+    }
+
+    /// <summary>
+    /// If Alt+F4 requested quit during the panel, finish by quitting the app instead of loading the menu.
+    /// </summary>
+    public static bool TryFinishWithApplicationQuit()
+    {
+        if (!_pendingAppQuitAfterDemoEnd)
+            return false;
+
+        _pendingAppQuitAfterDemoEnd = false;
+        _allowApplicationQuit = true;
+        Application.Quit();
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
+        return true;
+    }
+
+#if UNITY_EDITOR
+    [ContextMenu("DEV: Reset Demo End / Feedback Prefs")]
+    void ContextResetDemoProgressPrefs() => ResetDemoProgressPrefs();
+#endif
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetStatics()
+    {
+        _allowApplicationQuit = false;
+        _pendingAppQuitAfterDemoEnd = false;
+        _quitGuardRegistered = false;
+        Instance = null;
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void RegisterQuitGuard()
+    {
+        if (_quitGuardRegistered)
+            return;
+
+        _quitGuardRegistered = true;
+        Application.wantsToQuit += OnWantsToQuit;
+    }
+
+    static bool OnWantsToQuit()
+    {
+        if (_allowApplicationQuit)
+            return true;
+
+        // Already saw the end panel this install / after reset — allow normal quit.
+        if (HasBeenSeen)
+            return true;
+
+        var screen = Instance;
+        if (screen == null)
+            screen = FindFirstObjectByType<DemoEndScreenUI>(FindObjectsInactive.Include);
+
+        // Main menu / scenes without the panel — don't block quit.
+        if (screen == null)
+            return true;
+
+        _pendingAppQuitAfterDemoEnd = true;
+        screen.BeginForceQuitDemoEndFlow();
+        return false;
+    }
+
+    void BeginForceQuitDemoEndFlow()
+    {
+        if (_forceQuitDemoEndCo != null)
+            return;
+
+        if (!gameObject.activeSelf)
+            gameObject.SetActive(true);
+
+        _forceQuitDemoEndCo = StartCoroutine(ForceQuitDemoEndRoutine());
+    }
+
+    IEnumerator ForceQuitDemoEndRoutine()
+    {
+        // Unpause so fades / UI keep running after Alt+F4.
+        if (PauseManager.IsPaused)
+        {
+            Time.timeScale = 1f;
+            AudioListener.pause = false;
+            PlayerControlGate.Release(PlayerControlGate.ReasonPause);
+        }
+
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        bool startedHere = !_showing;
+        if (startedHere)
+            yield return WaitForExitRoutine();
+        else
+        {
+            // Panel already up (pause quit / finale) — wait for Exit; that owner finishes the flow.
+            while (!_exitRequested)
+                yield return null;
+        }
+
+        _forceQuitDemoEndCo = null;
+
+        if (startedHere)
+            TryFinishWithApplicationQuit();
+    }
 
     void Awake()
     {
@@ -46,6 +176,8 @@ public class DemoEndScreenUI : MonoBehaviour
             Debug.LogWarning("[DemoEndScreenUI] No DemoEndFeedbackUI found on Demo End Panel.");
 
         ResolveLogo();
+        SteamStoreLink.EnsureOn(logo);
+        SteamStoreLink.EnsureOn(ResolveWishlistBanner());
 
         if (exitHint == null)
         {
@@ -71,12 +203,14 @@ public class DemoEndScreenUI : MonoBehaviour
         _exitRequested = false;
 
         PlayerControlGate.Release(PlayerControlGate.ReasonCaptured);
+        PlayerControlGate.Acquire(PlayerControlGate.ReasonCinematic);
 
         if (!gameObject.activeSelf)
             gameObject.SetActive(true);
 
         ResetVisuals();
         SetLogoVisible(true);
+        SetWishlistBannerVisible(true);
         feedbackUI?.PrepareForShow();
         ConfigureInteractive(panelGroup);
 
@@ -100,13 +234,7 @@ public class DemoEndScreenUI : MonoBehaviour
     /// </summary>
     public void OnWishlistClicked()
     {
-        if (string.IsNullOrWhiteSpace(wishlistUrl))
-        {
-            Debug.LogWarning("[DemoEndScreenUI] wishlistUrl is empty.");
-            return;
-        }
-
-        Application.OpenURL(wishlistUrl.Trim());
+        SteamStoreLink.OpenStore();
     }
 
     public IEnumerator WaitForExitRoutine()
@@ -120,14 +248,17 @@ public class DemoEndScreenUI : MonoBehaviour
         while (!_exitRequested)
             yield return null;
 
+        MarkSeen();
         _showing = false;
         SetLogoVisible(false);
+        SetWishlistBannerVisible(false);
     }
 
     void PrepareHiddenState()
     {
         ResetVisuals();
         SetLogoVisible(false);
+        SetWishlistBannerVisible(false);
 
         if (gameObject.activeSelf)
             gameObject.SetActive(false);
@@ -175,8 +306,35 @@ public class DemoEndScreenUI : MonoBehaviour
     void SetLogoVisible(bool visible)
     {
         ResolveLogo();
-        if (logo != null)
-            logo.SetActive(visible);
+        SteamStoreLink.EnsureOn(logo);
+        if (logo == null)
+            return;
+
+        // Always use the prefab layout on the demo end screen (not the enlarged pause layout).
+        if (visible)
+            Object.FindFirstObjectByType<PauseManager>(FindObjectsInactive.Include)?.RestoreLogoLayout();
+
+        logo.SetActive(visible);
+    }
+
+    void SetWishlistBannerVisible(bool visible)
+    {
+        var banner = ResolveWishlistBanner();
+        SteamStoreLink.EnsureOn(banner);
+        if (banner != null)
+            banner.SetActive(visible);
+    }
+
+    GameObject ResolveWishlistBanner()
+    {
+        var all = FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        for (int i = 0; i < all.Length; i++)
+        {
+            if (all[i] != null && all[i].name == "Wishlist Banner")
+                return all[i].gameObject;
+        }
+
+        return null;
     }
 
     IEnumerator Fade(CanvasGroup group, float from, float to, float duration)
@@ -193,8 +351,7 @@ public class DemoEndScreenUI : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < duration)
         {
-            if (!PauseManager.IsPaused)
-                elapsed += Time.unscaledDeltaTime;
+            elapsed += Time.unscaledDeltaTime;
             group.alpha = Mathf.Lerp(from, to, Mathf.Clamp01(elapsed / duration));
             yield return null;
         }

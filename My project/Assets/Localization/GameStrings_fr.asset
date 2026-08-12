@@ -19,7 +19,7 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 5707297325056
-    m_Localized: "Paramètres"
+    m_Localized: "Param\xE8tres"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325057
@@ -35,7 +35,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325060
-    m_Localized: "Par défaut"
+    m_Localized: "Par d\xE9faut"
     m_Metadata:
       m_Items: []
   - m_Id: 1843970048000
@@ -47,7 +47,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325062
-    m_Localized: "Crédits"
+    m_Localized: "Cr\xE9dits"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325063
@@ -63,15 +63,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296577
-    m_Localized: "Merci d'avoir joué à Midnight Scour"
+    m_Localized: "Merci d'avoir jou\xE9 \xE0 Midnight Scour"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
-    m_Localized: appuyez sur échap pour quitter
+    m_Localized: "appuyez sur \xE9chap pour quitter"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296579
-    m_Localized: "appuyez sur une touche pour continuer"
+    m_Localized: appuyez sur une touche pour continuer
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296580
@@ -79,7 +79,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296581
-    m_Localized: "Utilisez les cachettes pour éviter le tueur"
+    m_Localized: "Utilisez les cachettes pour \xE9viter le tueur"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296582
@@ -87,7 +87,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296583
-    m_Localized: "Appuyez sur {0} pour déposer l'objet sélectionné"
+    m_Localized: "Appuyez sur {0} pour d\xE9poser l'objet s\xE9lectionn\xE9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296584
@@ -99,7 +99,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296586
-    m_Localized: "PARAMÈTRES"
+    m_Localized: "PARAM\xC8TRES"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296587
@@ -119,7 +119,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296591
-    m_Localized: "Général"
+    m_Localized: "G\xE9n\xE9ral"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296592
@@ -135,23 +135,23 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296595
-    m_Localized: "Luminosité"
+    m_Localized: "Luminosit\xE9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296596
-    m_Localized: "Sensibilité de la souris"
+    m_Localized: "Sensibilit\xE9 de la souris"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296800
-    m_Localized: Sensibilité du micro
+    m_Localized: "Sensibilit\xE9 du micro"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296597
-    m_Localized: "Résolution"
+    m_Localized: "R\xE9solution"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296598
-    m_Localized: "Plein écran"
+    m_Localized: "Plein \xE9cran"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296599
@@ -159,7 +159,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296600
-    m_Localized: "Qualité"
+    m_Localized: "Qualit\xE9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296601
@@ -175,19 +175,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296604
-    m_Localized: "Ça ne marchera pas ici."
+    m_Localized: "\xC7a ne marchera pas ici."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296605
-    m_Localized: "C'est verrouillé."
+    m_Localized: "C'est verrouill\xE9."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296606
-    m_Localized: "Je ne peux pas atteindre ça."
+    m_Localized: "C'est trop loin."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296607
-    m_Localized: "Ça ne bouge pas."
+    m_Localized: "\xC7a ne bouge pas."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296608
@@ -195,71 +195,72 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296609
-    m_Localized: "Tu es déjà caché."
+    m_Localized: "Tu es d\xE9j\xE0 cach\xE9."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296613
-    m_Localized: "Il te faut {0}."
+    m_Localized: Il te faut {0}.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296614
-    m_Localized: "{0} a été utilisé."
+    m_Localized: "{0} a \xE9t\xE9 utilis\xE9."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296615
-    m_Localized: "{0} a débloqué ceci."
+    m_Localized: "{0} a d\xE9bloqu\xE9 ceci."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296616
-    m_Localized: "Boulon retiré."
+    m_Localized: "Boulon retir\xE9."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296617
-    m_Localized: "C'est coincé."
+    m_Localized: "C'est coinc\xE9."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296618
-    m_Localized: "Cette interaction n'est pas configurée."
+    m_Localized: "Cette interaction n'est pas configur\xE9e."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296619
-    m_Localized: "Tu n'as rien à ranger."
+    m_Localized: "Tu n'as rien \xE0 ranger."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296620
-    m_Localized: "Rangé : {0}."
+    m_Localized: "Rang\xE9 : {0}."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296621
-    m_Localized: "{0} est déjà installé."
+    m_Localized: "{0} est d\xE9j\xE0 install\xE9."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296622
-    m_Localized: "Sélectionne d'abord une pièce de voiture dans ton inventaire."
+    m_Localized: "S\xE9lectionne d'abord une pi\xE8ce de voiture dans ton inventaire."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296623
-    m_Localized: "Tu n'as pas {0}."
+    m_Localized: Tu n'as pas {0}.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296624
-    m_Localized: "{0} installé."
+    m_Localized: "{0} install\xE9."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296625
-    m_Localized: "Cet emplacement n'est pas configuré."
+    m_Localized: "Cet emplacement n'est pas configur\xE9."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296626
-    m_Localized: "La séquence d'évasion n'est pas configurée."
+    m_Localized: "La s\xE9quence d'\xE9vasion n'est pas configur\xE9e."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296627
-    m_Localized: "Toutes les pièces sont installées. Tu t'es échappé !"
+    m_Localized: "Toutes les pi\xE8ces sont install\xE9es. Tu t'es \xE9chapp\xE9
+      !"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296628
-    m_Localized: "Il manque encore : {0}."
+    m_Localized: 'Il manque encore : {0}.'
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296629
@@ -279,11 +280,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296633
-    m_Localized: "Clé du sous-sol"
+    m_Localized: "Cl\xE9 du sous-sol"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296634
-    m_Localized: "Clé de boîte métallique"
+    m_Localized: "Cl\xE9 de bo\xEEte m\xE9tallique"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296635
@@ -315,67 +316,67 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296642
-    m_Localized: "Clé à molette"
+    m_Localized: "Cl\xE9 \xE0 molette"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296643
-    m_Localized: "Barre de fer récupérée"
+    m_Localized: "Barre de fer r\xE9cup\xE9r\xE9e"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296644
-    m_Localized: "Os ajouté à l'inventaire"
+    m_Localized: "Os ajout\xE9 \xE0 l'inventaire"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296645
-    m_Localized: "Os avec chewing-gum ajouté à l'inventaire"
+    m_Localized: "Os avec chewing-gum ajout\xE9 \xE0 l'inventaire"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296646
-    m_Localized: "Clé récupérée"
+    m_Localized: "Cl\xE9 r\xE9cup\xE9r\xE9e"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296647
-    m_Localized: "Petite clé récupérée"
+    m_Localized: "Petite cl\xE9 r\xE9cup\xE9r\xE9e"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296648
-    m_Localized: "Chewing-gum récupéré"
+    m_Localized: "Chewing-gum r\xE9cup\xE9r\xE9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296649
-    m_Localized: "Marteau récupéré"
+    m_Localized: "Marteau r\xE9cup\xE9r\xE9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296650
-    m_Localized: "Ventouse récupérée"
+    m_Localized: "Ventouse r\xE9cup\xE9r\xE9e"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296651
-    m_Localized: "Tournevis récupéré"
+    m_Localized: "Tournevis r\xE9cup\xE9r\xE9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296652
-    m_Localized: "Il y a quelque chose à l'intérieur"
+    m_Localized: "Il y a quelque chose \xE0 l'int\xE9rieur"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296653
-    m_Localized: "Clé à molette récupérée"
+    m_Localized: "Cl\xE9 \xE0 molette r\xE9cup\xE9r\xE9e"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296654
-    m_Localized: "C'est complètement bouché."
+    m_Localized: "C'est compl\xE8tement bouch\xE9."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296655
-    m_Localized: "L'eau est déjà partie."
+    m_Localized: "L'eau est d\xE9j\xE0 partie."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296656
-    m_Localized: "Il manque la barre pour le faire tourner."
+    m_Localized: Il manque la barre pour le faire tourner.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296657
-    m_Localized: "Utilise la barre de fer sur l'étau."
+    m_Localized: "Utilise la barre de fer sur l'\xE9tau."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296658
@@ -383,47 +384,49 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296659
-    m_Localized: "A collé le chewing-gum sur l'os."
+    m_Localized: "A coll\xE9 le chewing-gum sur l'os."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296660
-    m_Localized: "Ça glisse sans arrêt, je dois coller quelque chose sur l'os"
+    m_Localized: "\xC7a glisse sans arr\xEAt, je dois coller quelque chose sur l'os"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296661
-    m_Localized: "Le tournevis s'est cassé."
+    m_Localized: "Le tournevis s'est cass\xE9."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296662
-    m_Localized: "ASTUCE : Utilisez les cachettes pour échapper aux ennemis."
+    m_Localized: "ASTUCE : Utilisez les cachettes pour \xE9chapper aux ennemis."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296663
-    m_Localized: ASTUCE : Explorez attentivement les environs, vous pourriez trouver des indices importants.
+    m_Localized: 
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296664
-    m_Localized: ASTUCE : Restez silencieux, les ennemis peuvent vous entendre.
+    m_Localized: 
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296665
-    m_Localized: "ASTUCE : Votre lampe torche a une batterie limitée, utilisez-la avec prudence."
+    m_Localized: "ASTUCE : Votre lampe torche a une batterie limit\xE9e, utilisez-la
+      avec prudence."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296666
-    m_Localized: "ASTUCE : Certaines portes nécessitent des clés spéciales."
+    m_Localized: "ASTUCE : Certaines portes n\xE9cessitent des cl\xE9s sp\xE9ciales."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296667
-    m_Localized: ASTUCE : Courir peut attirer l'attention des ennemis.
+    m_Localized: 
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296668
-    m_Localized: "ASTUCE : Lisez les notes et documents pour découvrir l'histoire."
+    m_Localized: "ASTUCE : Lisez les notes et documents pour d\xE9couvrir l'histoire."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296669
-    m_Localized: "ASTUCE : Se cacher dans les coins sombres aide à se protéger des ennemis."
+    m_Localized: "ASTUCE : Se cacher dans les coins sombres aide \xE0 se prot\xE9ger
+      des ennemis."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296670
@@ -435,7 +438,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296672
-    m_Localized: "La grille est encore boulonnée."
+    m_Localized: "La grille est encore boulonn\xE9e."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296673
@@ -451,7 +454,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296676
-    m_Localized: "Voulez-vous vraiment quitter ?\n\nLa progression non sauvegardée sera perdue."
+    m_Localized: "Voulez-vous vraiment quitter ?\n\nLa progression non sauvegard\xE9e
+      sera perdue."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296677
@@ -463,7 +467,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296679
-    m_Localized: "Voulez-vous vraiment retourner au menu principal ?\n\nLa progression non sauvegardée sera perdue."
+    m_Localized: "Voulez-vous vraiment retourner au menu principal ?\n\nLa progression
+      non sauvegard\xE9e sera perdue."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296680
@@ -479,23 +484,23 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296683
-    m_Localized: "{0} déposé."
+    m_Localized: "{0} d\xE9pos\xE9."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296684
-    m_Localized: "Activé"
+    m_Localized: "Activ\xE9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296685
-    m_Localized: "Désactivé"
+    m_Localized: "D\xE9sactiv\xE9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296686
-    m_Localized: "Plein écran"
+    m_Localized: "Plein \xE9cran"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296687
-    m_Localized: "Fenêtré"
+    m_Localized: "Fen\xEAtr\xE9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296688
@@ -503,11 +508,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296689
-    m_Localized: "Plein écran exclusif"
+    m_Localized: "Plein \xE9cran exclusif"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296690
-    m_Localized: "Très faible"
+    m_Localized: "Tr\xE8s faible"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296691
@@ -519,11 +524,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296693
-    m_Localized: "Élevé"
+    m_Localized: "\xC9lev\xE9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296694
-    m_Localized: "Très élevé"
+    m_Localized: "Tr\xE8s \xE9lev\xE9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296695
@@ -535,23 +540,24 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296697
-    m_Localized: "Lâcher"
+    m_Localized: "L\xE2cher"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296698
-    m_Localized: "Il n'y a rien à portée de main."
+    m_Localized: "Il n'y a rien \xE0 port\xE9e de main."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296699
-    m_Localized: "Les toilettes sont bouchées, je ne trouve pas la ventouse. Elle était quelque part dans un seau, mais je ne me souviens plus où."
+    m_Localized: "Les toilettes sont bouch\xE9es, je ne trouve pas la ventouse. Elle
+      \xE9tait quelque part dans un seau, mais je ne me souviens plus o\xF9."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296701
-    m_Localized: "Embrayage récupéré"
+    m_Localized: "Embrayage r\xE9cup\xE9r\xE9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296700
-    m_Localized: "Bougie d'allumage récupérée"
+    m_Localized: "Bougie d'allumage r\xE9cup\xE9r\xE9e"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296702
@@ -563,11 +569,12 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296704
-    m_Localized: "Je crois qu'il faut le frapper avec quelque chose pour le faire tourner, il est complètement rouillé"
+    m_Localized: "Je crois qu'il faut le frapper avec quelque chose pour le faire
+      tourner, il est compl\xE8tement rouill\xE9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296705
-    m_Localized: "Le cadenas semble facile à briser."
+    m_Localized: "Le cadenas semble facile \xE0 briser."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296706
@@ -591,11 +598,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296711
-    m_Localized: "Comment évalueriez-vous cette expérience ?"
+    m_Localized: "Comment \xE9valueriez-vous cette exp\xE9rience ?"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296712
-    m_Localized: "Tension"
+    m_Localized: Tension
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296713
@@ -603,35 +610,36 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296714
-    m_Localized: "Amusement"
+    m_Localized: Amusement
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296715
-    m_Localized: "*facultatif* zone de commentaires"
+    m_Localized: '*facultatif* zone de commentaires'
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296716
-    m_Localized: "Envoyer"
+    m_Localized: Envoyer
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296717
-    m_Localized: "Bonjour — en tant qu'ingénieur logiciel fraîchement diplômé de l'université Haliç, j'ai essayé, dans cette version limitée, de vous montrer ce que Midnight Scour pourrait devenir. À l'avenir, je souhaite vous offrir la version complète en développant le monde et l'ambiance, en élargissant les bases posées ici, et en augmentant le budget. Laissez-nous vos retours pour que nous puissions améliorer votre expérience."
+    m_Localized: "Bonjour \u2014 Nous souhaitons \xE9largir le budget et l'envergure
+      du jeu complet, et vos retours sont le guide le plus important pour la suite."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296718
-    m_Localized: ?
+    m_Localized: '?'
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296719
-    m_Localized: "Envoi..."
+    m_Localized: Envoi...
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296720
-    m_Localized: "Envoyé"
+    m_Localized: "Envoy\xE9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296721
-    m_Localized: Réessayer
+    m_Localized: "R\xE9essayer"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296722
@@ -639,11 +647,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296723
-    m_Localized: "Configuration requise"
+    m_Localized: Configuration requise
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296724
-    m_Localized: Ajouter à la liste de souhaits !
+    m_Localized: "Ajouter \xE0 la liste de souhaits !"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296725
@@ -651,15 +659,131 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296726
-    m_Localized: "Déjà fait"
+    m_Localized: "D\xE9j\xE0 fait"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296727
-    m_Localized: "Mis à jour"
+    m_Localized: "Mis \xE0 jour"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296728
-    m_Localized: "Le tueur remarquera vos gestes répétés et s'adaptera."
+    m_Localized: "Le tueur remarquera vos gestes r\xE9p\xE9t\xE9s et s'adaptera."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296729
+    m_Localized: Je l'ai fait, timing parfait
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296730
+    m_Localized: Je peux synchroniser le coup de marteau avec le tonnerre
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296731
+    m_Localized: Ce sera trop bruyant, je ne peux pas frapper maintenant
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296732
+    m_Localized: "J'ai frappé trop tard, il va m'attraper"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296733
+    m_Localized: "Enfonce le tournevis."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296734
+    m_Localized: "Secoue violemment pour briser la serrure."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296735
+    m_Localized: "J'ai frappé trop tôt, je vais me faire attraper"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296736
+    m_Localized: "J'ai frappé trop tard, je vais me faire attraper"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296737
+    m_Localized: "C'est coincé, réessaie."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296738
+    m_Localized: "Butcher t'a vu te cacher."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296739
+    m_Localized: "Tu as fait trop de bruit."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296740
+    m_Localized: "Tu n'as cessé de te cacher au même endroit."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296741
+    m_Localized: "Tu n'as pas masqué le bruit du marteau avec le tonnerre."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296742
+    m_Localized: "Butcher t'a vu."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296743
+    m_Localized: "Tu t'es fait attraper."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296744
+    m_Localized: "Recommencer"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296745
+    m_Localized: "Menu principal"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296746
+    m_Localized: "Butcher t'a tendu une embuscade."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296747
+    m_Localized: "Les crochets te permettent de garder ta progression après t'être fait attraper."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296748
+    m_Localized: "Crochet"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296749
+    m_Localized: "Crochet récupéré"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296750
+    m_Localized: "Continuer"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296751
+    m_Localized: "Maintiens le clic droit pour appliquer de la pression"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296752
+    m_Localized: "Utilise ta souris pour d\u00E9placer le crochet et clique gauche pour lever les goupilles"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296753
+    m_Localized: "Goupille pos\u00E9e"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296754
+    m_Localized: "Serrure ouverte"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296755
+    m_Localized: "La porte est enchaînée."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296756
+    m_Localized: "La première fois que je me suis fait attraper, il a enchaîné la porte avec un cadenas. J'aurais dû prendre cette épingle à cheveux posée sur ces toilettes. Peut-être que j'aurais pu m'en servir comme crochet."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296757
+    m_Localized: "Je dois garder un œil ouvert pour trouver d'autres crochets"
     m_Metadata:
       m_Items: []
   references:

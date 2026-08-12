@@ -6,8 +6,11 @@ public class HudManager : MonoBehaviour
 {
     public static HudManager Instance { get; private set; }
 
+    public const int PriorityNormal = 0;
+    public const int PriorityHigh = 10;
+
     [SerializeField] private TextMeshProUGUI subtitleText;
-    [SerializeField] private float defaultDuration = 3f;
+    [SerializeField] private float defaultDuration = 6f;
 
     [Header("Subtitle colors")]
     [SerializeField] private Color defaultSubtitleColor = Color.white;
@@ -28,6 +31,9 @@ public class HudManager : MonoBehaviour
     private Coroutine shakeRoutine;
     private RectTransform subtitleRect;
     private Vector2 subtitleRestPos;
+    private int _activePriority;
+    private float _priorityLockUntilUnscaled;
+    private bool _persistent;
 
     private void Awake()
     {
@@ -55,15 +61,27 @@ public class HudManager : MonoBehaviour
             Instance = null;
     }
 
-    public void ShowSubtitle(string message, float? durationSeconds = null, Color? color = null)
+    /// <summary>
+    /// Shows a timed subtitle. Higher <paramref name="priority"/> cannot be replaced by lower
+    /// priority lines until its duration ends.
+    /// </summary>
+    public void ShowSubtitle(string message, float? durationSeconds = null, Color? color = null, int priority = PriorityNormal)
     {
         if (subtitleText == null || string.IsNullOrEmpty(message))
             return;
 
+        ExpirePriorityLockIfNeeded();
+        if (priority < _activePriority)
+            return;
+
         float d = durationSeconds ?? defaultDuration;
-        subtitleText.color = color ?? defaultSubtitleColor;
-        UIFont.SetText(subtitleText, message);
-        subtitleText.gameObject.SetActive(true);
+        _persistent = false;
+        _activePriority = priority;
+        _priorityLockUntilUnscaled = priority > PriorityNormal
+            ? Time.unscaledTime + Mathf.Max(0.05f, d)
+            : 0f;
+
+        ApplySubtitle(message, color ?? defaultSubtitleColor);
 
         if (hideRoutine != null)
             StopCoroutine(hideRoutine);
@@ -72,8 +90,44 @@ public class HudManager : MonoBehaviour
         PlaySubtitleShake();
     }
 
-    public void ClearSubtitle()
+    /// <summary>
+    /// Keeps a subtitle up until cleared or replaced. Blocked while a high-priority timed line is locked.
+    /// </summary>
+    public void ShowPersistentSubtitle(string message, Color? color = null, int priority = PriorityNormal)
     {
+        if (subtitleText == null || string.IsNullOrEmpty(message))
+            return;
+
+        ExpirePriorityLockIfNeeded();
+        if (priority < _activePriority)
+            return;
+
+        // Same persistent line already showing — don't restart shake / flicker.
+        if (_persistent
+            && _activePriority == priority
+            && subtitleText.gameObject.activeSelf
+            && subtitleText.text == message)
+            return;
+
+        _persistent = true;
+        _activePriority = priority;
+        _priorityLockUntilUnscaled = 0f;
+
+        if (hideRoutine != null)
+        {
+            StopCoroutine(hideRoutine);
+            hideRoutine = null;
+        }
+
+        ApplySubtitle(message, color ?? defaultSubtitleColor);
+    }
+
+    public void ClearSubtitle(int minPriorityToClear = PriorityNormal)
+    {
+        ExpirePriorityLockIfNeeded();
+        if (_activePriority > minPriorityToClear)
+            return;
+
         StopSubtitleShake();
 
         if (hideRoutine != null)
@@ -82,11 +136,37 @@ public class HudManager : MonoBehaviour
             hideRoutine = null;
         }
 
+        _persistent = false;
+        _activePriority = PriorityNormal;
+        _priorityLockUntilUnscaled = 0f;
+
         if (subtitleText != null)
         {
             subtitleText.text = string.Empty;
             subtitleText.gameObject.SetActive(false);
         }
+    }
+
+    void ExpirePriorityLockIfNeeded()
+    {
+        if (_activePriority <= PriorityNormal)
+            return;
+
+        if (_persistent)
+            return;
+
+        if (Time.unscaledTime < _priorityLockUntilUnscaled)
+            return;
+
+        _activePriority = PriorityNormal;
+        _priorityLockUntilUnscaled = 0f;
+    }
+
+    void ApplySubtitle(string message, Color color)
+    {
+        subtitleText.color = color;
+        UIFont.SetText(subtitleText, message);
+        subtitleText.gameObject.SetActive(true);
     }
 
     void PlaySubtitleShake()
@@ -118,7 +198,7 @@ public class HudManager : MonoBehaviour
         float elapsed = 0f;
         while (elapsed < shakeDuration)
         {
-            elapsed += Time.unscaledDeltaTime;
+            elapsed += Mathf.Min(Time.unscaledDeltaTime, 1f / 30f);
             float t = 1f - (elapsed / shakeDuration);
             float offset = shakeStrength * t;
             float x = Random.Range(-offset, offset);
@@ -135,6 +215,10 @@ public class HudManager : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(seconds);
         hideRoutine = null;
+        _persistent = false;
+        _activePriority = PriorityNormal;
+        _priorityLockUntilUnscaled = 0f;
+
         if (subtitleText != null)
         {
             subtitleText.text = string.Empty;
@@ -142,4 +226,3 @@ public class HudManager : MonoBehaviour
         }
     }
 }
-

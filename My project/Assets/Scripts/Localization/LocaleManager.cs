@@ -26,12 +26,10 @@ public static class LocaleManager
 
     /// <summary>
     /// Runs <paramref name="callback"/> once localization initialization is complete.
-    /// Always deferred onto a normal Unity update tick via <see cref="Pump"/> - never invoked
-    /// synchronously from inside InitializationOperation.Completed. That event fires from within
-    /// Addressables' own ResourceManager.Update(), and localization calls that can themselves
-    /// force a synchronous WaitForCompletion (Loc.Get, or reading LocalizationSettings.SelectedLocale
-    /// before init) would otherwise try to reenter ResourceManager.Update() and crash with
-    /// "Reentering the Update method is not allowed."
+    /// If init is already done, runs on the next update tick (never synchronously from an
+    /// Addressables completion callback — that can reenter ResourceManager.Update and crash).
+    /// Prefer applying the saved locale in <see cref="Bootstrap"/> before the first scene frame
+    /// so UI never paints English then snaps to Turkish.
     /// </summary>
     public static void WhenReady(Action callback)
     {
@@ -40,6 +38,9 @@ public static class LocaleManager
 
         Pump.Enqueue(callback);
     }
+
+    /// <summary>True when the localization system has finished loading locales/tables.</summary>
+    public static bool IsReady => LocalizationSettings.InitializationOperation.IsDone;
 
     /// <summary>Hidden runtime object that flushes queued WhenReady callbacks from a safe context.</summary>
     class Pump : MonoBehaviour
@@ -90,12 +91,19 @@ public static class LocaleManager
         }
     }
 
+    /// <summary>
+    /// Finish localization init and apply the saved/system locale before any scene Awake/UI paint.
+    /// Awake is too late — the default project locale (English) would already be on screen.
+    /// </summary>
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    static void Bootstrap() => WhenReady(() =>
+    static void Bootstrap()
     {
+        var op = LocalizationSettings.InitializationOperation;
+        if (!op.IsDone)
+            op.WaitForCompletion();
+
         ApplySavedOrSystemLocale();
-        RefreshAllUI();
-    });
+    }
 
     public static void ApplySavedOrSystemLocale()
     {

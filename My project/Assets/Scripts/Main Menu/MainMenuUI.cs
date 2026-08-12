@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class MainMenuUI : MonoBehaviour
 {
@@ -8,9 +7,6 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private SettingsMenu settingsMenu;
     [SerializeField] private GameObject creditsPanel;
-
-    [Header("Buttons")]
-    [SerializeField] private Button continueButton;
 
     [Header("Scenes")]
     [SerializeField] private string gameSceneName = "Cinematics";
@@ -53,35 +49,17 @@ public class MainMenuUI : MonoBehaviour
         // such as "captured", it would otherwise stay stuck for every future playthrough
         // in this process, silently freezing the NPC on its next capture attempt.
         PlayerControlGate.Clear();
-
-        // Grey-out Continue when there is nothing to resume
-        bool hasSave = SaveManager.Instance != null && SaveManager.Instance.HasSave();
-        if (continueButton != null)
-            continueButton.interactable = hasSave;
+        LockpickExtraLife.Clear();
     }
 
     // ───── Button callbacks ─────
 
-    /// <summary>Resume from the last save.</summary>
-    public void ContinueGame()
-    {
-        if (SaveManager.Instance == null || !SaveManager.Instance.HasSave()) return;
-        PlayerControlGate.Clear();
-        SaveManager.Instance.LoadGame();
-    }
-
-    /// <summary>Start a brand-new game (overwrites any existing save).</summary>
+    /// <summary>Start a brand-new game.</summary>
     public void NewGame()
     {
         PlayerControlGate.Clear();
-
-        if (SaveManager.Instance != null)
-            SaveManager.Instance.DeleteSave();
-
         GameplayHintManager.ResetAllHints();
-
-        if (InventoryManager.Instance != null)
-            InventoryManager.Instance.ClearInventory();
+        InventoryManager.ResetForNewGame();
 
         // Async load behind the loading screen (also warms up shaders there)
         // instead of an instant load that stalls on first-time shader compilation.

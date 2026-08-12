@@ -37,6 +37,9 @@ namespace FS_Atmo
         [SerializeField] private bool aiCloseAfterPassing = true;
         public bool AICloseAfterPassing => aiCloseAfterPassing;
 
+        [Tooltip("After the butcher opens this door, the player cannot close it for this many seconds.")]
+        [SerializeField] private float playerCloseLockoutAfterAiOpen = 3f;
+
         [Header("State")]
         public bool isLocked = false;
         public bool IsOpen { get; private set; }
@@ -53,6 +56,18 @@ namespace FS_Atmo
         // True while RequestOpen/RequestClose AI routines run. Player toggles sync carve only —
         // StopAllCoroutines here would cancel the NPC onDone and break door transit.
         private bool _requestInProgress;
+        float _playerCloseBlockedUntil = -1f;
+
+        /// <summary>True while the player must not close this door (butcher just opened it).</summary>
+        public bool IsPlayerCloseBlocked =>
+            playerCloseLockoutAfterAiOpen > 0f && Time.time < _playerCloseBlockedUntil;
+
+        void MarkOpenedByAi()
+        {
+            if (playerCloseLockoutAfterAiOpen <= 0f)
+                return;
+            _playerCloseBlockedUntil = Time.time + playerCloseLockoutAfterAiOpen;
+        }
 
         private void Reset()
         {
@@ -166,6 +181,7 @@ namespace FS_Atmo
 
             IsOpen = true;
             state = DoorState.Open;
+            MarkOpenedByAi();
             OnOpened?.Invoke();
         }
 
@@ -174,8 +190,8 @@ namespace FS_Atmo
             _requestInProgress = false;
             StopAllCoroutines();
 
-            if (simpleOpenClose && simpleOpenClose.objectOpen)
-                simpleOpenClose.ObjectClicked(bypassLock: true);
+            if (simpleOpenClose != null)
+                simpleOpenClose.ForceCloseInstant();
 
             lastOpenFlag = false;
             ApplyCarveImmediate(false);
@@ -215,6 +231,9 @@ namespace FS_Atmo
                 IsOpen = true;
                 lastOpenFlag = simpleOpenClose == null || simpleOpenClose.objectOpen;
                 state = DoorState.Open;
+                // Butcher / AI open — brief player close lockout so they can't slam it in his face.
+                if (bypassLock && triggerAnim)
+                    MarkOpenedByAi();
                 OnOpened?.Invoke();
                 onDone?.Invoke(true);
             }

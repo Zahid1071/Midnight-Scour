@@ -19,563 +19,642 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 5707297325056
-    m_Localized: "Настройки"
+    m_Localized: "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325057
-    m_Localized: "Выход"
+    m_Localized: "\u0412\u044B\u0445\u043E\u0434"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325058
-    m_Localized: "Назад"
+    m_Localized: "\u041D\u0430\u0437\u0430\u0434"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325059
-    m_Localized: "Применить"
+    m_Localized: "\u041F\u0440\u0438\u043C\u0435\u043D\u0438\u0442\u044C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325060
-    m_Localized: "По умолчанию"
+    m_Localized: "\u041F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E"
     m_Metadata:
       m_Items: []
   - m_Id: 1843970048000
-    m_Localized: "Продолжить"
+    m_Localized: "\u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0438\u0442\u044C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325061
-    m_Localized: "Новая игра"
+    m_Localized: "\u041D\u043E\u0432\u0430\u044F \u0438\u0433\u0440\u0430"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325062
-    m_Localized: "Титры"
+    m_Localized: "\u0422\u0438\u0442\u0440\u044B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325063
-    m_Localized: "Сохранить игру"
+    m_Localized: "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0438\u0433\u0440\u0443"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325064
-    m_Localized: "ПАУЗА"
+    m_Localized: "\u041F\u0410\u0423\u0417\u0410"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296576
-    m_Localized: "Продолжить"
+    m_Localized: "\u041F\u0440\u043E\u0434\u043E\u043B\u0436\u0438\u0442\u044C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296577
-    m_Localized: "Спасибо за игру в Midnight Scour"
+    m_Localized: "\u0421\u043F\u0430\u0441\u0438\u0431\u043E \u0437\u0430 \u0438\u0433\u0440\u0443
+      \u0432 Midnight Scour"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
-    m_Localized: нажмите esc, чтобы выйти
+    m_Localized: "\u043D\u0430\u0436\u043C\u0438\u0442\u0435 esc, \u0447\u0442\u043E\u0431\u044B
+      \u0432\u044B\u0439\u0442\u0438"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296579
-    m_Localized: "нажмите любую клавишу, чтобы продолжить"
+    m_Localized: "\u043D\u0430\u0436\u043C\u0438\u0442\u0435 \u043B\u044E\u0431\u0443\u044E
+      \u043A\u043B\u0430\u0432\u0438\u0448\u0443, \u0447\u0442\u043E\u0431\u044B
+      \u043F\u0440\u043E\u0434\u043E\u043B\u0436\u0438\u0442\u044C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296580
-    m_Localized: "Вы можете читать записки, чтобы найти подсказки"
+    m_Localized: "\u0412\u044B \u043C\u043E\u0436\u0435\u0442\u0435 \u0447\u0438\u0442\u0430\u0442\u044C
+      \u0437\u0430\u043F\u0438\u0441\u043A\u0438, \u0447\u0442\u043E\u0431\u044B
+      \u043D\u0430\u0439\u0442\u0438 \u043F\u043E\u0434\u0441\u043A\u0430\u0437\u043A\u0438"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296581
-    m_Localized: "Используйте укрытия, чтобы спрятаться от убийцы"
+    m_Localized: "\u0418\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0439\u0442\u0435
+      \u0443\u043A\u0440\u044B\u0442\u0438\u044F, \u0447\u0442\u043E\u0431\u044B
+      \u0441\u043F\u0440\u044F\u0442\u0430\u0442\u044C\u0441\u044F \u043E\u0442 \u0443\u0431\u0438\u0439\u0446\u044B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296582
-    m_Localized: "Шум может привлечь внимание убийцы"
+    m_Localized: "\u0428\u0443\u043C \u043C\u043E\u0436\u0435\u0442 \u043F\u0440\u0438\u0432\u043B\u0435\u0447\u044C
+      \u0432\u043D\u0438\u043C\u0430\u043D\u0438\u0435 \u0443\u0431\u0438\u0439\u0446\u044B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296583
-    m_Localized: "Нажмите {0}, чтобы выбросить выбранный предмет"
+    m_Localized: "\u041D\u0430\u0436\u043C\u0438\u0442\u0435 {0}, \u0447\u0442\u043E\u0431\u044B
+      \u0432\u044B\u0431\u0440\u043E\u0441\u0438\u0442\u044C \u0432\u044B\u0431\u0440\u0430\u043D\u043D\u044B\u0439
+      \u043F\u0440\u0435\u0434\u043C\u0435\u0442"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296584
-    m_Localized: "Использовать/Соединить предмет"
+    m_Localized: "\u0418\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u044C/\u0421\u043E\u0435\u0434\u0438\u043D\u0438\u0442\u044C
+      \u043F\u0440\u0435\u0434\u043C\u0435\u0442"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296585
-    m_Localized: "Взаимодействие"
+    m_Localized: "\u0412\u0437\u0430\u0438\u043C\u043E\u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0435"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296586
-    m_Localized: "НАСТРОЙКИ"
+    m_Localized: "\u041D\u0410\u0421\u0422\u0420\u041E\u0419\u041A\u0418"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296587
-    m_Localized: "Экран"
+    m_Localized: "\u042D\u043A\u0440\u0430\u043D"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296588
-    m_Localized: "Звук"
+    m_Localized: "\u0417\u0432\u0443\u043A"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296589
-    m_Localized: "Управление"
+    m_Localized: "\u0423\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0438\u0435"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296590
-    m_Localized: "Геймплей"
+    m_Localized: "\u0413\u0435\u0439\u043C\u043F\u043B\u0435\u0439"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296591
-    m_Localized: "Общие"
+    m_Localized: "\u041E\u0431\u0449\u0438\u0435"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296592
-    m_Localized: "Общая громкость"
+    m_Localized: "\u041E\u0431\u0449\u0430\u044F \u0433\u0440\u043E\u043C\u043A\u043E\u0441\u0442\u044C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296593
-    m_Localized: "Громкость музыки"
+    m_Localized: "\u0413\u0440\u043E\u043C\u043A\u043E\u0441\u0442\u044C \u043C\u0443\u0437\u044B\u043A\u0438"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296594
-    m_Localized: "Громкость эффектов"
+    m_Localized: "\u0413\u0440\u043E\u043C\u043A\u043E\u0441\u0442\u044C \u044D\u0444\u0444\u0435\u043A\u0442\u043E\u0432"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296595
-    m_Localized: "Яркость"
+    m_Localized: "\u042F\u0440\u043A\u043E\u0441\u0442\u044C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296596
-    m_Localized: "Чувствительность мыши"
+    m_Localized: "\u0427\u0443\u0432\u0441\u0442\u0432\u0438\u0442\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u044C
+      \u043C\u044B\u0448\u0438"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296800
-    m_Localized: Чувствительность микрофона
+    m_Localized: "\u0427\u0443\u0432\u0441\u0442\u0432\u0438\u0442\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u044C
+      \u043C\u0438\u043A\u0440\u043E\u0444\u043E\u043D\u0430"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296597
-    m_Localized: "Разрешение"
+    m_Localized: "\u0420\u0430\u0437\u0440\u0435\u0448\u0435\u043D\u0438\u0435"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296598
-    m_Localized: "Полноэкранный режим"
+    m_Localized: "\u041F\u043E\u043B\u043D\u043E\u044D\u043A\u0440\u0430\u043D\u043D\u044B\u0439
+      \u0440\u0435\u0436\u0438\u043C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296599
-    m_Localized: "Режим экрана"
+    m_Localized: "\u0420\u0435\u0436\u0438\u043C \u044D\u043A\u0440\u0430\u043D\u0430"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296600
-    m_Localized: "Качество"
+    m_Localized: "\u041A\u0430\u0447\u0435\u0441\u0442\u0432\u043E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296601
-    m_Localized: "Вертикальная синхронизация"
+    m_Localized: "\u0412\u0435\u0440\u0442\u0438\u043A\u0430\u043B\u044C\u043D\u0430\u044F
+      \u0441\u0438\u043D\u0445\u0440\u043E\u043D\u0438\u0437\u0430\u0446\u0438\u044F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296602
-    m_Localized: "Автосохранение"
+    m_Localized: "\u0410\u0432\u0442\u043E\u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u0435"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296603
-    m_Localized: "Язык"
+    m_Localized: "\u042F\u0437\u044B\u043A"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296604
-    m_Localized: "Это здесь не сработает."
+    m_Localized: "\u042D\u0442\u043E \u0437\u0434\u0435\u0441\u044C \u043D\u0435
+      \u0441\u0440\u0430\u0431\u043E\u0442\u0430\u0435\u0442."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296605
-    m_Localized: "Заперто."
+    m_Localized: "\u0417\u0430\u043F\u0435\u0440\u0442\u043E."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296606
-    m_Localized: "Я не могу до этого дотянуться."
+    m_Localized: "\u0421\u043B\u0438\u0448\u043A\u043E\u043C \u0434\u0430\u043B\u0435\u043A\u043E."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296607
-    m_Localized: "Не поддаётся."
+    m_Localized: "\u041D\u0435 \u043F\u043E\u0434\u0434\u0430\u0451\u0442\u0441\u044F."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296608
-    m_Localized: "Подожди немного."
+    m_Localized: "\u041F\u043E\u0434\u043E\u0436\u0434\u0438 \u043D\u0435\u043C\u043D\u043E\u0433\u043E."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296609
-    m_Localized: "Ты уже прячешься."
+    m_Localized: "\u0422\u044B \u0443\u0436\u0435 \u043F\u0440\u044F\u0447\u0435\u0448\u044C\u0441\u044F."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296613
-    m_Localized: "Нужен {0}."
+    m_Localized: "\u041D\u0443\u0436\u0435\u043D {0}."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296614
-    m_Localized: "{0} использован."
+    m_Localized: "{0} \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u043D."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296615
-    m_Localized: "{0} открыл это."
+    m_Localized: "{0} \u043E\u0442\u043A\u0440\u044B\u043B \u044D\u0442\u043E."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296616
-    m_Localized: "Болт снят."
+    m_Localized: "\u0411\u043E\u043B\u0442 \u0441\u043D\u044F\u0442."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296617
-    m_Localized: "Застряло."
+    m_Localized: "\u0417\u0430\u0441\u0442\u0440\u044F\u043B\u043E."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296618
-    m_Localized: "Это взаимодействие не настроено."
+    m_Localized: "\u042D\u0442\u043E \u0432\u0437\u0430\u0438\u043C\u043E\u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0435
+      \u043D\u0435 \u043D\u0430\u0441\u0442\u0440\u043E\u0435\u043D\u043E."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296619
-    m_Localized: "Тебе нечего складывать."
+    m_Localized: "\u0422\u0435\u0431\u0435 \u043D\u0435\u0447\u0435\u0433\u043E \u0441\u043A\u043B\u0430\u0434\u044B\u0432\u0430\u0442\u044C."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296620
-    m_Localized: "Сохранено: {0}."
+    m_Localized: "\u0421\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u043E: {0}."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296621
-    m_Localized: "{0} уже установлен."
+    m_Localized: "{0} \u0443\u0436\u0435 \u0443\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u0435\u043D."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296622
-    m_Localized: "Сначала выберите деталь автомобиля в инвентаре."
+    m_Localized: "\u0421\u043D\u0430\u0447\u0430\u043B\u0430 \u0432\u044B\u0431\u0435\u0440\u0438\u0442\u0435
+      \u0434\u0435\u0442\u0430\u043B\u044C \u0430\u0432\u0442\u043E\u043C\u043E\u0431\u0438\u043B\u044F
+      \u0432 \u0438\u043D\u0432\u0435\u043D\u0442\u0430\u0440\u0435."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296623
-    m_Localized: "У тебя нет {0}."
+    m_Localized: "\u0423 \u0442\u0435\u0431\u044F \u043D\u0435\u0442 {0}."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296624
-    m_Localized: "{0} установлен."
+    m_Localized: "{0} \u0443\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u0435\u043D."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296625
-    m_Localized: "Этот слот не настроен."
+    m_Localized: "\u042D\u0442\u043E\u0442 \u0441\u043B\u043E\u0442 \u043D\u0435
+      \u043D\u0430\u0441\u0442\u0440\u043E\u0435\u043D."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296626
-    m_Localized: "Последовательность побега не настроена."
+    m_Localized: "\u041F\u043E\u0441\u043B\u0435\u0434\u043E\u0432\u0430\u0442\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u044C
+      \u043F\u043E\u0431\u0435\u0433\u0430 \u043D\u0435 \u043D\u0430\u0441\u0442\u0440\u043E\u0435\u043D\u0430."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296627
-    m_Localized: "Все детали установлены. Ты сбежал!"
+    m_Localized: "\u0412\u0441\u0435 \u0434\u0435\u0442\u0430\u043B\u0438 \u0443\u0441\u0442\u0430\u043D\u043E\u0432\u043B\u0435\u043D\u044B.
+      \u0422\u044B \u0441\u0431\u0435\u0436\u0430\u043B!"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296628
-    m_Localized: "Всё ещё не хватает: {0}."
+    m_Localized: "\u0412\u0441\u0451 \u0435\u0449\u0451 \u043D\u0435 \u0445\u0432\u0430\u0442\u0430\u0435\u0442:
+      {0}."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296629
-    m_Localized: "Загрузка..."
+    m_Localized: "\u0417\u0430\u0433\u0440\u0443\u0437\u043A\u0430..."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296630
-    m_Localized: "Лом"
+    m_Localized: "\u041B\u043E\u043C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296631
-    m_Localized: "Кость"
+    m_Localized: "\u041A\u043E\u0441\u0442\u044C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296632
-    m_Localized: "Кость"
+    m_Localized: "\u041A\u043E\u0441\u0442\u044C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296633
-    m_Localized: "Ключ от подвала"
+    m_Localized: "\u041A\u043B\u044E\u0447 \u043E\u0442 \u043F\u043E\u0434\u0432\u0430\u043B\u0430"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296634
-    m_Localized: "Металлический ключ от ящика"
+    m_Localized: "\u041C\u0435\u0442\u0430\u043B\u043B\u0438\u0447\u0435\u0441\u043A\u0438\u0439
+      \u043A\u043B\u044E\u0447 \u043E\u0442 \u044F\u0449\u0438\u043A\u0430"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296635
-    m_Localized: "Жвачка"
+    m_Localized: "\u0416\u0432\u0430\u0447\u043A\u0430"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296636
-    m_Localized: "Сцепление"
+    m_Localized: "\u0421\u0446\u0435\u043F\u043B\u0435\u043D\u0438\u0435"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296637
-    m_Localized: "Молоток"
+    m_Localized: "\u041C\u043E\u043B\u043E\u0442\u043E\u043A"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296638
-    m_Localized: "Вантуз"
+    m_Localized: "\u0412\u0430\u043D\u0442\u0443\u0437"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296639
-    m_Localized: "Отвёртка"
+    m_Localized: "\u041E\u0442\u0432\u0451\u0440\u0442\u043A\u0430"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296640
-    m_Localized: "Свеча зажигания"
+    m_Localized: "\u0421\u0432\u0435\u0447\u0430 \u0437\u0430\u0436\u0438\u0433\u0430\u043D\u0438\u044F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296641
-    m_Localized: "Ваза"
+    m_Localized: "\u0412\u0430\u0437\u0430"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296642
-    m_Localized: "Гаечный ключ"
+    m_Localized: "\u0413\u0430\u0435\u0447\u043D\u044B\u0439 \u043A\u043B\u044E\u0447"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296643
-    m_Localized: "Поднят лом"
+    m_Localized: "\u041F\u043E\u0434\u043D\u044F\u0442 \u043B\u043E\u043C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296644
-    m_Localized: "Кость добавлена в инвентарь"
+    m_Localized: "\u041A\u043E\u0441\u0442\u044C \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u0430
+      \u0432 \u0438\u043D\u0432\u0435\u043D\u0442\u0430\u0440\u044C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296645
-    m_Localized: "Кость с жвачкой добавлена в инвентарь"
+    m_Localized: "\u041A\u043E\u0441\u0442\u044C \u0441 \u0436\u0432\u0430\u0447\u043A\u043E\u0439
+      \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u0430 \u0432 \u0438\u043D\u0432\u0435\u043D\u0442\u0430\u0440\u044C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296646
-    m_Localized: "Поднят ключ"
+    m_Localized: "\u041F\u043E\u0434\u043D\u044F\u0442 \u043A\u043B\u044E\u0447"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296647
-    m_Localized: "Поднят маленький ключ"
+    m_Localized: "\u041F\u043E\u0434\u043D\u044F\u0442 \u043C\u0430\u043B\u0435\u043D\u044C\u043A\u0438\u0439
+      \u043A\u043B\u044E\u0447"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296648
-    m_Localized: "Поднята жвачка"
+    m_Localized: "\u041F\u043E\u0434\u043D\u044F\u0442\u0430 \u0436\u0432\u0430\u0447\u043A\u0430"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296649
-    m_Localized: "Поднят молоток"
+    m_Localized: "\u041F\u043E\u0434\u043D\u044F\u0442 \u043C\u043E\u043B\u043E\u0442\u043E\u043A"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296650
-    m_Localized: "Поднят вантуз"
+    m_Localized: "\u041F\u043E\u0434\u043D\u044F\u0442 \u0432\u0430\u043D\u0442\u0443\u0437"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296651
-    m_Localized: "Поднята отвёртка"
+    m_Localized: "\u041F\u043E\u0434\u043D\u044F\u0442\u0430 \u043E\u0442\u0432\u0451\u0440\u0442\u043A\u0430"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296652
-    m_Localized: "Там что-то внутри"
+    m_Localized: "\u0422\u0430\u043C \u0447\u0442\u043E-\u0442\u043E \u0432\u043D\u0443\u0442\u0440\u0438"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296653
-    m_Localized: "Поднят гаечный ключ"
+    m_Localized: "\u041F\u043E\u0434\u043D\u044F\u0442 \u0433\u0430\u0435\u0447\u043D\u044B\u0439
+      \u043A\u043B\u044E\u0447"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296654
-    m_Localized: "Он полностью засорён."
+    m_Localized: "\u041E\u043D \u043F\u043E\u043B\u043D\u043E\u0441\u0442\u044C\u044E
+      \u0437\u0430\u0441\u043E\u0440\u0451\u043D."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296655
-    m_Localized: "Вода уже ушла."
+    m_Localized: "\u0412\u043E\u0434\u0430 \u0443\u0436\u0435 \u0443\u0448\u043B\u0430."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296656
-    m_Localized: "Не хватает лома, чтобы его провернуть."
+    m_Localized: "\u041D\u0435 \u0445\u0432\u0430\u0442\u0430\u0435\u0442 \u043B\u043E\u043C\u0430,
+      \u0447\u0442\u043E\u0431\u044B \u0435\u0433\u043E \u043F\u0440\u043E\u0432\u0435\u0440\u043D\u0443\u0442\u044C."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296657
-    m_Localized: "Используй лом на тисках."
+    m_Localized: "\u0418\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0439 \u043B\u043E\u043C
+      \u043D\u0430 \u0442\u0438\u0441\u043A\u0430\u0445."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296658
-    m_Localized: "Используй молоток на ломе."
+    m_Localized: "\u0418\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0439 \u043C\u043E\u043B\u043E\u0442\u043E\u043A
+      \u043D\u0430 \u043B\u043E\u043C\u0435."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296659
-    m_Localized: "Прилепил жвачку к кости."
+    m_Localized: "\u041F\u0440\u0438\u043B\u0435\u043F\u0438\u043B \u0436\u0432\u0430\u0447\u043A\u0443
+      \u043A \u043A\u043E\u0441\u0442\u0438."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296660
-    m_Localized: "Постоянно соскальзывает, нужно что-то приклеить к кости"
+    m_Localized: "\u041F\u043E\u0441\u0442\u043E\u044F\u043D\u043D\u043E \u0441\u043E\u0441\u043A\u0430\u043B\u044C\u0437\u044B\u0432\u0430\u0435\u0442,
+      \u043D\u0443\u0436\u043D\u043E \u0447\u0442\u043E-\u0442\u043E \u043F\u0440\u0438\u043A\u043B\u0435\u0438\u0442\u044C
+      \u043A \u043A\u043E\u0441\u0442\u0438"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296661
-    m_Localized: "Отвёртка сломалась."
+    m_Localized: "\u041E\u0442\u0432\u0451\u0440\u0442\u043A\u0430 \u0441\u043B\u043E\u043C\u0430\u043B\u0430\u0441\u044C."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296662
-    m_Localized: "СОВЕТ: Используйте укрытия, чтобы избежать врагов."
+    m_Localized: "\u0421\u041E\u0412\u0415\u0422: \u0418\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0439\u0442\u0435
+      \u0443\u043A\u0440\u044B\u0442\u0438\u044F, \u0447\u0442\u043E\u0431\u044B
+      \u0438\u0437\u0431\u0435\u0436\u0430\u0442\u044C \u0432\u0440\u0430\u0433\u043E\u0432."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296663
-    m_Localized: "СОВЕТ: Исследуйте окрестности внимательно, вы можете найти важные подсказки."
+    m_Localized: "\u0421\u041E\u0412\u0415\u0422: \u0418\u0441\u0441\u043B\u0435\u0434\u0443\u0439\u0442\u0435
+      \u043E\u043A\u0440\u0435\u0441\u0442\u043D\u043E\u0441\u0442\u0438 \u0432\u043D\u0438\u043C\u0430\u0442\u0435\u043B\u044C\u043D\u043E,
+      \u0432\u044B \u043C\u043E\u0436\u0435\u0442\u0435 \u043D\u0430\u0439\u0442\u0438
+      \u0432\u0430\u0436\u043D\u044B\u0435 \u043F\u043E\u0434\u0441\u043A\u0430\u0437\u043A\u0438."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296664
-    m_Localized: "СОВЕТ: Ведите себя тихо, враги могут вас услышать."
+    m_Localized: "\u0421\u041E\u0412\u0415\u0422: \u0412\u0435\u0434\u0438\u0442\u0435
+      \u0441\u0435\u0431\u044F \u0442\u0438\u0445\u043E, \u0432\u0440\u0430\u0433\u0438
+      \u043C\u043E\u0433\u0443\u0442 \u0432\u0430\u0441 \u0443\u0441\u043B\u044B\u0448\u0430\u0442\u044C."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296665
-    m_Localized: "СОВЕТ: У вашего фонарика ограниченный заряд батареи, используйте его с умом."
+    m_Localized: "\u0421\u041E\u0412\u0415\u0422: \u0423 \u0432\u0430\u0448\u0435\u0433\u043E
+      \u0444\u043E\u043D\u0430\u0440\u0438\u043A\u0430 \u043E\u0433\u0440\u0430\u043D\u0438\u0447\u0435\u043D\u043D\u044B\u0439
+      \u0437\u0430\u0440\u044F\u0434 \u0431\u0430\u0442\u0430\u0440\u0435\u0438,
+      \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0439\u0442\u0435 \u0435\u0433\u043E
+      \u0441 \u0443\u043C\u043E\u043C."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296666
-    m_Localized: "СОВЕТ: Некоторым дверям нужны особые ключи."
+    m_Localized: "\u0421\u041E\u0412\u0415\u0422: \u041D\u0435\u043A\u043E\u0442\u043E\u0440\u044B\u043C
+      \u0434\u0432\u0435\u0440\u044F\u043C \u043D\u0443\u0436\u043D\u044B \u043E\u0441\u043E\u0431\u044B\u0435
+      \u043A\u043B\u044E\u0447\u0438."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296667
-    m_Localized: "СОВЕТ: Бег может привлечь внимание врагов."
+    m_Localized: "\u0421\u041E\u0412\u0415\u0422: \u0411\u0435\u0433 \u043C\u043E\u0436\u0435\u0442
+      \u043F\u0440\u0438\u0432\u043B\u0435\u0447\u044C \u0432\u043D\u0438\u043C\u0430\u043D\u0438\u0435
+      \u0432\u0440\u0430\u0433\u043E\u0432."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296668
-    m_Localized: "СОВЕТ: Читайте записки и документы, чтобы раскрыть историю."
+    m_Localized: "\u0421\u041E\u0412\u0415\u0422: \u0427\u0438\u0442\u0430\u0439\u0442\u0435
+      \u0437\u0430\u043F\u0438\u0441\u043A\u0438 \u0438 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u044B,
+      \u0447\u0442\u043E\u0431\u044B \u0440\u0430\u0441\u043A\u0440\u044B\u0442\u044C
+      \u0438\u0441\u0442\u043E\u0440\u0438\u044E."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296669
-    m_Localized: "СОВЕТ: Прятаться в тёмных углах помогает укрыться от врагов."
+    m_Localized: "\u0421\u041E\u0412\u0415\u0422: \u041F\u0440\u044F\u0442\u0430\u0442\u044C\u0441\u044F
+      \u0432 \u0442\u0451\u043C\u043D\u044B\u0445 \u0443\u0433\u043B\u0430\u0445
+      \u043F\u043E\u043C\u043E\u0433\u0430\u0435\u0442 \u0443\u043A\u0440\u044B\u0442\u044C\u0441\u044F
+      \u043E\u0442 \u0432\u0440\u0430\u0433\u043E\u0432."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296670
-    m_Localized: "Здесь ничего нет."
+    m_Localized: "\u0417\u0434\u0435\u0441\u044C \u043D\u0438\u0447\u0435\u0433\u043E
+      \u043D\u0435\u0442."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296671
-    m_Localized: "Ваш инвентарь полон."
+    m_Localized: "\u0412\u0430\u0448 \u0438\u043D\u0432\u0435\u043D\u0442\u0430\u0440\u044C
+      \u043F\u043E\u043B\u043E\u043D."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296672
-    m_Localized: "Решётка всё ещё прикручена."
+    m_Localized: "\u0420\u0435\u0448\u0451\u0442\u043A\u0430 \u0432\u0441\u0451 \u0435\u0449\u0451
+      \u043F\u0440\u0438\u043A\u0440\u0443\u0447\u0435\u043D\u0430."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296673
-    m_Localized: "Подтвердить"
+    m_Localized: "\u041F\u043E\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296674
-    m_Localized: "Да"
+    m_Localized: "\u0414\u0430"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296675
-    m_Localized: "Нет"
+    m_Localized: "\u041D\u0435\u0442"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296676
-    m_Localized: "Вы уверены, что хотите выйти?\n\nНесохранённый прогресс будет потерян."
+    m_Localized: "\u0412\u044B \u0443\u0432\u0435\u0440\u0435\u043D\u044B, \u0447\u0442\u043E
+      \u0445\u043E\u0442\u0438\u0442\u0435 \u0432\u044B\u0439\u0442\u0438?\n\n\u041D\u0435\u0441\u043E\u0445\u0440\u0430\u043D\u0451\u043D\u043D\u044B\u0439
+      \u043F\u0440\u043E\u0433\u0440\u0435\u0441\u0441 \u0431\u0443\u0434\u0435\u0442
+      \u043F\u043E\u0442\u0435\u0440\u044F\u043D."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296677
-    m_Localized: "Выход"
+    m_Localized: "\u0412\u044B\u0445\u043E\u0434"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296678
-    m_Localized: "Выйти"
+    m_Localized: "\u0412\u044B\u0439\u0442\u0438"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296679
-    m_Localized: "Вы уверены, что хотите вернуться в главное меню?\n\nНесохранённый прогресс будет потерян."
+    m_Localized: "\u0412\u044B \u0443\u0432\u0435\u0440\u0435\u043D\u044B, \u0447\u0442\u043E
+      \u0445\u043E\u0442\u0438\u0442\u0435 \u0432\u0435\u0440\u043D\u0443\u0442\u044C\u0441\u044F
+      \u0432 \u0433\u043B\u0430\u0432\u043D\u043E\u0435 \u043C\u0435\u043D\u044E?\n\n\u041D\u0435\u0441\u043E\u0445\u0440\u0430\u043D\u0451\u043D\u043D\u044B\u0439
+      \u043F\u0440\u043E\u0433\u0440\u0435\u0441\u0441 \u0431\u0443\u0434\u0435\u0442
+      \u043F\u043E\u0442\u0435\u0440\u044F\u043D."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296680
-    m_Localized: "Главное меню"
+    m_Localized: "\u0413\u043B\u0430\u0432\u043D\u043E\u0435 \u043C\u0435\u043D\u044E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296681
-    m_Localized: "Вернуться"
+    m_Localized: "\u0412\u0435\u0440\u043D\u0443\u0442\u044C\u0441\u044F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296682
-    m_Localized: "Думаю, в той вазе что-то было."
+    m_Localized: "\u0414\u0443\u043C\u0430\u044E, \u0432 \u0442\u043E\u0439 \u0432\u0430\u0437\u0435
+      \u0447\u0442\u043E-\u0442\u043E \u0431\u044B\u043B\u043E."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296683
-    m_Localized: "Выброшено: {0}."
+    m_Localized: "\u0412\u044B\u0431\u0440\u043E\u0448\u0435\u043D\u043E: {0}."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296684
-    m_Localized: "Включено"
+    m_Localized: "\u0412\u043A\u043B\u044E\u0447\u0435\u043D\u043E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296685
-    m_Localized: "Отключено"
+    m_Localized: "\u041E\u0442\u043A\u043B\u044E\u0447\u0435\u043D\u043E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296686
-    m_Localized: "Полный экран"
+    m_Localized: "\u041F\u043E\u043B\u043D\u044B\u0439 \u044D\u043A\u0440\u0430\u043D"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296687
-    m_Localized: "Оконный режим"
+    m_Localized: "\u041E\u043A\u043E\u043D\u043D\u044B\u0439 \u0440\u0435\u0436\u0438\u043C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296688
-    m_Localized: "С рамкой"
+    m_Localized: "\u0421 \u0440\u0430\u043C\u043A\u043E\u0439"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296689
-    m_Localized: "Эксклюзивный полный экран"
+    m_Localized: "\u042D\u043A\u0441\u043A\u043B\u044E\u0437\u0438\u0432\u043D\u044B\u0439
+      \u043F\u043E\u043B\u043D\u044B\u0439 \u044D\u043A\u0440\u0430\u043D"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296690
-    m_Localized: "Очень низкое"
+    m_Localized: "\u041E\u0447\u0435\u043D\u044C \u043D\u0438\u0437\u043A\u043E\u0435"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296691
-    m_Localized: "Низкое"
+    m_Localized: "\u041D\u0438\u0437\u043A\u043E\u0435"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296692
-    m_Localized: "Среднее"
+    m_Localized: "\u0421\u0440\u0435\u0434\u043D\u0435\u0435"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296693
-    m_Localized: "Высокое"
+    m_Localized: "\u0412\u044B\u0441\u043E\u043A\u043E\u0435"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296694
-    m_Localized: "Очень высокое"
+    m_Localized: "\u041E\u0447\u0435\u043D\u044C \u0432\u044B\u0441\u043E\u043A\u043E\u0435"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296695
-    m_Localized: "Ультра"
+    m_Localized: "\u0423\u043B\u044C\u0442\u0440\u0430"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296696
-    m_Localized: "Использовать предмет"
+    m_Localized: "\u0418\u0441\u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u044C
+      \u043F\u0440\u0435\u0434\u043C\u0435\u0442"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296697
-    m_Localized: "Выбросить"
+    m_Localized: "\u0412\u044B\u0431\u0440\u043E\u0441\u0438\u0442\u044C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296698
-    m_Localized: "Ничего не досягается."
+    m_Localized: "\u041D\u0438\u0447\u0435\u0433\u043E \u043D\u0435 \u0434\u043E\u0441\u044F\u0433\u0430\u0435\u0442\u0441\u044F."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296699
-    m_Localized: "Унитаз засорён, не могу найти вантуз. Он был где-то в ведре, но я не помню где."
+    m_Localized: "\u0423\u043D\u0438\u0442\u0430\u0437 \u0437\u0430\u0441\u043E\u0440\u0451\u043D,
+      \u043D\u0435 \u043C\u043E\u0433\u0443 \u043D\u0430\u0439\u0442\u0438 \u0432\u0430\u043D\u0442\u0443\u0437.
+      \u041E\u043D \u0431\u044B\u043B \u0433\u0434\u0435-\u0442\u043E \u0432 \u0432\u0435\u0434\u0440\u0435,
+      \u043D\u043E \u044F \u043D\u0435 \u043F\u043E\u043C\u043D\u044E \u0433\u0434\u0435."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296701
-    m_Localized: "Поднято сцепление"
+    m_Localized: "\u041F\u043E\u0434\u043D\u044F\u0442\u043E \u0441\u0446\u0435\u043F\u043B\u0435\u043D\u0438\u0435"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296700
-    m_Localized: "Поднята свеча зажигания"
+    m_Localized: "\u041F\u043E\u0434\u043D\u044F\u0442\u0430 \u0441\u0432\u0435\u0447\u0430
+      \u0437\u0430\u0436\u0438\u0433\u0430\u043D\u0438\u044F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296702
-    m_Localized: У
+    m_Localized: "\u0423"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296703
-    m_Localized: П
+    m_Localized: "\u041F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296704
-    m_Localized: "Думаю, нужно ударить чем-нибудь, чтобы провернуть — он полностью заржавел"
+    m_Localized: "\u0414\u0443\u043C\u0430\u044E, \u043D\u0443\u0436\u043D\u043E
+      \u0443\u0434\u0430\u0440\u0438\u0442\u044C \u0447\u0435\u043C-\u043D\u0438\u0431\u0443\u0434\u044C,
+      \u0447\u0442\u043E\u0431\u044B \u043F\u0440\u043E\u0432\u0435\u0440\u043D\u0443\u0442\u044C
+      \u2014 \u043E\u043D \u043F\u043E\u043B\u043D\u043E\u0441\u0442\u044C\u044E
+      \u0437\u0430\u0440\u0436\u0430\u0432\u0435\u043B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296705
-    m_Localized: "Похоже, этот замок легко сломать."
+    m_Localized: "\u041F\u043E\u0445\u043E\u0436\u0435, \u044D\u0442\u043E\u0442
+      \u0437\u0430\u043C\u043E\u043A \u043B\u0435\u0433\u043A\u043E \u0441\u043B\u043E\u043C\u0430\u0442\u044C."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296706
-    m_Localized: "Присесть"
+    m_Localized: "\u041F\u0440\u0438\u0441\u0435\u0441\u0442\u044C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296707
-    m_Localized: "Бежать"
+    m_Localized: "\u0411\u0435\u0436\u0430\u0442\u044C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296708
@@ -587,79 +666,211 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296710
-    m_Localized: Я перекрываю путь.
+    m_Localized: "\u042F \u043F\u0435\u0440\u0435\u043A\u0440\u044B\u0432\u0430\u044E
+      \u043F\u0443\u0442\u044C."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296711
-    m_Localized: Как бы вы оценили этот опыт?
+    m_Localized: "\u041A\u0430\u043A \u0431\u044B \u0432\u044B \u043E\u0446\u0435\u043D\u0438\u043B\u0438
+      \u044D\u0442\u043E\u0442 \u043E\u043F\u044B\u0442?"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296712
-    m_Localized: Напряжение
+    m_Localized: "\u041D\u0430\u043F\u0440\u044F\u0436\u0435\u043D\u0438\u0435"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296713
-    m_Localized: Ужас
+    m_Localized: "\u0423\u0436\u0430\u0441"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296714
-    m_Localized: Веселье
+    m_Localized: "\u0412\u0435\u0441\u0435\u043B\u044C\u0435"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296715
-    m_Localized: *необязательно* поле отзыва
+    m_Localized: "*\u043D\u0435\u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u043E*
+      \u043F\u043E\u043B\u0435 \u043E\u0442\u0437\u044B\u0432\u0430"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296716
-    m_Localized: Отправить
+    m_Localized: "\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296717
-    m_Localized: "Привет — как инженер-программист, недавно окончивший университет Haliç, в этой ограниченной версии я постарался показать вам, чем может стать Midnight Scour. В дальнейшем я хочу принести вам полную версию, расширяя мир и атмосферу, развивая заложенные здесь основы и увеличивая бюджет. Пожалуйста, оставьте отзыв — так мы сможем улучшить ваш опыт."
+    m_Localized: "\u041F\u0440\u0438\u0432\u0435\u0442 \u2014 \u041C\u044B \u0445\u043E\u0442\u0438\u043C
+      \u0443\u0432\u0435\u043B\u0438\u0447\u0438\u0442\u044C \u0431\u044E\u0434\u0436\u0435\u0442
+      \u0438 \u043C\u0430\u0441\u0448\u0442\u0430\u0431 \u043F\u043E\u043B\u043D\u043E\u0439
+      \u0432\u0435\u0440\u0441\u0438\u0438, \u0438 \u0432\u0430\u0448 \u043E\u0442\u0437\u044B\u0432
+      \u2014 \u0441\u0430\u043C\u044B\u0439 \u0432\u0430\u0436\u043D\u044B\u0439
+      \u043E\u0440\u0438\u0435\u043D\u0442\u0438\u0440 \u0434\u043B\u044F \u0434\u0430\u043B\u044C\u043D\u0435\u0439\u0448\u0435\u0433\u043E
+      \u043F\u0443\u0442\u0438."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296718
-    m_Localized: ?
+    m_Localized: '?'
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296719
-    m_Localized: Отправка...
+    m_Localized: "\u041E\u0442\u043F\u0440\u0430\u0432\u043A\u0430..."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296720
-    m_Localized: Отправлено
+    m_Localized: "\u041E\u0442\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u043E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296721
-    m_Localized: Повторить
+    m_Localized: "\u041F\u043E\u0432\u0442\u043E\u0440\u0438\u0442\u044C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296722
-    m_Localized: Оцените всё
+    m_Localized: "\u041E\u0446\u0435\u043D\u0438\u0442\u0435 \u0432\u0441\u0451"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296723
-    m_Localized: Нужна настройка
+    m_Localized: "\u041D\u0443\u0436\u043D\u0430 \u043D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0430"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296724
-    m_Localized: В список желаемого!
+    m_Localized: "\u0412 \u0441\u043F\u0438\u0441\u043E\u043A \u0436\u0435\u043B\u0430\u0435\u043C\u043E\u0433\u043E!"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296725
-    m_Localized: Выход
+    m_Localized: "\u0412\u044B\u0445\u043E\u0434"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296726
-    m_Localized: "Уже отправлено"
+    m_Localized: "\u0423\u0436\u0435 \u043E\u0442\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u043E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296727
-    m_Localized: "Обновлено"
+    m_Localized: "\u041E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u043E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296728
-    m_Localized: Убийца заметит ваши повторяющиеся действия и подстроится.
+    m_Localized: "\u0423\u0431\u0438\u0439\u0446\u0430 \u0437\u0430\u043C\u0435\u0442\u0438\u0442
+      \u0432\u0430\u0448\u0438 \u043F\u043E\u0432\u0442\u043E\u0440\u044F\u044E\u0449\u0438\u0435\u0441\u044F
+      \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u044F \u0438 \u043F\u043E\u0434\u0441\u0442\u0440\u043E\u0438\u0442\u0441\u044F."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296729
+    m_Localized: "\u041F\u043E\u043B\u0443\u0447\u0438\u043B\u043E\u0441\u044C, \u0438\u0434\u0435\u0430\u043B\u044C\u043D\u044B\u0439
+      \u043C\u043E\u043C\u0435\u043D\u0442"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296730
+    m_Localized: "\u041C\u043E\u0436\u043D\u043E \u0443\u0434\u0430\u0440\u0438\u0442\u044C
+      \u043C\u043E\u043B\u043E\u0442\u043A\u043E\u043C \u0432 \u0442\u0430\u043A\u0442
+      \u0433\u0440\u043E\u043C\u0443"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296731
+    m_Localized: "\u0411\u0443\u0434\u0435\u0442 \u0441\u043B\u0438\u0448\u043A\u043E\u043C
+      \u0433\u0440\u043E\u043C\u043A\u043E, \u0441\u0435\u0439\u0447\u0430\u0441
+      \u0431\u0438\u0442\u044C \u043D\u0435\u043B\u044C\u0437\u044F"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296732
+    m_Localized: "Я ударил слишком поздно, он меня поймает"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296733
+    m_Localized: "Вставь отвёртку."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296734
+    m_Localized: "Резко тряси, чтобы сломать замок."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296735
+    m_Localized: "Я ударил слишком рано, меня поймают"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296736
+    m_Localized: "Я ударил слишком поздно, меня поймают"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296737
+    m_Localized: "Застряло, попробуй снова."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296738
+    m_Localized: "Butcher видел, как ты спрятался."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296739
+    m_Localized: "Ты слишком шумел."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296740
+    m_Localized: "Ты слишком часто прятался в одном месте."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296741
+    m_Localized: "Ты не заглушил звук молотка громом."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296742
+    m_Localized: "Butcher тебя увидел."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296743
+    m_Localized: "Тебя поймали."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296744
+    m_Localized: "Заново"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296745
+    m_Localized: "Главное меню"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296746
+    m_Localized: "Butcher устроил тебе засаду."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296747
+    m_Localized: "Отмычки позволяют сохранить прогресс после поимки."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296748
+    m_Localized: "Отмычка"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296749
+    m_Localized: "Поднята отмычка"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296750
+    m_Localized: "??????????"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296751
+    m_Localized: "\u0417\u0430\u0436\u043C\u0438 \u041F\u041A\u041C, \u0447\u0442\u043E\u0431\u044B \u0441\u043E\u0437\u0434\u0430\u0442\u044C \u043D\u0430\u0442\u044F\u0436\u0435\u043D\u0438\u0435"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296752
+    m_Localized: "\u0414\u0432\u0438\u0433\u0430\u0439 \u043E\u0442\u043C\u044B\u0447\u043A\u0443 \u043C\u044B\u0448\u044C\u044E \u0438 \u043D\u0430\u0436\u0438\u043C\u0430\u0439 \u041B\u041A\u041C, \u0447\u0442\u043E\u0431\u044B \u043F\u043E\u0434\u043D\u0438\u043C\u0430\u0442\u044C \u043F\u0438\u043D\u044B"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296753
+    m_Localized: "\u041F\u0438\u043D \u0437\u0430\u0444\u0438\u043A\u0441\u0438\u0440\u043E\u0432\u0430\u043D"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296754
+    m_Localized: "\u0417\u0430\u043C\u043E\u043A \u043E\u0442\u043A\u0440\u044B\u0442"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296755
+    m_Localized: "Дверь скована цепью."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296756
+    m_Localized: "В первый раз, когда меня поймали, он запер дверь навесной цепью с замком. Жаль, что та шпилька осталась сверху на том унитазе. Её можно было бы использовать как отмычку."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296757
+    m_Localized: "Нужно поискать ещё отмычки"
     m_Metadata:
       m_Items: []
   references:

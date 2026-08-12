@@ -129,6 +129,18 @@ public class InteractionUIManager : MonoBehaviour
 
     private void Update()
     {
+        if (PlayerControlGate.IsInputBlocked)
+        {
+            ClearDetection(true);
+            return;
+        }
+
+        if (DemoEndScreenUI.Instance != null && DemoEndScreenUI.Instance.IsShowing)
+        {
+            ClearDetection(true);
+            return;
+        }
+
         if (TryShowHiddenExitPrompt())
             return;
 

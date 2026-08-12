@@ -19,12 +19,18 @@ public class LocalizedUILabel : MonoBehaviour
     {
         _label = GetComponent<TextMeshProUGUI>();
         UIFont.Apply(_label);
+        // Locale is applied BeforeSceneLoad — refresh here so the first paint is already correct.
+        if (LocaleManager.IsReady)
+            Refresh();
     }
 
     void OnEnable()
     {
         LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
-        LocaleManager.WhenReady(Refresh);
+        if (LocaleManager.IsReady)
+            Refresh();
+        else
+            LocaleManager.WhenReady(Refresh);
     }
 
     void OnDisable() => LocalizationSettings.SelectedLocaleChanged -= OnLocaleChanged;

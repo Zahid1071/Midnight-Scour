@@ -24,7 +24,8 @@ public class SignalManager : MonoBehaviour
 
     public void LockPlayer()
     {
-        PlayerControlGate.Acquire(PlayerControlGate.ReasonCinematic);
+        if (!PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic))
+            PlayerControlGate.Acquire(PlayerControlGate.ReasonCinematic);
         GameplayHudVisibility.Instance?.HideGameplayHud();
     }
 
@@ -32,5 +33,6 @@ public class SignalManager : MonoBehaviour
     {
         PlayerControlGate.Release(PlayerControlGate.ReasonCinematic);
         GameplayHudVisibility.Instance?.ShowGameplayHud();
+        InteractionController.ArmBasementGraceAfterContinueIntro();
     }
 }

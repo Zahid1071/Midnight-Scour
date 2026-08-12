@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b3fb6c1c8058a749b2a30a3514c38f4, type: 3}
+  m_Name: Lockpick
+  m_EditorClassIdentifier: 
+  itemName: Lockpick
+  icon: {fileID: 21300000, guid: 2095342a3c1ffde4a938c7668cf70a9f, type: 3}
+  worldPrefab: {fileID: 343046743124868200, guid: 7798f55d55ccfde45953e73baf6da2a0, type: 3}
+  dropLandSFX: {fileID: 0}
+  canDrop: 1
+  pickUpSFX: {fileID: 8300000, guid: 14703ce226e238f43a4662e941bfc9f1, type: 3}
+  useSuccessSound: {fileID: 0}
+  consumeOnUse: 1
+  maxStack: 3
+  interactionReachBonus: 0
+  reachAttemptFailMessage: 
+  breaksOnWrongUse: 0
+  breakOnWrongUseSound: {fileID: 0}
+  breakOnWrongUseMessage: 
+  nameKey: item.lockpick.name
+  pickupKey: item.lockpick.pickup
+  breakMessageKey: 
+  pickUpText: Picked up Lockpick
+  description: Opens padlocks (consumed on unlock). Holding one lets you Continue
+    after getting caught.

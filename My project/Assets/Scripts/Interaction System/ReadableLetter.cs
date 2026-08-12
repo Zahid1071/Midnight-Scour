@@ -1,8 +1,11 @@
+using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
 public class ReadableLetter : MonoBehaviour, IInteractable
 {
+    const string PadlockHairpinLetterKey = "letter.padlock_hairpin";
+
     [SerializeField] private string letterKey;
     [TextArea(4, 12)]
     [SerializeField] private string letterText = "Letter text goes here.";
@@ -24,7 +27,11 @@ public class ReadableLetter : MonoBehaviour, IInteractable
             return false;
 
         InteractionFeedback.PlaySound(interactSFX, transform.position);
-        ReadPanelUI.Instance.Show(text);
+
+        bool padlockLetter = string.Equals(letterKey, PadlockHairpinLetterKey, StringComparison.Ordinal);
+        ReadPanelUI.Instance.Show(text, padlockLetter
+            ? () => GameplayHintManager.Instance?.NotifyPadlockHairpinLetterClosed()
+            : null);
         return true;
     }
 }

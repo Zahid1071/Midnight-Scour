@@ -30,9 +30,10 @@ public class HidingStamina : MonoBehaviour
     [SerializeField] float alertCooldownSeconds = 2.5f;
 
     [Header("UI")]
+    [Tooltip("Microphone icon shown beside the loudness bar. Leave empty to hide the icon.")]
+    [SerializeField] Sprite microphoneIcon;
+    [Tooltip("Optional legacy panel — disabled when runtime UI is created.")]
     [SerializeField] GameObject staminaPanel;
-    [SerializeField] Slider staminaSlider;
-    [SerializeField] Image staminaFillImage;
 
     [Header("Bar colors")]
     [SerializeField] Color fullColor = new Color(0.45f, 0.95f, 0.5f, 1f);
@@ -52,10 +53,13 @@ public class HidingStamina : MonoBehaviour
     PlayerHider hider;
     float defaultAmplitudeGain;
     float defaultFrequencyGain;
+    GameObject runtimePanel;
+    Slider staminaSlider;
+    Image staminaFillImage;
     RectTransform barRect;
     Vector2 barRestPos;
-    CanvasGroup panelCanvasGroup;
     Coroutine noiseFadeRoutine;
+    bool ownsRuntimeUi;
 
     string micDevice;
     AudioClip micClip;
@@ -75,32 +79,28 @@ public class HidingStamina : MonoBehaviour
         sampleWindow = Mathf.Max(64, sampleWindow);
         sampleBuffer = new float[sampleWindow];
 
-        if (staminaSlider != null)
-        {
-            staminaSlider.interactable = false;
-            barRect = staminaSlider.GetComponent<RectTransform>();
-            if (barRect != null)
-                barRestPos = barRect.anchoredPosition;
-        }
-
+        // Prefer runtime bar (same style as lock-break). Hide any scene-built panel.
         if (staminaPanel != null)
-        {
-            panelCanvasGroup = staminaPanel.GetComponent<CanvasGroup>();
-            if (panelCanvasGroup == null)
-                panelCanvasGroup = staminaPanel.AddComponent<CanvasGroup>();
-        }
+            staminaPanel.SetActive(false);
     }
 
     void Start()
     {
         ResolveHidingCameraNoise();
+        EnsureRuntimeUi();
         SetPanelVisible(false);
         RefreshUI();
+        // Warm the mic once at load. Start/Stop on every hide enter causes a main-thread hitch
+        // on the same frame as stealth visuals/layer — feels like "mesh disable lag".
+        StartMicrophone();
     }
 
     void OnDestroy()
     {
         StopMicrophone();
+        if (wasHidden)
+            GameplayHudVisibility.Instance?.SetHiddenDuringHiding(false);
+        TeardownRuntimeUi();
     }
 
     void OnApplicationQuit()
@@ -151,14 +151,21 @@ public class HidingStamina : MonoBehaviour
         sustainedTimer = 0f;
         smoothedLoudness = 0f;
         ResetMicAlertEscalation();
-        StartMicrophone();
+        // Prefer warm mic from Start. Only start here if warm-up failed (no device yet, etc.).
+        if (micClip == null)
+            StartMicrophone();
+        GameplayHudVisibility.Instance?.SetHiddenDuringHiding(true);
     }
 
     void OnExitHide()
     {
-        StopMicrophone();
+        // Keep mic recording so the next hide does not hitch on Microphone.Start.
         StartNoiseFadeOut();
         ResetMicAlertEscalation();
+        // Always clear the hide latch. Capture already hides HUD via BeginCaptureUi /
+        // CaptureUiActive / ReasonCaptured — skipping this left inventory dead forever
+        // after a successful hide-grab (game-over → Continue never re-showed it).
+        GameplayHudVisibility.Instance?.SetHiddenDuringHiding(false);
     }
 
     void TickWhileHidden()
@@ -214,7 +221,7 @@ public class HidingStamina : MonoBehaviour
             : spot.transform.position;
 
         // Only an NPC standing in the SAME ROOM as the hiding spot can hear the mic —
-        // noise never carries through walls, other rooms, or floors. Ambush is exempt.
+        // noise never carries through walls, other rooms, or floors.
         RoomAnchor spotRoom = spot.GetComponentInParent<RoomAnchor>();
         if (spotRoom == null)
             return;
@@ -229,8 +236,10 @@ public class HidingStamina : MonoBehaviour
                 continue;
             if (npc.HearingDisabled)
                 continue;
-            if (npc.currentState == NPCController.AIState.Ambush
-                || npc.currentState == NPCController.AIState.Capture
+            if (ThunderManager.ArePlayerNoisesMasked)
+                continue;
+            // Ambush still hears same-room mic — death copy stays "too much noise".
+            if (npc.currentState == NPCController.AIState.Capture
                 || npc.currentState == NPCController.AIState.Dead
                 || npc.currentState == NPCController.AIState.Scripted)
                 continue;
@@ -252,6 +261,8 @@ public class HidingStamina : MonoBehaviour
         if (best.perception != null)
             best.perception.RedirectLastKnownPosition(noisePos);
 
+        // Mic noise always owns the death copy — even during ambush.
+        CaptureContext.Set(CaptureReason.HideNoise);
         best.BeginWitnessedHideCapture(spot);
     }
 
@@ -372,16 +383,16 @@ public class HidingStamina : MonoBehaviour
 
     void RefreshUI()
     {
-        bool hidden = hider != null && hider.isHidden;
+        EnsureRuntimeUi();
+
+        bool hidden = hider != null && hider.isHidden
+            && !PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured);
         SetPanelVisible(hidden);
 
         float loudness = smoothedLoudness;
 
         if (staminaSlider != null)
             staminaSlider.value = loudness;
-
-        if (panelCanvasGroup != null)
-            panelCanvasGroup.alpha = 1f;
 
         // Empty while quiet; fills toward red as noise rises.
         if (staminaFillImage != null)
@@ -393,8 +404,129 @@ public class HidingStamina : MonoBehaviour
 
     void SetPanelVisible(bool visible)
     {
-        if (staminaPanel != null)
-            staminaPanel.SetActive(visible);
+        if (runtimePanel != null)
+            runtimePanel.SetActive(visible);
+    }
+
+    void EnsureRuntimeUi()
+    {
+        if (staminaSlider != null)
+            return;
+
+        Canvas canvas = null;
+        if (HudManager.Instance != null)
+            canvas = HudManager.Instance.GetComponentInParent<Canvas>();
+        if (canvas == null)
+            canvas = FindFirstObjectByType<Canvas>();
+        if (canvas == null)
+            return;
+
+        ownsRuntimeUi = true;
+
+        // Vertical bar, right-center of screen (mic icon below).
+        runtimePanel = new GameObject("MicLoudnessPanel", typeof(RectTransform));
+        runtimePanel.transform.SetParent(canvas.transform, false);
+        var panelRt = runtimePanel.GetComponent<RectTransform>();
+        panelRt.anchorMin = new Vector2(1f, 0.5f);
+        panelRt.anchorMax = new Vector2(1f, 0.5f);
+        panelRt.pivot = new Vector2(1f, 0.5f);
+        panelRt.anchoredPosition = new Vector2(-200f, 0f);
+        panelRt.sizeDelta = new Vector2(40f, 540f);
+        barRect = panelRt;
+        barRestPos = panelRt.anchoredPosition;
+
+        float iconSize = 36f;
+        float gap = 30f;
+        float barBottom = microphoneIcon != null ? iconSize + gap : 0f;
+
+        if (microphoneIcon != null)
+        {
+            var iconGo = new GameObject("MicIcon", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            iconGo.transform.SetParent(runtimePanel.transform, false);
+            var iconRt = iconGo.GetComponent<RectTransform>();
+            iconRt.anchorMin = new Vector2(0.5f, 0f);
+            iconRt.anchorMax = new Vector2(0.5f, 0f);
+            iconRt.pivot = new Vector2(0.5f, 0f);
+            iconRt.anchoredPosition = Vector2.zero;
+            iconRt.sizeDelta = new Vector2(iconSize, iconSize);
+            var iconImg = iconGo.GetComponent<Image>();
+            iconImg.sprite = microphoneIcon;
+            iconImg.preserveAspect = true;
+            iconImg.raycastTarget = false;
+            iconImg.color = Color.white;
+        }
+
+        var barRoot = new GameObject("Bar", typeof(RectTransform));
+        barRoot.transform.SetParent(runtimePanel.transform, false);
+        var barRootRt = barRoot.GetComponent<RectTransform>();
+        barRootRt.anchorMin = Vector2.zero;
+        barRootRt.anchorMax = Vector2.one;
+        barRootRt.offsetMin = new Vector2(6f, barBottom);
+        barRootRt.offsetMax = new Vector2(-6f, 0f);
+
+        var bg = new GameObject("Background", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        bg.transform.SetParent(barRoot.transform, false);
+        var bgRt = bg.GetComponent<RectTransform>();
+        bgRt.anchorMin = Vector2.zero;
+        bgRt.anchorMax = Vector2.one;
+        bgRt.offsetMin = Vector2.zero;
+        bgRt.offsetMax = Vector2.zero;
+        var bgImg = bg.GetComponent<Image>();
+        bgImg.color = new Color(0f, 0f, 0f, 0.65f);
+        bgImg.raycastTarget = false;
+
+        var sliderGo = new GameObject("Slider", typeof(RectTransform), typeof(Slider));
+        sliderGo.transform.SetParent(barRoot.transform, false);
+        var sliderRt = sliderGo.GetComponent<RectTransform>();
+        sliderRt.anchorMin = Vector2.zero;
+        sliderRt.anchorMax = Vector2.one;
+        sliderRt.offsetMin = new Vector2(4f, 4f);
+        sliderRt.offsetMax = new Vector2(-4f, -4f);
+
+        var fillArea = new GameObject("Fill Area", typeof(RectTransform));
+        fillArea.transform.SetParent(sliderGo.transform, false);
+        var fillAreaRt = fillArea.GetComponent<RectTransform>();
+        fillAreaRt.anchorMin = Vector2.zero;
+        fillAreaRt.anchorMax = Vector2.one;
+        fillAreaRt.offsetMin = Vector2.zero;
+        fillAreaRt.offsetMax = Vector2.zero;
+
+        var fillGo = new GameObject("Fill", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        fillGo.transform.SetParent(fillArea.transform, false);
+        var fillRt = fillGo.GetComponent<RectTransform>();
+        fillRt.anchorMin = Vector2.zero;
+        fillRt.anchorMax = Vector2.one;
+        fillRt.offsetMin = Vector2.zero;
+        fillRt.offsetMax = Vector2.zero;
+        staminaFillImage = fillGo.GetComponent<Image>();
+        staminaFillImage.color = fullColor;
+        staminaFillImage.raycastTarget = false;
+
+        staminaSlider = sliderGo.GetComponent<Slider>();
+        staminaSlider.interactable = false;
+        staminaSlider.minValue = 0f;
+        staminaSlider.maxValue = 1f;
+        staminaSlider.wholeNumbers = false;
+        staminaSlider.transition = Selectable.Transition.None;
+        staminaSlider.fillRect = fillRt;
+        staminaSlider.targetGraphic = staminaFillImage;
+        staminaSlider.direction = Slider.Direction.BottomToTop;
+        staminaSlider.value = 0f;
+    }
+
+    void TeardownRuntimeUi()
+    {
+        if (!ownsRuntimeUi)
+            return;
+
+        if (runtimePanel != null)
+            Destroy(runtimePanel);
+
+        runtimePanel = null;
+        staminaSlider = null;
+        staminaFillImage = null;
+        barRect = null;
+        ownsRuntimeUi = false;
     }
 
     void ApplyBarShake(bool hidden)

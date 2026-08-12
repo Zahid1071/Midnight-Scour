@@ -200,7 +200,9 @@ public class PerceptionController : MonoBehaviour
     {
         if (!player) { CanSeePlayer = false; return; }
 
-        if (player.gameObject.layer == 7)
+        // HiddenPlayer (7) or Captive in closed cage (12) — invisible to vision.
+        int layer = player.gameObject.layer;
+        if (layer == 7 || layer == 12)
         {
             CanSeePlayer = false;
             return;
@@ -289,7 +291,7 @@ public class PerceptionController : MonoBehaviour
         if (instantConfirmDistance <= 0f || !player)
             return false;
 
-        if (player.gameObject.layer == 7)
+        if (player.gameObject.layer == 7 || player.gameObject.layer == 12)
             return false;
 
         var hider = player.GetComponent<PlayerHider>();
@@ -324,7 +326,11 @@ public class PerceptionController : MonoBehaviour
         float minHearingDistance = DefaultMinHearingDistance,
         bool playInvestigateSfx = true)
     {
+        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic))
+            return;
         if (npc != null && npc.HearingDisabled)
+            return;
+        if (ThunderManager.ArePlayerNoisesMasked)
             return;
 
         float scaled = baseSuspicion * DistanceHearingMultiplier(
@@ -338,7 +344,11 @@ public class PerceptionController : MonoBehaviour
 
     public void HearPlayerFootstep(Transform soundSource, float suspicionAmount)
     {
+        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic))
+            return;
         if (npc != null && npc.HearingDisabled)
+            return;
+        if (ThunderManager.ArePlayerNoisesMasked)
             return;
 
         if (npc != null && npc.IsIgnoringPlayerFootsteps)
@@ -375,6 +385,8 @@ public class PerceptionController : MonoBehaviour
     {
         if (npc != null && npc.HearingDisabled)
             return;
+        if (ThunderManager.ArePlayerNoisesMasked)
+            return;
 
         if (npc.currentState == NPCController.AIState.Ambush)
             footstepSuspicionToAdd *= ambushAudioMul;
@@ -389,14 +401,8 @@ public class PerceptionController : MonoBehaviour
 
         npc.GetComponent<SuspicionSystem>()?.AddFootstepSuspicion(footstepSuspicionToAdd);
 
-        // Global / world noise while idle — pig bark as he commits to investigate.
-        // Cage door open passes false so the bark waits for the escape-sight reaction instead.
-        if (playInvestigateSfx
-            && (npc.currentState == NPCController.AIState.Natural
-                || npc.currentState == NPCController.AIState.Ambush))
-        {
-            npc.fsm?.TryPlayInvestigateSfx();
-        }
+        // Pig bark is handled by Chase enter (Natural/Ambush → Chase) and other story cues —
+        // do not bark again on every vase/grate/world noise while already hunting.
     }
 
     /// <summary>
@@ -451,9 +457,23 @@ public class PerceptionController : MonoBehaviour
     public Cage targetCage;
     private bool cageAlertTriggered = false;
 
+    /// <summary>Continue / day-reset — allow a fresh cage-escape reaction later.</summary>
+    public void ResetCageAlert() => cageAlertTriggered = false;
+
+    public void ClearVisionState()
+    {
+        CanSeePlayer = false;
+        visionMeter = 0f;
+        confirmedThisStreak = false;
+        lostSightTimer = 0f;
+    }
+
     private void CageCheckVision()
     {
+        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic)) return;
         if (targetCage == null || cageAlertTriggered) return;
+        // Default empty/open cage must not look like an escape during normal chase/search.
+        if (!targetCage.PendingEscapeSighting) return;
 
         Vector3 eye = transform.position + Vector3.up * 1.7f;
 
@@ -481,6 +501,7 @@ public class PerceptionController : MonoBehaviour
                     Debug.Log($"⚠️ NPC: Player Escaped! (isEmpty: {isEmpty}, isOpen: {isOpen})");
 
                     cageAlertTriggered = true;
+                    hitCage.ConsumeEscapeSighting();
 
                     if (npc.currentState != NPCController.AIState.Chase
                         && npc.currentState != NPCController.AIState.Capture)

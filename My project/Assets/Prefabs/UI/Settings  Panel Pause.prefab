@@ -10756,7 +10756,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &5362139815671808936
 RectTransform:
   m_ObjectHideFlags: 0
@@ -11303,7 +11303,6 @@ MonoBehaviour:
   resolutionSelector: {fileID: 2126402250074117839}
   qualitySelector: {fileID: 6296634184976223175}
   fullscreenSelector: {fileID: 8241891656234861504}
-  autoSaveSelector: {fileID: 0}
 --- !u!1 &6186000865758233679
 GameObject:
   m_ObjectHideFlags: 0

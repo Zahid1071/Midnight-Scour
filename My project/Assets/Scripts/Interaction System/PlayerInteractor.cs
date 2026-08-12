@@ -13,7 +13,7 @@ public class PlayerInteractor : MonoBehaviour
     [SerializeField] private float interactRange = 1.5f;
     [SerializeField] private LayerMask interactLayer;
     [SerializeField] private Transform cameraTransform;
-    [SerializeField] private string outOfReachMessage = "I can't reach that.";
+    [SerializeField] private string outOfReachMessage = "It is too far.";
 
     private PlayerHider _playerHider;
     private CharacterController _characterController;
@@ -157,6 +157,9 @@ public class PlayerInteractor : MonoBehaviour
     /// <summary>World interact: open doors, pick up items, etc.</summary>
     public bool TryInteract()
     {
+        if (_playerHider != null && _playerHider.isHidden)
+            return false;
+
         if (!TryRaycastForHint(out RaycastHit hit, out IInteractable interactable))
         {
             InteractionFeedback.Fail(Loc.Get("gameplay.nothing_here"));
@@ -176,6 +179,9 @@ public class PlayerInteractor : MonoBehaviour
     public bool PerformInteract(IInteractable interactable, RaycastHit hit)
     {
         if (interactable == null)
+            return false;
+
+        if (_playerHider != null && _playerHider.isHidden)
             return false;
 
         if (IsDuplicateInteractThisFrame(hit.collider))

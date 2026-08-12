@@ -45,6 +45,10 @@ public class NPCController : MonoBehaviour
     public AudioClip ChaseEnterSfx => chaseEnterSfx;
     public float ChaseEnterVolume => chaseEnterVolume;
 
+    Vector3 _runStartPos;
+    Quaternion _runStartRot;
+    bool _haveRunStart;
+
     [Header("Hearing")]
     [Tooltip("After entering the basement (door open SFX), ignore player footsteps for this long. Other noises still register.")]
     [SerializeField] float ignorePlayerFootstepsDuration = 2f;
@@ -103,6 +107,71 @@ public class NPCController : MonoBehaviour
         _captureRoutine = null;
     }
 
+    /// <summary>
+    /// Lockpick Continue day-reset: stop capture, warp home, hard-reset animator/AI.
+    /// </summary>
+    public void ResetAfterCaptureContinue()
+    {
+        if (_captureRoutine != null)
+        {
+            StopCoroutine(_captureRoutine);
+            _captureRoutine = null;
+        }
+
+        // Capture leaves the agent stopped / sometimes disabled — force usable before warp.
+        if (agent != null && !agent.enabled)
+            agent.enabled = true;
+
+        // Don't carry a mid-run player-room cooldown into the new life.
+        interaction?.ClearPlayerRoomPickCooldown();
+
+        WarpToRunStart();
+        fsm?.RecoverFromCaptureContinue();
+    }
+
+    void WarpToRunStart()
+    {
+        if (!_haveRunStart)
+        {
+            _runStartPos = transform.position;
+            _runStartRot = transform.rotation;
+            _haveRunStart = true;
+        }
+
+        // Always snap transform first so we leave jumpscare / off-mesh poses even if Warp fails.
+        transform.SetPositionAndRotation(_runStartPos, _runStartRot);
+
+        if (agent != null)
+        {
+            if (!agent.enabled)
+                agent.enabled = true;
+
+            agent.updatePosition = true;
+            agent.updateRotation = true;
+
+            Vector3 warpPos = _runStartPos;
+            if (NavMesh.SamplePosition(_runStartPos, out NavMeshHit hit, 4f, NavMesh.AllAreas))
+                warpPos = hit.position;
+
+            agent.Warp(warpPos);
+            transform.SetPositionAndRotation(warpPos, _runStartRot);
+
+            if (agent.isOnNavMesh)
+            {
+                agent.ResetPath();
+                agent.velocity = Vector3.zero;
+                agent.isStopped = false;
+            }
+            else
+            {
+                Debug.LogWarning($"[NPCController] {name} WarpToRunStart left agent off NavMesh at {warpPos}");
+            }
+        }
+
+        _lastChaseTarget = new Vector3(float.PositiveInfinity, 0f, 0f);
+        _nextChaseReplanTime = 0f;
+    }
+
     void Awake()
     {
         fsm          = new FSMController(this);
@@ -111,6 +180,10 @@ public class NPCController : MonoBehaviour
         suspicion    = GetComponent<SuspicionSystem>();
         navigator    = GetComponent<FS_Atmo.Navigator>();
         agent        = GetComponent<NavMeshAgent>();
+
+        _runStartPos = transform.position;
+        _runStartRot = transform.rotation;
+        _haveRunStart = true;
 
         // Pull sane defaults from NPCData if present
         var data = interaction != null ? interaction.data : null;
@@ -131,12 +204,23 @@ public class NPCController : MonoBehaviour
     {
         // Prefab default is already Natural (enum 0). SetState early-outs on same state and
         // would skip StartNextRoutine — so kick the natural loop explicitly in that case.
+        EnsureNaturalRoutineStarted();
+        ApplyLocomotionForState(currentState);
+    }
+
+    /// <summary>
+    /// Same path as first-load <see cref="Start"/> — used after Continue / cinematic unlock.
+    /// </summary>
+    public void EnsureNaturalRoutineStarted()
+    {
+        // Continue / intro owns the butcher until UnlockCinematic.
+        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic))
+            return;
+
         if (currentState == AIState.Natural)
             interaction?.StartNextRoutine();
         else
             fsm.SetState(AIState.Natural);
-
-        ApplyLocomotionForState(currentState);
     }
 
     void Update()
@@ -245,6 +329,9 @@ public class NPCController : MonoBehaviour
     /// </summary>
     public void BeginChaseFromPerception()
     {
+        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic))
+            return;
+
         if (currentState == AIState.Chase || currentState == AIState.Capture || currentState == AIState.Dead)
             return;
 
@@ -255,7 +342,9 @@ public class NPCController : MonoBehaviour
             return;
         }
 
-        fsm?.ClearWitnessedHideCapture();
+        // Relentless vise-miss hunt owns pathing — don't clear its hide tracking mid-hunt.
+        if (fsm == null || !fsm.IsRelentlessViseMissHunt)
+            fsm?.ClearWitnessedHideCapture();
         navigator?.ClearRoute();
 
         if (poiLookDirector != null)
@@ -289,6 +378,15 @@ public class NPCController : MonoBehaviour
         if (currentState == AIState.Capture || currentState == AIState.Dead || currentState == AIState.Scripted)
             return;
 
+        // Mistimed hammer hunt paths to the hide itself — don't arm the softlock-prone coroutine.
+        if (fsm != null && fsm.IsRelentlessViseMissHunt)
+        {
+            if (currentState != AIState.Chase)
+                fsm.SetState(AIState.Chase);
+            ApplyLocomotionForState(AIState.Chase);
+            return;
+        }
+
         navigator?.ClearRoute();
 
         if (poiLookDirector != null)
@@ -311,9 +409,30 @@ public class NPCController : MonoBehaviour
         ApplyLocomotionForState(AIState.Chase);
     }
 
+    /// <summary>
+    /// 3rd mistimed vise hammer: chase until capture (uses hide path if they duck into a locker).
+    /// </summary>
+    public void ForceHuntPlayerForViseMiss()
+    {
+        ForceRelentlessHunt(CaptureReason.HammerTimingFail);
+    }
+
+    /// <summary>
+    /// Perfect-knowledge hunt until capture (cage slam while seen, vise miss, etc.).
+    /// </summary>
+    public void ForceRelentlessHunt(CaptureReason reason)
+    {
+        if (currentState == AIState.Dead || currentState == AIState.Scripted || currentState == AIState.Capture)
+            return;
+
+        fsm?.BeginRelentlessHunt(reason);
+    }
+
     private void HandleSuspicionReached()
     {
         if (HearingDisabled) return;
+        if (ThunderManager.ArePlayerNoisesMasked) return;
+        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic)) return;
         if (currentState == AIState.Chase || currentState == AIState.Capture || currentState == AIState.Dead) return;
         navigator.ClearRoute();
         interaction?.StandUpFromHotspotThenSetState(AIState.Chase);
@@ -321,9 +440,16 @@ public class NPCController : MonoBehaviour
 
     private void HandleVisionConfirmed()
     {
+        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic))
+            return;
+
         if (currentState == AIState.Chase || currentState == AIState.Capture
             || currentState == AIState.Dead || currentState == AIState.Scripted)
             return;
+
+        // Idle routine + LoS, no noise-led hunt — death copy is "Butcher saw you."
+        if (currentState == AIState.Natural)
+            CaptureContext.Set(CaptureReason.Spotted);
 
         BeginChaseFromPerception();
     }

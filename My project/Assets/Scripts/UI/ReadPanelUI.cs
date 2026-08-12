@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -14,6 +15,7 @@ public class ReadPanelUI : MonoBehaviour
     int _openedOnFrame = -1;
     bool _lockHeld;
     bool _releaseLockAfterUpdates;
+    Action _onClosed;
 
     public bool IsOpen => panelRoot != null && panelRoot.activeSelf;
 
@@ -66,14 +68,19 @@ public class ReadPanelUI : MonoBehaviour
 
         PlayerControlGate.Release(PlayerControlGate.ReasonReading);
         _lockHeld = false;
+
+        var cb = _onClosed;
+        _onClosed = null;
+        cb?.Invoke();
     }
 
-    public void Show(string text)
+    public void Show(string text, Action onClosed = null)
     {
         if (panelRoot == null || bodyText == null || string.IsNullOrWhiteSpace(text))
             return;
 
         _releaseLockAfterUpdates = false;
+        _onClosed = onClosed;
 
         HudManager.Instance?.ClearSubtitle();
         UIFont.SetText(bodyText, text);
@@ -99,6 +106,7 @@ public class ReadPanelUI : MonoBehaviour
             panelRoot.SetActive(false);
 
         // Keep the gate held until LateUpdate so other Update() scripts cannot interact this frame.
+        // onClosed runs after the reading lock is released (see LateUpdate).
         if (_lockHeld)
             _releaseLockAfterUpdates = true;
     }
@@ -106,6 +114,7 @@ public class ReadPanelUI : MonoBehaviour
     void CloseImmediate()
     {
         _releaseLockAfterUpdates = false;
+        _onClosed = null;
 
         if (bodyText != null)
             bodyText.text = string.Empty;

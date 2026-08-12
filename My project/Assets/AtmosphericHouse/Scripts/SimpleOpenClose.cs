@@ -20,6 +20,8 @@ namespace FS_Atmo
         [Header("Lock Settings (Player Only)")]
         public bool isLocked = false;
         [SerializeField] private InventoryItem requiredKey;
+        [Tooltip("If set, using the required key starts this minigame instead of unlocking instantly.")]
+        [SerializeField] private ScrewdriverLockBreakMinigame lockBreakMinigame;
         [Tooltip("Preferred: a Loc key (e.g. gameplay.locked) so the message is translated. Takes priority over Locked Message below.")]
         [SerializeField] private string lockedMessageKey;
         [TextArea]
@@ -28,6 +30,9 @@ namespace FS_Atmo
         
         [Tooltip("Kilitli animasyonu kaç saniye sürüyor? Bu süre boyunca tekrar tıklanamaz.")]
         [SerializeField] private float lockedAnimationDuration = 1.0f; // YENİ: Spam engelleyici süre
+
+        /// <summary>After lockpick Continue: door stays locked, screwdriver break is disabled, chained message shows.</summary>
+        bool _chainedAfterContinue;
 
         [Header("Audio SFX")]
         [SerializeField] private AudioClip openSound;
@@ -211,13 +216,9 @@ namespace FS_Atmo
                     return false;
                 }
 
-                string message;
-                if (!string.IsNullOrWhiteSpace(lockedMessageKey))
-                    message = Loc.Get(lockedMessageKey);
-                else if (!string.IsNullOrWhiteSpace(lockedMessage))
-                    message = lockedMessage;
-                else
-                    message = Loc.Get("gameplay.locked");
+                string message = !string.IsNullOrWhiteSpace(lockedMessageKey)
+                    ? Loc.Get(lockedMessageKey)
+                    : Loc.Get("gameplay.locked");
                 InteractionFeedback.Fail(message, 2.5f);
 
                 Debug.Log("❌ Kapı kilitli! (Animasyon Tetikleniyor)");
@@ -245,6 +246,17 @@ namespace FS_Atmo
             {
                 InteractionFeedback.Fail(Loc.Get("gameplay.blocking_way"), 2.5f);
                 return false;
+            }
+
+            // Butcher just opened this door — don't let the player slam it shut in his face.
+            if (!bypassLock && !wantOpen)
+            {
+                var doorAi = GetComponentInParent<DoorController>();
+                if (doorAi != null && doorAi.IsPlayerCloseBlocked)
+                {
+                    InteractionFeedback.Fail(Loc.Get("gameplay.wait_moment"), 2f);
+                    return false;
+                }
             }
 
             // --- TEK KAPIYSA ---
@@ -291,6 +303,39 @@ namespace FS_Atmo
                 return false;
             }
 
+            if (lockBreakMinigame != null && !_chainedAfterContinue)
+            {
+                return lockBreakMinigame.TryBegin(
+                    item,
+                    onSuccess: CompleteUnlockFromMinigame,
+                    onCancel: null);
+            }
+
+            // Chained after Continue — screwdriver (or any key) won't break it; pick the padlock.
+            if (_chainedAfterContinue)
+            {
+                if (Time.time < nextInteractTime)
+                    return false;
+
+                string chained = !string.IsNullOrWhiteSpace(lockedMessageKey)
+                    ? Loc.Get(lockedMessageKey)
+                    : Loc.Get("gameplay.door_chained");
+                InteractionFeedback.Fail(chained, 2.5f);
+                myAnimator.SetTrigger(lockedHash);
+                if (hasAdditional) additionalAnimator.SetTrigger(lockedHash);
+                nextInteractTime = Time.time + lockedAnimationDuration;
+                return false;
+            }
+
+            CompleteUnlockFromMinigame(item);
+            return true;
+        }
+
+        void CompleteUnlockFromMinigame(InventoryItem item)
+        {
+            if (item == null)
+                return;
+
             // ✅ KİLİT AÇILDI
             isLocked = false;
             HudManager.Instance?.ShowSubtitle(
@@ -305,7 +350,27 @@ namespace FS_Atmo
 
             AudioClip unlockSfx = unlockSound != null ? unlockSound : item.useSuccessSound;
             PlaySound(unlockSfx);
-            return true;
+
+            // Open immediately after a successful lock break (ignore player-in-path block).
+            ForceOpenAfterUnlock();
+        }
+
+        /// <summary>Opens if closed, skipping obstruction / interact cooldowns used by normal clicks.</summary>
+        public void ForceOpenAfterUnlock()
+        {
+            if (objectOpen)
+                return;
+
+            float openAmount = GetOpenAmount(myAnimator);
+            if (!hasAdditional)
+            {
+                ToggleSelf(openAmount);
+                return;
+            }
+
+            float openAmountAdd = GetOpenAmount(additionalAnimator);
+            ToggleSelf(openAmount);
+            ToggleAdditional(openAmountAdd);
         }
 
         // --- Helper Methods ---
@@ -325,6 +390,40 @@ namespace FS_Atmo
 
         public void SetLocked(bool locked) => isLocked = locked;
         public void SetRequiredKey(InventoryItem key) => requiredKey = key;
+
+        /// <summary>
+        /// Lockpick Continue: door stays locked, screwdriver break is off, chained subtitle key is used.
+        /// </summary>
+        public void ApplyContinueChainedLock(string messageKey = "gameplay.door_chained")
+        {
+            isLocked = true;
+            _chainedAfterContinue = true;
+            if (!string.IsNullOrWhiteSpace(messageKey))
+                lockedMessageKey = messageKey;
+        }
+
+        /// <summary>Unlock without subtitle / unlock SFX / opening (padlock already handled feedback).</summary>
+        public void UnlockSilently()
+        {
+            isLocked = false;
+            _chainedAfterContinue = false;
+        }
+
+        /// <summary>Snap shut immediately — used after lockpick Continue day-reset.</summary>
+        public void ForceCloseInstant()
+        {
+            _moving = false;
+            _reverting = false;
+            objectOpen = false;
+
+            if (myAnimator != null)
+                myAnimator.Play(closeHash, 0, 1f);
+
+            if (hasAdditional && additionalAnimator != null)
+                additionalAnimator.Play(closeHash, 0, 1f);
+
+            SyncAdditionalFlags(open: false);
+        }
 
         private void ToggleSelf(float openAmount)
         {

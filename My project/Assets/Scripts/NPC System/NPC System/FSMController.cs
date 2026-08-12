@@ -22,6 +22,9 @@ public class FSMController
     Coroutine _witnessedHideCaptureCo;
     Coroutine _cageEscapeReactionCo;
     HidingSpot _witnessedHideSpot;
+    bool _relentlessViseMissHunt;
+
+    public bool IsRelentlessViseMissHunt => _relentlessViseMissHunt;
 
     Transform _lastAmbushSpot;
     int _consecutiveSameAmbushCount;
@@ -32,6 +35,12 @@ public class FSMController
     bool _ambushRustlePlayed;
     float _ambushRustleDelay;
     float _ambushRustleElapsed;
+
+    /// <summary>
+    /// Room he committed to for this ambush. Sticky from Ambush enter until he leaves that room
+    /// (even after Ambush → Natural), so captures in that window read as ambush — not noise.
+    /// </summary>
+    RoomAnchor _ambushThreatRoom;
 
     public FSMController(NPCController controller)
     {
@@ -67,6 +76,25 @@ public class FSMController
 
     public void SetState(NPCController.AIState newState)
     {
+        // Continue intro owns the butcher — no hunt/patrol transitions until UnlockCinematic.
+        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic)
+            && (newState == NPCController.AIState.Chase
+                || newState == NPCController.AIState.Search
+                || newState == NPCController.AIState.Ambush
+                || newState == NPCController.AIState.Suspicious
+                || newState == NPCController.AIState.Capture))
+            return;
+
+        // Mistimed hammer hunt ignores Search / Natural until Capture clears the flag.
+        if (_relentlessViseMissHunt
+            && (newState == NPCController.AIState.Search
+                || newState == NPCController.AIState.Natural
+                || newState == NPCController.AIState.Ambush
+                || newState == NPCController.AIState.Suspicious))
+        {
+            newState = NPCController.AIState.Chase;
+        }
+
         if (newState == npc.currentState)
             return;
 
@@ -90,6 +118,8 @@ public class FSMController
 
 
             case NPCController.AIState.Search:
+                if (prev == NPCController.AIState.Chase)
+                    CaptureContext.ClearIf(CaptureReason.Spotted);
                 ClearWitnessedHideCapture();
                 StartSearchRoutine();
                 break;
@@ -106,6 +136,8 @@ public class FSMController
             //     break;
 
             case NPCController.AIState.Natural:
+                if (prev == NPCController.AIState.Chase)
+                    CaptureContext.ClearIf(CaptureReason.Spotted);
                 StopSearchRoutine();
                 StopAmbushRoutine();
                 ClearWitnessedHideCapture();
@@ -132,6 +164,8 @@ public class FSMController
                 break;
 
             case NPCController.AIState.Capture:
+                // Keep _relentlessViseMissHunt until DoCaptureNow — aborting Capture to
+                // run to a hide spot must not drop back into a normal chase/search.
                 StopSearchRoutine();
                 StopAmbushRoutine();
                 ClearWitnessedHideCapture();
@@ -178,10 +212,12 @@ public class FSMController
     }
 
     /// <summary>
-    /// First time he sees the cage empty/open: pig bark, freeze briefly, then search.
+    /// First time he sees the cage after a real escape: pig bark, then (re)start search.
     /// </summary>
     public void BeginCageEscapeReaction()
     {
+        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic))
+            return;
         if (_cageEscapeReactionCo != null)
             return;
 
@@ -202,6 +238,16 @@ public class FSMController
         if (npc.currentState == NPCController.AIState.Chase
             || npc.currentState == NPCController.AIState.Capture)
             yield break;
+
+        // SetState(Search) no-ops when already Searching — that left him frozen after
+        // StopSearchRoutine + StopAgentMovement. Restart search in place instead.
+        if (npc.currentState == NPCController.AIState.Search)
+        {
+            if (agent != null)
+                agent.isStopped = false;
+            StartSearchRoutine();
+            yield break;
+        }
 
         // Stand up if mid-sit, then Search. SearchRoutine already waits 2s at the start.
         // SetState alone CancelInteraction()s and leaves him floating in the sit pose.
@@ -259,6 +305,121 @@ public class FSMController
         }
 
         _witnessedHideSpot = null;
+    }
+
+    /// <summary>
+    /// Hard day-reset after lockpick Continue: leave Capture cleanly (animator + AI + meters).
+    /// Parks in Natural idle — does NOT start patrol until cinematic unlock kicks Natural.
+    /// </summary>
+    public void RecoverFromCaptureContinue()
+    {
+        _relentlessViseMissHunt = false;
+        _ambushThreatRoom = null;
+        ClearWitnessedHideCapture();
+        StopSearchRoutine();
+        StopAmbushRoutine();
+        if (_cageEscapeReactionCo != null)
+        {
+            npc.StopCoroutine(_cageEscapeReactionCo);
+            _cageEscapeReactionCo = null;
+        }
+
+        nav?.ClearRoute();
+        npc.interaction?.CancelInteraction();
+
+        if (animator != null)
+        {
+            if (!animator.enabled)
+                animator.enabled = true;
+            animator.ResetTrigger("Jumpscare");
+            // Full graph rebuild — kills mid-jumpscare pose that SetState alone cannot clear.
+            animator.Rebind();
+            animator.Update(0f);
+            if (animator.parameters != null)
+            {
+                for (int i = 0; i < animator.parameterCount; i++)
+                {
+                    var p = animator.parameters[i];
+                    if (p.type == AnimatorControllerParameterType.Trigger)
+                        animator.ResetTrigger(p.name);
+                }
+            }
+            animator.SetFloat("Speed", 0f);
+            animator.SetInteger("Behaviour", -1);
+        }
+
+        npc.GetComponent<SuspicionSystem>()?.ResetMeters();
+        npc.poiLookDirector?.CancelHoldAndClearLook();
+        npc.poiLookDirector?.UnlockLookFromPlayer();
+
+        if (npc.perception != null)
+        {
+            npc.perception.searchTarget = null;
+            npc.perception.ResetCageAlert();
+            npc.perception.RedirectLastKnownPosition(npc.transform.position);
+            npc.perception.ClearVisionState();
+        }
+
+        EnsureAgentReadyAfterCapture();
+        if (agent != null)
+        {
+            agent.ResetPath();
+            agent.velocity = Vector3.zero;
+            // Keep agent runnable — Unlock kicks Natural; isStopped=true softlocks patrol.
+            agent.isStopped = false;
+        }
+
+        // Natural idle without StartNextRoutine — UnlockCinematic starts patrol after intro.
+        npc.currentState = NPCController.AIState.Natural;
+        if (agent != null)
+            agent.speed = walkingSpeed;
+    }
+
+    void EnsureAgentReadyAfterCapture()
+    {
+        if (agent == null)
+            return;
+
+        if (!agent.enabled)
+            agent.enabled = true;
+
+        agent.updatePosition = true;
+        agent.updateRotation = true;
+
+        Vector3 pos = npc.transform.position;
+        if (!agent.isOnNavMesh)
+        {
+            if (NavMesh.SamplePosition(pos, out NavMeshHit hit, 4f, NavMesh.AllAreas))
+            {
+                agent.Warp(hit.position);
+                npc.transform.position = hit.position;
+            }
+        }
+
+        if (agent.isOnNavMesh)
+        {
+            agent.ResetPath();
+            agent.velocity = Vector3.zero;
+            agent.isStopped = false;
+            EnsureLocomotion();
+            agent.speed = walkingSpeed;
+        }
+        else
+        {
+            Debug.LogWarning($"[FSMController] {npc.name} off NavMesh after Continue recovery at {pos}");
+        }
+    }
+
+    IEnumerator KickNaturalRoutineNextFrame()
+    {
+        yield return null;
+        if (npc == null || npc.currentState != NPCController.AIState.Natural)
+            yield break;
+        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic))
+            yield break;
+
+        EnsureAgentReadyAfterCapture();
+        npc.EnsureNaturalRoutineStarted();
     }
 
     /// <summary>
@@ -396,6 +557,8 @@ public class FSMController
         if (reallyThere && stillOccupied)
         {
             Debug.Log($"🎯 Player caught after witnessed hide enter: {spot.name}");
+            if (CaptureContext.Pending == CaptureReason.Unknown)
+                CaptureContext.Set(CaptureReason.WitnessedHide);
             // Keep _witnessedHideSpot set until Capture state takes over (blocks TickChase).
             _witnessedHideCaptureCo = null;
             SetState(NPCController.AIState.Capture);
@@ -405,10 +568,18 @@ public class FSMController
         _witnessedHideCaptureCo = null;
         _witnessedHideSpot = null;
 
-        // Player left, or we never reached the spot — search the room around last known.
         if (lookDirector != null)
             lookDirector.CancelHoldAndClearLook();
 
+        // Mistimed hammer hunt: don't drop into Search — keep chasing until capture.
+        if (_relentlessViseMissHunt)
+        {
+            if (npc.currentState != NPCController.AIState.Chase)
+                SetState(NPCController.AIState.Chase);
+            yield break;
+        }
+
+        // Player left, or we never reached the spot — search the room around last known.
         string homeID = npc.interaction != null && npc.interaction.data != null
             ? npc.interaction.data.homeID
             : string.Empty;
@@ -442,6 +613,37 @@ public class FSMController
         npc.poiLookDirector?.LockLookToPlayer();
     }
 
+    void ArmAmbushThreatRoom(Transform ambushPoint)
+    {
+        RoomAnchor room = null;
+        if (ambushPoint != null)
+            room = ambushPoint.GetComponentInParent<RoomAnchor>();
+        if (room == null)
+            room = npc.GetCurrentRoom();
+        _ambushThreatRoom = room;
+    }
+
+    void ClearAmbushThreatRoom()
+    {
+        _ambushThreatRoom = null;
+    }
+
+    /// <summary>
+    /// Keep ambush death-copy until he physically leaves the ambush room.
+    /// While still in Ambush state, never clear (pathing / room flicker mid-walk).
+    /// </summary>
+    void TickAmbushThreatRoom()
+    {
+        if (_ambushThreatRoom == null)
+            return;
+        if (npc.currentState == NPCController.AIState.Ambush)
+            return;
+
+        RoomAnchor current = npc.GetCurrentRoom();
+        if (current == null || current != _ambushThreatRoom)
+            ClearAmbushThreatRoom();
+    }
+
     IEnumerator RunAmbushRoutine()
     {
         yield return AmbushRoutine();
@@ -451,6 +653,7 @@ public class FSMController
     public void Update()
     {
         EnsureLocomotion();
+        TickAmbushThreatRoom();
 
         // Explicitly drive look during chase/capture (no autonomous look loop).
         var lookDirector = npc != null ? npc.poiLookDirector : null;
@@ -509,11 +712,26 @@ public class FSMController
     {
         npc.poiLookDirector?.CancelHoldAndClearLook();
 
-        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured))
+        // Only skip if jumpscare already started. ReasonCaptured alone is wrong —
+        // BeginCaptureUi holds that gate during the grab, and a failed grab can leave it stuck.
+        if (JumpscareManager.Instance != null && JumpscareManager.Instance.IsJumpscarePlaying)
         {
             npc.OnCaptureRoutineFinished();
             yield break;
         }
+
+        // Recover sticky capture UI/gate from a grab that never reached TriggerJumpscare.
+        if (JumpscareManager.CaptureUiActive
+            || PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured))
+        {
+            JumpscareManager.CancelCaptureUi();
+            if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured))
+                PlayerControlGate.Release(PlayerControlGate.ReasonCaptured);
+        }
+
+        // Hide HUD/cursor immediately — hide-exit wait happens before DoCaptureNow/jumpscare,
+        // and exiting the locker would otherwise flash crosshair UI.
+        JumpscareManager.BeginCaptureUi();
 
         var playerT = npc.perception != null ? npc.perception.PlayerTransform : null;
         if (playerT != null)
@@ -536,9 +754,13 @@ public class FSMController
                 if (distToSpot > SearchArriveDistance + ArriveRecheckSlack || yDelta > SearchArriveMaxYDelta)
                 {
                     Debug.Log($"🚫 Capture blocked — {distToSpot:0.0}m from {spot.name}. Running there first.");
+                    JumpscareManager.CancelCaptureUi();
                     npc.OnCaptureRoutineFinished();
                     SetState(NPCController.AIState.Chase);
-                    BeginWitnessedHideCapture(spot);
+                    // Relentless hunt paths to the hide itself each TickChase — don't arm the
+                    // witnessed-hide coroutine (it can softlock and steal chase ownership).
+                    if (!_relentlessViseMissHunt)
+                        BeginWitnessedHideCapture(spot);
                     yield break;
                 }
 
@@ -558,6 +780,8 @@ public class FSMController
         catch (System.Exception e)
         {
             Debug.LogError($"[FSMController] DoCaptureNow threw, forcing a safe recovery: {e}");
+            _relentlessViseMissHunt = false;
+            JumpscareManager.CancelCaptureUi();
             PlayerControlGate.Release(PlayerControlGate.ReasonCaptured);
             SetState(NPCController.AIState.Natural);
         }
@@ -565,8 +789,91 @@ public class FSMController
         npc.OnCaptureRoutineFinished();
     }
 
+    /// <summary>
+    /// Perfect-knowledge chase until capture (vise miss, watched cage-door slam, etc.).
+    /// If they hide, uses the same witnessed-hide capture path as seeing them enter a locker.
+    /// </summary>
+    public void BeginRelentlessViseMissHunt() => BeginRelentlessHunt(CaptureReason.HammerTimingFail);
+
+    public void BeginRelentlessHunt(CaptureReason reason)
+    {
+        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured))
+            return;
+        if (npc.currentState == NPCController.AIState.Dead
+            || npc.currentState == NPCController.AIState.Scripted
+            || npc.currentState == NPCController.AIState.Capture)
+            return;
+
+        _relentlessViseMissHunt = true;
+        CaptureContext.Set(reason);
+        StopSearchRoutine();
+        StopAmbushRoutine();
+
+        Transform playerT = npc.perception != null ? npc.perception.PlayerTransform : null;
+        if (playerT == null)
+        {
+            var playerGo = GameObject.FindGameObjectWithTag("Player");
+            if (playerGo != null)
+                playerT = playerGo.transform;
+        }
+
+        if (playerT == null)
+            return;
+
+        var hider = playerT.GetComponent<PlayerHider>();
+        bool hiddenInSpot = hider != null && hider.isHidden && hider.CurrentHidingSpot != null
+            && !hider.CurrentHidingSpot.searchCheckpointOnly;
+
+        ClearWitnessedHideCapture();
+
+        npc.perception?.RedirectLastKnownPosition(
+            hiddenInSpot
+                ? (hider.CurrentHidingSpot.GetSearchPivot() != null
+                    ? hider.CurrentHidingSpot.GetSearchPivot().position
+                    : hider.CurrentHidingSpot.transform.position)
+                : playerT.position);
+
+        if (agent != null)
+        {
+            agent.isStopped = false;
+            agent.speed = runningSpeed;
+        }
+
+        npc._lastChaseTarget = new Vector3(float.PositiveInfinity, 0f, 0f);
+        npc._nextChaseReplanTime = 0f;
+
+        if (npc.poiLookDirector != null)
+        {
+            npc.poiLookDirector.UnlockLookFromPlayer();
+            npc.poiLookDirector.CancelHoldAndClearLook();
+        }
+
+        nav?.ClearRoute();
+
+        if (npc.interaction != null && npc.interaction.IsStandingUpFromHotspot)
+        {
+            npc.interaction.StandUpFromHotspotThenSetState(NPCController.AIState.Chase);
+            return;
+        }
+
+        if (npc.interaction != null
+            && npc.interaction.StandUpFromHotspotThenSetState(NPCController.AIState.Chase))
+            return;
+
+        if (npc.currentState != NPCController.AIState.Chase)
+            SetState(NPCController.AIState.Chase);
+        else
+        {
+            EnsureLocomotion();
+            if (agent != null)
+                agent.speed = runningSpeed;
+            TickChase();
+        }
+    }
+
     void DoCaptureNow()
     {
+        _relentlessViseMissHunt = false;
         HidingSpot.EndHidingCameraForCapture();
 
         nav.ClearRoute();
@@ -582,7 +889,15 @@ public class FSMController
             }
         }
 
-        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured)) return;
+        // Do NOT early-out on ReasonCaptured here.
+        // BeginCaptureUi() acquires that gate before this runs (to block inventory during
+        // hide-exit). Treating it as "already captured" skipped TriggerJumpscare entirely.
+
+        // Still in the ambush room (or mid-Ambush): this catch is an ambush, not "too much noise".
+        if (_ambushThreatRoom != null)
+            CaptureContext.Set(CaptureReason.Ambush);
+        else if (CaptureContext.Pending == CaptureReason.Unknown)
+            CaptureContext.Set(CaptureReason.CaughtInOpen);
 
         if (SoundManager.Instance != null && SoundManager.Instance.tensionSFXBank != null)
         {
@@ -591,7 +906,9 @@ public class FSMController
             if (bank.Length > 1) SoundManager.Instance.PlaySFXAt(bank[1], npc.transform.position);
         }
 
-        PlayerControlGate.Acquire(PlayerControlGate.ReasonCaptured);
+        // BeginCaptureUi already holds this for hide-exit; open-world capture acquires here.
+        if (!PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured))
+            PlayerControlGate.Acquire(PlayerControlGate.ReasonCaptured);
 
         //Debug.Log("Player Caught!");
 
@@ -666,6 +983,8 @@ public class FSMController
             SetState(NPCController.AIState.Natural);
             yield break;
         }
+
+        ArmAmbushThreatRoom(ambushPoint);
 
         NavMeshAgent moveAgent = npc.interaction.agent ?? agent;
         if (moveAgent != null)
@@ -932,6 +1251,7 @@ public class FSMController
             yield break;
         }
 
+        // Raise pick bias for the occupied hide in this room (capture odds still only rise on a real spot check).
         RegisterSearchExposureForHiddenPlayer(roomAnchor);
 
         // Already standing at the hear/LKP near this room — don't freeze on a room-anchor wait.
@@ -1024,13 +1344,25 @@ public class FSMController
 
             if (!spot.searchCheckpointOnly && data != null && spot.isOccupied)
             {
-                float captureChance = spot.GetCaptureChance(data.captureChance);
                 var occupyingHider = spot.ResolveOccupyingHider();
+                // Count this check of the occupied spot (same-hide ladder: 0/0/25/50/100).
+                occupyingHider?.NotifyOccupiedSpotSearched(spot);
+
+                float captureChance = spot.GetCaptureChance(data.captureChance);
+                bool micForced = occupyingHider != null
+                    && occupyingHider.TryGetMicCaptureOverrideSpot(out var micSpot)
+                    && micSpot == spot;
+                int exposure = occupyingHider != null ? occupyingHider.GetSearchExposureCount(spot) : 0;
                 occupyingHider?.ClearMicCaptureOverride();
 
                 if (UnityEngine.Random.value < captureChance)
                 {
-                    Debug.Log($"🎯 Player Caught in: {spot.name}");
+                    if (micForced)
+                        CaptureContext.Set(CaptureReason.HideNoise);
+                    else
+                        CaptureContext.Set(CaptureReason.SameHideSpot);
+
+                    Debug.Log($"🎯 Player Caught in: {spot.name} (exposure={exposure}, chance={captureChance:0.##})");
                     SetState(NPCController.AIState.Capture);
                     yield break;
                 }
@@ -1147,23 +1479,56 @@ public class FSMController
 
     static int PickWeightedSearchSpotIndex(List<HidingSpot> pool)
     {
+        if (pool == null || pool.Count == 0)
+            return 0;
+        if (pool.Count == 1)
+            return 0;
+
         float total = 0f;
         for (int i = 0; i < pool.Count; i++)
-            total += pool[i].GetSearchPickWeight();
+            total += Mathf.Max(0f, pool[i].GetSearchPickWeight());
 
+        // Default / equal weights: pure uniform — no hierarchy-order bias.
         if (total <= 0f)
             return Random.Range(0, pool.Count);
 
-        float roll = Random.value * total;
+        float first = Mathf.Max(0f, pool[0].GetSearchPickWeight());
+        bool allEqual = true;
+        for (int i = 1; i < pool.Count; i++)
+        {
+            if (!Mathf.Approximately(Mathf.Max(0f, pool[i].GetSearchPickWeight()), first))
+            {
+                allEqual = false;
+                break;
+            }
+        }
+
+        if (allEqual)
+            return Random.Range(0, pool.Count);
+
+        // Unity float Range is inclusive on max — keep roll in [0, total).
+        float roll = Random.Range(0f, total);
+        if (roll >= total)
+            roll = total * 0.999999f;
+
         float acc = 0f;
         for (int i = 0; i < pool.Count; i++)
         {
-            acc += pool[i].GetSearchPickWeight();
-            if (roll <= acc)
+            acc += Mathf.Max(0f, pool[i].GetSearchPickWeight());
+            if (roll < acc)
                 return i;
         }
 
         return pool.Count - 1;
+    }
+
+    static void ShuffleHidingSpots(List<HidingSpot> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            (list[i], list[j]) = (list[j], list[i]);
+        }
     }
 
     static List<HidingSpot> PickSearchSpots(HidingSpot[] allStops, float[] extraSpotChances)
@@ -1181,6 +1546,9 @@ public class FSMController
 
         if (pool.Count == 0)
             return picked;
+
+        // Break hierarchy / GetComponentsInChildren order so searches don't feel sequential.
+        ShuffleHidingSpots(pool);
 
         // Mic-alerted hide spot should be checked first so the override capture roll can fire.
         var player = GameObject.FindWithTag("Player");
@@ -1221,7 +1589,9 @@ public class FSMController
     static bool IsPlayerStealthHidden(Transform playerTransform)
     {
         if (playerTransform == null) return false;
-        if (playerTransform.gameObject.layer == 7) return true;
+        // 7 = HiddenPlayer, 12 = Captive (closed cage) — must match PerceptionController.
+        int layer = playerTransform.gameObject.layer;
+        if (layer == 7 || layer == 12) return true;
         var hider = playerTransform.GetComponent<PlayerHider>();
         return hider != null && hider.isHidden;
     }
@@ -1238,6 +1608,17 @@ public class FSMController
         var agent = npc.interaction.agent;
         if (npc.perception == null || nav == null || agent == null) return;
 
+        // Mistimed hammer hunt owns pathing completely — never let witnessed-hide softlock it.
+        if (_relentlessViseMissHunt)
+        {
+            TickRelentlessViseMissChase(agent);
+            return;
+        }
+
+        // Stale hide lock with no running coroutine freezes chase forever.
+        if (_witnessedHideSpot != null && _witnessedHideCaptureCo == null)
+            _witnessedHideSpot = null;
+
         // Witnessed hide-enter capture owns pathing until arrival — never proximity-capture.
         if (_witnessedHideSpot != null || _witnessedHideCaptureCo != null)
             return;
@@ -1252,6 +1633,7 @@ public class FSMController
             float dist = Vector3.Distance(npc.transform.position, npc.perception.PlayerTransform.position);
             if (dist <= npc.captureDistance)
             {
+                CaptureContext.Set(CaptureReason.CaughtInOpen);
                 SetState(NPCController.AIState.Capture); 
                 agent.ResetPath();
                 return;
@@ -1274,8 +1656,16 @@ public class FSMController
             // --- VAZGEÇME MANTIĞI (Burada birleştirdik) ---
             // Eğer oyuncuyu göremiyorsam VE gitmem gereken yere (LSP) vardıysam:
             float distToLSP = Vector3.Distance(npc.transform.position, targetPosition);
+            float distToPlayer = npc.perception.PlayerTransform != null
+                ? Vector3.Distance(npc.transform.position, npc.perception.PlayerTransform.position)
+                : float.MaxValue;
 
-            if (distToLSP < 1.5f)
+            // Closed cage / locker: agent often cannot reach the LSP/player point.
+            // Standing at the bars counts as "arrived" so Chase does not softlock.
+            float blockedArriveDist = Mathf.Max(2.5f, npc.captureDistance + 1.25f);
+            bool arrived = distToLSP < 1.5f || (isHidden && distToPlayer < blockedArriveDist);
+
+            if (arrived)
             {
                 Debug.Log("Chase bitti: İzini kaybettim. Odayı aramaya başlıyorum.");
 
@@ -1292,6 +1682,70 @@ public class FSMController
         }
 
         // 4. Hareket — door-aware routing (wait at gate, open, cross). Skip replans mid-door.
+        ReplanChasePath(targetPosition);
+    }
+
+    void TickRelentlessViseMissChase(NavMeshAgent agent)
+    {
+        // Drop any witnessed-hide coroutine so it cannot own pathing / softlock this hunt.
+        if (_witnessedHideSpot != null || _witnessedHideCaptureCo != null)
+            ClearWitnessedHideCapture();
+
+        Transform playerT = npc.perception.PlayerTransform;
+        if (playerT == null)
+        {
+            var playerGo = GameObject.FindGameObjectWithTag("Player");
+            if (playerGo != null)
+                playerT = playerGo.transform;
+        }
+
+        if (playerT == null)
+            return;
+
+        var hider = playerT.GetComponent<PlayerHider>();
+        bool hiddenInSpot = hider != null && hider.isHidden && hider.CurrentHidingSpot != null
+            && !hider.CurrentHidingSpot.searchCheckpointOnly;
+
+        Vector3 targetPosition;
+        if (hiddenInSpot)
+        {
+            var spot = hider.CurrentHidingSpot;
+            targetPosition = spot.GetSearchPivot() != null
+                ? spot.GetSearchPivot().position
+                : spot.transform.position;
+        }
+        else
+        {
+            targetPosition = playerT.position;
+        }
+
+        npc.perception.RedirectLastKnownPosition(targetPosition);
+
+        float dist = Vector3.Distance(npc.transform.position, targetPosition);
+        float yDelta = Mathf.Abs(npc.transform.position.y - targetPosition.y);
+
+        // Hidden: grab only when actually at the spot. Visible: normal capture range.
+        float captureRange = hiddenInSpot
+            ? SearchArriveDistance + ArriveRecheckSlack
+            : npc.captureDistance;
+        float maxY = hiddenInSpot ? SearchArriveMaxYDelta : 3f;
+
+        if (dist <= captureRange && yDelta <= maxY)
+        {
+            SetState(NPCController.AIState.Capture);
+            agent.ResetPath();
+            return;
+        }
+
+        if (agent.isStopped)
+            agent.isStopped = false;
+
+        // Hunt the live player / occupied hide every tick — never park on a stale LKP.
+        ReplanChasePath(targetPosition, force: true);
+    }
+
+    void ReplanChasePath(Vector3 targetPosition, bool force = false)
+    {
         if (nav.IsInDoorTransit)
             return;
 
@@ -1300,12 +1754,12 @@ public class FSMController
             (npc._lastChaseTarget.x == float.PositiveInfinity) ||
             (targetPosition - npc._lastChaseTarget).sqrMagnitude > (npc.chaseReplanDist * npc.chaseReplanDist);
 
-        if (targetMovedEnough || now >= npc._nextChaseReplanTime)
+        if (force || targetMovedEnough || now >= npc._nextChaseReplanTime)
         {
             nav.GoToPoint(targetPosition);
 
             npc._lastChaseTarget = targetPosition;
-            npc._nextChaseReplanTime = now + npc.chaseReplanCooldown;
+            npc._nextChaseReplanTime = now + (force ? Mathf.Min(0.15f, npc.chaseReplanCooldown) : npc.chaseReplanCooldown);
         }
     }
 

@@ -32,7 +32,10 @@ public class DropItemHintLabel : MonoBehaviour
     void OnEnable()
     {
         LocalizationSettings.SelectedLocaleChanged += OnLocaleChanged;
-        LocaleManager.WhenReady(Refresh);
+        if (LocaleManager.IsReady)
+            Refresh();
+        else
+            LocaleManager.WhenReady(Refresh);
     }
 
     void OnDisable()

@@ -19,147 +19,148 @@ MonoBehaviour:
     m_Items: []
   m_TableData:
   - m_Id: 5707297325057
-    m_Localized: "ออก"
+    m_Localized: "\u0E2D\u0E2D\u0E01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325056
-    m_Localized: "การตั้งค่า"
+    m_Localized: "\u0E01\u0E32\u0E23\u0E15\u0E31\u0E49\u0E07\u0E04\u0E48\u0E32"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325058
-    m_Localized: "กลับ"
+    m_Localized: "\u0E01\u0E25\u0E31\u0E1A"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325059
-    m_Localized: "ใช้"
+    m_Localized: "\u0E43\u0E0A\u0E49"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325060
-    m_Localized: "ค่าเริ่มต้น"
+    m_Localized: "\u0E04\u0E48\u0E32\u0E40\u0E23\u0E34\u0E48\u0E21\u0E15\u0E49\u0E19"
     m_Metadata:
       m_Items: []
   - m_Id: 1843970048000
-    m_Localized: "เล่นต่อ"
+    m_Localized: "\u0E40\u0E25\u0E48\u0E19\u0E15\u0E48\u0E2D"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325061
-    m_Localized: "เกมใหม่"
+    m_Localized: "\u0E40\u0E01\u0E21\u0E43\u0E2B\u0E21\u0E48"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325062
-    m_Localized: "เครดิต"
+    m_Localized: "\u0E40\u0E04\u0E23\u0E14\u0E34\u0E15"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325063
-    m_Localized: "บันทึกเกม"
+    m_Localized: "\u0E1A\u0E31\u0E19\u0E17\u0E36\u0E01\u0E40\u0E01\u0E21"
     m_Metadata:
       m_Items: []
   - m_Id: 5707297325064
-    m_Localized: "หยุดชั่วคราว"
+    m_Localized: "\u0E2B\u0E22\u0E38\u0E14\u0E0A\u0E31\u0E48\u0E27\u0E04\u0E23\u0E32\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296576
-    m_Localized: "เล่นต่อ"
+    m_Localized: "\u0E40\u0E25\u0E48\u0E19\u0E15\u0E48\u0E2D"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296577
-    m_Localized: "ขอบคุณที่เล่น Midnight Scour"
+    m_Localized: "\u0E02\u0E2D\u0E1A\u0E04\u0E38\u0E13\u0E17\u0E35\u0E48\u0E40\u0E25\u0E48\u0E19
+      Midnight Scour"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296578
-    m_Localized: "กด esc เพื่อออก"
+    m_Localized: "\u0E01\u0E14 esc \u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E2D\u0E2D\u0E01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296579
-    m_Localized: "กดปุ่มใดก็ได้เพื่อดำเนินการต่อ"
+    m_Localized: "\u0E01\u0E14\u0E1B\u0E38\u0E48\u0E21\u0E43\u0E14\u0E01\u0E47\u0E44\u0E14\u0E49\u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E14\u0E33\u0E40\u0E19\u0E34\u0E19\u0E01\u0E32\u0E23\u0E15\u0E48\u0E2D"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296580
-    m_Localized: "คุณสามารถอ่านบันทึกเพื่อหาเบาะแส"
+    m_Localized: "\u0E04\u0E38\u0E13\u0E2A\u0E32\u0E21\u0E32\u0E23\u0E16\u0E2D\u0E48\u0E32\u0E19\u0E1A\u0E31\u0E19\u0E17\u0E36\u0E01\u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E2B\u0E32\u0E40\u0E1A\u0E32\u0E30\u0E41\u0E2A"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296581
-    m_Localized: "ใช้ที่ซ่อนเพื่อหลบฆาตกร"
+    m_Localized: "\u0E43\u0E0A\u0E49\u0E17\u0E35\u0E48\u0E0B\u0E48\u0E2D\u0E19\u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E2B\u0E25\u0E1A\u0E06\u0E32\u0E15\u0E01\u0E23"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296582
-    m_Localized: "การส่งเสียงอาจทำให้ฆาตกรรู้ตัว"
+    m_Localized: "\u0E01\u0E32\u0E23\u0E2A\u0E48\u0E07\u0E40\u0E2A\u0E35\u0E22\u0E07\u0E2D\u0E32\u0E08\u0E17\u0E33\u0E43\u0E2B\u0E49\u0E06\u0E32\u0E15\u0E01\u0E23\u0E23\u0E39\u0E49\u0E15\u0E31\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296583
-    m_Localized: "กด {0} เพื่อทิ้งไอเท็มที่เลือก"
+    m_Localized: "\u0E01\u0E14 {0} \u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E17\u0E34\u0E49\u0E07\u0E44\u0E2D\u0E40\u0E17\u0E47\u0E21\u0E17\u0E35\u0E48\u0E40\u0E25\u0E37\u0E2D\u0E01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296584
-    m_Localized: "ใช้ไอเท็ม/รวมไอเท็ม"
+    m_Localized: "\u0E43\u0E0A\u0E49\u0E44\u0E2D\u0E40\u0E17\u0E47\u0E21/\u0E23\u0E27\u0E21\u0E44\u0E2D\u0E40\u0E17\u0E47\u0E21"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296585
-    m_Localized: "โต้ตอบ"
+    m_Localized: "\u0E42\u0E15\u0E49\u0E15\u0E2D\u0E1A"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296586
-    m_Localized: "การตั้งค่า"
+    m_Localized: "\u0E01\u0E32\u0E23\u0E15\u0E31\u0E49\u0E07\u0E04\u0E48\u0E32"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296587
-    m_Localized: "การแสดงผล"
+    m_Localized: "\u0E01\u0E32\u0E23\u0E41\u0E2A\u0E14\u0E07\u0E1C\u0E25"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296588
-    m_Localized: "เสียง"
+    m_Localized: "\u0E40\u0E2A\u0E35\u0E22\u0E07"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296589
-    m_Localized: "การควบคุม"
+    m_Localized: "\u0E01\u0E32\u0E23\u0E04\u0E27\u0E1A\u0E04\u0E38\u0E21"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296590
-    m_Localized: "การเล่นเกม"
+    m_Localized: "\u0E01\u0E32\u0E23\u0E40\u0E25\u0E48\u0E19\u0E40\u0E01\u0E21"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296591
-    m_Localized: "ทั่วไป"
+    m_Localized: "\u0E17\u0E31\u0E48\u0E27\u0E44\u0E1B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296592
-    m_Localized: "ระดับเสียงหลัก"
+    m_Localized: "\u0E23\u0E30\u0E14\u0E31\u0E1A\u0E40\u0E2A\u0E35\u0E22\u0E07\u0E2B\u0E25\u0E31\u0E01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296593
-    m_Localized: "ระดับเสียงเพลง"
+    m_Localized: "\u0E23\u0E30\u0E14\u0E31\u0E1A\u0E40\u0E2A\u0E35\u0E22\u0E07\u0E40\u0E1E\u0E25\u0E07"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296594
-    m_Localized: "ระดับเสียงเอฟเฟกต์"
+    m_Localized: "\u0E23\u0E30\u0E14\u0E31\u0E1A\u0E40\u0E2A\u0E35\u0E22\u0E07\u0E40\u0E2D\u0E1F\u0E40\u0E1F\u0E01\u0E15\u0E4C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296595
-    m_Localized: "ความสว่าง"
+    m_Localized: "\u0E04\u0E27\u0E32\u0E21\u0E2A\u0E27\u0E48\u0E32\u0E07"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296596
-    m_Localized: "ความไวเมาส์"
+    m_Localized: "\u0E04\u0E27\u0E32\u0E21\u0E44\u0E27\u0E40\u0E21\u0E32\u0E2A\u0E4C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296800
-    m_Localized: ความไวไมโครโฟน
+    m_Localized: "\u0E04\u0E27\u0E32\u0E21\u0E44\u0E27\u0E44\u0E21\u0E42\u0E04\u0E23\u0E42\u0E1F\u0E19"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296597
-    m_Localized: "ความละเอียด"
+    m_Localized: "\u0E04\u0E27\u0E32\u0E21\u0E25\u0E30\u0E40\u0E2D\u0E35\u0E22\u0E14"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296598
-    m_Localized: "เต็มจอ"
+    m_Localized: "\u0E40\u0E15\u0E47\u0E21\u0E08\u0E2D"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296599
-    m_Localized: "โหมดการแสดงผล"
+    m_Localized: "\u0E42\u0E2B\u0E21\u0E14\u0E01\u0E32\u0E23\u0E41\u0E2A\u0E14\u0E07\u0E1C\u0E25"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296600
-    m_Localized: "คุณภาพ"
+    m_Localized: "\u0E04\u0E38\u0E13\u0E20\u0E32\u0E1E"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296601
@@ -167,415 +168,424 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296602
-    m_Localized: "บันทึกอัตโนมัติ"
+    m_Localized: "\u0E1A\u0E31\u0E19\u0E17\u0E36\u0E01\u0E2D\u0E31\u0E15\u0E42\u0E19\u0E21\u0E31\u0E15\u0E34"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296603
-    m_Localized: "ภาษา"
+    m_Localized: "\u0E20\u0E32\u0E29\u0E32"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296604
-    m_Localized: "อันนี้ใช้ที่นี่ไม่ได้"
+    m_Localized: "\u0E2D\u0E31\u0E19\u0E19\u0E35\u0E49\u0E43\u0E0A\u0E49\u0E17\u0E35\u0E48\u0E19\u0E35\u0E48\u0E44\u0E21\u0E48\u0E44\u0E14\u0E49"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296605
-    m_Localized: "ล็อกอยู่"
+    m_Localized: "\u0E25\u0E47\u0E2D\u0E01\u0E2D\u0E22\u0E39\u0E48"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296606
-    m_Localized: "เอื้อมไม่ถึง"
+    m_Localized: "\u0E44\u0E01\u0E25\u0E40\u0E01\u0E34\u0E19\u0E44\u0E1B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296607
-    m_Localized: "ขยับไม่ได้"
+    m_Localized: "\u0E02\u0E22\u0E31\u0E1A\u0E44\u0E21\u0E48\u0E44\u0E14\u0E49"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296608
-    m_Localized: "รอสักครู่"
+    m_Localized: "\u0E23\u0E2D\u0E2A\u0E31\u0E01\u0E04\u0E23\u0E39\u0E48"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296609
-    m_Localized: "คุณกำลังซ่อนอยู่แล้ว"
+    m_Localized: "\u0E04\u0E38\u0E13\u0E01\u0E33\u0E25\u0E31\u0E07\u0E0B\u0E48\u0E2D\u0E19\u0E2D\u0E22\u0E39\u0E48\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296613
-    m_Localized: "คุณต้องมี {0}"
+    m_Localized: "\u0E04\u0E38\u0E13\u0E15\u0E49\u0E2D\u0E07\u0E21\u0E35 {0}"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296614
-    m_Localized: "ใช้ {0} แล้ว"
+    m_Localized: "\u0E43\u0E0A\u0E49 {0} \u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296615
-    m_Localized: "{0} ปลดล็อกแล้ว"
+    m_Localized: "{0} \u0E1B\u0E25\u0E14\u0E25\u0E47\u0E2D\u0E01\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296616
-    m_Localized: "ถอดสลักออกแล้ว"
+    m_Localized: "\u0E16\u0E2D\u0E14\u0E2A\u0E25\u0E31\u0E01\u0E2D\u0E2D\u0E01\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296617
-    m_Localized: "ติดอยู่"
+    m_Localized: "\u0E15\u0E34\u0E14\u0E2D\u0E22\u0E39\u0E48"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296618
-    m_Localized: "การโต้ตอบนี้ยังไม่ได้ตั้งค่า"
+    m_Localized: "\u0E01\u0E32\u0E23\u0E42\u0E15\u0E49\u0E15\u0E2D\u0E1A\u0E19\u0E35\u0E49\u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E44\u0E14\u0E49\u0E15\u0E31\u0E49\u0E07\u0E04\u0E48\u0E32"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296619
-    m_Localized: "ไม่มีอะไรจะเก็บ"
+    m_Localized: "\u0E44\u0E21\u0E48\u0E21\u0E35\u0E2D\u0E30\u0E44\u0E23\u0E08\u0E30\u0E40\u0E01\u0E47\u0E1A"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296620
-    m_Localized: "เก็บแล้ว: {0}"
+    m_Localized: "\u0E40\u0E01\u0E47\u0E1A\u0E41\u0E25\u0E49\u0E27: {0}"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296621
-    m_Localized: "{0} ติดตั้งแล้ว"
+    m_Localized: "{0} \u0E15\u0E34\u0E14\u0E15\u0E31\u0E49\u0E07\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296622
-    m_Localized: "เลือกชิ้นส่วนรถจากกระเป๋าก่อน"
+    m_Localized: "\u0E40\u0E25\u0E37\u0E2D\u0E01\u0E0A\u0E34\u0E49\u0E19\u0E2A\u0E48\u0E27\u0E19\u0E23\u0E16\u0E08\u0E32\u0E01\u0E01\u0E23\u0E30\u0E40\u0E1B\u0E4B\u0E32\u0E01\u0E48\u0E2D\u0E19"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296623
-    m_Localized: "คุณไม่มี {0}"
+    m_Localized: "\u0E04\u0E38\u0E13\u0E44\u0E21\u0E48\u0E21\u0E35 {0}"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296624
-    m_Localized: "ติดตั้ง {0} แล้ว"
+    m_Localized: "\u0E15\u0E34\u0E14\u0E15\u0E31\u0E49\u0E07 {0} \u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296625
-    m_Localized: "ช่องนี้ยังไม่ได้ตั้งค่า"
+    m_Localized: "\u0E0A\u0E48\u0E2D\u0E07\u0E19\u0E35\u0E49\u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E44\u0E14\u0E49\u0E15\u0E31\u0E49\u0E07\u0E04\u0E48\u0E32"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296626
-    m_Localized: "ลำดับการหลบหนียังไม่ได้ตั้งค่า"
+    m_Localized: "\u0E25\u0E33\u0E14\u0E31\u0E1A\u0E01\u0E32\u0E23\u0E2B\u0E25\u0E1A\u0E2B\u0E19\u0E35\u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E44\u0E14\u0E49\u0E15\u0E31\u0E49\u0E07\u0E04\u0E48\u0E32"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296627
-    m_Localized: "ติดตั้งชิ้นส่วนครบแล้ว คุณหนีรอดแล้ว!"
+    m_Localized: "\u0E15\u0E34\u0E14\u0E15\u0E31\u0E49\u0E07\u0E0A\u0E34\u0E49\u0E19\u0E2A\u0E48\u0E27\u0E19\u0E04\u0E23\u0E1A\u0E41\u0E25\u0E49\u0E27
+      \u0E04\u0E38\u0E13\u0E2B\u0E19\u0E35\u0E23\u0E2D\u0E14\u0E41\u0E25\u0E49\u0E27!"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296628
-    m_Localized: "ยังขาด: {0}"
+    m_Localized: "\u0E22\u0E31\u0E07\u0E02\u0E32\u0E14: {0}"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296629
-    m_Localized: "กำลังโหลด..."
+    m_Localized: "\u0E01\u0E33\u0E25\u0E31\u0E07\u0E42\u0E2B\u0E25\u0E14..."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296630
-    m_Localized: "เหล็กเส้น"
+    m_Localized: "\u0E40\u0E2B\u0E25\u0E47\u0E01\u0E40\u0E2A\u0E49\u0E19"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296631
-    m_Localized: "กระดูก"
+    m_Localized: "\u0E01\u0E23\u0E30\u0E14\u0E39\u0E01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296632
-    m_Localized: "กระดูก"
+    m_Localized: "\u0E01\u0E23\u0E30\u0E14\u0E39\u0E01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296633
-    m_Localized: "กุญแจห้องใต้ดิน"
+    m_Localized: "\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E2B\u0E49\u0E2D\u0E07\u0E43\u0E15\u0E49\u0E14\u0E34\u0E19"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296634
-    m_Localized: "กุญแจกล่องโลหะ"
+    m_Localized: "\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E01\u0E25\u0E48\u0E2D\u0E07\u0E42\u0E25\u0E2B\u0E30"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296635
-    m_Localized: "หมากฝรั่ง"
+    m_Localized: "\u0E2B\u0E21\u0E32\u0E01\u0E1D\u0E23\u0E31\u0E48\u0E07"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296636
-    m_Localized: "คลัตช์"
+    m_Localized: "\u0E04\u0E25\u0E31\u0E15\u0E0A\u0E4C"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296637
-    m_Localized: "ค้อน"
+    m_Localized: "\u0E04\u0E49\u0E2D\u0E19"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296638
-    m_Localized: "ที่ดูดส้วม"
+    m_Localized: "\u0E17\u0E35\u0E48\u0E14\u0E39\u0E14\u0E2A\u0E49\u0E27\u0E21"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296639
-    m_Localized: "ไขควง"
+    m_Localized: "\u0E44\u0E02\u0E04\u0E27\u0E07"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296640
-    m_Localized: "หัวเทียน"
+    m_Localized: "\u0E2B\u0E31\u0E27\u0E40\u0E17\u0E35\u0E22\u0E19"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296641
-    m_Localized: "แจกัน"
+    m_Localized: "\u0E41\u0E08\u0E01\u0E31\u0E19"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296642
-    m_Localized: "ประแจ"
+    m_Localized: "\u0E1B\u0E23\u0E30\u0E41\u0E08"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296643
-    m_Localized: "เก็บเหล็กเส้นแล้ว"
+    m_Localized: "\u0E40\u0E01\u0E47\u0E1A\u0E40\u0E2B\u0E25\u0E47\u0E01\u0E40\u0E2A\u0E49\u0E19\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296644
-    m_Localized: "เพิ่มกระดูกเข้ากระเป๋าแล้ว"
+    m_Localized: "\u0E40\u0E1E\u0E34\u0E48\u0E21\u0E01\u0E23\u0E30\u0E14\u0E39\u0E01\u0E40\u0E02\u0E49\u0E32\u0E01\u0E23\u0E30\u0E40\u0E1B\u0E4B\u0E32\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296645
-    m_Localized: "เพิ่มกระดูกติดหมากฝรั่งเข้ากระเป๋าแล้ว"
+    m_Localized: "\u0E40\u0E1E\u0E34\u0E48\u0E21\u0E01\u0E23\u0E30\u0E14\u0E39\u0E01\u0E15\u0E34\u0E14\u0E2B\u0E21\u0E32\u0E01\u0E1D\u0E23\u0E31\u0E48\u0E07\u0E40\u0E02\u0E49\u0E32\u0E01\u0E23\u0E30\u0E40\u0E1B\u0E4B\u0E32\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296646
-    m_Localized: "เก็บกุญแจแล้ว"
+    m_Localized: "\u0E40\u0E01\u0E47\u0E1A\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296647
-    m_Localized: "เก็บกุญแจเล็กแล้ว"
+    m_Localized: "\u0E40\u0E01\u0E47\u0E1A\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E40\u0E25\u0E47\u0E01\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296648
-    m_Localized: "เก็บหมากฝรั่งแล้ว"
+    m_Localized: "\u0E40\u0E01\u0E47\u0E1A\u0E2B\u0E21\u0E32\u0E01\u0E1D\u0E23\u0E31\u0E48\u0E07\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296649
-    m_Localized: "เก็บค้อนแล้ว"
+    m_Localized: "\u0E40\u0E01\u0E47\u0E1A\u0E04\u0E49\u0E2D\u0E19\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296650
-    m_Localized: "เก็บที่ดูดส้วมแล้ว"
+    m_Localized: "\u0E40\u0E01\u0E47\u0E1A\u0E17\u0E35\u0E48\u0E14\u0E39\u0E14\u0E2A\u0E49\u0E27\u0E21\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296651
-    m_Localized: "เก็บไขควงแล้ว"
+    m_Localized: "\u0E40\u0E01\u0E47\u0E1A\u0E44\u0E02\u0E04\u0E27\u0E07\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296652
-    m_Localized: "ข้างในมีอะไรอยู่"
+    m_Localized: "\u0E02\u0E49\u0E32\u0E07\u0E43\u0E19\u0E21\u0E35\u0E2D\u0E30\u0E44\u0E23\u0E2D\u0E22\u0E39\u0E48"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296653
-    m_Localized: "เก็บประแจแล้ว"
+    m_Localized: "\u0E40\u0E01\u0E47\u0E1A\u0E1B\u0E23\u0E30\u0E41\u0E08\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296654
-    m_Localized: "อุดตันสนิท"
+    m_Localized: "\u0E2D\u0E38\u0E14\u0E15\u0E31\u0E19\u0E2A\u0E19\u0E34\u0E17"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296655
-    m_Localized: "น้ำหมดไปแล้ว"
+    m_Localized: "\u0E19\u0E49\u0E33\u0E2B\u0E21\u0E14\u0E44\u0E1B\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296656
-    m_Localized: "คงต้องเคาะด้วยอะไรสักอย่างถึงจะหมุนได้ มันสนิมติดแน่น"
+    m_Localized: "\u0E04\u0E07\u0E15\u0E49\u0E2D\u0E07\u0E40\u0E04\u0E32\u0E30\u0E14\u0E49\u0E27\u0E22\u0E2D\u0E30\u0E44\u0E23\u0E2A\u0E31\u0E01\u0E2D\u0E22\u0E48\u0E32\u0E07\u0E16\u0E36\u0E07\u0E08\u0E30\u0E2B\u0E21\u0E38\u0E19\u0E44\u0E14\u0E49
+      \u0E21\u0E31\u0E19\u0E2A\u0E19\u0E34\u0E21\u0E15\u0E34\u0E14\u0E41\u0E19\u0E48\u0E19"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296657
-    m_Localized: "ใช้เหล็กเส้นกับปากกาจับ"
+    m_Localized: "\u0E43\u0E0A\u0E49\u0E40\u0E2B\u0E25\u0E47\u0E01\u0E40\u0E2A\u0E49\u0E19\u0E01\u0E31\u0E1A\u0E1B\u0E32\u0E01\u0E01\u0E32\u0E08\u0E31\u0E1A"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296658
-    m_Localized: "ใช้ค้อนกับเหล็กเส้น"
+    m_Localized: "\u0E43\u0E0A\u0E49\u0E04\u0E49\u0E2D\u0E19\u0E01\u0E31\u0E1A\u0E40\u0E2B\u0E25\u0E47\u0E01\u0E40\u0E2A\u0E49\u0E19"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296659
-    m_Localized: "ติดหมากฝรั่งบนกระดูกแล้ว"
+    m_Localized: "\u0E15\u0E34\u0E14\u0E2B\u0E21\u0E32\u0E01\u0E1D\u0E23\u0E31\u0E48\u0E07\u0E1A\u0E19\u0E01\u0E23\u0E30\u0E14\u0E39\u0E01\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296660
-    m_Localized: "มันลื่นตลอด ต้องติดอะไรไว้บนกระดูก"
+    m_Localized: "\u0E21\u0E31\u0E19\u0E25\u0E37\u0E48\u0E19\u0E15\u0E25\u0E2D\u0E14
+      \u0E15\u0E49\u0E2D\u0E07\u0E15\u0E34\u0E14\u0E2D\u0E30\u0E44\u0E23\u0E44\u0E27\u0E49\u0E1A\u0E19\u0E01\u0E23\u0E30\u0E14\u0E39\u0E01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296661
-    m_Localized: "ไขควงหักแล้ว"
+    m_Localized: "\u0E44\u0E02\u0E04\u0E27\u0E07\u0E2B\u0E31\u0E01\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296662
-    m_Localized: "เคล็ดลับ: ใช้ที่ซ่อนเพื่อหนีศัตรู"
+    m_Localized: "\u0E40\u0E04\u0E25\u0E47\u0E14\u0E25\u0E31\u0E1A: \u0E43\u0E0A\u0E49\u0E17\u0E35\u0E48\u0E0B\u0E48\u0E2D\u0E19\u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E2B\u0E19\u0E35\u0E28\u0E31\u0E15\u0E23\u0E39"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296663
-    m_Localized: "เคล็ดลับ: สำรวจอย่างระมัดระวัง อาจพบเบาะแสสำคัญ"
+    m_Localized: "\u0E40\u0E04\u0E25\u0E47\u0E14\u0E25\u0E31\u0E1A: \u0E2A\u0E33\u0E23\u0E27\u0E08\u0E2D\u0E22\u0E48\u0E32\u0E07\u0E23\u0E30\u0E21\u0E31\u0E14\u0E23\u0E30\u0E27\u0E31\u0E07
+      \u0E2D\u0E32\u0E08\u0E1E\u0E1A\u0E40\u0E1A\u0E32\u0E30\u0E41\u0E2A\u0E2A\u0E33\u0E04\u0E31\u0E0D"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296664
-    m_Localized: "เคล็ดลับ: เงียบๆ ไว้ ศัตรูได้ยินคุณ"
+    m_Localized: "\u0E40\u0E04\u0E25\u0E47\u0E14\u0E25\u0E31\u0E1A: \u0E40\u0E07\u0E35\u0E22\u0E1A\u0E46
+      \u0E44\u0E27\u0E49 \u0E28\u0E31\u0E15\u0E23\u0E39\u0E44\u0E14\u0E49\u0E22\u0E34\u0E19\u0E04\u0E38\u0E13"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296665
-    m_Localized: "เคล็ดลับ: ไฟฉายมีแบตจำกัด ใช้อย่างฉลาด"
+    m_Localized: "\u0E40\u0E04\u0E25\u0E47\u0E14\u0E25\u0E31\u0E1A: \u0E44\u0E1F\u0E09\u0E32\u0E22\u0E21\u0E35\u0E41\u0E1A\u0E15\u0E08\u0E33\u0E01\u0E31\u0E14
+      \u0E43\u0E0A\u0E49\u0E2D\u0E22\u0E48\u0E32\u0E07\u0E09\u0E25\u0E32\u0E14"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296666
-    m_Localized: "เคล็ดลับ: ประตูบางบานต้องใช้กุญแจพิเศษ"
+    m_Localized: "\u0E40\u0E04\u0E25\u0E47\u0E14\u0E25\u0E31\u0E1A: \u0E1B\u0E23\u0E30\u0E15\u0E39\u0E1A\u0E32\u0E07\u0E1A\u0E32\u0E19\u0E15\u0E49\u0E2D\u0E07\u0E43\u0E0A\u0E49\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E1E\u0E34\u0E40\u0E28\u0E29"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296667
-    m_Localized: "เคล็ดลับ: การวิ่งอาจดึงดูดความสนใจของศัตรู"
+    m_Localized: "\u0E40\u0E04\u0E25\u0E47\u0E14\u0E25\u0E31\u0E1A: \u0E01\u0E32\u0E23\u0E27\u0E34\u0E48\u0E07\u0E2D\u0E32\u0E08\u0E14\u0E36\u0E07\u0E14\u0E39\u0E14\u0E04\u0E27\u0E32\u0E21\u0E2A\u0E19\u0E43\u0E08\u0E02\u0E2D\u0E07\u0E28\u0E31\u0E15\u0E23\u0E39"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296668
-    m_Localized: "เคล็ดลับ: อ่านบันทึกและเอกสารเพื่อเปิดเผยเรื่องราว"
+    m_Localized: "\u0E40\u0E04\u0E25\u0E47\u0E14\u0E25\u0E31\u0E1A: \u0E2D\u0E48\u0E32\u0E19\u0E1A\u0E31\u0E19\u0E17\u0E36\u0E01\u0E41\u0E25\u0E30\u0E40\u0E2D\u0E01\u0E2A\u0E32\u0E23\u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E40\u0E1B\u0E34\u0E14\u0E40\u0E1C\u0E22\u0E40\u0E23\u0E37\u0E48\u0E2D\u0E07\u0E23\u0E32\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296669
-    m_Localized: "เคล็ดลับ: ซ่อนตามมุมมืดช่วยให้พ้นจากศัตรู"
+    m_Localized: "\u0E40\u0E04\u0E25\u0E47\u0E14\u0E25\u0E31\u0E1A: \u0E0B\u0E48\u0E2D\u0E19\u0E15\u0E32\u0E21\u0E21\u0E38\u0E21\u0E21\u0E37\u0E14\u0E0A\u0E48\u0E27\u0E22\u0E43\u0E2B\u0E49\u0E1E\u0E49\u0E19\u0E08\u0E32\u0E01\u0E28\u0E31\u0E15\u0E23\u0E39"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296670
-    m_Localized: "ไม่มีอะไรที่นี่"
+    m_Localized: "\u0E44\u0E21\u0E48\u0E21\u0E35\u0E2D\u0E30\u0E44\u0E23\u0E17\u0E35\u0E48\u0E19\u0E35\u0E48"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296671
-    m_Localized: "กระเป๋าเต็มแล้ว"
+    m_Localized: "\u0E01\u0E23\u0E30\u0E40\u0E1B\u0E4B\u0E32\u0E40\u0E15\u0E47\u0E21\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296672
-    m_Localized: "ตะแกรงยังถูกยึดด้วยสลักอยู่"
+    m_Localized: "\u0E15\u0E30\u0E41\u0E01\u0E23\u0E07\u0E22\u0E31\u0E07\u0E16\u0E39\u0E01\u0E22\u0E36\u0E14\u0E14\u0E49\u0E27\u0E22\u0E2A\u0E25\u0E31\u0E01\u0E2D\u0E22\u0E39\u0E48"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296673
-    m_Localized: "ยืนยัน"
+    m_Localized: "\u0E22\u0E37\u0E19\u0E22\u0E31\u0E19"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296674
-    m_Localized: "ใช่"
+    m_Localized: "\u0E43\u0E0A\u0E48"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296675
-    m_Localized: "ไม่"
+    m_Localized: "\u0E44\u0E21\u0E48"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296676
-    m_Localized: "แน่ใจหรือว่าต้องการออก?\n\nความคืบหน้าที่ยังไม่ได้บันทึกจะหายไป"
+    m_Localized: "\u0E41\u0E19\u0E48\u0E43\u0E08\u0E2B\u0E23\u0E37\u0E2D\u0E27\u0E48\u0E32\u0E15\u0E49\u0E2D\u0E07\u0E01\u0E32\u0E23\u0E2D\u0E2D\u0E01?\n\n\u0E04\u0E27\u0E32\u0E21\u0E04\u0E37\u0E1A\u0E2B\u0E19\u0E49\u0E32\u0E17\u0E35\u0E48\u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E44\u0E14\u0E49\u0E1A\u0E31\u0E19\u0E17\u0E36\u0E01\u0E08\u0E30\u0E2B\u0E32\u0E22\u0E44\u0E1B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296677
-    m_Localized: "ออก"
+    m_Localized: "\u0E2D\u0E2D\u0E01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296678
-    m_Localized: "ออก"
+    m_Localized: "\u0E2D\u0E2D\u0E01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296679
-    m_Localized: "แน่ใจหรือว่าต้องการกลับเมนูหลัก?\n\nความคืบหน้าที่ยังไม่ได้บันทึกจะหายไป"
+    m_Localized: "\u0E41\u0E19\u0E48\u0E43\u0E08\u0E2B\u0E23\u0E37\u0E2D\u0E27\u0E48\u0E32\u0E15\u0E49\u0E2D\u0E07\u0E01\u0E32\u0E23\u0E01\u0E25\u0E31\u0E1A\u0E40\u0E21\u0E19\u0E39\u0E2B\u0E25\u0E31\u0E01?\n\n\u0E04\u0E27\u0E32\u0E21\u0E04\u0E37\u0E1A\u0E2B\u0E19\u0E49\u0E32\u0E17\u0E35\u0E48\u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E44\u0E14\u0E49\u0E1A\u0E31\u0E19\u0E17\u0E36\u0E01\u0E08\u0E30\u0E2B\u0E32\u0E22\u0E44\u0E1B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296680
-    m_Localized: "เมนูหลัก"
+    m_Localized: "\u0E40\u0E21\u0E19\u0E39\u0E2B\u0E25\u0E31\u0E01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296681
-    m_Localized: "กลับ"
+    m_Localized: "\u0E01\u0E25\u0E31\u0E1A"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296682
-    m_Localized: "คิดว่าในแจกันใบนั้นมีอะไรอยู่"
+    m_Localized: "\u0E04\u0E34\u0E14\u0E27\u0E48\u0E32\u0E43\u0E19\u0E41\u0E08\u0E01\u0E31\u0E19\u0E43\u0E1A\u0E19\u0E31\u0E49\u0E19\u0E21\u0E35\u0E2D\u0E30\u0E44\u0E23\u0E2D\u0E22\u0E39\u0E48"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296683
-    m_Localized: "ทิ้ง {0} แล้ว"
+    m_Localized: "\u0E17\u0E34\u0E49\u0E07 {0} \u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296684
-    m_Localized: "เปิด"
+    m_Localized: "\u0E40\u0E1B\u0E34\u0E14"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296685
-    m_Localized: "ปิด"
+    m_Localized: "\u0E1B\u0E34\u0E14"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296686
-    m_Localized: "เต็มจอ"
+    m_Localized: "\u0E40\u0E15\u0E47\u0E21\u0E08\u0E2D"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296687
-    m_Localized: "หน้าต่าง"
+    m_Localized: "\u0E2B\u0E19\u0E49\u0E32\u0E15\u0E48\u0E32\u0E07"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296688
-    m_Localized: "มีขอบ"
+    m_Localized: "\u0E21\u0E35\u0E02\u0E2D\u0E1A"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296689
-    m_Localized: "เต็มจอเฉพาะ"
+    m_Localized: "\u0E40\u0E15\u0E47\u0E21\u0E08\u0E2D\u0E40\u0E09\u0E1E\u0E32\u0E30"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296690
-    m_Localized: "ต่ำมาก"
+    m_Localized: "\u0E15\u0E48\u0E33\u0E21\u0E32\u0E01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296691
-    m_Localized: "ต่ำ"
+    m_Localized: "\u0E15\u0E48\u0E33"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296692
-    m_Localized: "กลาง"
+    m_Localized: "\u0E01\u0E25\u0E32\u0E07"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296693
-    m_Localized: "สูง"
+    m_Localized: "\u0E2A\u0E39\u0E07"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296694
-    m_Localized: "สูงมาก"
+    m_Localized: "\u0E2A\u0E39\u0E07\u0E21\u0E32\u0E01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296695
-    m_Localized: "อัลตร้า"
+    m_Localized: "\u0E2D\u0E31\u0E25\u0E15\u0E23\u0E49\u0E32"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296696
-    m_Localized: "ใช้ไอเท็ม"
+    m_Localized: "\u0E43\u0E0A\u0E49\u0E44\u0E2D\u0E40\u0E17\u0E47\u0E21"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296697
-    m_Localized: "ทิ้ง"
+    m_Localized: "\u0E17\u0E34\u0E49\u0E07"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296698
-    m_Localized: "ไม่มีอะไรในระยะเอื้อม"
+    m_Localized: "\u0E44\u0E21\u0E48\u0E21\u0E35\u0E2D\u0E30\u0E44\u0E23\u0E43\u0E19\u0E23\u0E30\u0E22\u0E30\u0E40\u0E2D\u0E37\u0E49\u0E2D\u0E21"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296699
-    m_Localized: "ส้วมตัน หาที่ดูดส้วมไม่เจอ เคยอยู่ในถังที่ไหนสักแห่ง แต่จำไม่ได้ว่าที่ไหน"
+    m_Localized: "\u0E2A\u0E49\u0E27\u0E21\u0E15\u0E31\u0E19 \u0E2B\u0E32\u0E17\u0E35\u0E48\u0E14\u0E39\u0E14\u0E2A\u0E49\u0E27\u0E21\u0E44\u0E21\u0E48\u0E40\u0E08\u0E2D
+      \u0E40\u0E04\u0E22\u0E2D\u0E22\u0E39\u0E48\u0E43\u0E19\u0E16\u0E31\u0E07\u0E17\u0E35\u0E48\u0E44\u0E2B\u0E19\u0E2A\u0E31\u0E01\u0E41\u0E2B\u0E48\u0E07
+      \u0E41\u0E15\u0E48\u0E08\u0E33\u0E44\u0E21\u0E48\u0E44\u0E14\u0E49\u0E27\u0E48\u0E32\u0E17\u0E35\u0E48\u0E44\u0E2B\u0E19"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296701
-    m_Localized: "เก็บคลัตช์แล้ว"
+    m_Localized: "\u0E40\u0E01\u0E47\u0E1A\u0E04\u0E25\u0E31\u0E15\u0E0A\u0E4C\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296700
-    m_Localized: "เก็บหัวเทียนแล้ว"
+    m_Localized: "\u0E40\u0E01\u0E47\u0E1A\u0E2B\u0E31\u0E27\u0E40\u0E17\u0E35\u0E22\u0E19\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296702
-    m_Localized: "ำ"
+    m_Localized: "\u0E33"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296703
-    m_Localized: "เ"
+    m_Localized: "\u0E40"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296704
-    m_Localized: "คงต้องเคาะด้วยอะไรสักอย่างถึงจะหมุนได้ มันสนิมติดแน่น"
+    m_Localized: "\u0E04\u0E07\u0E15\u0E49\u0E2D\u0E07\u0E40\u0E04\u0E32\u0E30\u0E14\u0E49\u0E27\u0E22\u0E2D\u0E30\u0E44\u0E23\u0E2A\u0E31\u0E01\u0E2D\u0E22\u0E48\u0E32\u0E07\u0E16\u0E36\u0E07\u0E08\u0E30\u0E2B\u0E21\u0E38\u0E19\u0E44\u0E14\u0E49
+      \u0E21\u0E31\u0E19\u0E2A\u0E19\u0E34\u0E21\u0E15\u0E34\u0E14\u0E41\u0E19\u0E48\u0E19"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296705
-    m_Localized: "กุญแจล็อกนี้ดูเหมือนจะหักง่าย"
+    m_Localized: "\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E25\u0E47\u0E2D\u0E01\u0E19\u0E35\u0E49\u0E14\u0E39\u0E40\u0E2B\u0E21\u0E37\u0E2D\u0E19\u0E08\u0E30\u0E2B\u0E31\u0E01\u0E07\u0E48\u0E32\u0E22"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296706
-    m_Localized: "ย่อตัว"
+    m_Localized: "\u0E22\u0E48\u0E2D\u0E15\u0E31\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296707
-    m_Localized: "วิ่ง"
+    m_Localized: "\u0E27\u0E34\u0E48\u0E07"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296708
@@ -587,79 +597,196 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296710
-    m_Localized: "ฉันขวางทางอยู่"
+    m_Localized: "\u0E09\u0E31\u0E19\u0E02\u0E27\u0E32\u0E07\u0E17\u0E32\u0E07\u0E2D\u0E22\u0E39\u0E48"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296711
-    m_Localized: "คุณจะให้คะแนนประสบการณ์นี้อย่างไร?"
+    m_Localized: "\u0E04\u0E38\u0E13\u0E08\u0E30\u0E43\u0E2B\u0E49\u0E04\u0E30\u0E41\u0E19\u0E19\u0E1B\u0E23\u0E30\u0E2A\u0E1A\u0E01\u0E32\u0E23\u0E13\u0E4C\u0E19\u0E35\u0E49\u0E2D\u0E22\u0E48\u0E32\u0E07\u0E44\u0E23?"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296712
-    m_Localized: "ความตึงเครียด"
+    m_Localized: "\u0E04\u0E27\u0E32\u0E21\u0E15\u0E36\u0E07\u0E40\u0E04\u0E23\u0E35\u0E22\u0E14"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296713
-    m_Localized: "ความน่ากลัว"
+    m_Localized: "\u0E04\u0E27\u0E32\u0E21\u0E19\u0E48\u0E32\u0E01\u0E25\u0E31\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296714
-    m_Localized: "ความสนุก"
+    m_Localized: "\u0E04\u0E27\u0E32\u0E21\u0E2A\u0E19\u0E38\u0E01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296715
-    m_Localized: "*ไม่บังคับ* พื้นที่แสดงความคิดเห็น"
+    m_Localized: "*\u0E44\u0E21\u0E48\u0E1A\u0E31\u0E07\u0E04\u0E31\u0E1A* \u0E1E\u0E37\u0E49\u0E19\u0E17\u0E35\u0E48\u0E41\u0E2A\u0E14\u0E07\u0E04\u0E27\u0E32\u0E21\u0E04\u0E34\u0E14\u0E40\u0E2B\u0E47\u0E19"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296716
-    m_Localized: "ส่ง"
+    m_Localized: "\u0E2A\u0E48\u0E07"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296717
-    m_Localized: "สวัสดี - ในฐานะวิศวกรซอฟต์แวร์ที่เพิ่งจบจากมหาวิทยาลัยฮาลิช ในเวอร์ชันจำกัดนี้ผมพยายามแสดงให้เห็นว่า Midnight Scour สามารถเป็นอะไรได้บ้าง ต่อไปผมอยากนำเวอร์ชันเต็มมาให้คุณ โดยขยายโลกและบรรยากาศ ต่อยอดจากรากฐานที่วางไว้ที่นี่ และเพิ่มงบประมาณ โปรดฝากความคิดเห็นไว้ เพื่อให้เราปรับปรุงประสบการณ์ของคุณได้"
+    m_Localized: "\u0E2A\u0E27\u0E31\u0E2A\u0E14\u0E35 \u2014 \u0E40\u0E23\u0E32\u0E15\u0E49\u0E2D\u0E07\u0E01\u0E32\u0E23\u0E02\u0E22\u0E32\u0E22\u0E07\u0E1A\u0E1B\u0E23\u0E30\u0E21\u0E32\u0E13\u0E41\u0E25\u0E30\u0E02\u0E2D\u0E1A\u0E40\u0E02\u0E15\u0E02\u0E2D\u0E07\u0E40\u0E01\u0E21\u0E40\u0E15\u0E47\u0E21
+      \u0E41\u0E25\u0E30\u0E04\u0E27\u0E32\u0E21\u0E04\u0E34\u0E14\u0E40\u0E2B\u0E47\u0E19\u0E02\u0E2D\u0E07\u0E04\u0E38\u0E13\u0E04\u0E37\u0E2D\u0E41\u0E19\u0E27\u0E17\u0E32\u0E07\u0E17\u0E35\u0E48\u0E2A\u0E33\u0E04\u0E31\u0E0D\u0E17\u0E35\u0E48\u0E2A\u0E38\u0E14\u0E43\u0E19\u0E01\u0E32\u0E23\u0E01\u0E49\u0E32\u0E27\u0E15\u0E48\u0E2D\u0E44\u0E1B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296718
-    m_Localized: "?"
+    m_Localized: '?'
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296719
-    m_Localized: "กำลังส่ง..."
+    m_Localized: "\u0E01\u0E33\u0E25\u0E31\u0E07\u0E2A\u0E48\u0E07..."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296720
-    m_Localized: "ส่งแล้ว"
+    m_Localized: "\u0E2A\u0E48\u0E07\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296721
-    m_Localized: "ลองใหม่"
+    m_Localized: "\u0E25\u0E2D\u0E07\u0E43\u0E2B\u0E21\u0E48"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296722
-    m_Localized: "ให้คะแนนทั้งหมด"
+    m_Localized: "\u0E43\u0E2B\u0E49\u0E04\u0E30\u0E41\u0E19\u0E19\u0E17\u0E31\u0E49\u0E07\u0E2B\u0E21\u0E14"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296723
-    m_Localized: "ต้องตั้งค่า"
+    m_Localized: "\u0E15\u0E49\u0E2D\u0E07\u0E15\u0E31\u0E49\u0E07\u0E04\u0E48\u0E32"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296724
-    m_Localized: "เพิ่มในรายการสิ่งที่อยากได้!"
+    m_Localized: "\u0E40\u0E1E\u0E34\u0E48\u0E21\u0E43\u0E19\u0E23\u0E32\u0E22\u0E01\u0E32\u0E23\u0E2A\u0E34\u0E48\u0E07\u0E17\u0E35\u0E48\u0E2D\u0E22\u0E32\u0E01\u0E44\u0E14\u0E49!"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296725
-    m_Localized: "ออก"
+    m_Localized: "\u0E2D\u0E2D\u0E01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296726
-    m_Localized: "ส่งไปแล้ว"
+    m_Localized: "\u0E2A\u0E48\u0E07\u0E44\u0E1B\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296727
-    m_Localized: "อัปเดตแล้ว"
+    m_Localized: "\u0E2D\u0E31\u0E1B\u0E40\u0E14\u0E15\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296728
-    m_Localized: ฆาตกรจะจำพฤติกรรมที่คุณทำซ้ำแล้วปรับตัวตาม
+    m_Localized: "\u0E06\u0E32\u0E15\u0E01\u0E23\u0E08\u0E30\u0E08\u0E33\u0E1E\u0E24\u0E15\u0E34\u0E01\u0E23\u0E23\u0E21\u0E17\u0E35\u0E48\u0E04\u0E38\u0E13\u0E17\u0E33\u0E0B\u0E49\u0E33\u0E41\u0E25\u0E49\u0E27\u0E1B\u0E23\u0E31\u0E1A\u0E15\u0E31\u0E27\u0E15\u0E32\u0E21"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296729
+    m_Localized: "\u0E2A\u0E33\u0E40\u0E23\u0E47\u0E08\u0E41\u0E25\u0E49\u0E27 \u0E08\u0E31\u0E07\u0E2B\u0E27\u0E30\u0E14\u0E35\u0E21\u0E32\u0E01"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296730
+    m_Localized: "\u0E09\u0E31\u0E19\u0E08\u0E31\u0E1A\u0E08\u0E31\u0E07\u0E2B\u0E27\u0E30\u0E15\u0E35\u0E04\u0E49\u0E2D\u0E19\u0E43\u0E2B\u0E49\u0E15\u0E23\u0E07\u0E01\u0E31\u0E1A\u0E1F\u0E49\u0E32\u0E23\u0E49\u0E2D\u0E07\u0E44\u0E14\u0E49"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296731
+    m_Localized: "\u0E14\u0E31\u0E07\u0E40\u0E01\u0E34\u0E19\u0E44\u0E1B \u0E15\u0E2D\u0E19\u0E19\u0E35\u0E49\u0E15\u0E35\u0E44\u0E21\u0E48\u0E44\u0E14\u0E49"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296732
+    m_Localized: "ฉันตีช้าเกินไป เขาจะจับฉันได้"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296733
+    m_Localized: "ดันไขควงเข้าไป"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296734
+    m_Localized: "เขย่าแรงๆ เพื่องัดกุญแจ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296735
+    m_Localized: "ฉันตีเร็วเกินไป ฉันจะถูกจับ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296736
+    m_Localized: "ฉันตีช้าเกินไป ฉันจะถูกจับ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296737
+    m_Localized: "ติดแล้ว ลองใหม่"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296738
+    m_Localized: "Butcher เห็นคุณซ่อน"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296739
+    m_Localized: "คุณส่งเสียงดังเกินไป"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296740
+    m_Localized: "คุณซ่อนที่เดิมซ้ำๆ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296741
+    m_Localized: "คุณกลบเสียงค้อนด้วยฟ้าร้องไม่สำเร็จ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296742
+    m_Localized: "Butcher เห็นคุณ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296743
+    m_Localized: "คุณถูกจับแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296744
+    m_Localized: "เริ่มใหม่"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296745
+    m_Localized: "เมนูหลัก"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296746
+    m_Localized: "Butcher ซุ่มโจมตีคุณ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296747
+    m_Localized: "ที่งัดกุญแจช่วยให้คุณเก็บความคืบหน้าไว้ได้หลังถูกจับ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296748
+    m_Localized: "ที่งัดกุญแจ"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296749
+    m_Localized: "เก็บที่งัดกุญแจแล้ว"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296750
+    m_Localized: "????????????"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296751
+    m_Localized: "\u0E01\u0E14\u0E04\u0E25\u0E34\u0E01\u0E02\u0E27\u0E32\u0E04\u0E49\u0E32\u0E07\u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E2D\u0E2D\u0E01\u0E41\u0E23\u0E07"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296752
+    m_Localized: "\u0E43\u0E0A\u0E49\u0E40\u0E21\u0E32\u0E2A\u0E4C\u0E40\u0E25\u0E37\u0E48\u0E2D\u0E19\u0E17\u0E35\u0E48\u0E07\u0E31\u0E14\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E41\u0E25\u0E49\u0E27\u0E04\u0E25\u0E34\u0E01\u0E0B\u0E49\u0E32\u0E22\u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E07\u0E31\u0E14\u0E2B\u0E21\u0E38\u0E14"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296753
+    m_Localized: "\u0E2B\u0E21\u0E38\u0E14\u0E15\u0E31\u0E49\u0E07\u0E41\u0E25\u0E49\u0E27"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296754
+    m_Localized: "\u0E44\u0E02\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E41\u0E25\u0E49\u0E27"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296755
+    m_Localized: "ประตูถูกล็อกด้วยโซ่"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296756
+    m_Localized: "ตอนที่ฉันถูกจับครั้งแรก เขาล็อกประตูด้วยกุญแจคล้อง อยากจะเก็บกิ๊บบนโถส้วมนั้นไว้เหลือเกิน บางทีอาจใช้เป็นที่งัดกุญแจได้"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5707318296757
+    m_Localized: "ฉันต้องคอยหาที่งัดกุญแจเพิ่ม"
     m_Metadata:
       m_Items: []
   references:

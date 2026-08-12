@@ -20,11 +20,223 @@ public class InteractionController : MonoBehaviour
 
     const string BasementExcludedRoom = "Basement_Room";
 
-    [Tooltip("NPC routine will not pick the basement room until this many seconds after the scene starts.")]
+    [Tooltip("After the player leaves the cage, Natural routines wait this long before the butcher may pick/enter the basement. Chase from noise is not blocked.")]
     [SerializeField] float basementRoutineDelaySeconds = 30f;
 
+    [Tooltip("After Natural picks the player's current room: once the butcher physically leaves that room, he cannot pick it again for this long.")]
+    [SerializeField] float playerRoomPickCooldownSeconds = 30f;
+
+    /// <summary>Room he Natural-picked while the player was there — cooldown starts when he leaves it.</summary>
+    string _pendingLeaveCooldownRoomId;
+    /// <summary>True after the butcher has entered <see cref="_pendingLeaveCooldownRoomId"/> (so we don't start cooldown while still walking there).</summary>
+    bool _enteredPendingCooldownRoom;
+    /// <summary>Room blocked until <see cref="_roomCooldownUntil"/>.</summary>
+    string _cooldownRoomId;
+    float _roomCooldownUntil = -1f;
+
+    /// <summary>True until the player leaves the cage — countdown has not started yet.</summary>
+    static bool s_basementGracePendingCageExit;
+    /// <summary>
+    /// Continue day-reset: keep basement blocked through the intro cinematic, then arm the
+    /// normal leave-cage gate on unlock (intro must not eat the grace, and spawn-outside must
+    /// not start the 30s early).
+    /// </summary>
+    static bool s_basementGraceHoldForManualStart;
+    /// <summary>When the post-exit countdown ends. &lt;= 0 means not counting.</summary>
     static float s_basementRoutineUnlockTime = -1f;
+    static float s_basementGraceDurationSeconds = 30f;
     static int s_basementDelaySceneHandle = -1;
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    static void ResetBasementGraceStatics()
+    {
+        s_basementGracePendingCageExit = false;
+        s_basementGraceHoldForManualStart = false;
+        s_basementRoutineUnlockTime = -1f;
+        s_basementGraceDurationSeconds = 30f;
+        s_basementDelaySceneHandle = -1;
+    }
+
+    /// <summary>
+    /// True while the butcher must not choose / enter the basement:
+    /// still in cage (timer not started), held for Continue intro, or within the post-exit grace window.
+    /// </summary>
+    public static bool IsBasementRoutineDelayed =>
+        s_basementGracePendingCageExit
+        || s_basementGraceHoldForManualStart
+        || (s_basementRoutineUnlockTime > 0f && Time.time < s_basementRoutineUnlockTime);
+
+    /// <summary>
+    /// Arm basement block like thunder's cage gate: do not start the timer until the player
+    /// leaves the cage. If they are already outside, the countdown begins immediately.
+    /// </summary>
+    public static void ArmBasementGraceUntilCageExit(float seconds)
+    {
+        s_basementGraceDurationSeconds = Mathf.Max(0f, seconds);
+        s_basementGracePendingCageExit = true;
+        s_basementGraceHoldForManualStart = false;
+        s_basementRoutineUnlockTime = -1f;
+        TryStartBasementGraceCountdownIfPlayerOutsideCage();
+    }
+
+    /// <summary>
+    /// Continue: block basement through the replayed intro, then call
+    /// <see cref="ArmBasementGraceAfterContinueIntro"/> when the cinematic unlocks
+    /// (same leave-cage countdown as a fresh start).
+    /// </summary>
+    public static void HoldBasementGraceUntilManualStart(float seconds)
+    {
+        s_basementGraceDurationSeconds = Mathf.Max(0f, seconds);
+        s_basementGracePendingCageExit = false;
+        s_basementGraceHoldForManualStart = true;
+        s_basementRoutineUnlockTime = -1f;
+    }
+
+    /// <summary>
+    /// After Continue intro unlock: same as a new game — wait until the player leaves the cage,
+    /// then start the countdown. If they are already outside, the countdown starts now.
+    /// </summary>
+    public static void ArmBasementGraceAfterContinueIntro()
+    {
+        if (!s_basementGraceHoldForManualStart)
+            return;
+
+        float seconds = s_basementGraceDurationSeconds;
+        // Clears the Continue hold, then arms the normal cage-exit gate.
+        ArmBasementGraceUntilCageExit(seconds);
+    }
+
+    /// <summary>Obsolete name — use <see cref="ArmBasementGraceAfterContinueIntro"/>.</summary>
+    public static void TryBeginBasementGraceAfterContinueIntro() =>
+        ArmBasementGraceAfterContinueIntro();
+
+    /// <summary>Legacy name — same as <see cref="ArmBasementGraceUntilCageExit"/>.</summary>
+    public static void RestartBasementRoutineDelay(float seconds) =>
+        ArmBasementGraceUntilCageExit(seconds);
+
+    /// <summary>Called when the player exits a cage trigger — starts the post-exit countdown once.</summary>
+    public static void NotifyPlayerLeftCage()
+    {
+        // Continue intro owns the block until UnlockCinematic arms the normal cage-exit gate.
+        if (s_basementGraceHoldForManualStart)
+            return;
+
+        if (!s_basementGracePendingCageExit)
+            return;
+
+        s_basementGracePendingCageExit = false;
+        s_basementRoutineUnlockTime = Time.time + s_basementGraceDurationSeconds;
+    }
+
+    static void TryStartBasementGraceCountdownIfPlayerOutsideCage()
+    {
+        if (s_basementGraceHoldForManualStart)
+            return;
+
+        if (!s_basementGracePendingCageExit)
+            return;
+
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null)
+            return;
+
+        if (!Cage.IsPlayerInsideAnyCage(player.transform))
+            NotifyPlayerLeftCage();
+    }
+
+    public float BasementRoutineDelaySeconds => basementRoutineDelaySeconds;
+
+    bool TryGetPlayerRoomAnchorId(out string roomAnchorId)
+    {
+        roomAnchorId = null;
+        if (data == null || NPCAnchorManager.Instance == null)
+            return false;
+
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null)
+            return false;
+
+        Transform anchor = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(
+            player.transform.position,
+            data.homeID,
+            NavMesh.AllAreas,
+            isNpcSelf: false);
+        if (anchor == null)
+            return false;
+
+        var room = anchor.GetComponent<RoomAnchor>();
+        roomAnchorId = room != null
+            ? (string.IsNullOrEmpty(room.roomID) ? room.name : room.roomID)
+            : anchor.name;
+        return !string.IsNullOrEmpty(roomAnchorId);
+    }
+
+    string GetActiveCooldownRoomId()
+    {
+        if (playerRoomPickCooldownSeconds <= 0f
+            || string.IsNullOrEmpty(_cooldownRoomId)
+            || Time.time >= _roomCooldownUntil)
+            return null;
+        return _cooldownRoomId;
+    }
+
+    static string RoomIdOf(RoomAnchor room)
+    {
+        if (room == null) return null;
+        return string.IsNullOrEmpty(room.roomID) ? room.name : room.roomID;
+    }
+
+    void TickPlayerRoomLeaveCooldown()
+    {
+        if (playerRoomPickCooldownSeconds <= 0f || string.IsNullOrEmpty(_pendingLeaveCooldownRoomId))
+            return;
+
+        string butcherRoomId = RoomIdOf(navigator != null ? navigator.GetCurrentRoom() : null);
+        if (string.IsNullOrEmpty(butcherRoomId))
+            return;
+
+        if (butcherRoomId == _pendingLeaveCooldownRoomId)
+        {
+            _enteredPendingCooldownRoom = true;
+            return;
+        }
+
+        // Only start the timer after he actually entered that room, then left it.
+        if (!_enteredPendingCooldownRoom)
+            return;
+
+        _cooldownRoomId = _pendingLeaveCooldownRoomId;
+        _roomCooldownUntil = Time.time + playerRoomPickCooldownSeconds;
+        _pendingLeaveCooldownRoomId = null;
+        _enteredPendingCooldownRoom = false;
+    }
+
+    void MarkPendingLeaveCooldownIfPickedPlayerRoom(string pickedRoomId)
+    {
+        if (playerRoomPickCooldownSeconds <= 0f || string.IsNullOrEmpty(pickedRoomId))
+            return;
+
+        if (!TryGetPlayerRoomAnchorId(out string playerRoomId))
+            return;
+
+        if (pickedRoomId != playerRoomId)
+            return;
+
+        // He picked the room the player is in — cooldown starts when he physically leaves it.
+        _pendingLeaveCooldownRoomId = pickedRoomId;
+        // Already standing in that room (e.g. another hotspot) → leave can start immediately later.
+        string butcherRoomId = RoomIdOf(navigator != null ? navigator.GetCurrentRoom() : null);
+        _enteredPendingCooldownRoom = butcherRoomId == pickedRoomId;
+    }
+
+    /// <summary>Continue / new life — clear leave-pending and active room cooldown so the last run does not stick.</summary>
+    public void ClearPlayerRoomPickCooldown()
+    {
+        _pendingLeaveCooldownRoomId = null;
+        _enteredPendingCooldownRoom = false;
+        _cooldownRoomId = null;
+        _roomCooldownUntil = -1f;
+    }
 
     public float remainHomeFactor = 1f;
 
@@ -60,12 +272,17 @@ public class InteractionController : MonoBehaviour
         if (s_basementDelaySceneHandle != sceneHandle)
         {
             s_basementDelaySceneHandle = sceneHandle;
-            s_basementRoutineUnlockTime = Time.time + basementRoutineDelaySeconds;
+            ArmBasementGraceUntilCageExit(basementRoutineDelaySeconds);
         }
     }
 
     void Update()
     {
+        // Intro / Continue can arm grace before the player tag exists; keep checking until exit.
+        if (s_basementGracePendingCageExit)
+            TryStartBasementGraceCountdownIfPlayerOutsideCage();
+
+        TickPlayerRoomLeaveCooldown();
         SetCurrentMovementState();
         UpdateAnimation();
     }
@@ -100,6 +317,7 @@ public class InteractionController : MonoBehaviour
 
     public void StartNextRoutine()
     {
+        isCancelled = false;
         PickNextWeightedRoutine();
     }
 
@@ -123,19 +341,72 @@ public class InteractionController : MonoBehaviour
             });
         }
 
+        // During basement grace, don't even roll a zone that only has basement rooms.
+        if (IsBasementRoutineDelayed)
+        {
+            var zonesWithUpstairs = boostedZones
+                .Where(z => z.roomPlans != null
+                    && z.roomPlans.Any(r => r.roomAnchorID != BasementExcludedRoom))
+                .ToList();
+            if (zonesWithUpstairs.Count > 0)
+                boostedZones = zonesWithUpstairs;
+        }
+
+        string blockedRoomId = GetActiveCooldownRoomId();
+        if (!string.IsNullOrEmpty(blockedRoomId))
+        {
+            var zonesAwayFromBlocked = boostedZones
+                .Where(z => z.roomPlans != null
+                    && z.roomPlans.Any(r => r.roomAnchorID != blockedRoomId))
+                .ToList();
+            if (zonesAwayFromBlocked.Count > 0)
+                boostedZones = zonesAwayFromBlocked;
+        }
+
         currentZonePlan = WeightedPicker.Pick(boostedZones, z => z.weight);
 
         List<WeightedRoomPlan> roomOptions = currentZonePlan.roomPlans;
-        if (Time.time < s_basementRoutineUnlockTime)
+        if (IsBasementRoutineDelayed)
         {
             var withoutBasement = roomOptions
                 .Where(r => r.roomAnchorID != BasementExcludedRoom)
                 .ToList();
             if (withoutBasement.Count > 0)
                 roomOptions = withoutBasement;
+            else
+            {
+                // Avoid targeting basement during grace (navigator would abort and used to softlock).
+                StartCoroutine(RetryPickNextRoutineDelayed());
+                return;
+            }
+        }
+
+        if (!string.IsNullOrEmpty(blockedRoomId))
+        {
+            var withoutBlocked = roomOptions
+                .Where(r => r.roomAnchorID != blockedRoomId)
+                .ToList();
+            if (withoutBlocked.Count > 0)
+                roomOptions = withoutBlocked;
+            else
+            {
+                StartCoroutine(RetryPickNextRoutineDelayed());
+                return;
+            }
         }
 
         currentRoomPlan = WeightedPicker.Pick(roomOptions, r => r.weight);
+
+        // Abandoned the player-room trip before arriving — no leave, no cooldown.
+        if (!string.IsNullOrEmpty(_pendingLeaveCooldownRoomId)
+            && !_enteredPendingCooldownRoom
+            && currentRoomPlan.roomAnchorID != _pendingLeaveCooldownRoomId)
+        {
+            _pendingLeaveCooldownRoomId = null;
+        }
+
+        // Picked the player's room → cooldown starts when he physically leaves that room.
+        MarkPendingLeaveCooldownIfPickedPlayerRoom(currentRoomPlan.roomAnchorID);
 
         // Avoid repeating the last hotspot if possible
         List<WeightedHotspot> possibleHotspots = currentRoomPlan.hotspots
@@ -169,6 +440,25 @@ public class InteractionController : MonoBehaviour
         //Debug.Log(hotspotTransform);
     }
 
+    /// <summary>
+    /// Navigator aborted a Natural route (e.g. basement blocked during grace). Re-pick so he doesn't idle forever.
+    /// </summary>
+    public void NotifyRouteAbortedNeedNewRoutine()
+    {
+        if (npc != null && npc.currentState != NPCController.AIState.Natural)
+            return;
+
+        if (interactionRoutine != null)
+        {
+            StopCoroutine(interactionRoutine);
+            interactionRoutine = null;
+        }
+
+        IsPerformingHotspotAction = false;
+        isCancelled = false;
+        StartNextRoutine();
+    }
+
     private IEnumerator RetryPickNextRoutineDelayed()
     {
         yield return null;
@@ -177,18 +467,119 @@ public class InteractionController : MonoBehaviour
 
     private IEnumerator WaitForArrival(Transform hotspotTransform)
     {
-        const float hotspotArriveRadius = 2f; // tweak if needed
+        // Sit anchors often sit on furniture off the NavMesh — landing can be >2m from the transform.
+        const float hotspotArriveRadius = 3.25f;
+        const float nearAndStillSeconds = 0.2f;
+        const float pathAbortedFarSeconds = 4f;
+        const float noProgressTimeoutSeconds = 25f;
+        const float nudgeCooldownSeconds = 2.5f;
+
+        float nearStillTimer = 0f;
+        float stuckFarTimer = 0f;
+        float noProgressTimer = 0f;
+        float nudgeCooldown = 0f;
+        float bestDist = float.PositiveInfinity;
+        bool didNudge = false;
+
         while (true)
         {
-            if (!agent.pathPending &&   agent.remainingDistance <= agent.stoppingDistance)
+            // Chase / capture / etc. took over — don't sit or softlock Natural arrival.
+            if (npc != null && npc.currentState != NPCController.AIState.Natural)
+                yield break;
+
+            if (agent == null)
+                yield break;
+
+            if (nudgeCooldown > 0f)
+                nudgeCooldown -= Time.deltaTime;
+
+            float toHotspot = hotspotTransform != null
+                ? Vector3.Distance(transform.position, hotspotTransform.position)
+                : 0f;
+
+            bool nearHotspot = toHotspot <= hotspotArriveRadius;
+            float stopDist = Mathf.Max(0.15f, agent.stoppingDistance);
+            bool pathSettled = !agent.pathPending && agent.remainingDistance <= stopDist;
+            bool mostlyStill = agent.velocity.sqrMagnitude < 0.08f;
+
+            // Prefer a real path settle near the hotspot (old reliable sit start).
+            if (nearHotspot && pathSettled)
+                break;
+
+            // remainingDistance is unreliable near the goal — accept near + mostly still.
+            if (nearHotspot && mostlyStill)
             {
-                // Only accept arrival if we're actually close to the hotspot,
-                // not just some intermediate waypoint (door prepoint).
-                if (hotspotTransform == null ||  Vector3.Distance(transform.position, hotspotTransform.position) <= hotspotArriveRadius)
-                {
+                nearStillTimer += Time.deltaTime;
+                if (nearStillTimer >= nearAndStillSeconds)
                     break;
+            }
+            else
+            {
+                nearStillTimer = 0f;
+            }
+
+            // True abort: path wiped / invalid while still far (door cancel, grace abort).
+            // Do NOT treat "remainingDistance ~0" alone as abort — that is normal after
+            // Navigator finishes the last waypoint, even when the sit transform is further away.
+            bool pathReallyGone = !agent.pathPending
+                && (!agent.hasPath || agent.pathStatus == NavMeshPathStatus.PathInvalid);
+
+            // Finished walking but still outside sit radius — nudge onto the hotspot (furniture off-mesh).
+            bool finishedButFar = !nearHotspot && pathSettled
+                && hotspotTransform != null
+                && nudgeCooldown <= 0f;
+
+            if (finishedButFar)
+            {
+                nudgeCooldown = nudgeCooldownSeconds;
+                agent.SetDestination(hotspotTransform.position);
+                didNudge = true;
+                stuckFarTimer = 0f;
+            }
+            else if (pathReallyGone && !nearHotspot)
+            {
+                if (!didNudge && hotspotTransform != null && nudgeCooldown <= 0f)
+                {
+                    didNudge = true;
+                    nudgeCooldown = nudgeCooldownSeconds;
+                    agent.SetDestination(hotspotTransform.position);
+                    stuckFarTimer = 0f;
+                }
+                else
+                {
+                    stuckFarTimer += Time.deltaTime;
+                    if (stuckFarTimer >= pathAbortedFarSeconds)
+                    {
+                        Debug.LogWarning(
+                            $"[InteractionController] Arrival softlock ({toHotspot:0.0}m from hotspot) — re-picking Natural.");
+                        interactionRoutine = null;
+                        StartNextRoutine();
+                        yield break;
+                    }
                 }
             }
+            else
+            {
+                stuckFarTimer = 0f;
+            }
+
+            if (toHotspot < bestDist - 0.1f)
+            {
+                bestDist = toHotspot;
+                noProgressTimer = 0f;
+            }
+            else
+            {
+                noProgressTimer += Time.deltaTime;
+                if (noProgressTimer >= noProgressTimeoutSeconds)
+                {
+                    Debug.LogWarning("[InteractionController] Hotspot walk made no progress — re-picking Natural.");
+                    interactionRoutine = null;
+                    StartNextRoutine();
+                    yield break;
+                }
+            }
+
             yield return null;
         }
 
@@ -233,7 +624,12 @@ public class InteractionController : MonoBehaviour
 
             while (t < interpolationDurationEnter)
             {
-                if (isCancelled) yield break;
+                if (isCancelled)
+                {
+                    IsPerformingHotspotAction = false;
+                    interactionRoutine = null;
+                    yield break;
+                }
 
                 t += Time.deltaTime;
                 float lerpT = interpolationCurveEnter.Evaluate(t / interpolationDurationEnter);
@@ -255,7 +651,12 @@ public class InteractionController : MonoBehaviour
 
         while (timer < remainingSitTime)
         {
-            if (isCancelled) yield break;
+            if (isCancelled)
+            {
+                IsPerformingHotspotAction = false;
+                interactionRoutine = null;
+                yield break;
+            }
             timer += Time.deltaTime;
             yield return null;
         }
