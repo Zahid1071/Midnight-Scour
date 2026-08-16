@@ -733,22 +733,17 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         DestroySpawnedVisual();
 
         var playerCam = FindPlayerVirtualCamera();
-        var playerLook = FindFirstObjectByType<CinemachineMouseLook>();
         var brain = FindFirstObjectByType<CinemachineBrain>();
 
-        // PVC follows PlayerCameraRoot — zeroing only the VCam transform does nothing.
-        // Reset the look root to (0,0,0), force Always standby so CM resamples, THEN blend.
+        // Player keeps the look pitch they entered with — no rotation clear on exit.
         CinemachineVirtualCameraBase.StandbyUpdateMode savedStandby = default;
         if (playerCam != null)
         {
             savedStandby = playerCam.StandbyUpdate;
             playerCam.StandbyUpdate = CinemachineVirtualCameraBase.StandbyUpdateMode.Always;
-            playerCam.transform.localRotation = Quaternion.identity;
         }
 
-        playerLook?.ResetLocalRotation();
-
-        // Give CM a couple frames to bake the zeroed look into the standby PVC state.
+        // Give CM a couple frames to bake the standby PVC state before blending back.
         yield return null;
         yield return null;
 

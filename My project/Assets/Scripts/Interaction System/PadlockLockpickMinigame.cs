@@ -153,6 +153,7 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
     Quaternion _savedRotation;
     bool _poseStored;
     Coroutine _poseRoutine;
+    Coroutine _unwindRoutine;
     int _openedOnFrame = -1;
     float _nextInteractTime;
 
@@ -1042,6 +1043,45 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
         keyholeCylinder.localRotation = _cylinderBaseLocalRot * Quaternion.AngleAxis(_twistAngle, axis);
     }
 
+    /// <summary>
+    /// Turns the cylinder back to rest with the normal release feel instead of snapping.
+    /// Runs alongside the exit so it never delays the camera blend.
+    /// </summary>
+    void StartCylinderUnwind()
+    {
+        if (_unwindRoutine != null)
+            StopCoroutine(_unwindRoutine);
+
+        _unwindRoutine = StartCoroutine(UnwindCylinderRoutine());
+    }
+
+    IEnumerator UnwindCylinderRoutine()
+    {
+        // Guard against a zero return speed in the inspector spinning here forever.
+        float elapsed = 0f;
+        while (_cylinderPoseStored
+            && keyholeCylinder != null
+            && (_twistAngle > 0.01f || _wrenchLeadAngle > 0.01f)
+            && elapsed < 3f)
+        {
+            TickCylinderTwist(held: false);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        _unwindRoutine = null;
+        RestoreCylinderPose();
+    }
+
+    void StopCylinderUnwind()
+    {
+        if (_unwindRoutine == null)
+            return;
+
+        StopCoroutine(_unwindRoutine);
+        _unwindRoutine = null;
+    }
+
     void RestoreCylinderPose()
     {
         if (!_cylinderPoseStored || keyholeCylinder == null)
@@ -1281,7 +1321,7 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
         SetProgressVisible(false);
 
         StopPoseRoutine();
-        RestoreCylinderPose();
+        StartCylinderUnwind();
         RestoreWrenchPose();
         RestorePickPose();
         if (hidePickWhenIdle)
@@ -1290,18 +1330,15 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
             SetWrenchVisible(false);
 
         var playerCam = FindPlayerVirtualCamera();
-        var playerLook = FindFirstObjectByType<CinemachineMouseLook>();
         var brain = FindFirstObjectByType<CinemachineBrain>();
 
+        // Player keeps the look pitch they entered with — no rotation clear on exit.
         CinemachineVirtualCameraBase.StandbyUpdateMode savedStandby = default;
         if (playerCam != null)
         {
             savedStandby = playerCam.StandbyUpdate;
             playerCam.StandbyUpdate = CinemachineVirtualCameraBase.StandbyUpdateMode.Always;
-            playerCam.transform.localRotation = Quaternion.identity;
         }
-
-        playerLook?.ResetLocalRotation();
 
         if (lockpickCamera != null)
             lockpickCamera.Priority = 0;
@@ -1430,9 +1467,13 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
         {
             StopPoseRoutine();
             SnapToSavedPose();
+            StopCylinderUnwind();
         }
 
-        RestoreCylinderPose();
+        // A still-running unwind owns the cylinder and restores it when it lands.
+        if (_unwindRoutine == null)
+            RestoreCylinderPose();
+
         RestoreWrenchPose();
         RestorePickPose();
         if (hidePickWhenIdle)

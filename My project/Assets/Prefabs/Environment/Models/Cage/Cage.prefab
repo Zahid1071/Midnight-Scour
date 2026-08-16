@@ -13,11 +13,14 @@ GameObject:
   - component: {fileID: 7533699263200710925}
   - component: {fileID: 4101492480443246727}
   - component: {fileID: 1455957981578715101}
+  - component: {fileID: 6786271329886161358}
   - component: {fileID: 37625835344352224}
+  - component: {fileID: 2934584603430667659}
+  - component: {fileID: 2423113783508179686}
   m_Layer: 17
   m_Name: Door
   m_TagString: Untagged
-  m_Icon: {fileID: 0}
+  m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -33,7 +36,10 @@ Transform:
   m_LocalPosition: {x: 63.961792, y: 13.4761305, z: 235}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 651632101154044060}
+  - {fileID: 2417817367459639519}
+  - {fileID: 8170547060249024630}
   m_Father: {fileID: 1365926730738584012}
   m_LocalEulerAnglesHint: {x: 1.2722218e-14, y: 0, z: 0}
 --- !u!33 &7614403797812092651
@@ -108,6 +114,7 @@ MonoBehaviour:
   minToggleProgress: 0.1
   isLocked: 1
   requiredKey: {fileID: 11400000, guid: 2771dad0276634d4ab27043760a0bc9e, type: 2}
+  lockBreakMinigame: {fileID: 2934584603430667659}
   lockedMessageKey: gameplay.cage_lock_breakable
   lockedMessage: The lock seems easy to break
   lockedAnimationDuration: 0.7
@@ -120,6 +127,8 @@ MonoBehaviour:
   objectOpen: 0
   objectOpenAdditional: 0
   animateAdditional: {fileID: 0}
+  playerBlockingOpen: 0
+  playerBlockingClose: 0
 --- !u!95 &1455957981578715101
 Animator:
   serializedVersion: 7
@@ -142,7 +151,103 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!64 &6786271329886161358
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 78838702602705804}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -915712872417006085, guid: 8715b595187e4f34db9da98a245487fd, type: 3}
 --- !u!65 &37625835344352224
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 78838702602705804}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 136.38617, y: 355.6281, z: 4.292233}
+  m_Center: {x: -66.893036, y: 176.15298, z: -1.0099936}
+--- !u!114 &2934584603430667659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 78838702602705804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7c3e91f4b2d5846a0e1f928c6d45b37, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  keyhole: {fileID: 8170547060249024630}
+  lockpickCamera: {fileID: 0}
+  activeCameraPriority: 20
+  cameraBlendOutSeconds: 0
+  screwdriverPrefabOverride: {fileID: 7779702028675145206, guid: b3ed9fa3f33dfe644a67e7011bfab457, type: 3}
+  tipLocalOffset: {x: 0, y: 0, z: 0}
+  tipAxisFixEuler: {x: 0, y: 0, z: 0}
+  autoFitScale: 1
+  targetLength: 0.22
+  spawnScale: 1
+  autoTipFromBounds: 1
+  aimSensitivity: 0.05
+  aimConeDegrees: 13
+  invertAimX: 1
+  invertAimY: 1
+  insertDepth: 0.1
+  insertPushSeconds: 0.1
+  barDecayPerSecond: 0.01
+  mouseFillPerPixel: 0.00005
+  maxFillPerPush: 0.28
+  stuckAimScale: 0.05
+  progressPanel: {fileID: 0}
+  progressSlider: {fileID: 0}
+  progressFillImage: {fileID: 0}
+  barEmptyColor: {r: 0, g: 0, b: 0, a: 1}
+  barFullColor: {r: 1, g: 1, b: 1, a: 1}
+  holdLoopSfx: {fileID: 8300000, guid: 858cf1cb634d6d946845259e0b96988b, type: 3}
+  stuckLoopSfx: {fileID: 8300000, guid: 325cb3e5d054b414cacbe6e70c809f28, type: 3}
+  breakSfx: {fileID: 0}
+  cancelSfx: {fileID: 0}
+  sfxVolume: 1
+  holdLoopMinVolume: 0
+  holdLoopMaxVolume: 1
+  holdLoopMouseForMaxVolume: 25
+  holdLoopVolumeSmooth: 12
+  stuckLoopMinVolume: 0
+  stuckLoopMaxVolume: 1
+  stuckLoopMouseForMaxVolume: 25
+  aimHintKey: gameplay.screwdriver_aim
+  holdHintKey: gameplay.screwdriver_shake
+  stuckHintKey: gameplay.screwdriver_stuck
+--- !u!65 &2423113783508179686
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -161,8 +266,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 136.38617, y: 355.6281, z: 4.292233}
-  m_Center: {x: -66.893036, y: 176.15298, z: -1.0099936}
+  m_Size: {x: 136.38617, y: 6.96, z: 5.61}
+  m_Center: {x: -66.893036, y: 221.5, z: -1.0104818}
 --- !u!1 &1729763867886001605
 GameObject:
   m_ObjectHideFlags: 0
@@ -179,6 +284,7 @@ GameObject:
   - component: {fileID: 11914625447880499}
   - component: {fileID: 517294775576602028}
   - component: {fileID: 6643407808740859646}
+  - component: {fileID: 3596064152952114780}
   m_Layer: 2
   m_Name: defaultMaterial.001
   m_TagString: Untagged
@@ -271,7 +377,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 10, y: 473.84998, z: 484.16547}
   m_Center: {x: 240.4, y: 236.92502, z: 1.6617583}
@@ -292,7 +398,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 10, y: 473.84998, z: 484.16547}
   m_Center: {x: -239.6, y: 236.92502, z: 1.6617583}
@@ -313,7 +419,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 480.84198, y: 473.84998, z: 14.6}
   m_Center: {x: 0, y: 236.92502, z: -238.33824}
@@ -334,7 +440,7 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 170, y: 473.84998, z: 14.6}
   m_Center: {x: 160, y: 236.92502, z: 241.6618}
@@ -355,10 +461,63 @@ BoxCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Size: {x: 170, y: 473.84998, z: 14.6}
   m_Center: {x: -153.9, y: 236.92502, z: 241.6618}
+--- !u!64 &3596064152952114780
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1729763867886001605}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -5340085334044306003, guid: 8715b595187e4f34db9da98a245487fd, type: 3}
+--- !u!1 &3274906275620362076
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8170547060249024630}
+  m_Layer: 9
+  m_Name: 'Keyhole '
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8170547060249024630
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3274906275620362076}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -129.2, y: 171.41, z: -3.17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1105053390402581134}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3803244312444861257
 GameObject:
   m_ObjectHideFlags: 0
@@ -384,12 +543,80 @@ Transform:
   m_GameObject: {fileID: 3803244312444861257}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -1, z: -0, w: -0.00000035762784}
-  m_LocalPosition: {x: -0, y: 0, z: 2.219}
+  m_LocalPosition: {x: 0.09, y: 0, z: 1.59}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3872148759047075944}
   m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
+--- !u!1 &4174375913003563757
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 651632101154044060}
+  - component: {fileID: 4811054991681345249}
+  - component: {fileID: 1129469292016772327}
+  m_Layer: 2
+  m_Name: OpenObstacleTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &651632101154044060
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4174375913003563757}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1105053390402581134}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &4811054991681345249
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4174375913003563757}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 151.36688, y: 363.36, z: 29.00427}
+  m_Center: {x: -75.68344, y: 176.153, z: 25.977137}
+--- !u!114 &1129469292016772327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4174375913003563757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79224eab370190249bcfb492b5bd8742, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  door: {fileID: 4101492480443246727}
+  blocksMotion: 0
 --- !u!1 &4840318949635837052
 GameObject:
   m_ObjectHideFlags: 0
@@ -489,6 +716,7 @@ GameObject:
   - component: {fileID: 582770639019896361}
   - component: {fileID: 3740890898391113488}
   - component: {fileID: 4251131083297194485}
+  - component: {fileID: 4776812341237354132}
   m_Layer: 2
   m_Name: Frame
   m_TagString: Untagged
@@ -602,8 +830,31 @@ MonoBehaviour:
   disableObstacleWhenOpen: 1
   obstacleFailsafeDelay: 0.1
   aiCloseAfterPassing: 0
+  playerCloseLockoutAfterAiOpen: 3
   isLocked: 0
   state: 0
+--- !u!64 &4776812341237354132
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5852713230228027726}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -554636699800685662, guid: 8715b595187e4f34db9da98a245487fd, type: 3}
 --- !u!1 &6212282963389218283
 GameObject:
   m_ObjectHideFlags: 0
@@ -678,10 +929,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cageDoor: {fileID: 4101492480443246727}
-  basementSidePrePoint: {fileID: 1191007264423744488}
   isOccupied: 0
-  doorSoundSuspicion: 100
-  doorSoundMaxHearDistance: 10
+  doorSoundSuspicion: 50
+  doorSoundMaxHearDistance: 7
   doorSoundMinHearDistance: 5
 --- !u!114 &1158444412124586538
 MonoBehaviour:
@@ -697,6 +947,74 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   roomID: 
   zoneID: 
+--- !u!1 &6851086054493587754
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2417817367459639519}
+  - component: {fileID: 2878756756937300873}
+  - component: {fileID: 7728944851622648475}
+  m_Layer: 2
+  m_Name: CloseObstacleTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2417817367459639519
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6851086054493587754}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1105053390402581134}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &2878756756937300873
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6851086054493587754}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 156.91129, y: 363.36, z: 21.22861}
+  m_Center: {x: -78.45564, y: 176.153, z: -22.389307}
+--- !u!114 &7728944851622648475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6851086054493587754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 79224eab370190249bcfb492b5bd8742, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  door: {fileID: 4101492480443246727}
+  blocksMotion: 1
 --- !u!1 &8258125930004150894
 GameObject:
   m_ObjectHideFlags: 0
