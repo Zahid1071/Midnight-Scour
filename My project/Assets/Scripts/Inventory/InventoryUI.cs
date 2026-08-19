@@ -10,8 +10,8 @@ public class InventoryUI : MonoBehaviour
     public static InventoryUI Instance { get; private set; }
 
     [SerializeField] private Image[] slotImages;
-    [SerializeField] private Image[] slotBackgrounds; // These are the background images
-    [SerializeField] private Color selectedColor = Color.red;
+    [SerializeField] private Image[] slotBackgrounds;
+    [SerializeField] private Image[] slotOutlines;
 
     [Header("Drop throw")]
     [SerializeField] private float dropSpawnForward = 0.55f;
@@ -20,15 +20,12 @@ public class InventoryUI : MonoBehaviour
     [SerializeField] private float dropThrowUpward = 0.6f;
     [SerializeField] private float dropItemMass = 1f;
 
-    private Color defaultColor = Color.white;
-
     private int selectedIndex = -1;
     TextMeshProUGUI[] _stackLabels;
 
     private void Awake()
     {
         Instance = this;
-        defaultColor = slotBackgrounds[0].color;
         EnsureStackLabels();
     }
 
@@ -106,8 +103,8 @@ public class InventoryUI : MonoBehaviour
             else
                 slotImages[i].color = Color.white;
 
-            if (slotBackgrounds[i] != null)
-                slotBackgrounds[i].color = (i == selectedIndex) ? selectedColor : defaultColor;
+            if (slotOutlines != null && i < slotOutlines.Length && slotOutlines[i] != null)
+                slotOutlines[i].enabled = (i == selectedIndex);
 
             int count = hasItem ? InventoryManager.Instance.GetCountAt(i) : 0;
             if (_stackLabels != null && i < _stackLabels.Length && _stackLabels[i] != null)
@@ -136,6 +133,7 @@ public class InventoryUI : MonoBehaviour
             var existing = slotImages[i].GetComponentInChildren<TextMeshProUGUI>(true);
             if (existing != null && existing.name == "Stack Count")
             {
+                ApplyCubicFont(existing);
                 _stackLabels[i] = existing;
                 continue;
             }
@@ -146,7 +144,7 @@ public class InventoryUI : MonoBehaviour
             rt.anchorMin = new Vector2(1f, 0f);
             rt.anchorMax = new Vector2(1f, 0f);
             rt.pivot = new Vector2(1f, 0f);
-            rt.anchoredPosition = new Vector2(-4f, 4f);
+            rt.anchoredPosition = new Vector2(-10f, 4f);
             rt.sizeDelta = new Vector2(48f, 28f);
 
             var tmp = go.GetComponent<TextMeshProUGUI>();
@@ -157,11 +155,21 @@ public class InventoryUI : MonoBehaviour
             tmp.color = Color.white;
             tmp.raycastTarget = false;
             tmp.enabled = false;
-            UIFont.ApplyTree(go.transform);
+
+            ApplyCubicFont(tmp);
             _stackLabels[i] = tmp;
         }
     }
 
+
+    static void ApplyCubicFont(TextMeshProUGUI tmp)
+    {
+        var cubicFont = UIFont.ChineseOrNull;
+        if (cubicFont == null || tmp == null) return;
+        tmp.font = cubicFont;
+        if (cubicFont.material != null)
+            tmp.fontSharedMaterial = cubicFont.material;
+    }
 
     static bool WasUseItemPressedThisFrame()
     {

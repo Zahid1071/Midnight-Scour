@@ -118,6 +118,7 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
     bool _wasHolding;
     bool _ownsProgressUi;
     bool _wasStuck;
+    UIFadeHelper _progressFade;
     AudioSource _loopSource;
     bool _loopIsStuckClip;
     float _holdLoopMoveSmoothed;
@@ -581,13 +582,16 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
 
     void SetProgressVisible(bool visible)
     {
-        if (progressPanel != null)
-            progressPanel.SetActive(visible);
+        if (progressPanel == null) return;
+        if (_progressFade == null)
+            _progressFade = new UIFadeHelper(progressPanel);
+        _progressFade.SetVisible(visible);
     }
 
     void TeardownOwnedProgressUi()
     {
-        SetProgressVisible(false);
+        if (progressPanel != null)
+            progressPanel.SetActive(false);
         if (!_ownsProgressUi)
             return;
 
@@ -597,6 +601,7 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         progressPanel = null;
         progressSlider = null;
         progressFillImage = null;
+        _progressFade = null;
         _ownsProgressUi = false;
     }
 
@@ -729,7 +734,6 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         _stage = Stage.Exiting;
         HudManager.Instance?.ClearSubtitle();
 
-        SetProgressVisible(false);
         DestroySpawnedVisual();
 
         var playerCam = FindPlayerVirtualCamera();
@@ -744,7 +748,9 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         }
 
         // Give CM a couple frames to bake the standby PVC state before blending back.
+        SetProgressVisible(false);
         yield return null;
+        SetProgressVisible(false);
         yield return null;
 
         if (lockpickCamera != null)
@@ -754,6 +760,7 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         float t = 0f;
         while (t < wait)
         {
+            SetProgressVisible(false);
             if (brain != null && !brain.IsBlending && t > 0.1f)
                 break;
             t += Time.unscaledDeltaTime;
@@ -794,8 +801,9 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
     {
         StopHoldLoop();
         DestroySpawnedVisual();
+        if (_progressFade != null)
+            _progressFade.SetVisible(false, instant: true);
         TeardownOwnedProgressUi();
-        SetProgressVisible(false);
 
         if (lockpickCamera != null)
             lockpickCamera.Priority = 0;

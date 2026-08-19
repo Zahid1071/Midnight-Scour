@@ -12,10 +12,13 @@ public class GameplayHudVisibility : MonoBehaviour
     [SerializeField] private GameObject interactionRoot;
     [SerializeField] private GameObject inventoryRoot;
 
+    [SerializeField] private float fadeDuration = 0.25f;
+
     bool _hiddenForCinematic;
     bool _hiddenForHiding;
     CanvasGroup _interactionGroup;
     CanvasGroup _inventoryGroup;
+    float _targetAlpha = 1f;
 
     private void Awake()
     {
@@ -117,25 +120,33 @@ public class GameplayHudVisibility : MonoBehaviour
         bool reading = PlayerControlGate.IsAcquired(PlayerControlGate.ReasonReading);
         bool show = !_hiddenForCinematic && !_hiddenForHiding && !lockpick && !captured && !reading
             && !JumpscareManager.CaptureUiActive;
-        SetGroupVisible(_interactionGroup, interactionRoot, show);
-        SetGroupVisible(_inventoryGroup, inventoryRoot, show);
+
+        _targetAlpha = show ? 1f : 0f;
+        float speed = fadeDuration > 0f ? Time.unscaledDeltaTime / fadeDuration : 1f;
+
+        LerpGroup(_interactionGroup, interactionRoot, _targetAlpha, speed);
+        LerpGroup(_inventoryGroup, inventoryRoot, _targetAlpha, speed);
     }
 
-    static void SetGroupVisible(CanvasGroup group, GameObject root, bool show)
+    static void LerpGroup(CanvasGroup group, GameObject root, float target, float speed)
     {
-        if (show && root != null && !root.activeSelf)
+        if (target > 0f && root != null && !root.activeSelf)
             root.SetActive(true);
 
         if (group != null)
         {
-            group.alpha = show ? 1f : 0f;
-            group.interactable = show;
-            group.blocksRaycasts = show;
+            group.alpha = Mathf.MoveTowards(group.alpha, target, speed);
+            bool interactive = group.alpha > 0.01f;
+            group.interactable = interactive;
+            group.blocksRaycasts = interactive;
+
+            if (group.alpha <= 0f && root != null && root.activeSelf)
+                root.SetActive(false);
             return;
         }
 
         if (root != null)
-            root.SetActive(show);
+            root.SetActive(target > 0f);
     }
 
     void CacheGroups()

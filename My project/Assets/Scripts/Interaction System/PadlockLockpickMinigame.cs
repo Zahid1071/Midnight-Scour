@@ -190,6 +190,7 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
     Coroutine _chainSettleRoutine;
 
     bool _ownsProgressUi;
+    UIFadeHelper _progressFade;
     bool _showedPressureGuide;
     bool _showedFindPinsGuide;
 
@@ -1004,13 +1005,16 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
 
     void SetProgressVisible(bool visible)
     {
-        if (progressPanel != null)
-            progressPanel.SetActive(visible);
+        if (progressPanel == null) return;
+        if (_progressFade == null)
+            _progressFade = new UIFadeHelper(progressPanel);
+        _progressFade.SetVisible(visible);
     }
 
     void TeardownOwnedProgressUi()
     {
-        SetProgressVisible(false);
+        if (progressPanel != null)
+            progressPanel.SetActive(false);
         if (!_ownsProgressUi)
             return;
 
@@ -1020,6 +1024,7 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
         progressPanel = null;
         progressSlider = null;
         progressFillImage = null;
+        _progressFade = null;
         _ownsProgressUi = false;
     }
 
@@ -1318,7 +1323,6 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
     {
         _stage = Stage.Exiting;
         HudManager.Instance?.ClearSubtitle();
-        SetProgressVisible(false);
 
         StopPoseRoutine();
         StartCylinderUnwind();
@@ -1349,6 +1353,7 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
         float t = 0f;
         while (t < wait)
         {
+            SetProgressVisible(false);
             if (brain != null && !brain.IsBlending && t > 0.1f)
                 break;
             t += Time.unscaledDeltaTime;
@@ -1481,7 +1486,8 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
         if (hideWrenchWhenIdle)
             SetWrenchVisible(false);
         StopCylinderRotateSfx();
-        SetProgressVisible(false);
+        if (_progressFade != null)
+            _progressFade.SetVisible(false, instant: true);
         TeardownOwnedProgressUi();
 
         if (lockpickCamera != null)

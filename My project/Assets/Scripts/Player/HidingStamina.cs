@@ -60,6 +60,7 @@ public class HidingStamina : MonoBehaviour
     Vector2 barRestPos;
     Coroutine noiseFadeRoutine;
     bool ownsRuntimeUi;
+    UIFadeHelper _panelFade;
 
     string micDevice;
     AudioClip micClip;
@@ -404,8 +405,10 @@ public class HidingStamina : MonoBehaviour
 
     void SetPanelVisible(bool visible)
     {
-        if (runtimePanel != null)
-            runtimePanel.SetActive(visible);
+        if (runtimePanel == null) return;
+        if (_panelFade == null)
+            _panelFade = new UIFadeHelper(runtimePanel);
+        _panelFade.SetVisible(visible);
     }
 
     void EnsureRuntimeUi()

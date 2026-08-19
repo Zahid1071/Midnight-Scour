@@ -72,7 +72,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
   - From: Player Virutal Camera
-    To: Lock Minigame Camera
+    To: Screwdriver Minigame Camera
     Blend:
       Style: 1
       Time: 0.5
@@ -100,7 +100,7 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - From: Lock Minigame Camera
+  - From: Screwdriver Minigame Camera
     To: Player Virutal Camera
     Blend:
       Style: 1
@@ -130,7 +130,7 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
   - From: Player Virutal Camera
-    To: Padlock Lockpick Camera
+    To: Lockpick Minigame Camera
     Blend:
       Style: 1
       Time: 0.5
@@ -158,7 +158,7 @@ MonoBehaviour:
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - From: Padlock Lockpick Camera
+  - From: Lockpick Minigame Camera
     To: Player Virutal Camera
     Blend:
       Style: 1
