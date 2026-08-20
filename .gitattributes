@@ -1,12 +1,52 @@
-# Auto detect text files
+# Auto detect text files by default
 * text=auto
 
-# Unity scenes & configs (NORMAL GIT)
-*.unity text
-*.prefab text
-*.mat text
-*.asset text
-*.meta text
-*.cs text
+# Unity YAML / code (safe as text)
+*.unity text eol=lf
+*.prefab text eol=lf
+*.mat text eol=lf
+*.meta text eol=lf
+*.cs text eol=lf
+*.shader text eol=lf
+*.cginc text eol=lf
+*.hlsl text eol=lf
+*.compute text eol=lf
+*.asmdef text eol=lf
+*.inputactions text eol=lf
+*.uxml text eol=lf
+*.uss text eol=lf
 
+# .asset is MIXED: ScriptableObjects are YAML, but Terrain / LightingData /
+# NavMesh / Occlusion / etc. are BINARY. Forcing text corrupts those files.
+*.asset -text
 
+# Other common Unity binaries
+*.terrainlayer -text
+*.bytes -text
+*.cubemap -text
+*.unitypackage binary
+*.dll binary
+*.exe binary
+*.so binary
+*.dylib binary
+*.a binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.tif binary
+*.tiff binary
+*.tga binary
+*.psd binary
+*.exr binary
+*.hdr binary
+*.fbx binary
+*.obj binary
+*.blend binary
+*.wav binary
+*.mp3 binary
+*.ogg binary
+*.aif binary
+*.aiff binary
+*.mp4 binary
+*.mov binary
+*.avi binary
