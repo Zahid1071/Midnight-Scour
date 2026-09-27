@@ -21,13 +21,13 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Floor_wooden_A_clean
-  m_Shader: {fileID: -6465566751694194690, guid: 12803f30aee67f94d94f3e6f0c1a6f68, type: 3}
-  m_Parent: {fileID: 2100000, guid: 7d251c6a74ca8284cb81822da615e32e, type: 2}
+  m_Shader: {fileID: -6465566751694194690, guid: 9a62b1915c8add54d86e343647b9b861, type: 3}
+  m_Parent: {fileID: 2100000, guid: cbd851c0290a09947baa06c42243d0af, type: 2}
   m_ModifiedSerializedProperties: 16
-  m_ValidKeywords:
+  m_ValidKeywords: []
+  m_InvalidKeywords:
   - _DISABLE_DECALS
   - _DISABLE_SSR_TRANSPARENT
-  m_InvalidKeywords:
   - _METALLICSPECGLOSSMAP
   - _NORMALMAP
   - _OCCLUSIONMAP
