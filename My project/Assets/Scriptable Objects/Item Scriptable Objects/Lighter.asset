@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Lighter
   m_EditorClassIdentifier: 
   itemName: Lighter
-  icon: {fileID: 21300000, guid: 751aa1b6637101946b2fdbb7aa27d6ad, type: 3}
+  icon: {fileID: 21300000, guid: b9b9839b13dc76f4f8d2ce32ac3301b8, type: 3}
   worldPrefab: {fileID: 0}
   dropLandSFX: {fileID: 0}
   canDrop: 0

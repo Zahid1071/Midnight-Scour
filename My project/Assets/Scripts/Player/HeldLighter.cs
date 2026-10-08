@@ -23,6 +23,22 @@ public sealed class HeldLighter : MonoBehaviour
     [SerializeField] private string lidClosedState = "LidClosed";
     [SerializeField] private string putDownState = "PutDown";
 
+    [Tooltip("Masked layer (thumb + lid) that closes the lid during the put-down while the arm lowers. " +
+             "Must match the HeldItemView's put-down overlay layer.")]
+    [SerializeField] private string lidLayer = "Lid";
+
+    [Header("Draw speed")]
+    [Tooltip("Float parameter used as the Draw state's speed multiplier.")]
+    [SerializeField] private string drawSpeedParameter = "DrawSpeed";
+
+    [Tooltip("Draw speed while the hand comes up (draw clip up to the closed-lid pose).")]
+    [Min(0.01f)]
+    [SerializeField] private float drawRaiseSpeed = 1.1f;
+
+    [Tooltip("Draw speed from the closed-lid pose on, i.e. the lid opening. Keep in line with the LidOpen state's speed.")]
+    [Min(0.01f)]
+    [SerializeField] private float drawLidSpeed = 2.1f;
+
     [Tooltip("Seconds of blending into the strike and the lid close / open (the idle loops drift from their start pose).")]
     [Min(0f)]
     [SerializeField] private float blend = 0.08f;
@@ -40,6 +56,11 @@ public sealed class HeldLighter : MonoBehaviour
     [Range(0f, 1f)]
     [SerializeField] private float lidOpenRest = 58f / 68f;
 
+    [Tooltip("Lid fully open with the thumb still on it (frame 45 of 68). The put-down's lid closing starts here at " +
+             "the latest, skipping the thumb settling back, so the lid shuts before the arm is out of view.")]
+    [Range(0f, 1f)]
+    [SerializeField] private float lidCloseStart = 45f / 68f;
+
     [Header("Strike")]
     [Tooltip("Point in the strike clip (0-1) where the flame catches: frame 10 of 30. Follows the state's speed. " +
              "Ignored if the clip calls Ignite() from an animation event.")]
@@ -56,6 +77,9 @@ public sealed class HeldLighter : MonoBehaviour
     public bool IsLidOpen { get; private set; } = true;
 
     private HeldItemView _view;
+    private int _lidLayer = -1;
+    private int _drawSpeedId;
+    private bool _hasDrawSpeed;
     private bool _striking;
     private bool _closing;
 
@@ -64,6 +88,14 @@ public sealed class HeldLighter : MonoBehaviour
         _view = GetComponent<HeldItemView>();
         if (animator == null)
             animator = _view.Animator != null ? _view.Animator : GetComponentInChildren<Animator>();
+        if (animator != null && !string.IsNullOrEmpty(lidLayer))
+            _lidLayer = animator.GetLayerIndex(lidLayer);
+        if (animator != null && !string.IsNullOrEmpty(drawSpeedParameter))
+        {
+            _drawSpeedId = Animator.StringToHash(drawSpeedParameter);
+            foreach (AnimatorControllerParameter p in animator.parameters)
+                _hasDrawSpeed |= p.nameHash == _drawSpeedId && p.type == AnimatorControllerParameterType.Float;
+        }
         if (flame != null)
             flame.SetActive(false);
     }
@@ -86,6 +118,7 @@ public sealed class HeldLighter : MonoBehaviour
         if (animator == null)
             return;
 
+        UpdateDrawSpeed();
         TrackReversedLid();
         if (_view.IsHolstering || Mouse.current == null || Cursor.lockState != CursorLockMode.Locked)
             return;
@@ -106,7 +139,8 @@ public sealed class HeldLighter : MonoBehaviour
         if (animator == null || _view.IsHolstering)
             return;
 
-        // Put-down reverses the draw from wherever the lid is, skipping the still tail.
+        // Put-down reverses the draw from wherever the lid is, skipping the still tail. With the lid open the
+        // arm lowers from the closed-lid pose while the lid layer closes the lid at the same time.
         AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
         float drawTime = lidOpenRest;
         if (state.IsName(drawState) || state.IsName(lidOpenState))
@@ -115,7 +149,11 @@ public sealed class HeldLighter : MonoBehaviour
             drawTime = 1f - Mathf.Clamp01(state.normalizedTime);
         else if (state.IsName(lidClosedState))
             drawTime = lidClosedPose;
-        _view.PutDownStartTime = Mathf.Min(drawTime, lidOpenRest);
+        drawTime = Mathf.Min(drawTime, lidOpenRest);
+
+        bool lidOpen = drawTime > lidClosedPose && _lidLayer > 0;
+        _view.PutDownStartTime = lidOpen ? lidClosedPose : drawTime;
+        _view.PutDownOverlayStartTime = lidOpen ? Mathf.Min(drawTime, lidCloseStart) : -1f;
     }
 
     public void OpenLid()
@@ -159,6 +197,15 @@ public sealed class HeldLighter : MonoBehaviour
             flame.SetActive(false);
     }
 
+    private void UpdateDrawSpeed()
+    {
+        if (!_hasDrawSpeed)
+            return;
+        AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+        bool lidPart = state.IsName(drawState) && state.normalizedTime >= lidClosedPose;
+        animator.SetFloat(_drawSpeedId, lidPart ? drawLidSpeed : drawRaiseSpeed);
+    }
+
     // While the lid section plays reversed (closing or put-down): flame out once the lid shuts,
     // and start the closed-lid idle when a close finishes.
     private void TrackReversedLid()
@@ -169,6 +216,9 @@ public sealed class HeldLighter : MonoBehaviour
         bool closing = state.IsName(lidCloseState);
         if (!closing && !state.IsName(putDownState))
             return;
+
+        if (!closing && _lidLayer > 0 && animator.GetLayerWeight(_lidLayer) > 0f)
+            state = animator.GetCurrentAnimatorStateInfo(_lidLayer);
 
         float drawTime = 1f - state.normalizedTime;
         if (IsLit && drawTime <= lidShut)

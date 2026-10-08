@@ -35,6 +35,15 @@ public class InteractionUIManager : MonoBehaviour
     [SerializeField] private float failShakeStrength = 6f;
     [SerializeField] private float successScalePeak = 1.22f;
 
+    [Header("Crosshair Fade")]
+    [Tooltip("Fade the default crosshair (nothing targeted) out instead of showing it.")]
+    [SerializeField] private bool fadeDefaultCrosshair = true;
+    [Min(0.01f)]
+    [SerializeField] private float defaultFadeDuration = 0.35f;
+    [Tooltip("Fade-in of the interact / door / out-of-reach crosshair when it appears after nothing was targeted.")]
+    [Min(0.01f)]
+    [SerializeField] private float targetFadeInDuration = 0.2f;
+
     private GameObject lastDetectedObject;
     private PlayerHider _cachedPlayerHider;
     private CrosshairState _crosshairState = CrosshairState.Default;
@@ -42,6 +51,10 @@ public class InteractionUIManager : MonoBehaviour
     private Vector2 crosshairRestPos;
     private Vector3 crosshairRestScale = Vector3.one;
     private static int doorLayer = -1;
+    private float _defaultBaseAlpha = 1f;
+    private float _defaultAlpha;
+    private float _targetAlpha = 1f;
+    private readonly float[] _stateBaseAlpha = { 1f, 1f, 1f, 1f };
 
     private void Awake()
     {
@@ -62,6 +75,15 @@ public class InteractionUIManager : MonoBehaviour
 
         if (doorLayer < 0)
             doorLayer = LayerMask.NameToLayer("Door");
+
+        if (defaultCrosshairImage != null)
+            _defaultBaseAlpha = defaultCrosshairImage.color.a;
+        for (int i = 0; i < _stateBaseAlpha.Length; i++)
+        {
+            Image image = GetCrosshairImage((CrosshairState)i);
+            if (image != null)
+                _stateBaseAlpha[i] = image.color.a;
+        }
     }
 
     private void OnDestroy()
@@ -125,6 +147,11 @@ public class InteractionUIManager : MonoBehaviour
             doorCrosshairImage = crosshairRoot.Find("CrosshairDoor")?.GetComponent<Image>();
         if (outOfReachCrosshairImage == null)
             outOfReachCrosshairImage = crosshairRoot.Find("CrosshairOutOfReach")?.GetComponent<Image>();
+    }
+
+    private void LateUpdate()
+    {
+        UpdateCrosshairFade();
     }
 
     private void Update()
@@ -236,12 +263,54 @@ public class InteractionUIManager : MonoBehaviour
 
     private void ApplyCrosshairState(CrosshairState state)
     {
+        // Looking away from a target: show the default crosshair at full strength, then fade it.
+        if (state == CrosshairState.Default && _crosshairState != CrosshairState.Default)
+            _defaultAlpha = 1f;
+
+        // Targeting something after nothing: fade its crosshair in from wherever the default faded to.
+        if (state != CrosshairState.Default && _crosshairState == CrosshairState.Default)
+            _targetAlpha = fadeDefaultCrosshair ? _defaultAlpha : 1f;
+
+        if (state != _crosshairState)
+            SetImageAlpha(GetCrosshairImage(_crosshairState), _stateBaseAlpha[(int)_crosshairState]);
+
         _crosshairState = state;
 
         SetCrosshairActive(defaultCrosshairImage, state == CrosshairState.Default);
         SetCrosshairActive(interactCrosshairImage, state == CrosshairState.Interact);
         SetCrosshairActive(doorCrosshairImage, state == CrosshairState.Door);
         SetCrosshairActive(outOfReachCrosshairImage, state == CrosshairState.OutOfReach);
+    }
+
+    private void UpdateCrosshairFade()
+    {
+        float target = fadeDefaultCrosshair ? 0f : 1f;
+        _defaultAlpha = Mathf.MoveTowards(_defaultAlpha, target, Time.unscaledDeltaTime / defaultFadeDuration);
+        SetImageAlpha(defaultCrosshairImage, _defaultBaseAlpha * _defaultAlpha);
+
+        if (_crosshairState != CrosshairState.Default)
+        {
+            _targetAlpha = Mathf.MoveTowards(_targetAlpha, 1f, Time.unscaledDeltaTime / targetFadeInDuration);
+            SetImageAlpha(GetCrosshairImage(_crosshairState), _stateBaseAlpha[(int)_crosshairState] * _targetAlpha);
+        }
+    }
+
+    private Image GetCrosshairImage(CrosshairState state) => state switch
+    {
+        CrosshairState.Default => defaultCrosshairImage,
+        CrosshairState.Interact => interactCrosshairImage,
+        CrosshairState.Door => doorCrosshairImage,
+        CrosshairState.OutOfReach => outOfReachCrosshairImage,
+        _ => null
+    };
+
+    private static void SetImageAlpha(Image image, float alpha)
+    {
+        if (image == null)
+            return;
+        Color c = image.color;
+        c.a = alpha;
+        image.color = c;
     }
 
     private static bool IsDoorTarget(IInteractable interactable, Collider collider)

@@ -25,6 +25,12 @@ public sealed class HeldItemView : MonoBehaviour
     [Min(0f)]
     [SerializeField] private float putDownBlend = 0.1f;
 
+    [Tooltip("Optional layer + state played alongside the put-down (e.g. a lighter lid closing on a masked layer " +
+             "while the arm lowers). Only used while PutDownOverlayStartTime >= 0. The layer fades in over the " +
+             "put-down blend and is reset to weight 0 on the next draw.")]
+    [SerializeField] private string putDownOverlayLayer = "";
+    [SerializeField] private string putDownOverlayState = "";
+
     [Tooltip("Safety limit; the view hides after this long even if the put-down has not finished.")]
     [Min(0.1f)]
     [SerializeField] private float putDownTimeout = 3f;
@@ -37,6 +43,7 @@ public sealed class HeldItemView : MonoBehaviour
 
     private readonly Dictionary<string, Transform> _sockets = new();
     private float _putDownTimer;
+    private bool _overlayPlaying;
 
     public InventoryItem Item => item;
 
@@ -52,6 +59,11 @@ public sealed class HeldItemView : MonoBehaviour
     /// closed lighter skips the lid-closing part.
     /// </summary>
     public float PutDownStartTime { get; set; } = 1f;
+
+    /// <summary>
+    /// Draw clip time (0-1) the put-down overlay starts from, reversing back to 0. Negative = no overlay.
+    /// </summary>
+    public float PutDownOverlayStartTime { get; set; } = -1f;
 
     /// <summary>Finds a named transform (e.g. an exported socket bone) anywhere under this view.</summary>
     public Transform FindSocket(string socketName)
@@ -94,6 +106,13 @@ public sealed class HeldItemView : MonoBehaviour
             return;
 
         _putDownTimer += Time.deltaTime;
+        if (_overlayPlaying)
+        {
+            int layer = OverlayLayerIndex();
+            float weight = putDownBlend > 0f ? animator.GetLayerWeight(layer) + Time.deltaTime / putDownBlend : 1f;
+            animator.SetLayerWeight(layer, Mathf.Min(weight, 1f));
+        }
+
         AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
         bool finished = !animator.IsInTransition(0) && state.IsName(putDownState) && state.normalizedTime >= 1f;
         if (finished || _putDownTimer >= putDownTimeout)
@@ -103,11 +122,15 @@ public sealed class HeldItemView : MonoBehaviour
     public void Draw()
     {
         IsHolstering = false;
+        _overlayPlaying = false;
         gameObject.SetActive(true);
         if (animator == null || string.IsNullOrEmpty(drawState))
             return;
 
         animator.Rebind();
+        int overlayLayer = OverlayLayerIndex();
+        if (overlayLayer > 0)
+            animator.SetLayerWeight(overlayLayer, 0f);
         animator.Play(drawState, 0, 0f);
         animator.Update(0f);
     }
@@ -128,11 +151,21 @@ public sealed class HeldItemView : MonoBehaviour
         _putDownTimer = 0f;
         float sourceLength = animator.GetCurrentAnimatorStateInfo(0).length;
         animator.CrossFade(putDownState, sourceLength > 0f ? putDownBlend / sourceLength : 0f, 0, 1f - PutDownStartTime);
+
+        // Faded in over putDownBlend in Update, like the base layer's cross-fade.
+        int overlayLayer = OverlayLayerIndex();
+        _overlayPlaying = overlayLayer > 0 && PutDownOverlayStartTime >= 0f;
+        if (_overlayPlaying)
+            animator.Play(putDownOverlayState, overlayLayer, 1f - PutDownOverlayStartTime);
     }
 
     public void HolsterImmediate()
     {
         IsHolstering = false;
+        _overlayPlaying = false;
         gameObject.SetActive(false);
     }
+
+    private int OverlayLayerIndex() =>
+        string.IsNullOrEmpty(putDownOverlayLayer) ? -1 : animator.GetLayerIndex(putDownOverlayLayer);
 }
