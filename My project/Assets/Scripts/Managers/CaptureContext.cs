@@ -282,10 +282,6 @@ public static class CaptureContinue
         Cage.RebindAllAfterContinueTeleport(playerGo);
 
         HidingSpot.EndHidingCameraForCapture();
-
-        var dimmer = playerGo.GetComponent<PlayerSpotlightWallDimmer>()
-            ?? playerGo.GetComponentInChildren<PlayerSpotlightWallDimmer>(true);
-        dimmer?.ResetAfterCaptureContinue();
     }
 
     static void Teleport(Transform player, Vector3 pos, Quaternion rot)

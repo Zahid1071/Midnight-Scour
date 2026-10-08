@@ -30,12 +30,6 @@ public class HidingSpot : MonoBehaviour, IInteractable
     public float stealthLayerDelay = 1f;
     [Tooltip("Restore the player layer immediately when exit begins (before the exit animation finishes).")]
     public bool restoreLayerOnExitStart = true;
-    [Tooltip("Seconds after hide starts before the player spotlight starts fading out. Tune per hide spot.")]
-    [Min(0f)]
-    public float suppressLightInSeconds = 0f;
-    [Tooltip("Seconds after exit starts before the player spotlight fades back in. Tune per hide spot.")]
-    [Min(0f)]
-    public float restoreLightInSeconds = 1.5f;
     [Tooltip("Seconds to ease player XZ to the hide pivot when leaving. Runs under the hide cam so it is not visible. Y unchanged.")]
     [Min(0.05f)]
     [SerializeField] float exitSlideDuration = 0.35f;
@@ -399,11 +393,6 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
         hider.SetHidingEngaged(true);
 
-        if (suppressLightInSeconds <= 0f)
-            SetHideLighting(player, true);
-        else
-            StartCoroutine(SuppressHideLightAfterSeconds(player, suppressLightInSeconds));
-
         HidingCameraSystem.Instance.AttachToPivot(activePivot);
         HidingCameraSystem.Instance.SetActive(true);
         hider.DisableControlsOnly();
@@ -480,9 +469,6 @@ public class HidingSpot : MonoBehaviour, IInteractable
             float slide = forCapture ? 0.05f : exitSlideDuration;
             yield return hider.SmoothMoveToXZ(standPos.x, standPos.z, slide);
         }
-
-        if (!forCapture)
-            StartCoroutine(RestoreHideLightAfterSeconds(player, restoreLightInSeconds));
 
         // Always clear the stealth layer/hidden flag as soon as the exit begins - even when
         // exiting for a capture. Previously this was skipped for forCapture, so if the
@@ -630,22 +616,6 @@ public class HidingSpot : MonoBehaviour, IInteractable
         _suppressedSolidWasEnabled.Clear();
     }
 
-    private IEnumerator SuppressHideLightAfterSeconds(GameObject player, float seconds)
-    {
-        if (seconds > 0f)
-            yield return new WaitForSeconds(seconds);
-        if (isOccupied && playerRef == player)
-            SetHideLighting(player, true);
-    }
-
-    private IEnumerator RestoreHideLightAfterSeconds(GameObject player, float seconds)
-    {
-        if (seconds > 0f)
-            yield return new WaitForSeconds(seconds);
-
-        SetHideLighting(player, false);
-    }
-
     public static void EndHidingCameraForCapture()
     {
         if (HidingCameraSystem.Instance != null)
@@ -667,16 +637,6 @@ public class HidingSpot : MonoBehaviour, IInteractable
 
         var look = player.GetComponentInChildren<CinemachineMouseLook>(true);
         look?.ResetLocalRotation();
-    }
-
-    static void SetHideLighting(GameObject player, bool suppressed)
-    {
-        if (player == null)
-            return;
-
-        var dimmer = player.GetComponent<PlayerSpotlightWallDimmer>();
-        if (dimmer != null)
-            dimmer.SetHideLightSuppressed(suppressed);
     }
 
     public void PlayDoorOpenSfx(Vector3 worldPosition)

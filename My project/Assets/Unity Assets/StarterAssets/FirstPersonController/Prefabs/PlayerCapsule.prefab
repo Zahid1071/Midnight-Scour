@@ -318,7 +318,6 @@ GameObject:
   - component: {fileID: 7829341056284017392}
   - component: {fileID: 750681375347046963}
   - component: {fileID: 8847291056384729103}
-  - component: {fileID: 2242704982271436769}
   - component: {fileID: 5193847261059384721}
   m_Layer: 12
   m_Name: PlayerCapsule
@@ -812,36 +811,6 @@ MonoBehaviour:
   crouchHeightRatio: 0.6
   crouchStepOffset: 0.15
   transitionSpeed: 4
---- !u!114 &2242704982271436769
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8616685848737228372}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: db3cc8266d01cc143880beb10bf2ea25, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spotlight: {fileID: 0}
-  castSource: {fileID: 0}
-  facePalmDistance: 1
-  sideYawDegrees: 25
-  obstacleLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  triggerInteraction: 0
-  ignoreCage: 1
-  ignoreSelf: 1
-  normalIntensity: 1
-  minIntensity: 0.1
-  cageInsideIntensity: 0.5
-  cageTransitionSpeed: 2
-  intensityDeadzone: 0.02
-  dimSpeed: 10
-  restoreSpeed: 6
-  dimWhileHidden: 1
 --- !u!114 &5193847261059384721
 MonoBehaviour:
   m_ObjectHideFlags: 0
