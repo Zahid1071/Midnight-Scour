@@ -3,7 +3,17 @@ guid: 07c9234dfa33aee42912a87b8e862548
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Basiccharacter_Body_Defaultskin
+    second: {fileID: 2100000, guid: 8987dee291d16634eac8e3c4b56606da, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Lighter_Mat
+    second: {fileID: 2100000, guid: bf0a37624abeb5a468b801f26c3519cf, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Zippo_Viewmodel
+  m_Shader: {fileID: 4800000, guid: 342160d92f544f13950ae6e186c88c17, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords:
+  - _METALLICSPECGLOSSMAP
+  - _NORMALMAP
+  - _OCCLUSIONMAP
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 2800000, guid: 2bae50c0dfd6ec04c82a41e8a30d7ebe, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 2800000, guid: 1170662907c87904e8c82c4691251b0c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 2bae50c0dfd6ec04c82a41e8a30d7ebe, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 2800000, guid: aa66b03d2529bfc448ec0c19913be017, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 2800000, guid: 5b03d3ea9e7ac8b4bbc161eeb3b2e46a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _AddPrecomputedVelocity: 0
+    - _BumpScale: 1
+    - _Cull: 2
+    - _Cutoff: 0.5
+    - _EnvironmentReflections: 1
+    - _HighlightKnee: 0.6
+    - _HighlightMax: 1
+    - _HotDesaturate: 0.35
+    - _Metallic: 1
+    - _NearRadius: 0.1
+    - _OcclusionStrength: 1
+    - _ReflectFillUnlit: 0.025945947
+    - _Smoothness: 0.6
+    - _SmoothnessFromAlbedoAlpha: 0
+    - _SpecularHighlights: 1
+    - _Surface: 0
+    - _UseMetallicMap: 1
+    - _UseNormalMap: 1
+    - _UseOcclusionMap: 1
+    - _Wrap: 0.35
+    m_Colors:
+    - _AmbientFloor: {r: 0.01297294, g: 0.010810786, b: 0.008648649, a: 1}
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _ReflectFillBottom: {r: 0.31999996, g: 0.21999997, b: 0.13999996, a: 1}
+    - _ReflectFillTop: {r: 1.2, g: 0.85, b: 0.54999995, a: 1}
+    - _ScatterColor: {r: 0, g: 0, b: 0, a: 1}
+    - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

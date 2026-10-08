@@ -20,7 +20,6 @@ MonoBehaviour:
   pickUpSFX: {fileID: 0}
   useSuccessSound: {fileID: 0}
   consumeOnUse: 1
-  heldViewPrefab: {fileID: 7383468305289636798, guid: 937e34680bc9d6c47b7704e3a3642007, type: 3}
   maxStack: 1
   interactionReachBonus: 0
   reachAttemptFailMessage: 

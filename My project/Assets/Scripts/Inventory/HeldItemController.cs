@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Lives under the gameplay camera. Shows the HeldItemView of the selected inventory item
-/// (InventoryItem.heldViewPrefab) and draws it on equip. Views are spawned once and reused.
+/// Lives under the gameplay camera. Shows the HeldItemView (placed in the scene under this object)
+/// of the selected inventory item and draws it on equip.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class HeldItemController : MonoBehaviour
@@ -23,6 +23,17 @@ public sealed class HeldItemController : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+
+        foreach (var view in GetComponentsInChildren<HeldItemView>(true))
+        {
+            if (view.Item == null)
+            {
+                Debug.LogWarning($"[HeldItemController] {view.name} has no item assigned.", view);
+                continue;
+            }
+            _views[view.Item] = view;
+            view.HolsterImmediate();
+        }
     }
 
     private void OnDestroy()
@@ -35,11 +46,30 @@ public sealed class HeldItemController : MonoBehaviour
     {
         InventoryItem selected = InventoryUI.Instance != null ? InventoryUI.Instance.GetSelectedItem() : null;
         bool canShow = CanShowHeldItem();
-        if (selected == _current && canShow == _shown)
+
+        if (_currentView != null && _currentView.IsHolstering)
+        {
+            if (canShow)
+                return;
+            _currentView.HolsterImmediate();
+        }
+
+        bool viewShown = _currentView != null && _currentView.gameObject.activeSelf;
+        if (selected == _current && canShow == _shown && (_currentView == null || viewShown))
             return;
 
-        if (_currentView != null)
-            _currentView.Holster();
+        if (viewShown)
+        {
+            // Switching items: the next one is drawn once this put-down has finished.
+            if (canShow)
+            {
+                _currentView.Holster();
+                if (_currentView.IsHolstering)
+                    return;
+            }
+            else
+                _currentView.HolsterImmediate();
+        }
 
         _current = selected;
         _shown = canShow;
@@ -62,21 +92,6 @@ public sealed class HeldItemController : MonoBehaviour
         return _hider == null || !_hider.isHidden;
     }
 
-    private HeldItemView GetView(InventoryItem item)
-    {
-        if (item == null || item.heldViewPrefab == null)
-            return null;
-
-        if (_views.TryGetValue(item, out HeldItemView view) && view != null)
-            return view;
-
-        GameObject go = Instantiate(item.heldViewPrefab, transform, false);
-        go.name = item.heldViewPrefab.name;
-        view = go.GetComponent<HeldItemView>();
-        if (view == null)
-            view = go.AddComponent<HeldItemView>();
-        view.Holster();
-        _views[item] = view;
-        return view;
-    }
+    private HeldItemView GetView(InventoryItem item) =>
+        item != null && _views.TryGetValue(item, out HeldItemView view) ? view : null;
 }

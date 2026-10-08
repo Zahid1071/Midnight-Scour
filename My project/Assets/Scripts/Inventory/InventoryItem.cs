@@ -22,10 +22,6 @@ public class InventoryItem : ScriptableObject
 
     public bool consumeOnUse = true;
 
-    [Header("First-person view")]
-    [Tooltip("Arms + item prefab (root has HeldItemView) shown in front of the camera while this item is selected. Empty = nothing is held.")]
-    public GameObject heldViewPrefab;
-
     [Header("Stacking")]
     [Tooltip("How many of this item can share one inventory slot. 1 = no stacking.")]
     [Min(1)]
