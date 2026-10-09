@@ -88,7 +88,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296583
-    m_Localized: "Se\xE7ili \xF6\u011Feyi b\u0131rakmak i\xE7in {0} tu\u015Funa bas\u0131n"
+    m_Localized: "F\u0131rlatmak i\xE7in {0} tu\u015Funa bas, yere koymak i\xE7in
+      bas\u0131l\u0131 tut"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296584
@@ -184,7 +185,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296606
-    m_Localized: "\u00C7ok uzak."
+    m_Localized: "\xC7ok uzak."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296607
@@ -680,7 +681,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296730
-    m_Localized: "Çekiç darbesinin sesini, gökgürültüsüne denk getirebilirim"
+    m_Localized: "\xC7eki\xE7 darbesinin sesini, g\xF6kg\xFCr\xFClt\xFCs\xFCne denk
+      getirebilirim"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296731
@@ -688,95 +690,98 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296732
-    m_Localized: "Çok geç vurdum, yakalayacak"
+    m_Localized: "\xC7ok ge\xE7 vurdum, yakalayacak"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296733
-    m_Localized: "Tornavidayı içeri sok."
+    m_Localized: "Tornaviday\u0131 i\xE7eri sok."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296734
-    m_Localized: "Kilidi kırmak için şiddetle salla."
+    m_Localized: "Kilidi k\u0131rmak i\xE7in \u015Fiddetle salla."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296735
-    m_Localized: "Çok erken vurdum, yakalanacağım"
+    m_Localized: "\xC7ok erken vurdum, yakalanaca\u011F\u0131m"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296736
-    m_Localized: "Çok geç vurdum, yakalanacağım"
+    m_Localized: "\xC7ok ge\xE7 vurdum, yakalanaca\u011F\u0131m"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296737
-    m_Localized: "Sıkıştı, tekrar dene."
+    m_Localized: "S\u0131k\u0131\u015Ft\u0131, tekrar dene."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296738
-    m_Localized: "Butcher saklandığını gördü."
+    m_Localized: "Butcher sakland\u0131\u011F\u0131n\u0131 g\xF6rd\xFC."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296739
-    m_Localized: "Çok fazla ses çıkardın."
+    m_Localized: "\xC7ok fazla ses \xE7\u0131kard\u0131n."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296740
-    m_Localized: "Aynı saklanma yerini tekrar tekrar kullandın."
+    m_Localized: "Ayn\u0131 saklanma yerini tekrar tekrar kulland\u0131n."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296741
-    m_Localized: "Çekiç sesini gökgürültüsüyle gizleyemedin."
+    m_Localized: "\xC7eki\xE7 sesini g\xF6kg\xFCr\xFClt\xFCs\xFCyle gizleyemedin."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296742
-    m_Localized: "Butcher seni gördü."
+    m_Localized: "Butcher seni g\xF6rd\xFC."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296743
-    m_Localized: "Yakalandın."
+    m_Localized: "Yakaland\u0131n."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296744
-    m_Localized: "Yeniden Başla"
+    m_Localized: "Yeniden Ba\u015Fla"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296745
-    m_Localized: "Ana Menü"
+    m_Localized: "Ana Men\xFC"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296746
-    m_Localized: "Butcher sana pusu kurdu."
+    m_Localized: Butcher sana pusu kurdu.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296747
-    m_Localized: "Maymuncuklar yakalandıktan sonra ilerlemeni korumanı sağlar."
+    m_Localized: "Maymuncuklar yakaland\u0131ktan sonra ilerlemeni koruman\u0131
+      sa\u011Flar."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296748
-    m_Localized: "Maymuncuk"
+    m_Localized: Maymuncuk
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296749
-    m_Localized: "Maymuncuk alındı"
+    m_Localized: "Maymuncuk al\u0131nd\u0131"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296750
-    m_Localized: "Devam"
+    m_Localized: Devam
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296751
-    m_Localized: "Bas\u0131n\u00E7 uygulamak i\u00E7in sa\u011F t\u0131k bas\u0131l\u0131 tut"
+    m_Localized: "Bas\u0131n\xE7 uygulamak i\xE7in sa\u011F t\u0131k bas\u0131l\u0131
+      tut"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296752
-    m_Localized: "Maymuncu\u011Fu mouse ile hareket ettir ve pinleri kald\u0131rmak i\u00E7in sol t\u0131kla"
+    m_Localized: "Maymuncu\u011Fu mouse ile hareket ettir ve pinleri kald\u0131rmak
+      i\xE7in sol t\u0131kla"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296753
-    m_Localized: "Pin sabitlendi"
+    m_Localized: Pin sabitlendi
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296754
-    m_Localized: "Kilit a\u00E7\u0131ld\u0131"
+    m_Localized: "Kilit a\xE7\u0131ld\u0131"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296755
@@ -784,11 +789,35 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296756
-    m_Localized: "İlk yakalandığımda kapıyı asma kilitli bir zincirle bağladı. Keşke o tuvaletin üstündeki saç tokasını alsaydım. Belki maymuncuk olarak kullanabilirdim."
+    m_Localized: "\u0130lk yakaland\u0131\u011F\u0131mda kap\u0131y\u0131 asma kilitli
+      bir zincirle ba\u011Flad\u0131. Ke\u015Fke o tuvaletin \xFCst\xFCndeki sa\xE7
+      tokas\u0131n\u0131 alsayd\u0131m. Belki maymuncuk olarak kullanabilirdim."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296757
-    m_Localized: "Daha fazla maymuncuk bulmak için gözümü açık tutmalıyım"
+    m_Localized: "Daha fazla maymuncuk bulmak i\xE7in g\xF6z\xFCm\xFC a\xE7\u0131k
+      tutmal\u0131y\u0131m"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34286902860185600
+    m_Localized: "Bir maymuncuk... Bununla o asma kilidi a\xE7abilirim."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34286903040540672
+    m_Localized: "Bir maymuncuk daha. Beni yakalarsa, bununla kafesten yine \xE7\u0131kabilirim."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34292293547458560
+    m_Localized: "\xC7akmak al\u0131nd\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34292666949566464
+    m_Localized: "\xC7akmak"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34365368158781440
+    m_Localized: "S\u0131k\u0131\u015Ft\u0131. Zorla, ya da \xE7\u0131kar\u0131p
+      tekrar sokarak gev\u015Fet."
     m_Metadata:
       m_Items: []
   references:

@@ -35,6 +35,9 @@ public class HeadBobController : MonoBehaviour
     float bobTimer;
     bool initialized;
 
+    /// <summary>Current bob phase in radians (Sin of it is the vertical bob); reset to 0 when the player stops.</summary>
+    public float BobPhase => bobTimer;
+
     void Awake()
     {
         if (controller == null)

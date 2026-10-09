@@ -87,7 +87,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296583
-    m_Localized: Pressione {0} para soltar o item selecionado
+    m_Localized: Pressione {0} para arremessar, segure para colocar
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296584
@@ -183,7 +183,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296606
-    m_Localized: "Est\u00E1 longe demais."
+    m_Localized: "Est\xE1 longe demais."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296607
@@ -680,107 +680,131 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296732
-    m_Localized: "Bati tarde demais, ele vai me pegar"
+    m_Localized: Bati tarde demais, ele vai me pegar
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296733
-    m_Localized: "Enfie a chave de fenda."
+    m_Localized: Enfie a chave de fenda.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296734
-    m_Localized: "Agite com força para quebrar a tranca."
+    m_Localized: "Agite com for\xE7a para quebrar a tranca."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296735
-    m_Localized: "Bati cedo demais, vou ser pego"
+    m_Localized: Bati cedo demais, vou ser pego
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296736
-    m_Localized: "Bati tarde demais, vou ser pego"
+    m_Localized: Bati tarde demais, vou ser pego
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296737
-    m_Localized: "Travou, tenta de novo."
+    m_Localized: Travou, tenta de novo.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296738
-    m_Localized: "Butcher te viu se esconder."
+    m_Localized: Butcher te viu se esconder.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296739
-    m_Localized: "Você fez barulho demais."
+    m_Localized: "Voc\xEA fez barulho demais."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296740
-    m_Localized: "Você ficou se escondendo no mesmo lugar."
+    m_Localized: "Voc\xEA ficou se escondendo no mesmo lugar."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296741
-    m_Localized: "Você não mascarou o barulho do martelo com o trovão."
+    m_Localized: "Voc\xEA n\xE3o mascarou o barulho do martelo com o trov\xE3o."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296742
-    m_Localized: "Butcher te viu."
+    m_Localized: Butcher te viu.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296743
-    m_Localized: "Você foi pego."
+    m_Localized: "Voc\xEA foi pego."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296744
-    m_Localized: "Recomeçar"
+    m_Localized: "Recome\xE7ar"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296745
-    m_Localized: "Menu Principal"
+    m_Localized: Menu Principal
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296746
-    m_Localized: "Butcher te emboscou."
+    m_Localized: Butcher te emboscou.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296747
-    m_Localized: "Ganzás permitem manter seu progresso depois de ser pego."
+    m_Localized: "Ganz\xE1s permitem manter seu progresso depois de ser pego."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296748
-    m_Localized: "Ganzá"
+    m_Localized: "Ganz\xE1"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296749
-    m_Localized: "Pegou a Ganzá"
+    m_Localized: "Pegou a Ganz\xE1"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296750
-    m_Localized: "Continuar"
+    m_Localized: Continuar
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296751
-    m_Localized: "Segure o bot\u00E3o direito do mouse para aplicar press\u00E3o"
+    m_Localized: "Segure o bot\xE3o direito do mouse para aplicar press\xE3o"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296752
-    m_Localized: "Use o mouse para mover a ganz\u00E1 e o bot\u00E3o esquerdo para levantar os pinos"
+    m_Localized: "Use o mouse para mover a ganz\xE1 e o bot\xE3o esquerdo para levantar
+      os pinos"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296753
-    m_Localized: "Pino travado"
+    m_Localized: Pino travado
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296754
-    m_Localized: "Tranca aberta"
+    m_Localized: Tranca aberta
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296755
-    m_Localized: "A porta está acorrentada."
+    m_Localized: "A porta est\xE1 acorrentada."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296756
-    m_Localized: "Quando me pegaram pela primeira vez, ele acorrentou a porta com um cadeado. Queria ter pegado aquele grampo de cabelo em cima daquele vaso. Talvez eu pudesse usá-lo como ganzá."
+    m_Localized: "Quando me pegaram pela primeira vez, ele acorrentou a porta com
+      um cadeado. Queria ter pegado aquele grampo de cabelo em cima daquele vaso.
+      Talvez eu pudesse us\xE1-lo como ganz\xE1."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296757
-    m_Localized: "Eu preciso ficar de olho para encontrar mais ganzás"
+    m_Localized: "Eu preciso ficar de olho para encontrar mais ganz\xE1s"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34286902860185600
+    m_Localized: "Uma ganz\xE1... Eu poderia abrir aquele cadeado com isso."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34286903040540672
+    m_Localized: "Outra ganz\xE1. Se ele me pegar, posso us\xE1-la para sair da jaula
+      de novo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34292293547458560
+    m_Localized: Pegou o Isqueiro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34292666949566464
+    m_Localized: Isqueiro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34365368158781440
+    m_Localized: Travou. Force, ou tira e enfia de novo para soltar.
     m_Metadata:
       m_Items: []
   references:

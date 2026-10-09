@@ -8,9 +8,9 @@ using UnityEngine.UI;
 /// <summary>
 /// Screwdriver lock break:
 /// Aim — tip stays on the keyhole; move the butt in a limited cone.
-/// Hold LMB — shove in; mouse travel fills the break bar.
-/// Release — pulls out; a full in→out pump also fills the bar.
-/// Bar decays slowly; fill it completely to break the lock.
+/// Hold LMB — shove in; mouse travel slowly fills the break bar until it jams.
+/// Jammed — force it (hard mouse movement) to break through for a big chunk of progress.
+/// Pulling fully out and shoving back returns to the same jam, but each re-seat loosens it.
 /// </summary>
 [DisallowMultipleComponent]
 public class ScrewdriverLockBreakMinigame : MonoBehaviour
@@ -65,10 +65,74 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
     [SerializeField] float barDecayPerSecond = 0f;
     [Tooltip("Bar fill from mouse travel while shoved in (per mouse-pixel).")]
     [SerializeField] float mouseFillPerPixel = 0.00055f;
-    [Tooltip("Max bar fill you can earn in one shove before you must release and push again.")]
+    [Tooltip("Bar fill mouse movement can earn before the screwdriver jams again.")]
     [SerializeField] float maxFillPerPush = 0.28f;
-    [Tooltip("Aim sensitivity multiplier when this shove's budget is used up (stuck).")]
-    [SerializeField, Range(0f, 1f)] float stuckAimScale = 0.12f;
+
+    [Header("Jam (forcing through)")]
+    [Tooltip("Seconds of steady pushing in the pry direction needed to break through a fresh jam.")]
+    [SerializeField] float stuckForceRequired = 4f;
+    [Tooltip("While not pushing, built-up force drains at this many seconds per second.")]
+    [SerializeField] float stuckForceBleedPerSecond = 0.5f;
+    [Tooltip("Slowest push (pixels/second along the pry direction) that still counts.")]
+    [SerializeField] float steadyPushMinSpeed = 15f;
+    [Tooltip("Pushing faster than this earns no extra progress; at twice this speed it earns none.")]
+    [SerializeField] float steadyPushMaxSpeed = 1500f;
+    [Tooltip("How quickly the measured push speed follows the mouse (per second).")]
+    [SerializeField] float pushSpeedSmooth = 20f;
+    [Tooltip("Bar fill granted when a jam breaks.")]
+    [SerializeField, Range(0f, 1f)] float stuckBreakFill = 0.35f;
+    [Tooltip("Each full pull-out and re-seat multiplies the remaining force requirement by this.")]
+    [SerializeField, Range(0.1f, 1f)] float reseatForceMultiplier = 0.7f;
+    [Tooltip("Re-seating can never lower the requirement below this fraction of Stuck Force Required.")]
+    [SerializeField, Range(0f, 1f)] float reseatMinForceFraction = 0.35f;
+    [Tooltip("Insert progress below which the screwdriver counts as pulled out.")]
+    [SerializeField, Range(0f, 0.5f)] float pulledOutThreshold = 0.05f;
+    [Tooltip("Sideways mouse travel after a jam that decides whether the player pries left or right.")]
+    [SerializeField] float jamDirectionPickPixels = 25f;
+    [Tooltip("How fast pushing back against the pry direction removes force (1 = as fast as pushing builds it).")]
+    [SerializeField, Range(0f, 2f)] float pushBackPenalty = 1f;
+    [Tooltip("While jammed the mouse can't steer the screwdriver; it only creeps this many degrees toward the pry direction as force builds, and stays there on breakthrough.")]
+    [SerializeField] float stuckLeanDegrees = 8f;
+    [Tooltip("Max screwdriver tremble (degrees) while pushing the right way during a jam. 0 = off.")]
+    [SerializeField] float stuckTrembleDegrees = 0.5f;
+    [Tooltip("Extra depth (m) the tip lurches into the lock when a jam breaks.")]
+    [SerializeField] float releaseDepthPunch = 0.012f;
+
+    [Header("Final jam (breaking it opens the lock)")]
+    [Tooltip("Force multiplier for the last jam relative to Stuck Force Required.")]
+    [SerializeField] float finalJamForceMultiplier = 2f;
+    [Tooltip("Loops while forcing the final jam. Falls back to Stuck Loop Sfx.")]
+    [SerializeField] AudioClip finalJamLoopSfx;
+    [SerializeField, Range(0f, 1f)] float finalLoopMinVolume = 0f;
+    [SerializeField, Range(0f, 1f)] float finalLoopMaxVolume = 0.9f;
+
+    [Header("Jam camera feel (tension -> release)")]
+    [Tooltip("FOV narrows by up to this many degrees as force builds.")]
+    [SerializeField] float tensionFovSqueeze = 2f;
+    [Tooltip("Extra noise amplitude at full force (on top of the camera's own).")]
+    [SerializeField] float tensionNoiseAmplitude = 0.35f;
+    [Tooltip("Extra noise frequency at full force, so tension reads as a tremor.")]
+    [SerializeField] float tensionNoiseFrequency = 1.5f;
+    [Tooltip("Share of the tension shake/tremble present the instant a correct push starts (rest builds with force).")]
+    [SerializeField, Range(0f, 1f)] float pushShakeFloor = 0.12f;
+    [Tooltip("Scales the tension shake during the final jam.")]
+    [SerializeField, Range(0f, 1f)] float finalJamShakeScale = 0.7f;
+    [Tooltip("Camera jolt when a push in the right direction starts. 0 = off.")]
+    [SerializeField] float pushOnsetKickDegrees = 0f;
+    [SerializeField] float pushOnsetKickFrequency = 10f;
+    [SerializeField] float pushOnsetKickDuration = 0.2f;
+    [Tooltip("Minimum seconds between push-start jolts.")]
+    [SerializeField] float pushOnsetCooldown = 0.3f;
+    [Tooltip("FOV pops out by this many degrees when the jam breaks, then settles.")]
+    [SerializeField] float releaseFovKick = 2.5f;
+    [Tooltip("Noise amplitude burst when the jam breaks.")]
+    [SerializeField] float releaseNoiseAmplitude = 1f;
+    [Tooltip("Noise frequency during the release burst (higher = sharper jolt).")]
+    [SerializeField] float releaseNoiseFrequency = 3f;
+    [Tooltip("How fast the release settles (per second).")]
+    [SerializeField] float releaseDecay = 9f;
+    [Tooltip("How fast the tension follows the applied force (per second).")]
+    [SerializeField] float tensionSmooth = 8f;
 
     [Header("Progress UI (mic-style). Leave empty to auto-create.")]
     [SerializeField] GameObject progressPanel;
@@ -82,6 +146,14 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
     [SerializeField] AudioClip holdLoopSfx;
     [Tooltip("Loops while LMB is held and the shove is stuck. Own volume controls.")]
     [SerializeField] AudioClip stuckLoopSfx;
+    [Tooltip("Parts cracking when a shove gets stuck (random pick each time).")]
+    [SerializeField] AudioClip[] stuckCrackSfx;
+    [SerializeField, Range(0f, 1f)] float stuckCrackVolume = 0.8f;
+    [SerializeField] Vector2 stuckCrackPitchRange = new Vector2(0.9f, 1.1f);
+    [Tooltip("Played when a jam is forced through (random pick). Falls back to Stuck Crack Sfx.")]
+    [SerializeField] AudioClip[] jamBreakSfx;
+    [SerializeField, Range(0f, 1f)] float jamBreakVolume = 1f;
+    [Tooltip("Played when the lock finally breaks.")]
     [SerializeField] AudioClip breakSfx;
     [SerializeField] AudioClip cancelSfx;
     [SerializeField] float sfxVolume = 1f;
@@ -90,7 +162,9 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
     [Tooltip("Mouse travel (pixels/frame, smoothed) that reaches max hold-loop volume.")]
     [SerializeField] float holdLoopMouseForMaxVolume = 25f;
     [SerializeField] float holdLoopVolumeSmooth = 12f;
-    [SerializeField, Range(0f, 1f)] float stuckLoopMinVolume = 0.05f;
+    [Tooltip("Volume response while jammed; high so the loop cuts out as soon as the push stops.")]
+    [SerializeField] float stuckLoopVolumeSmooth = 45f;
+    [SerializeField, Range(0f, 1f)] float stuckLoopMinVolume = 0f;
     [SerializeField, Range(0f, 1f)] float stuckLoopMaxVolume = 0.45f;
     [Tooltip("Mouse travel that reaches max stuck-loop volume.")]
     [SerializeField] float stuckLoopMouseForMaxVolume = 25f;
@@ -98,7 +172,7 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
     [Header("Hints")]
     [SerializeField] string aimHintKey = "gameplay.screwdriver_aim";
     [SerializeField] string holdHintKey = "gameplay.screwdriver_shake";
-    [SerializeField] string stuckHintKey = "gameplay.screwdriver_stuck";
+    [SerializeField] string stuckHintKey = "gameplay.screwdriver_force";
 
     Stage _stage = Stage.Idle;
     InventoryItem _tool;
@@ -115,6 +189,26 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
     float _breakFill;
     float _sessionFillLeft;
     bool _sessionArmed;
+    bool _jammed;
+    bool _finalJam;
+    float _jamForce;
+    float _jamForceRequired;
+    float _jamBaseRequired;
+    Vector2 _jamDirection;
+    Vector2 _jamDirectionProbe;
+    float _pushSpeedSmoothed;
+    float _pushGain;
+    float _pushActivity;
+    bool _wasPushing;
+    float _lastPushOnsetTime;
+    CameraKick _cameraKick;
+    bool _pulledOutSinceSeat;
+    float _tension;
+    float _release;
+    CinemachineBasicMultiChannelPerlin _cameraNoise;
+    float _baseNoiseAmplitude;
+    float _baseNoiseFrequency;
+    float _baseFov;
     bool _wasHolding;
     bool _ownsProgressUi;
     bool _wasStuck;
@@ -185,8 +279,32 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         _aimAngles = Vector2.zero;
         _insertProgress = 0f;
         _breakFill = 0f;
-        _sessionFillLeft = 0f;
+        _sessionFillLeft = Mathf.Max(0.01f, maxFillPerPush);
         _sessionArmed = false;
+        _jammed = false;
+        _finalJam = false;
+        _jamForce = 0f;
+        _jamForceRequired = 0f;
+        _jamBaseRequired = 0f;
+        _jamDirection = Vector2.zero;
+        _jamDirectionProbe = Vector2.zero;
+        _pushSpeedSmoothed = 0f;
+        _pushGain = 0f;
+        _pushActivity = 0f;
+        _pulledOutSinceSeat = false;
+        _tension = 0f;
+        _release = 0f;
+        _cameraNoise = lockpickCamera.GetComponent<CinemachineBasicMultiChannelPerlin>();
+        if (_cameraNoise != null)
+        {
+            _baseNoiseAmplitude = _cameraNoise.AmplitudeGain;
+            _baseNoiseFrequency = _cameraNoise.FrequencyGain;
+        }
+        _baseFov = lockpickCamera.Lens.FieldOfView;
+        _wasPushing = false;
+        _lastPushOnsetTime = -999f;
+        if (_cameraKick == null && pushOnsetKickDegrees > 0f)
+            _cameraKick = lockpickCamera.gameObject.AddComponent<CameraKick>();
         _wasHolding = false;
         _wasStuck = false;
 
@@ -393,26 +511,115 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
 
         bool seated = holding && _insertProgress >= 0.99f;
 
-        // New shove: grant a fresh movement budget once fully in.
+        if (_insertProgress <= pulledOutThreshold)
+            _pulledOutSinceSeat = true;
+
         if (seated && !_sessionArmed)
         {
             _sessionArmed = true;
-            _sessionFillLeft = Mathf.Max(0.01f, maxFillPerPush);
+            // Re-seating into the same jam after a full pull-out loosens it.
+            if (_jammed && _pulledOutSinceSeat)
+            {
+                float floor = _jamBaseRequired * reseatMinForceFraction;
+                _jamForceRequired = Mathf.Max(floor, _jamForceRequired * reseatForceMultiplier);
+            }
+            _pulledOutSinceSeat = false;
         }
 
         if (!holding)
-        {
             _sessionArmed = false;
-            _sessionFillLeft = 0f;
+
+        if (seated && !_jammed && _sessionFillLeft <= 0.0001f)
+        {
+            _jammed = true;
+            _jamForce = 0f;
+            _jamDirection = Vector2.zero;
+            _jamDirectionProbe = Vector2.zero;
+            _pushSpeedSmoothed = 0f;
+            // If breaking this jam plus one more wiggle would fill the bar, it is the last one.
+            _finalJam = _breakFill + stuckBreakFill + maxFillPerPush >= 0.999f;
+            _jamBaseRequired = Mathf.Max(0.1f, stuckForceRequired * (_finalJam ? finalJamForceMultiplier : 1f));
+            _jamForceRequired = _jamBaseRequired;
         }
 
-        bool canWiggle = seated && _sessionFillLeft > 0.0001f;
-        bool stuck = seated && !canWiggle;
+        bool canWiggle = seated && !_jammed;
+        bool stuck = seated && _jammed;
 
-        // Aim freely when not seated; full wiggle while budget remains; tiny motion when stuck.
-        float aimScale = 1f;
-        if (seated)
-            aimScale = canWiggle ? 1f : stuckAimScale;
+        float dt = Time.deltaTime;
+        float follow = 1f - Mathf.Exp(-pushSpeedSmooth * dt);
+        _pushGain = 0f;
+        if (stuck)
+        {
+            // The first consistent left or right movement picks the pry direction. Force is time spent
+            // pushing steadily along it: speed beyond the steady range earns nothing, pushing back eases it off.
+            // Summed travel cancels out while shaking, so only a consistent push picks the direction.
+            if (_jamDirection == Vector2.zero && _wasStuck)
+            {
+                _jamDirectionProbe = _jamDirectionProbe * Mathf.Exp(-1f * dt) + new Vector2(mouseDelta.x, 0f);
+                if (Mathf.Abs(_jamDirectionProbe.x) >= jamDirectionPickPixels)
+                    _jamDirection = new Vector2(Mathf.Sign(_jamDirectionProbe.x), 0f);
+            }
+            if (_jamDirection != Vector2.zero)
+            {
+                float pryPushSpeed = dt > 0f ? Vector2.Dot(mouseDelta, _jamDirection) / dt : 0f;
+                _pushSpeedSmoothed = Mathf.Lerp(_pushSpeedSmoothed, pryPushSpeed, follow);
+                _pushGain = SteadyPushGain(_pushSpeedSmoothed);
+                if (_pushGain > 0f)
+                    _jamForce += _pushGain * dt;
+                else if (_pushSpeedSmoothed <= -steadyPushMinSpeed)
+                    _jamForce -= pushBackPenalty * dt;
+                else
+                    _jamForce -= stuckForceBleedPerSecond * dt;
+                _jamForce = Mathf.Max(0f, _jamForce);
+            }
+        }
+        _pushActivity = Mathf.Lerp(_pushActivity, _pushGain, follow);
+        bool pushing = _pushGain > 0f;
+        if (pushing && !_wasPushing && Time.time - _lastPushOnsetTime >= pushOnsetCooldown)
+        {
+            _lastPushOnsetTime = Time.time;
+            if (_cameraKick != null)
+                _cameraKick.Kick(pushOnsetKickDegrees, pushOnsetKickFrequency, pushOnsetKickDuration);
+        }
+        _wasPushing = pushing;
+        if (!stuck)
+        {
+            _pushSpeedSmoothed = 0f;
+            if (_jamForce > 0f)
+                _jamForce = Mathf.Max(0f, _jamForce - stuckForceBleedPerSecond * dt);
+        }
+        if (stuck)
+        {
+            if (_jamForce >= _jamForceRequired)
+            {
+                Vector2 leanBaked = _aimAngles + JamLeanDirection() * stuckLeanDegrees;
+                _aimAngles = new Vector2(
+                    Mathf.Clamp(leanBaked.x, -aimConeDegrees, aimConeDegrees),
+                    Mathf.Clamp(leanBaked.y, -aimConeDegrees, aimConeDegrees));
+                _jammed = false;
+                _jamForce = 0f;
+                _sessionFillLeft = Mathf.Max(0.01f, maxFillPerPush);
+                if (_finalJam)
+                    _breakFill = 1f;
+                else
+                {
+                    AddBreakFill(stuckBreakFill);
+                    PlayJamBreak();
+                }
+                _release = 1f;
+                _tension = 0f;
+                stuck = false;
+                canWiggle = true;
+            }
+        }
+
+        float strain = stuck ? Mathf.Clamp01(_jamForce / Mathf.Max(0.01f, _jamForceRequired)) : 0f;
+        _tension = Mathf.Lerp(_tension, strain, 1f - Mathf.Exp(-tensionSmooth * Time.deltaTime));
+        _release = Mathf.Lerp(_release, 0f, 1f - Mathf.Exp(-releaseDecay * Time.deltaTime));
+        ApplyCameraFeel();
+
+        // Aim freely when not seated or wiggling; jammed, the mouse can't steer it at all.
+        float aimScale = seated && !canWiggle ? 0f : 1f;
 
         if (aimScale > 0f)
         {
@@ -428,7 +635,13 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
                 aimConeDegrees);
         }
 
-        ApplyAimPose(_insertProgress * insertDepth);
+        Vector2 savedAim = _aimAngles;
+        if (stuck)
+            _aimAngles += JamLeanDirection() * (stuckLeanDegrees * strain);
+        if (stuck && stuckTrembleDegrees > 0f)
+            _aimAngles += UnityEngine.Random.insideUnitCircle * (stuckTrembleDegrees * _pushActivity * (pushShakeFloor + (1f - pushShakeFloor) * strain));
+        ApplyAimPose(_insertProgress * insertDepth + _release * releaseDepthPunch);
+        _aimAngles = savedAim;
 
         if (holding && !_wasHolding)
         {
@@ -441,6 +654,7 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         else if (holding && stuck && !_wasStuck)
         {
             StartLoop(stuck: true);
+            PlayStuckCrack();
         }
         else if (holding && !stuck && _wasStuck)
         {
@@ -455,14 +669,20 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         _wasHolding = holding;
         _wasStuck = stuck;
 
-        // Mouse fill only while seated and this shove still has budget.
         if (canWiggle && mouseDelta.sqrMagnitude > 0f)
         {
             float want = mouseDelta.magnitude * mouseFillPerPixel;
             float add = Mathf.Min(want, _sessionFillLeft);
+            // Wiggling alone never opens the lock; the final jam must be forced.
+            float roomBeforeFull = 0.99f - _breakFill;
+            if (add >= roomBeforeFull)
+            {
+                add = Mathf.Max(0f, roomBeforeFull);
+                _sessionFillLeft = 0f;
+            }
             if (add > 0f)
             {
-                _sessionFillLeft -= add;
+                _sessionFillLeft = Mathf.Max(0f, _sessionFillLeft - add);
                 AddBreakFill(add);
             }
         }
@@ -483,6 +703,77 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
             _breakFill = Mathf.Max(0f, _breakFill - barDecayPerSecond * Time.deltaTime);
 
         RefreshProgressUi();
+    }
+
+    void PlayStuckCrack()
+    {
+        if (stuckCrackSfx == null || stuckCrackSfx.Length == 0 || SoundManager.Instance == null)
+            return;
+        AudioClip clip = stuckCrackSfx[UnityEngine.Random.Range(0, stuckCrackSfx.Length)];
+        if (clip == null)
+            return;
+        float pitch = UnityEngine.Random.Range(stuckCrackPitchRange.x, stuckCrackPitchRange.y);
+        SoundManager.Instance.PlaySFXAt(clip, keyhole.position, stuckCrackVolume, pitch);
+    }
+
+    /// <summary>1 inside the steady push range, fading to 0 at twice the max speed; 0 below the min.</summary>
+    float SteadyPushGain(float pushSpeed)
+    {
+        if (pushSpeed < steadyPushMinSpeed)
+            return 0f;
+        if (pushSpeed <= steadyPushMaxSpeed)
+            return 1f;
+        return Mathf.Clamp01(2f - pushSpeed / Mathf.Max(1f, steadyPushMaxSpeed));
+    }
+
+    /// <summary>Pry direction in aim space (zero until the player commits to one).</summary>
+    Vector2 JamLeanDirection()
+    {
+        return new Vector2(
+            _jamDirection.x * (invertAimX ? -1f : 1f),
+            _jamDirection.y * (invertAimY ? -1f : 1f));
+    }
+
+    void ApplyCameraFeel()
+    {
+        if (lockpickCamera == null)
+            return;
+
+        var lens = lockpickCamera.Lens;
+        lens.FieldOfView = _baseFov - _tension * tensionFovSqueeze + _release * releaseFovKick;
+        lockpickCamera.Lens = lens;
+
+        if (_cameraNoise != null)
+        {
+            // Tension shake only while pushing the right way; it grows with the built-up force.
+            float shake = _pushActivity * (pushShakeFloor + (1f - pushShakeFloor) * _tension);
+            if (_finalJam)
+                shake *= finalJamShakeScale;
+            _cameraNoise.AmplitudeGain = _baseNoiseAmplitude + shake * tensionNoiseAmplitude + _release * releaseNoiseAmplitude;
+            _cameraNoise.FrequencyGain = _baseNoiseFrequency + shake * tensionNoiseFrequency + _release * releaseNoiseFrequency;
+        }
+    }
+
+    void ResetCameraFeel()
+    {
+        _tension = 0f;
+        _release = 0f;
+        _pushActivity = 0f;
+        if (lockpickCamera == null || _baseFov <= 0f)
+            return;
+        ApplyCameraFeel();
+    }
+
+    void PlayJamBreak()
+    {
+        AudioClip[] pool = jamBreakSfx != null && jamBreakSfx.Length > 0 ? jamBreakSfx : stuckCrackSfx;
+        if (pool == null || pool.Length == 0 || SoundManager.Instance == null)
+            return;
+        AudioClip clip = pool[UnityEngine.Random.Range(0, pool.Length)];
+        if (clip == null)
+            return;
+        float pitch = UnityEngine.Random.Range(stuckCrackPitchRange.x, stuckCrackPitchRange.y);
+        SoundManager.Instance.PlaySFXAt(clip, keyhole.position, jamBreakVolume, pitch);
     }
 
     void AddBreakFill(float amount)
@@ -628,6 +919,8 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
     void StartLoop(bool stuck)
     {
         AudioClip clip = stuck ? stuckLoopSfx : holdLoopSfx;
+        if (stuck && _finalJam && finalJamLoopSfx != null)
+            clip = finalJamLoopSfx;
         // Fall back to hold loop if stuck clip not assigned.
         if (clip == null && stuck)
             clip = holdLoopSfx;
@@ -653,7 +946,7 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         _loopIsStuckClip = stuck;
         _holdLoopMoveSmoothed = 0f;
 
-        float minVol = stuck ? stuckLoopMinVolume : holdLoopMinVolume;
+        float minVol = LoopMinVolume(stuck);
         _holdLoopVolumeSmoothed = minVol * sfxVolume;
         _loopSource.volume = _holdLoopVolumeSmoothed;
         _loopSource.Play();
@@ -668,20 +961,30 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
             _loopSource.transform.position = keyhole.position;
 
         float move = mouseDelta.magnitude;
-        float smooth = Mathf.Max(1f, holdLoopVolumeSmooth);
+        float smooth = Mathf.Max(1f, stuck ? stuckLoopVolumeSmooth : holdLoopVolumeSmooth);
         _holdLoopMoveSmoothed = Mathf.Lerp(_holdLoopMoveSmoothed, move, 1f - Mathf.Exp(-smooth * Time.deltaTime));
 
-        float minVol = stuck ? stuckLoopMinVolume : holdLoopMinVolume;
-        float maxVol = stuck ? stuckLoopMaxVolume : holdLoopMaxVolume;
+        float minVol = LoopMinVolume(stuck);
+        float maxVol = !stuck ? holdLoopMaxVolume
+            : _finalJam && finalJamLoopSfx != null ? finalLoopMaxVolume
+            : stuckLoopMaxVolume;
         float mouseForMax = stuck ? stuckLoopMouseForMaxVolume : holdLoopMouseForMaxVolume;
 
-        float t = mouseForMax > 0.01f
-            ? Mathf.Clamp01(_holdLoopMoveSmoothed / mouseForMax)
+        // Jammed: the loop only sounds while the push is actually making progress.
+        float t = stuck ? _pushGain
+            : mouseForMax > 0.01f ? Mathf.Clamp01(_holdLoopMoveSmoothed / mouseForMax)
             : 1f;
         float target = Mathf.Lerp(minVol, maxVol, t) * sfxVolume;
 
         _holdLoopVolumeSmoothed = Mathf.Lerp(_holdLoopVolumeSmoothed, target, 1f - Mathf.Exp(-smooth * Time.deltaTime));
         _loopSource.volume = _holdLoopVolumeSmoothed;
+    }
+
+    float LoopMinVolume(bool stuck)
+    {
+        if (!stuck)
+            return holdLoopMinVolume;
+        return _finalJam && finalJamLoopSfx != null ? finalLoopMinVolume : stuckLoopMinVolume;
     }
 
     void StopHoldLoop()
@@ -761,6 +1064,11 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         while (t < wait)
         {
             SetProgressVisible(false);
+            float settle = 1f - Mathf.Exp(-releaseDecay * Time.unscaledDeltaTime);
+            _release = Mathf.Lerp(_release, 0f, settle);
+            _tension = Mathf.Lerp(_tension, 0f, settle);
+            _pushActivity = Mathf.Lerp(_pushActivity, 0f, settle);
+            ApplyCameraFeel();
             if (brain != null && !brain.IsBlending && t > 0.1f)
                 break;
             t += Time.unscaledDeltaTime;
@@ -800,6 +1108,12 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
     void ForceAbortCleanup()
     {
         StopHoldLoop();
+        ResetCameraFeel();
+        if (_cameraKick != null)
+        {
+            Destroy(_cameraKick);
+            _cameraKick = null;
+        }
         DestroySpawnedVisual();
         if (_progressFade != null)
             _progressFade.SetVisible(false, instant: true);
@@ -834,7 +1148,7 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         if (stuck)
         {
             key = stuckHintKey;
-            fallback = "It's stuck, try again.";
+            fallback = "It's jammed. Force it, or pull out and shove again to loosen it.";
         }
         else if (seated && holding)
         {

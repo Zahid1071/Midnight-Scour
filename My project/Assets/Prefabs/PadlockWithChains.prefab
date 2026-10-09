@@ -571,7 +571,7 @@ MonoBehaviour:
   wrenchLeadEngageSpeed: 120
   wrenchLeadReturnSpeed: 160
   hideWrenchWhenIdle: 1
-  insertSensitivity: 0.001
+  insertSensitivity: 0.0004
   invertInsert: 0
   pickInsertAxisLocal: {x: 0, y: 0, z: 1}
   pickInsertDistance: 0.0012
@@ -641,6 +641,18 @@ MonoBehaviour:
   chainFallSfx: {fileID: 8300000, guid: dff285796c1b31c42b303e8381bec45a, type: 3}
   sfxVolume: 1
   cylinderRotateSfxVolume: 0.85
+  stageTickSfx: {fileID: 8300000, guid: d554bb4910e5fcd49aedce3f0433c173, type: 3}
+  stageTickSemitones:
+  - 0
+  - 2
+  - 4
+  - 5
+  stageTickVolume: 0.6
+  stageShakeDegrees: 0.25
+  stageShakeFrequency: 12
+  stageShakeDuration: 0.15
+  wrongPinSfx: {fileID: 8300000, guid: 5829e34d85550de478b6aee71ad0677d, type: 3}
+  wrongPinVolume: 0.7
 --- !u!1 &2250484085094044765
 GameObject:
   m_ObjectHideFlags: 0

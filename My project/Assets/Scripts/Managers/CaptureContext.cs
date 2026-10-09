@@ -231,29 +231,7 @@ public static class CaptureContinue
         }
     }
 
-    static void CloseCageDoor()
-    {
-        var cage = Object.FindFirstObjectByType<Cage>();
-        if (cage == null || cage.cageDoor == null)
-        {
-            Debug.LogWarning("[CaptureContinue] Cage / cageDoor missing — chained lock not applied.");
-            return;
-        }
-
-        var doorController = cage.cageDoor.GetComponentInParent<DoorController>();
-        if (doorController != null)
-        {
-            doorController.ForceCloseInstant();
-            doorController.SetLocked(true);
-        }
-        else
-        {
-            cage.cageDoor.ForceCloseInstant();
-        }
-
-        // Continue run: door is chained — no screwdriver break; pick the padlock instead.
-        cage.cageDoor.ApplyContinueChainedLock("gameplay.door_chained");
-    }
+    static void CloseCageDoor() => ContinuePadlockSpawner.ChainCageDoor(closeInstantly: true);
 
     static void RestorePlayer(GameObject playerGo)
     {

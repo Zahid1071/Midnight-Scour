@@ -25,6 +25,19 @@ public static class ItemDropHelper
         return instance;
     }
 
+    /// <summary>Spawns a dropped world item at rest at the given pose (e.g. a PlacementPreview's), without a throw.</summary>
+    public static GameObject SpawnPlaced(
+        GameObject prefab,
+        Vector3 position,
+        Quaternion rotation,
+        float mass = 1f,
+        AudioClip landClipOverride = null)
+    {
+        GameObject instance = Object.Instantiate(prefab, position, rotation);
+        PreparePhysics(instance, mass, landClipOverride);
+        return instance;
+    }
+
     private static Rigidbody PreparePhysics(GameObject root, float mass, AudioClip landClipOverride)
     {
         EnsureColliders(root);

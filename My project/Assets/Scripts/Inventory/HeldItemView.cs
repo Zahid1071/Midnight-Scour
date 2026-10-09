@@ -54,6 +54,9 @@ public sealed class HeldItemView : MonoBehaviour
 
     public bool IsHolstering { get; private set; }
 
+    /// <summary>Raised at the end of <see cref="Draw"/>, after the draw state started, so item scripts can layer on top of it.</summary>
+    public event System.Action Drawn;
+
     /// <summary>
     /// Draw clip time (0-1) the put-down picks up from, reversing back to 0. Item scripts move it, e.g. a
     /// closed lighter skips the lid-closing part.
@@ -133,6 +136,7 @@ public sealed class HeldItemView : MonoBehaviour
             animator.SetLayerWeight(overlayLayer, 0f);
         animator.Play(drawState, 0, 0f);
         animator.Update(0f);
+        Drawn?.Invoke();
     }
 
     /// <summary>Plays the put-down, then hides the view. Check IsHolstering to wait for it.</summary>

@@ -87,7 +87,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296583
-    m_Localized: "Naci\u015Bnij {0}, aby upu\u015Bci\u0107 wybrany przedmiot"
+    m_Localized: "Naci\u015Bnij {0}, aby rzuci\u0107, przytrzymaj, aby po\u0142o\u017Cy\u0107"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296584
@@ -183,7 +183,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296606
-    m_Localized: "To za daleko."
+    m_Localized: To za daleko.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296607
@@ -687,79 +687,79 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296732
-    m_Localized: "Uderzyłem za późno, złapie mnie"
+    m_Localized: "Uderzy\u0142em za p\xF3\u017Ano, z\u0142apie mnie"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296733
-    m_Localized: "Wepchnij śrubokręt."
+    m_Localized: "Wepchnij \u015Brubokr\u0119t."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296734
-    m_Localized: "Szarp gwałtownie, by złamać zamek."
+    m_Localized: "Szarp gwa\u0142townie, by z\u0142ama\u0107 zamek."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296735
-    m_Localized: "Uderzyłem za wcześnie, zostanę złapany"
+    m_Localized: "Uderzy\u0142em za wcze\u015Bnie, zostan\u0119 z\u0142apany"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296736
-    m_Localized: "Uderzyłem za późno, zostanę złapany"
+    m_Localized: "Uderzy\u0142em za p\xF3\u017Ano, zostan\u0119 z\u0142apany"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296737
-    m_Localized: "Utknęło, spróbuj ponownie."
+    m_Localized: "Utkn\u0119\u0142o, spr\xF3buj ponownie."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296738
-    m_Localized: "Butcher widział, jak się ukrywasz."
+    m_Localized: "Butcher widzia\u0142, jak si\u0119 ukrywasz."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296739
-    m_Localized: "Zrobiłeś za dużo hałasu."
+    m_Localized: "Zrobi\u0142e\u015B za du\u017Co ha\u0142asu."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296740
-    m_Localized: "Ukrywałeś się wciąż w tym samym miejscu."
+    m_Localized: "Ukrywa\u0142e\u015B si\u0119 wci\u0105\u017C w tym samym miejscu."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296741
-    m_Localized: "Nie ukryłeś dźwięku młotka grzmotem."
+    m_Localized: "Nie ukry\u0142e\u015B d\u017Awi\u0119ku m\u0142otka grzmotem."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296742
-    m_Localized: "Butcher cię zobaczył."
+    m_Localized: "Butcher ci\u0119 zobaczy\u0142."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296743
-    m_Localized: "Zostałeś złapany."
+    m_Localized: "Zosta\u0142e\u015B z\u0142apany."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296744
-    m_Localized: "Od nowa"
+    m_Localized: Od nowa
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296745
-    m_Localized: "Menu główne"
+    m_Localized: "Menu g\u0142\xF3wne"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296746
-    m_Localized: "Butcher zastawił na ciebie zasadzkę."
+    m_Localized: "Butcher zastawi\u0142 na ciebie zasadzk\u0119."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296747
-    m_Localized: "Wytrychy pozwalają zachować postęp po złapaniu."
+    m_Localized: "Wytrychy pozwalaj\u0105 zachowa\u0107 post\u0119p po z\u0142apaniu."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296748
-    m_Localized: "Wytrych"
+    m_Localized: Wytrych
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296749
-    m_Localized: "Podniesiono wytrych"
+    m_Localized: Podniesiono wytrych
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296750
-    m_Localized: "Kontynuuj"
+    m_Localized: Kontynuuj
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296751
@@ -767,27 +767,54 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296752
-    m_Localized: "U\u017Cyj myszy, aby przesun\u0105\u0107 wytrych, i lewego przycisku, aby podnie\u015B\u0107 bolce"
+    m_Localized: "U\u017Cyj myszy, aby przesun\u0105\u0107 wytrych, i lewego przycisku,
+      aby podnie\u015B\u0107 bolce"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296753
-    m_Localized: "Bolec ustawiony"
+    m_Localized: Bolec ustawiony
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296754
-    m_Localized: "Zamek otwarty"
+    m_Localized: Zamek otwarty
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296755
-    m_Localized: "Drzwi są spięte łańcuchem."
+    m_Localized: "Drzwi s\u0105 spi\u0119te \u0142a\u0144cuchem."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296756
-    m_Localized: "Kiedy złapano mnie za pierwszym razem, spiął drzwi kłódką. Szkoda, że nie ma przy mnie tej spinki do włosów z wierzchu tamtej toalety. Może dałoby się użyć jej jako wytrychu."
+    m_Localized: "Kiedy z\u0142apano mnie za pierwszym razem, spi\u0105\u0142 drzwi
+      k\u0142\xF3dk\u0105. Szkoda, \u017Ce nie ma przy mnie tej spinki do w\u0142os\xF3w
+      z wierzchu tamtej toalety. Mo\u017Ce da\u0142oby si\u0119 u\u017Cy\u0107 jej
+      jako wytrychu."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296757
-    m_Localized: "Muszę mieć oczy otwarte, żeby znaleźć więcej wytrychów"
+    m_Localized: "Musz\u0119 mie\u0107 oczy otwarte, \u017Ceby znale\u017A\u0107
+      wi\u0119cej wytrych\xF3w"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34286902860185600
+    m_Localized: "Wytrych... M\xF3g\u0142bym nim otworzy\u0107 t\u0119 k\u0142\xF3dk\u0119."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34286903040540672
+    m_Localized: "Kolejny wytrych. Je\u015Bli mnie z\u0142apie, u\u017Cyj\u0119 go,
+      \u017Ceby zn\xF3w wydosta\u0107 si\u0119 z klatki."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34292293547458560
+    m_Localized: "Podniesiono zapalniczk\u0119"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34292666949566464
+    m_Localized: Zapalniczka
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34365368158781440
+    m_Localized: "Zablokowa\u0142o si\u0119. Przepchnij na si\u0142\u0119 albo wyjmij
+      i wepchnij ponownie, \u017Ceby poluzowa\u0107."
     m_Metadata:
       m_Items: []
   references:

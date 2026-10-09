@@ -87,7 +87,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296583
-    m_Localized: "\u6309 {0} \u4E22\u5F03\u9009\u4E2D\u7684\u7269\u54C1"
+    m_Localized: "\u8F7B\u6309 {0} \u6254\u51FA\uFF0C\u957F\u6309\u653E\u4E0B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296584
@@ -675,79 +675,79 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296732
-    m_Localized: "我打晚了，他会抓住我"
+    m_Localized: "\u6211\u6253\u665A\u4E86\uFF0C\u4ED6\u4F1A\u6293\u4F4F\u6211"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296733
-    m_Localized: "把螺丝刀推进去。"
+    m_Localized: "\u628A\u87BA\u4E1D\u5200\u63A8\u8FDB\u53BB\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296734
-    m_Localized: "用力晃动来撬开锁。"
+    m_Localized: "\u7528\u529B\u6643\u52A8\u6765\u64AC\u5F00\u9501\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296735
-    m_Localized: "我打早了，我会被抓住"
+    m_Localized: "\u6211\u6253\u65E9\u4E86\uFF0C\u6211\u4F1A\u88AB\u6293\u4F4F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296736
-    m_Localized: "我打晚了，我会被抓住"
+    m_Localized: "\u6211\u6253\u665A\u4E86\uFF0C\u6211\u4F1A\u88AB\u6293\u4F4F"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296737
-    m_Localized: "卡住了，再试一次。"
+    m_Localized: "\u5361\u4F4F\u4E86\uFF0C\u518D\u8BD5\u4E00\u6B21\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296738
-    m_Localized: "Butcher看见你躲起来了。"
+    m_Localized: "Butcher\u770B\u89C1\u4F60\u8EB2\u8D77\u6765\u4E86\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296739
-    m_Localized: "你发出了太多声音。"
+    m_Localized: "\u4F60\u53D1\u51FA\u4E86\u592A\u591A\u58F0\u97F3\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296740
-    m_Localized: "你反复躲在同一个地方。"
+    m_Localized: "\u4F60\u53CD\u590D\u8EB2\u5728\u540C\u4E00\u4E2A\u5730\u65B9\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296741
-    m_Localized: "你没能用雷声掩盖锤击声。"
+    m_Localized: "\u4F60\u6CA1\u80FD\u7528\u96F7\u58F0\u63A9\u76D6\u9524\u51FB\u58F0\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296742
-    m_Localized: "Butcher看见了你。"
+    m_Localized: "Butcher\u770B\u89C1\u4E86\u4F60\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296743
-    m_Localized: "你被抓住了。"
+    m_Localized: "\u4F60\u88AB\u6293\u4F4F\u4E86\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296744
-    m_Localized: "重新开始"
+    m_Localized: "\u91CD\u65B0\u5F00\u59CB"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296745
-    m_Localized: "主菜单"
+    m_Localized: "\u4E3B\u83DC\u5355"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296746
-    m_Localized: "Butcher伏击了你。"
+    m_Localized: "Butcher\u4F0F\u51FB\u4E86\u4F60\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296747
-    m_Localized: "开锁器能让你在被抓住后保留进度。"
+    m_Localized: "\u5F00\u9501\u5668\u80FD\u8BA9\u4F60\u5728\u88AB\u6293\u4F4F\u540E\u4FDD\u7559\u8FDB\u5EA6\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296748
-    m_Localized: "开锁器"
+    m_Localized: "\u5F00\u9501\u5668"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296749
-    m_Localized: "拾取了开锁器"
+    m_Localized: "\u62FE\u53D6\u4E86\u5F00\u9501\u5668"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296750
-    m_Localized: "??"
+    m_Localized: ??
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296751
@@ -767,15 +767,35 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296755
-    m_Localized: "门被铁链锁住了。"
+    m_Localized: "\u95E8\u88AB\u94C1\u94FE\u9501\u4F4F\u4E86\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296756
-    m_Localized: "我第一次被抓住时，他用挂锁把门锁住了。真希望我当时拿走了马桶上面的那根发夹。也许我能用它当开锁器。"
+    m_Localized: "\u6211\u7B2C\u4E00\u6B21\u88AB\u6293\u4F4F\u65F6\uFF0C\u4ED6\u7528\u6302\u9501\u628A\u95E8\u9501\u4F4F\u4E86\u3002\u771F\u5E0C\u671B\u6211\u5F53\u65F6\u62FF\u8D70\u4E86\u9A6C\u6876\u4E0A\u9762\u7684\u90A3\u6839\u53D1\u5939\u3002\u4E5F\u8BB8\u6211\u80FD\u7528\u5B83\u5F53\u5F00\u9501\u5668\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296757
-    m_Localized: "我必须留意去找更多开锁器"
+    m_Localized: "\u6211\u5FC5\u987B\u7559\u610F\u53BB\u627E\u66F4\u591A\u5F00\u9501\u5668"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34286902860185600
+    m_Localized: "\u4E00\u628A\u5F00\u9501\u5668\u2026\u2026\u6211\u53EF\u4EE5\u7528\u5B83\u64AC\u5F00\u90A3\u628A\u6302\u9501\u3002"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34286903040540672
+    m_Localized: "\u53C8\u4E00\u628A\u5F00\u9501\u5668\u3002\u5982\u679C\u4ED6\u6293\u4F4F\u6211\uFF0C\u6211\u8FD8\u80FD\u7528\u5B83\u518D\u9003\u51FA\u7B3C\u5B50\u3002"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34292293547458560
+    m_Localized: "\u62FE\u53D6\u4E86\u6253\u706B\u673A"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34292666949566464
+    m_Localized: "\u6253\u706B\u673A"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34365368158781440
+    m_Localized: "\u5361\u4F4F\u4E86\u3002\u7528\u529B\u64AC\u5F00\uFF0C\u6216\u8005\u62D4\u51FA\u6765\u518D\u63A8\u8FDB\u53BB\u8BA9\u5B83\u677E\u52A8\u3002"
     m_Metadata:
       m_Items: []
   references:

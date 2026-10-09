@@ -22,6 +22,8 @@ namespace FS_Atmo
         [SerializeField] private InventoryItem requiredKey;
         [Tooltip("If set, using the required key starts this minigame instead of unlocking instantly.")]
         [SerializeField] private ScrewdriverLockBreakMinigame lockBreakMinigame;
+        [Tooltip("If off, a door whose lock was broken stays shut until the player opens it.")]
+        [SerializeField] private bool openAfterLockBreak = true;
         [Tooltip("Preferred: a Loc key (e.g. gameplay.locked) so the message is translated. Takes priority over Locked Message below.")]
         [SerializeField] private string lockedMessageKey;
         [TextArea]
@@ -307,7 +309,7 @@ namespace FS_Atmo
             {
                 return lockBreakMinigame.TryBegin(
                     item,
-                    onSuccess: CompleteUnlockFromMinigame,
+                    onSuccess: CompleteLockBreak,
                     onCancel: null);
             }
 
@@ -353,6 +355,27 @@ namespace FS_Atmo
 
             // Open immediately after a successful lock break (ignore player-in-path block).
             ForceOpenAfterUnlock();
+        }
+
+        /// <summary>Screwdriver minigame finished: the minigame already played its break sound.</summary>
+        void CompleteLockBreak(InventoryItem item)
+        {
+            if (item == null)
+                return;
+
+            isLocked = false;
+            HudManager.Instance?.ShowSubtitle(
+                Loc.Format("gameplay.item_unlocked", item.GetLocalizedName()),
+                2.5f, HudManager.Instance.SuccessColor);
+
+            if (item.consumeOnUse)
+            {
+                InventoryManager.Instance.RemoveItem(item);
+                InventoryUI.Instance?.RefreshUI();
+            }
+
+            if (openAfterLockBreak)
+                ForceOpenAfterUnlock();
         }
 
         /// <summary>Opens if closed, skipping obstruction / interact cooldowns used by normal clicks.</summary>

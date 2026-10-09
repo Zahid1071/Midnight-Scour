@@ -25,6 +25,8 @@ public class InteractionUIManager : MonoBehaviour
     [SerializeField] private Image interactCrosshairImage;
     [SerializeField] private Image doorCrosshairImage;
     [SerializeField] private Image outOfReachCrosshairImage;
+    [Tooltip("Small dot that stays on while no other crosshair or blocking UI is showing.")]
+    [SerializeField] private Image dotCrosshairImage;
 
     [Header("Button Prompt")]
     [SerializeField] private Image buttonPromptImage;
@@ -147,11 +149,26 @@ public class InteractionUIManager : MonoBehaviour
             doorCrosshairImage = crosshairRoot.Find("CrosshairDoor")?.GetComponent<Image>();
         if (outOfReachCrosshairImage == null)
             outOfReachCrosshairImage = crosshairRoot.Find("CrosshairOutOfReach")?.GetComponent<Image>();
+        if (dotCrosshairImage == null)
+            dotCrosshairImage = crosshairRoot.Find("CrosshairDot")?.GetComponent<Image>();
     }
 
     private void LateUpdate()
     {
         UpdateCrosshairFade();
+        UpdateCrosshairDot();
+    }
+
+    private void UpdateCrosshairDot()
+    {
+        if (dotCrosshairImage == null)
+            return;
+
+        bool show = _crosshairState == CrosshairState.Default
+            && !PlayerControlGate.IsInputBlocked
+            && (_cachedPlayerHider == null || (!_cachedPlayerHider.isHidden && !_cachedPlayerHider.IsHidingEngaged))
+            && (DemoEndScreenUI.Instance == null || !DemoEndScreenUI.Instance.IsShowing);
+        SetCrosshairActive(dotCrosshairImage, show);
     }
 
     private void Update()

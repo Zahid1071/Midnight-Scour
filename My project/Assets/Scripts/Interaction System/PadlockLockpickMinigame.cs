@@ -10,7 +10,7 @@ using UnityEngine.UI;
 /// Padlock lockpick — binding-pin style:
 /// RMB — tension (cylinder binds; full turn only when all pins are set).
 /// Mouse — travel 0–1; pick snaps to 4 stages (0–25% / 25–50% / 50–75% / 75–100%).
-/// LMB — lift to set the binding pin; while held, can't push past that unset binder.
+/// LMB — lift to set the binding pin; while held, the pick stays at its current stage.
 /// Release LMB to move freely again. Binding order is shuffled each attempt.
 /// Releasing RMB drops set pins but keeps the same binding order.
 /// </summary>
@@ -144,8 +144,21 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
     [SerializeField] AudioClip chainFallSfx;
     [SerializeField] float sfxVolume = 1f;
     [SerializeField, Range(0f, 1f)] float cylinderRotateSfxVolume = 0.85f;
+    [Tooltip("Short metallic tick played whenever the pick moves into a new depth stage, pitched per stage.")]
+    [SerializeField] AudioClip stageTickSfx;
+    [Tooltip("Pitch offset of each stage's tick in semitones, shallow to deep (0,2,4,5 = do re mi fa).")]
+    [SerializeField] float[] stageTickSemitones = { 0f, 2f, 4f, 5f };
+    [SerializeField, Range(0f, 1f)] float stageTickVolume = 0.6f;
+    [Tooltip("Peak camera wobble (degrees) when the pick moves into a new stage. 0 = off.")]
+    [SerializeField] float stageShakeDegrees = 0.25f;
+    [SerializeField] float stageShakeFrequency = 12f;
+    [SerializeField] float stageShakeDuration = 0.15f;
+    [Tooltip("Springy bounce-back played when the player lifts a pin that isn't the binding one (while tension is held).")]
+    [SerializeField] AudioClip wrongPinSfx;
+    [SerializeField, Range(0f, 1f)] float wrongPinVolume = 0.7f;
 
     Stage _stage = Stage.Idle;
+    CameraKick _cameraKick;
     InventoryItem _tool;
     Action<InventoryItem> _onSuccess;
     Action _onCancel;
@@ -409,6 +422,8 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
 
         StorePose();
         lockpickCamera.Priority = activeCameraPriority;
+        if (_cameraKick == null && stageShakeDegrees > 0f)
+            _cameraKick = lockpickCamera.gameObject.AddComponent<CameraKick>();
         _stage = Stage.Presenting;
         StartPoseRoutine(PresentThenStartPlaying());
 
@@ -440,17 +455,22 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
         bool tensionHeld = mouse != null && mouse.rightButton.isPressed;
         bool lifting = mouse != null && mouse.leftButton.isPressed;
 
-        // Continuous travel input, then snap into one of 4 stage zones.
-        float insertDelta = delta.y * insertSensitivity * (invertInsert ? -1f : 1f);
-        float desiredTravel = Mathf.Clamp01(_travel01 + insertDelta);
+        // Continuous travel input, then snap into one of 4 stage zones. While lifting (LMB) the pick is
+        // pressed against a pin and holds its depth; mouse movement is ignored.
+        if (!lifting)
+        {
+            float insertDelta = delta.y * insertSensitivity * (invertInsert ? -1f : 1f);
+            _travel01 = Mathf.Clamp01(_travel01 + insertDelta);
+        }
 
-        // While lifting, block pushing past the unset binder — but never yank the pick back
-        // (next binder can be shallower after a set; that used to reset you to the start).
-        if (lifting)
-            desiredTravel = LimitTravelPushAgainstBindingPin(_travel01, desiredTravel);
-
-        _travel01 = desiredTravel;
+        int previousSlot = _pinSlot;
         RefreshPinSlotFromTravel();
+        if (_pinSlot != previousSlot)
+        {
+            PlayStageTick(_pinSlot);
+            if (_cameraKick != null)
+                _cameraKick.Kick(stageShakeDegrees, stageShakeFrequency, stageShakeDuration);
+        }
 
         TickPickLift(lifting);
         TickPickStageVisual();
@@ -503,55 +523,24 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
         _pinSlot = slot;
     }
 
-    /// <summary>
-    /// While LMB is held, block pushing deeper than the current unset binding pin.
-    /// Never reduce travel — after a pin sets, the next binder may be shallower and
-    /// must not snap the pick back to the start.
-    /// </summary>
-    float LimitTravelPushAgainstBindingPin(float currentTravel, float desiredTravel)
+    void PlayWrongPinSfx()
     {
-        if (!TryGetBindingPinMaxTravel(out float maxTravel))
-            return desiredTravel;
-
-        if (desiredTravel <= maxTravel)
-            return desiredTravel;
-
-        // Already past this binder (e.g. just set a deeper pin): stay / allow pull-out only.
-        if (currentTravel > maxTravel)
-            return Mathf.Min(desiredTravel, currentTravel);
-
-        // Approaching the binder: stop on its stage.
-        return maxTravel;
+        if (wrongPinSfx == null || SoundManager.Instance == null)
+            return;
+        Vector3 position = keyholeCylinder != null ? keyholeCylinder.position : transform.position;
+        SoundManager.Instance.PlaySFXAt(wrongPinSfx, position, wrongPinVolume);
     }
 
-    bool TryGetBindingPinMaxTravel(out float maxTravel)
+    void PlayStageTick(int slot)
     {
-        maxTravel = 1f;
-        if (_pinsComplete || pins == null || pins.Length == 0 || _depthOrder == null)
-            return false;
+        if (stageTickSfx == null || SoundManager.Instance == null)
+            return;
 
-        int binder = GetBindingPinIndex();
-        if (binder < 0)
-            return false;
-
-        int binderSlot = -1;
-        for (int i = 0; i < _depthOrder.Length; i++)
-        {
-            if (_depthOrder[i] == binder)
-            {
-                binderSlot = i;
-                break;
-            }
-        }
-
-        if (binderSlot < 0)
-            return false;
-
-        int count = pins.Length;
-        // End of binder's quartile, kept inside that stage for Floor(travel * count).
-        float end = (binderSlot + 1f) / count;
-        maxTravel = end >= 1f ? 1f : end - 0.0001f;
-        return true;
+        float semitones = stageTickSemitones != null && stageTickSemitones.Length > 0
+            ? stageTickSemitones[Mathf.Clamp(slot, 0, stageTickSemitones.Length - 1)]
+            : 0f;
+        Vector3 position = keyholeCylinder != null ? keyholeCylinder.position : transform.position;
+        SoundManager.Instance.PlaySFXAt(stageTickSfx, position, stageTickVolume, Mathf.Pow(2f, semitones / 12f));
     }
 
     /// <summary>Snapped stage depth along local forward (stage 1→0.25 … stage 4→1).</summary>
@@ -709,7 +698,10 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
             return;
 
         if (_depthOrder[_pinSlot] != binder)
+        {
+            PlayWrongPinSfx();
             return;
+        }
 
         _pinSet[binder] = true;
         _bindingOrderIndex++;
@@ -1492,6 +1484,11 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
 
         if (lockpickCamera != null)
             lockpickCamera.Priority = 0;
+        if (_cameraKick != null)
+        {
+            Destroy(_cameraKick);
+            _cameraKick = null;
+        }
 
         if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonLockpick))
             PlayerControlGate.Release(PlayerControlGate.ReasonLockpick);

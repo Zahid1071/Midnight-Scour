@@ -775,6 +775,26 @@ MonoBehaviour:
     m_Key: gameplay.lockpick_watch_for_more
     m_Metadata:
       m_Items: []
+  - m_Id: 34286902860185600
+    m_Key: item.lockpick.pickup_padlock
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34286903040540672
+    m_Key: item.lockpick.pickup_extra_life
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34292293547458560
+    m_Key: item.lighter.pickup
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34292666949566464
+    m_Key: item.lighter.name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34365368158781440
+    m_Key: gameplay.screwdriver_force
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -38,9 +38,9 @@ public sealed class FollowHeldItemSocket : MonoBehaviour
         if (held)
             transform.SetPositionAndRotation(_socket.position + worldOffset, Quaternion.identity);
 
+        // A lighter drawn already lit (picked up burning) shows its flame during the draw too.
         bool show = held
-                    && !(hideWhileDrawing && _view.IsDrawing)
-                    && (_lighter == null || _lighter.IsLit);
+                    && (_lighter != null ? _lighter.IsLit : !(hideWhileDrawing && _view.IsDrawing));
         if (hideChildrenWhenNotHeld && _childrenShown != show)
         {
             _childrenShown = show;

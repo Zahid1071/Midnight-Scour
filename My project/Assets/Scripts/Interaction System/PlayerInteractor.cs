@@ -204,7 +204,7 @@ public class PlayerInteractor : MonoBehaviour
 
     public void ShowOutOfReach() => InteractionFeedback.Fail(Loc.Get("gameplay.cant_reach"), 3f);
 
-    Vector3 GetFeetPosition()
+    public Vector3 GetFeetPosition()
     {
         if (_characterController != null)
         {

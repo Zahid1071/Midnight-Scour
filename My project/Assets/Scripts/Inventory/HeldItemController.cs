@@ -45,11 +45,12 @@ public sealed class HeldItemController : MonoBehaviour
     private void LateUpdate()
     {
         InventoryItem selected = InventoryUI.Instance != null ? InventoryUI.Instance.GetSelectedItem() : null;
-        bool canShow = CanShowHeldItem();
+        bool hiding = IsHiding();
+        bool canShow = !hiding && CanShowHeldItem();
 
         if (_currentView != null && _currentView.IsHolstering)
         {
-            if (canShow)
+            if (canShow || hiding)
                 return;
             _currentView.HolsterImmediate();
         }
@@ -60,8 +61,8 @@ public sealed class HeldItemController : MonoBehaviour
 
         if (viewShown)
         {
-            // Switching items: the next one is drawn once this put-down has finished.
-            if (canShow)
+            // Switching items or starting to hide: the put-down plays first.
+            if (canShow || hiding)
             {
                 _currentView.Holster();
                 if (_currentView.IsHolstering)
@@ -78,18 +79,24 @@ public sealed class HeldItemController : MonoBehaviour
             _currentView.Draw();
     }
 
-    private bool CanShowHeldItem()
-    {
-        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic)
-            || PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured))
-            return false;
+    private static bool CanShowHeldItem() =>
+        !PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic)
+        && !PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured);
 
+    private bool IsHiding()
+    {
         if (!_hiderLookedUp)
         {
             _hider = FindFirstObjectByType<PlayerHider>();
             _hiderLookedUp = true;
         }
-        return _hider == null || !_hider.isHidden;
+        return _hider != null && (_hider.isHidden || _hider.IsHidingEngaged);
+    }
+
+    public bool TryGetView(InventoryItem item, out HeldItemView view)
+    {
+        view = GetView(item);
+        return view != null;
     }
 
     private HeldItemView GetView(InventoryItem item) =>

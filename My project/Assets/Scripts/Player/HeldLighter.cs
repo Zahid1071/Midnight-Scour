@@ -7,7 +7,8 @@ using UnityEngine.InputSystem;
 /// Left-click opens the lid if it is closed, otherwise strikes; right-click closes the lid, which puts
 /// the flame out. Lid open uses the draw clip, lid close and the put-down its reversed copy, and the closed
 /// lid loops its own idle (starting on draw frame 20). Timings below are draw clip times.
-/// FollowHeldItemSocket keeps the flame lights off until IsLit.
+/// FollowHeldItemSocket keeps the flame lights off until IsLit. A lighter picked up burning (DrawLitNextTime) draws
+/// with the flame on and the lid held open by the lid layer.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(HeldItemView))]
@@ -33,11 +34,11 @@ public sealed class HeldLighter : MonoBehaviour
 
     [Tooltip("Draw speed while the hand comes up (draw clip up to the closed-lid pose).")]
     [Min(0.01f)]
-    [SerializeField] private float drawRaiseSpeed = 1.1f;
+    [SerializeField] private float drawRaiseSpeed = 1.65f;
 
     [Tooltip("Draw speed from the closed-lid pose on, i.e. the lid opening. Keep in line with the LidOpen state's speed.")]
     [Min(0.01f)]
-    [SerializeField] private float drawLidSpeed = 2.1f;
+    [SerializeField] private float drawLidSpeed = 4f;
 
     [Tooltip("Seconds of blending into the strike and the lid close / open (the idle loops drift from their start pose).")]
     [Min(0f)]
@@ -69,9 +70,25 @@ public sealed class HeldLighter : MonoBehaviour
 
     [SerializeField] private bool useAnimationEvent;
 
+    [Header("Lit draw (picked up burning)")]
+    [Tooltip("Lid layer state holding the open lid (the idle clip) while the hand comes up with the flame on.")]
+    [SerializeField] private string lidOpenHoldState = "LidOpenHold";
+
+    [Tooltip("Seconds of blending from the raised hand into the idle, and of fading the lid layer out.")]
+    [Min(0f)]
+    [SerializeField] private float litDrawBlend = 0.2f;
+
     [Header("Flame")]
     [Tooltip("Optional extra object switched on at ignition.")]
     [SerializeField] private GameObject flame;
+
+    [Header("Audio")]
+    [Tooltip("Played as the lid starts opening (left-click or the end of the draw). Trimmed so the clink lands as the lid flips.")]
+    [SerializeField] private AudioClip lidOpenSfx;
+    [SerializeField, Range(0f, 1f)] private float lidOpenVolume = 0.7f;
+    [Tooltip("Played when the strike starts; its flick peaks where the flame catches.")]
+    [SerializeField] private AudioClip strikeSfx;
+    [SerializeField, Range(0f, 1f)] private float strikeVolume = 1f;
 
     public bool IsLit { get; private set; }
     public bool IsLidOpen { get; private set; } = true;
@@ -82,6 +99,10 @@ public sealed class HeldLighter : MonoBehaviour
     private bool _hasDrawSpeed;
     private bool _striking;
     private bool _closing;
+    private bool _drawLitNext;
+    private bool _litDraw;
+    private bool _litDrawHandedOff;
+    private float _lastDrawTime = -1f;
 
     private void Awake()
     {
@@ -98,19 +119,49 @@ public sealed class HeldLighter : MonoBehaviour
         }
         if (flame != null)
             flame.SetActive(false);
+        _view.Drawn += OnDrawn;
     }
+
+    private void OnDestroy()
+    {
+        if (_view != null)
+            _view.Drawn -= OnDrawn;
+    }
+
+    /// <summary>
+    /// The next draw keeps the flame on (a burning lighter was picked up): the lid stays open while the hand
+    /// comes up, then it goes straight to the lit idle without opening the lid or striking.
+    /// </summary>
+    public void DrawLitNextTime() => _drawLitNext = true;
 
     private void OnEnable()
     {
         IsLidOpen = true;
         _closing = false;
         Extinguish();
+
+        _litDraw = _drawLitNext;
+        _litDrawHandedOff = false;
+        _drawLitNext = false;
+        _lastDrawTime = -1f;
+        if (_litDraw)
+            Ignite();
     }
 
     private void OnDisable()
     {
         _closing = false;
+        _litDraw = false;
         Extinguish();
+    }
+
+    private void OnDrawn()
+    {
+        if (!_litDraw || animator == null || _lidLayer <= 0)
+            return;
+        animator.Play(lidOpenHoldState, _lidLayer, 0f);
+        animator.SetLayerWeight(_lidLayer, 1f);
+        animator.Update(0f);
     }
 
     private void Update()
@@ -119,8 +170,19 @@ public sealed class HeldLighter : MonoBehaviour
             return;
 
         UpdateDrawSpeed();
+        TrackDrawLidOpen();
         TrackReversedLid();
-        if (_view.IsHolstering || Mouse.current == null || Cursor.lockState != CursorLockMode.Locked)
+        if (_view.IsHolstering)
+        {
+            _litDraw = false;
+            return;
+        }
+
+        TickLitDraw();
+        if (_litDraw || Mouse.current == null || Cursor.lockState != CursorLockMode.Locked)
+            return;
+        // Left-click while G is held places the lighter (InventoryUI); don't strike or open the lid too.
+        if (InventoryUI.Instance != null && InventoryUI.Instance.IsDropKeyHeld)
             return;
 
         if (Mouse.current.leftButton.wasPressedThisFrame)
@@ -151,15 +213,45 @@ public sealed class HeldLighter : MonoBehaviour
             drawTime = lidClosedPose;
         drawTime = Mathf.Min(drawTime, lidOpenRest);
 
-        bool lidOpen = drawTime > lidClosedPose && _lidLayer > 0;
-        _view.PutDownStartTime = lidOpen ? lidClosedPose : drawTime;
-        _view.PutDownOverlayStartTime = lidOpen ? Mathf.Min(drawTime, lidCloseStart) : -1f;
+        // During a lit draw the lid layer holds the lid open even while the hand is still coming up.
+        bool lidOpen = (drawTime > lidClosedPose || _litDraw) && _lidLayer > 0;
+        _view.PutDownStartTime = lidOpen ? Mathf.Min(drawTime, lidClosedPose) : drawTime;
+        _view.PutDownOverlayStartTime = !lidOpen ? -1f : _litDraw ? lidCloseStart : Mathf.Min(drawTime, lidCloseStart);
+    }
+
+    // Lit draw: once the hand is up (closed-lid pose of the draw clip), cross-fade into the idle while the
+    // lid layer, which held the lid open, fades out. Both show the same open-lid pose, so the hand-off is clean.
+    private void TickLitDraw()
+    {
+        if (!_litDraw)
+            return;
+
+        if (!_litDrawHandedOff)
+        {
+            AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+            if (state.IsName(drawState) && state.normalizedTime < lidClosedPose)
+                return;
+            _litDrawHandedOff = true;
+            animator.CrossFadeInFixedTime(idleState, litDrawBlend, 0, 0f);
+        }
+
+        if (_lidLayer <= 0)
+        {
+            _litDraw = false;
+            return;
+        }
+
+        float weight = litDrawBlend > 0f ? animator.GetLayerWeight(_lidLayer) - Time.deltaTime / litDrawBlend : 0f;
+        animator.SetLayerWeight(_lidLayer, Mathf.Max(0f, weight));
+        if (weight <= 0f)
+            _litDraw = false;
     }
 
     public void OpenLid()
     {
         IsLidOpen = true;
         CrossFade(lidOpenState, lidClosedPose);
+        PlaySfx(lidOpenSfx, lidOpenVolume);
     }
 
     public void CloseLid()
@@ -175,6 +267,7 @@ public sealed class HeldLighter : MonoBehaviour
             return;
         _striking = true;
         CrossFade(strikeState, 0f);
+        PlaySfx(strikeSfx, strikeVolume);
         if (!useAnimationEvent)
             StartCoroutine(IgniteAtStrikeFrame());
     }
@@ -204,6 +297,28 @@ public sealed class HeldLighter : MonoBehaviour
         AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
         bool lidPart = state.IsName(drawState) && state.normalizedTime >= lidClosedPose;
         animator.SetFloat(_drawSpeedId, lidPart ? drawLidSpeed : drawRaiseSpeed);
+    }
+
+    // The draw ends with the lid opening: sound it when the draw crosses the closed-lid pose. A lit draw keeps the lid open.
+    private void TrackDrawLidOpen()
+    {
+        AnimatorStateInfo state = animator.GetCurrentAnimatorStateInfo(0);
+        if (!state.IsName(drawState) || _litDraw)
+        {
+            _lastDrawTime = -1f;
+            return;
+        }
+
+        float t = state.normalizedTime;
+        if (_lastDrawTime >= 0f && _lastDrawTime < lidClosedPose && t >= lidClosedPose)
+            PlaySfx(lidOpenSfx, lidOpenVolume);
+        _lastDrawTime = t;
+    }
+
+    private static void PlaySfx(AudioClip clip, float volume)
+    {
+        if (clip != null && SoundManager.Instance != null)
+            SoundManager.Instance.PlaySFX(clip, volume);
     }
 
     // While the lid section plays reversed (closing or put-down): flame out once the lid shuts,

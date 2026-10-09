@@ -87,7 +87,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296583
-    m_Localized: "Appuyez sur {0} pour d\xE9poser l'objet s\xE9lectionn\xE9"
+    m_Localized: Appuyez sur {0} pour lancer, maintenez pour poser
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296584
@@ -183,7 +183,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296606
-    m_Localized: "C'est trop loin."
+    m_Localized: C'est trop loin.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296607
@@ -683,107 +683,133 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296732
-    m_Localized: "J'ai frappé trop tard, il va m'attraper"
+    m_Localized: "J'ai frapp\xE9 trop tard, il va m'attraper"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296733
-    m_Localized: "Enfonce le tournevis."
+    m_Localized: Enfonce le tournevis.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296734
-    m_Localized: "Secoue violemment pour briser la serrure."
+    m_Localized: Secoue violemment pour briser la serrure.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296735
-    m_Localized: "J'ai frappé trop tôt, je vais me faire attraper"
+    m_Localized: "J'ai frapp\xE9 trop t\xF4t, je vais me faire attraper"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296736
-    m_Localized: "J'ai frappé trop tard, je vais me faire attraper"
+    m_Localized: "J'ai frapp\xE9 trop tard, je vais me faire attraper"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296737
-    m_Localized: "C'est coincé, réessaie."
+    m_Localized: "C'est coinc\xE9, r\xE9essaie."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296738
-    m_Localized: "Butcher t'a vu te cacher."
+    m_Localized: Butcher t'a vu te cacher.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296739
-    m_Localized: "Tu as fait trop de bruit."
+    m_Localized: Tu as fait trop de bruit.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296740
-    m_Localized: "Tu n'as cessé de te cacher au même endroit."
+    m_Localized: "Tu n'as cess\xE9 de te cacher au m\xEAme endroit."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296741
-    m_Localized: "Tu n'as pas masqué le bruit du marteau avec le tonnerre."
+    m_Localized: "Tu n'as pas masqu\xE9 le bruit du marteau avec le tonnerre."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296742
-    m_Localized: "Butcher t'a vu."
+    m_Localized: Butcher t'a vu.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296743
-    m_Localized: "Tu t'es fait attraper."
+    m_Localized: Tu t'es fait attraper.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296744
-    m_Localized: "Recommencer"
+    m_Localized: Recommencer
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296745
-    m_Localized: "Menu principal"
+    m_Localized: Menu principal
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296746
-    m_Localized: "Butcher t'a tendu une embuscade."
+    m_Localized: Butcher t'a tendu une embuscade.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296747
-    m_Localized: "Les crochets te permettent de garder ta progression après t'être fait attraper."
+    m_Localized: "Les crochets te permettent de garder ta progression apr\xE8s t'\xEAtre
+      fait attraper."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296748
-    m_Localized: "Crochet"
+    m_Localized: Crochet
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296749
-    m_Localized: "Crochet récupéré"
+    m_Localized: "Crochet r\xE9cup\xE9r\xE9"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296750
-    m_Localized: "Continuer"
+    m_Localized: Continuer
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296751
-    m_Localized: "Maintiens le clic droit pour appliquer de la pression"
+    m_Localized: Maintiens le clic droit pour appliquer de la pression
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296752
-    m_Localized: "Utilise ta souris pour d\u00E9placer le crochet et clique gauche pour lever les goupilles"
+    m_Localized: "Utilise ta souris pour d\xE9placer le crochet et clique gauche
+      pour lever les goupilles"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296753
-    m_Localized: "Goupille pos\u00E9e"
+    m_Localized: "Goupille pos\xE9e"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296754
-    m_Localized: "Serrure ouverte"
+    m_Localized: Serrure ouverte
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296755
-    m_Localized: "La porte est enchaînée."
+    m_Localized: "La porte est encha\xEEn\xE9e."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296756
-    m_Localized: "La première fois que je me suis fait attraper, il a enchaîné la porte avec un cadenas. J'aurais dû prendre cette épingle à cheveux posée sur ces toilettes. Peut-être que j'aurais pu m'en servir comme crochet."
+    m_Localized: "La premi\xE8re fois que je me suis fait attraper, il a encha\xEEn\xE9
+      la porte avec un cadenas. J'aurais d\xFB prendre cette \xE9pingle \xE0 cheveux
+      pos\xE9e sur ces toilettes. Peut-\xEAtre que j'aurais pu m'en servir comme
+      crochet."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296757
-    m_Localized: "Je dois garder un œil ouvert pour trouver d'autres crochets"
+    m_Localized: "Je dois garder un \u0153il ouvert pour trouver d'autres crochets"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34286902860185600
+    m_Localized: "Un crochet... Je pourrais crocheter ce cadenas avec \xE7a."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34286903040540672
+    m_Localized: "Un autre crochet. S'il m'attrape, je pourrai m'en servir pour sortir
+      de la cage \xE0 nouveau."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34292293547458560
+    m_Localized: "Briquet r\xE9cup\xE9r\xE9"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34292666949566464
+    m_Localized: Briquet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34365368158781440
+    m_Localized: "C'est coinc\xE9. Force, ou retire et renfonce pour le desserrer."
     m_Metadata:
       m_Items: []
   references:

@@ -3,7 +3,7 @@ using UnityEngine;
 using FS_Atmo;
 
 /// <summary>
-/// Spawns a fresh PadlockWithChains on each lockpick Continue.
+/// Chains the cage door with a fresh PadlockWithChains at scene start and on each lockpick Continue.
 /// Assign prefab, spawn pose, door, and lockpick camera in the Inspector.
 /// </summary>
 [DisallowMultipleComponent]
@@ -22,6 +22,10 @@ public class ContinuePadlockSpawner : MonoBehaviour
     [SerializeField] SimpleOpenClose doorToUnlock;
     [SerializeField] CinemachineCamera lockpickCamera;
 
+    [Header("Start")]
+    [Tooltip("Chain the cage door with a padlock as soon as the scene starts (New Game / Restart).")]
+    [SerializeField] bool lockOnStart = true;
+
     GameObject _liveInstance;
 
     void Awake()
@@ -35,13 +39,22 @@ public class ContinuePadlockSpawner : MonoBehaviour
         Instance = this;
     }
 
+    void Start()
+    {
+        if (!lockOnStart || _liveInstance != null)
+            return;
+
+        SpawnFresh();
+        ChainCageDoor(closeInstantly: false);
+    }
+
     void OnDestroy()
     {
         if (Instance == this)
             Instance = null;
     }
 
-    /// <summary>Destroy the previous Continue padlock (if any) and spawn a fresh locked one.</summary>
+    /// <summary>Destroy the previous padlock (if any) and spawn a fresh locked one.</summary>
     public void SpawnFresh()
     {
         if (padlockPrefab == null)
@@ -68,5 +81,32 @@ public class ContinuePadlockSpawner : MonoBehaviour
         }
 
         minigame.ConfigureForContinue(doorToUnlock, lockpickCamera);
+    }
+
+    /// <summary>
+    /// Lock the cage door so only the padlock opens it (screwdriver break and other keys are refused).
+    /// </summary>
+    public static void ChainCageDoor(bool closeInstantly)
+    {
+        var cage = FindFirstObjectByType<Cage>();
+        if (cage == null || cage.cageDoor == null)
+        {
+            Debug.LogWarning("[ContinuePadlockSpawner] Cage / cageDoor missing — chained lock not applied.");
+            return;
+        }
+
+        var doorController = cage.cageDoor.GetComponentInParent<DoorController>();
+        if (closeInstantly)
+        {
+            if (doorController != null)
+                doorController.ForceCloseInstant();
+            else
+                cage.cageDoor.ForceCloseInstant();
+        }
+
+        if (doorController != null)
+            doorController.SetLocked(true);
+
+        cage.cageDoor.ApplyContinueChainedLock("gameplay.door_chained");
     }
 }

@@ -24,6 +24,26 @@ namespace StarterAssets
 		[Tooltip("Sneak speed of the character in m/s")]
 		public float SneakSpeed = 1.5f;
 
+		[Header("Directional Sprint")]
+		[Tooltip("Sprint speed multiplier when running diagonally or sideways (any left/right key held).")]
+		[Range(0f, 1f)] public float SprintStrafeMultiplier = 0.9f;
+		[Tooltip("Sprint speed multiplier when running straight backwards.")]
+		[Range(0f, 1f)] public float SprintBackwardMultiplier = 0.6f;
+
+		[Header("Direction Change Spam")]
+		[Tooltip("How quickly the movement direction follows the keys (per second). Lower = heavier turns. 0 = instant.")]
+		public float DirectionResponsiveness = 12f;
+		[Tooltip("Smallest key-direction change that counts (W -> W+A is 45, W+A -> W+D is 90, A -> D is 180).")]
+		public float DirectionChangeMinAngle = 60f;
+		[Tooltip("Speed lost per recent direction change. The first change in a while costs nothing; each quick one after it costs more.")]
+		[Range(0f, 1f)] public float DirectionChangeDropPerStreak = 0.15f;
+		[Tooltip("Most speed direction-change spam can take away.")]
+		[Range(0f, 1f)] public float DirectionChangeMaxDrop = 0.5f;
+		[Tooltip("How fast recent direction changes are forgotten (changes per second). 1 = a change counts for about a second.")]
+		public float DirectionChangeStreakDecay = 1f;
+		[Tooltip("How fast the speed climbs back to full after a spam penalty (fraction per second).")]
+		public float DirectionChangeRecovery = 0.6f;
+
 		[Tooltip("Safety cap on how fast the CharacterController is allowed to be shoved by colliders (e.g. a door closing on the player) in a single frame. Prevents physics depenetration from ever reading as an instant 'launch' - the player still gets pushed out, just never faster than this speed.")]
 		public float MaxExternalPushSpeed = 5.0f;
 
@@ -69,6 +89,15 @@ namespace StarterAssets
 		private float _rotationVelocity;
 		private float _verticalVelocity;
 		private float _terminalVelocity = 53.0f;
+
+		// direction change
+		private Vector3 _moveDirection;
+		private Vector2 _lastInputDirection;
+		private float _lastInputTime = -1f;
+		private float _directionChangeStreak;
+		private float _speedCap = 1f;
+		private bool _directionChangedThisFrame;
+		private const float InputMemorySeconds = 0.3f;
 
 		// timeout deltatime
 		private float _jumpTimeoutDelta;
@@ -180,9 +209,12 @@ namespace StarterAssets
 			if (_isSneaking)
 				targetSpeed = SneakSpeed;
 			else if (_input.sprint)
-				targetSpeed = SprintSpeed;
+				targetSpeed = Mathf.Max(MoveSpeed, SprintSpeed * SprintDirectionMultiplier(_input.move));
 			else
 				targetSpeed = MoveSpeed;
+
+			TrackDirectionChange();
+			targetSpeed *= _speedCap;
 
 
 			// a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
@@ -212,24 +244,73 @@ namespace StarterAssets
 				_speed = targetSpeed;
 			}
 
-			// normalise input direction
-			Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
+			if (_directionChangedThisFrame)
+				_speed = Mathf.Min(_speed, targetSpeed * inputMagnitude);
 
-			// note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-			// if there is a move input rotate player when the player is moving
+			// The movement direction eases toward the keys instead of snapping. It stays unit length: the
+			// speed is read back from the controller's velocity, so a shortened direction would compound.
+			Vector3 inputDirection = Vector3.zero;
 			if (_input.move != Vector2.zero)
+				inputDirection = (transform.right * _input.move.x + transform.forward * _input.move.y).normalized;
+			if (DirectionResponsiveness > 0f && _input.move != Vector2.zero && _moveDirection != Vector3.zero)
 			{
-				// move
-				inputDirection = transform.right * _input.move.x + transform.forward * _input.move.y;
+				Vector3 blended = Vector3.Lerp(_moveDirection, inputDirection, 1f - Mathf.Exp(-DirectionResponsiveness * Time.deltaTime));
+				_moveDirection = blended.sqrMagnitude > 0.01f ? blended.normalized : inputDirection;
+			}
+			else
+			{
+				_moveDirection = inputDirection;
 			}
 
 			// move the player
-			Vector3 horizontalMove = inputDirection.normalized * (_speed * Time.deltaTime);
+			Vector3 horizontalMove = _moveDirection * (_speed * Time.deltaTime);
 			Vector3 positionBeforeMove = transform.position;
 
 			_controller.Move(horizontalMove + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 
 			ClampSuddenPush(positionBeforeMove, horizontalMove);
+		}
+
+		// Full sprint straight ahead; any left/right key held costs a flat amount, straight back costs more.
+		private float SprintDirectionMultiplier(Vector2 move)
+		{
+			if (move == Vector2.zero)
+				return 1f;
+			if (Mathf.Abs(move.x) > 0.01f)
+				return SprintStrafeMultiplier;
+			return move.y < 0f ? SprintBackwardMultiplier : 1f;
+		}
+
+		// Spam guard: a sharp change of key direction (including a quick release and press of another key) is
+		// free on its own, but each one that follows soon after cuts the speed cap harder. The cap climbs back
+		// over time and the count of recent changes wears off.
+		private void TrackDirectionChange()
+		{
+			float dt = Time.deltaTime;
+			_directionChangedThisFrame = false;
+			_directionChangeStreak = Mathf.Max(0f, _directionChangeStreak - DirectionChangeStreakDecay * dt);
+			_speedCap = Mathf.Min(1f, _speedCap + DirectionChangeRecovery * dt);
+
+			if (_input.move == Vector2.zero)
+				return;
+
+			Vector2 direction = _input.move.normalized;
+			if (_lastInputTime >= 0f && Time.time - _lastInputTime <= InputMemorySeconds
+				&& Vector2.Angle(_lastInputDirection, direction) >= DirectionChangeMinAngle)
+			{
+				float drop = Mathf.Min(DirectionChangeMaxDrop, DirectionChangeDropPerStreak * _directionChangeStreak);
+				if (drop > 0f)
+				{
+					float currentSpeed = new Vector3(_controller.velocity.x, 0f, _controller.velocity.z).magnitude;
+					float speedFactor = SprintSpeed > 0f ? Mathf.Clamp01(currentSpeed / SprintSpeed) : 1f;
+					_speedCap = Mathf.Min(_speedCap, 1f - drop * speedFactor);
+					_directionChangedThisFrame = true;
+				}
+				float maxStreak = DirectionChangeDropPerStreak > 0f ? DirectionChangeMaxDrop / DirectionChangeDropPerStreak : 0f;
+				_directionChangeStreak = Mathf.Min(maxStreak, _directionChangeStreak + 1f);
+			}
+			_lastInputDirection = direction;
+			_lastInputTime = Time.time;
 		}
 
 		// Colliders that are animated directly (e.g. a closing door) can sweep through the
@@ -322,6 +403,10 @@ namespace StarterAssets
 		{
 			_verticalVelocity = -2f;
 			_speed = 0f;
+			_moveDirection = Vector3.zero;
+			_speedCap = 1f;
+			_directionChangeStreak = 0f;
+			_lastInputTime = -1f;
 			Grounded = true;
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;

@@ -31,6 +31,8 @@ public class InventoryItem : ScriptableObject
     [Tooltip("Added to the player's interact range while this item is selected (e.g. bone to reach through a grate).")]
     public float interactionReachBonus;
     [TextArea] public string reachAttemptFailMessage;
+    [Tooltip("Left-click is the held item's own action (e.g. lighter). It is never used on targets; E interacts with the world normally.")]
+    public bool hasPrimaryAction;
 
     [Header("Fragile tool (optional)")]
     [Tooltip("If true, using this item on the wrong locked door (SimpleOpenClose) removes it and plays break sound.")]

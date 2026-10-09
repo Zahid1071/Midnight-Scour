@@ -88,7 +88,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296583
-    m_Localized: "\u0E01\u0E14 {0} \u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E17\u0E34\u0E49\u0E07\u0E44\u0E2D\u0E40\u0E17\u0E47\u0E21\u0E17\u0E35\u0E48\u0E40\u0E25\u0E37\u0E2D\u0E01"
+    m_Localized: "\u0E01\u0E14 {0} \u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E42\u0E22\u0E19
+      \u0E01\u0E14\u0E04\u0E49\u0E32\u0E07\u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E27\u0E32\u0E07"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296584
@@ -686,79 +687,82 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296732
-    m_Localized: "ฉันตีช้าเกินไป เขาจะจับฉันได้"
+    m_Localized: "\u0E09\u0E31\u0E19\u0E15\u0E35\u0E0A\u0E49\u0E32\u0E40\u0E01\u0E34\u0E19\u0E44\u0E1B
+      \u0E40\u0E02\u0E32\u0E08\u0E30\u0E08\u0E31\u0E1A\u0E09\u0E31\u0E19\u0E44\u0E14\u0E49"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296733
-    m_Localized: "ดันไขควงเข้าไป"
+    m_Localized: "\u0E14\u0E31\u0E19\u0E44\u0E02\u0E04\u0E27\u0E07\u0E40\u0E02\u0E49\u0E32\u0E44\u0E1B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296734
-    m_Localized: "เขย่าแรงๆ เพื่องัดกุญแจ"
+    m_Localized: "\u0E40\u0E02\u0E22\u0E48\u0E32\u0E41\u0E23\u0E07\u0E46 \u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E07\u0E31\u0E14\u0E01\u0E38\u0E0D\u0E41\u0E08"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296735
-    m_Localized: "ฉันตีเร็วเกินไป ฉันจะถูกจับ"
+    m_Localized: "\u0E09\u0E31\u0E19\u0E15\u0E35\u0E40\u0E23\u0E47\u0E27\u0E40\u0E01\u0E34\u0E19\u0E44\u0E1B
+      \u0E09\u0E31\u0E19\u0E08\u0E30\u0E16\u0E39\u0E01\u0E08\u0E31\u0E1A"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296736
-    m_Localized: "ฉันตีช้าเกินไป ฉันจะถูกจับ"
+    m_Localized: "\u0E09\u0E31\u0E19\u0E15\u0E35\u0E0A\u0E49\u0E32\u0E40\u0E01\u0E34\u0E19\u0E44\u0E1B
+      \u0E09\u0E31\u0E19\u0E08\u0E30\u0E16\u0E39\u0E01\u0E08\u0E31\u0E1A"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296737
-    m_Localized: "ติดแล้ว ลองใหม่"
+    m_Localized: "\u0E15\u0E34\u0E14\u0E41\u0E25\u0E49\u0E27 \u0E25\u0E2D\u0E07\u0E43\u0E2B\u0E21\u0E48"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296738
-    m_Localized: "Butcher เห็นคุณซ่อน"
+    m_Localized: "Butcher \u0E40\u0E2B\u0E47\u0E19\u0E04\u0E38\u0E13\u0E0B\u0E48\u0E2D\u0E19"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296739
-    m_Localized: "คุณส่งเสียงดังเกินไป"
+    m_Localized: "\u0E04\u0E38\u0E13\u0E2A\u0E48\u0E07\u0E40\u0E2A\u0E35\u0E22\u0E07\u0E14\u0E31\u0E07\u0E40\u0E01\u0E34\u0E19\u0E44\u0E1B"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296740
-    m_Localized: "คุณซ่อนที่เดิมซ้ำๆ"
+    m_Localized: "\u0E04\u0E38\u0E13\u0E0B\u0E48\u0E2D\u0E19\u0E17\u0E35\u0E48\u0E40\u0E14\u0E34\u0E21\u0E0B\u0E49\u0E33\u0E46"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296741
-    m_Localized: "คุณกลบเสียงค้อนด้วยฟ้าร้องไม่สำเร็จ"
+    m_Localized: "\u0E04\u0E38\u0E13\u0E01\u0E25\u0E1A\u0E40\u0E2A\u0E35\u0E22\u0E07\u0E04\u0E49\u0E2D\u0E19\u0E14\u0E49\u0E27\u0E22\u0E1F\u0E49\u0E32\u0E23\u0E49\u0E2D\u0E07\u0E44\u0E21\u0E48\u0E2A\u0E33\u0E40\u0E23\u0E47\u0E08"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296742
-    m_Localized: "Butcher เห็นคุณ"
+    m_Localized: "Butcher \u0E40\u0E2B\u0E47\u0E19\u0E04\u0E38\u0E13"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296743
-    m_Localized: "คุณถูกจับแล้ว"
+    m_Localized: "\u0E04\u0E38\u0E13\u0E16\u0E39\u0E01\u0E08\u0E31\u0E1A\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296744
-    m_Localized: "เริ่มใหม่"
+    m_Localized: "\u0E40\u0E23\u0E34\u0E48\u0E21\u0E43\u0E2B\u0E21\u0E48"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296745
-    m_Localized: "เมนูหลัก"
+    m_Localized: "\u0E40\u0E21\u0E19\u0E39\u0E2B\u0E25\u0E31\u0E01"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296746
-    m_Localized: "Butcher ซุ่มโจมตีคุณ"
+    m_Localized: "Butcher \u0E0B\u0E38\u0E48\u0E21\u0E42\u0E08\u0E21\u0E15\u0E35\u0E04\u0E38\u0E13"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296747
-    m_Localized: "ที่งัดกุญแจช่วยให้คุณเก็บความคืบหน้าไว้ได้หลังถูกจับ"
+    m_Localized: "\u0E17\u0E35\u0E48\u0E07\u0E31\u0E14\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E0A\u0E48\u0E27\u0E22\u0E43\u0E2B\u0E49\u0E04\u0E38\u0E13\u0E40\u0E01\u0E47\u0E1A\u0E04\u0E27\u0E32\u0E21\u0E04\u0E37\u0E1A\u0E2B\u0E19\u0E49\u0E32\u0E44\u0E27\u0E49\u0E44\u0E14\u0E49\u0E2B\u0E25\u0E31\u0E07\u0E16\u0E39\u0E01\u0E08\u0E31\u0E1A"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296748
-    m_Localized: "ที่งัดกุญแจ"
+    m_Localized: "\u0E17\u0E35\u0E48\u0E07\u0E31\u0E14\u0E01\u0E38\u0E0D\u0E41\u0E08"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296749
-    m_Localized: "เก็บที่งัดกุญแจแล้ว"
+    m_Localized: "\u0E40\u0E01\u0E47\u0E1A\u0E17\u0E35\u0E48\u0E07\u0E31\u0E14\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E41\u0E25\u0E49\u0E27"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296750
-    m_Localized: "????????????"
+    m_Localized: ????????????
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296751
@@ -778,15 +782,42 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296755
-    m_Localized: "ประตูถูกล็อกด้วยโซ่"
+    m_Localized: "\u0E1B\u0E23\u0E30\u0E15\u0E39\u0E16\u0E39\u0E01\u0E25\u0E47\u0E2D\u0E01\u0E14\u0E49\u0E27\u0E22\u0E42\u0E0B\u0E48"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296756
-    m_Localized: "ตอนที่ฉันถูกจับครั้งแรก เขาล็อกประตูด้วยกุญแจคล้อง อยากจะเก็บกิ๊บบนโถส้วมนั้นไว้เหลือเกิน บางทีอาจใช้เป็นที่งัดกุญแจได้"
+    m_Localized: "\u0E15\u0E2D\u0E19\u0E17\u0E35\u0E48\u0E09\u0E31\u0E19\u0E16\u0E39\u0E01\u0E08\u0E31\u0E1A\u0E04\u0E23\u0E31\u0E49\u0E07\u0E41\u0E23\u0E01
+      \u0E40\u0E02\u0E32\u0E25\u0E47\u0E2D\u0E01\u0E1B\u0E23\u0E30\u0E15\u0E39\u0E14\u0E49\u0E27\u0E22\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E04\u0E25\u0E49\u0E2D\u0E07
+      \u0E2D\u0E22\u0E32\u0E01\u0E08\u0E30\u0E40\u0E01\u0E47\u0E1A\u0E01\u0E34\u0E4A\u0E1A\u0E1A\u0E19\u0E42\u0E16\u0E2A\u0E49\u0E27\u0E21\u0E19\u0E31\u0E49\u0E19\u0E44\u0E27\u0E49\u0E40\u0E2B\u0E25\u0E37\u0E2D\u0E40\u0E01\u0E34\u0E19
+      \u0E1A\u0E32\u0E07\u0E17\u0E35\u0E2D\u0E32\u0E08\u0E43\u0E0A\u0E49\u0E40\u0E1B\u0E47\u0E19\u0E17\u0E35\u0E48\u0E07\u0E31\u0E14\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E44\u0E14\u0E49"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296757
-    m_Localized: "ฉันต้องคอยหาที่งัดกุญแจเพิ่ม"
+    m_Localized: "\u0E09\u0E31\u0E19\u0E15\u0E49\u0E2D\u0E07\u0E04\u0E2D\u0E22\u0E2B\u0E32\u0E17\u0E35\u0E48\u0E07\u0E31\u0E14\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E40\u0E1E\u0E34\u0E48\u0E21"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34286902860185600
+    m_Localized: "\u0E17\u0E35\u0E48\u0E07\u0E31\u0E14\u0E01\u0E38\u0E0D\u0E41\u0E08...
+      \u0E09\u0E31\u0E19\u0E19\u0E48\u0E32\u0E08\u0E30\u0E43\u0E0A\u0E49\u0E21\u0E31\u0E19\u0E07\u0E31\u0E14\u0E41\u0E21\u0E48\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E19\u0E31\u0E48\u0E19\u0E44\u0E14\u0E49"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34286903040540672
+    m_Localized: "\u0E17\u0E35\u0E48\u0E07\u0E31\u0E14\u0E01\u0E38\u0E0D\u0E41\u0E08\u0E2D\u0E35\u0E01\u0E2D\u0E31\u0E19
+      \u0E16\u0E49\u0E32\u0E40\u0E02\u0E32\u0E08\u0E31\u0E1A\u0E09\u0E31\u0E19\u0E44\u0E14\u0E49
+      \u0E09\u0E31\u0E19\u0E08\u0E30\u0E43\u0E0A\u0E49\u0E21\u0E31\u0E19\u0E2B\u0E19\u0E35\u0E2D\u0E2D\u0E01\u0E08\u0E32\u0E01\u0E01\u0E23\u0E07\u0E44\u0E14\u0E49\u0E2D\u0E35\u0E01\u0E04\u0E23\u0E31\u0E49\u0E07"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34292293547458560
+    m_Localized: "\u0E40\u0E01\u0E47\u0E1A\u0E44\u0E1F\u0E41\u0E0A\u0E47\u0E01\u0E41\u0E25\u0E49\u0E27"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34292666949566464
+    m_Localized: "\u0E44\u0E1F\u0E41\u0E0A\u0E47\u0E01"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34365368158781440
+    m_Localized: "\u0E15\u0E34\u0E14\u0E41\u0E25\u0E49\u0E27 \u0E14\u0E31\u0E19\u0E41\u0E23\u0E07\u0E46
+      \u0E2B\u0E23\u0E37\u0E2D\u0E14\u0E36\u0E07\u0E2D\u0E2D\u0E01\u0E41\u0E25\u0E49\u0E27\u0E14\u0E31\u0E19\u0E40\u0E02\u0E49\u0E32\u0E43\u0E2B\u0E21\u0E48\u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E43\u0E2B\u0E49\u0E2B\u0E25\u0E27\u0E21"
     m_Metadata:
       m_Items: []
   references:

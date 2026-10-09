@@ -87,7 +87,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296583
-    m_Localized: Press {0} to drop selected item
+    m_Localized: Tap {0} to throw, hold to place
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296584
@@ -183,7 +183,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296606
-    m_Localized: "It is too far."
+    m_Localized: It is too far.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296607
@@ -686,107 +686,131 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296732
-    m_Localized: "I hit it too late, I'll get caught"
+    m_Localized: I hit it too late, I'll get caught
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296733
-    m_Localized: "Shove the screwdriver in."
+    m_Localized: Shove the screwdriver in.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296734
-    m_Localized: "Shake violently to break it."
+    m_Localized: Shake violently to break it.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296735
-    m_Localized: "I hit it too early, I'll get caught"
+    m_Localized: I hit it too early, I'll get caught
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296736
-    m_Localized: "I hit it too late, I'll get caught"
+    m_Localized: I hit it too late, I'll get caught
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296737
-    m_Localized: "It's stuck, try again."
+    m_Localized: It's stuck, try again.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296738
-    m_Localized: "Butcher saw you hiding."
+    m_Localized: Butcher saw you hiding.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296739
-    m_Localized: "You made too much noise."
+    m_Localized: You made too much noise.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296740
-    m_Localized: "You kept hiding in the same spot."
+    m_Localized: You kept hiding in the same spot.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296741
-    m_Localized: "You failed to mask Hammer noise with thunder."
+    m_Localized: You failed to mask Hammer noise with thunder.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296742
-    m_Localized: "Butcher saw you."
+    m_Localized: Butcher saw you.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296743
-    m_Localized: "You were caught."
+    m_Localized: You were caught.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296744
-    m_Localized: "Restart"
+    m_Localized: Restart
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296745
-    m_Localized: "Main Menu"
+    m_Localized: Main Menu
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296746
-    m_Localized: "Butcher ambushed you."
+    m_Localized: Butcher ambushed you.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296747
-    m_Localized: "Lockpicks let you keep your progress after getting caught."
+    m_Localized: Lockpicks let you keep your progress after getting caught.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296748
-    m_Localized: "Lockpick"
+    m_Localized: Lockpick
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296749
-    m_Localized: "Picked up Lockpick"
+    m_Localized: Picked up Lockpick
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296750
-    m_Localized: "Continue"
+    m_Localized: Continue
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296751
-    m_Localized: "Hold right mouse click to apply pressure"
+    m_Localized: Hold right mouse click to apply pressure
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296752
-    m_Localized: "Use your mouse to move the lockpick and press left mouse button to pick pins"
+    m_Localized: Use your mouse to move the lockpick and press left mouse button
+      to pick pins
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296753
-    m_Localized: "Pin set"
+    m_Localized: Pin set
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296754
-    m_Localized: "Unlocked key"
+    m_Localized: Unlocked key
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296755
-    m_Localized: "The door is chained."
+    m_Localized: The door is chained.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296756
-    m_Localized: "When I got caught the first time, he chained the door with a padlock. I wish I had taken that hairpin on top of that toilet. Maybe I could've used it as a lockpick."
+    m_Localized: When I got caught the first time, he chained the door with a padlock.
+      I wish I had taken that hairpin on top of that toilet. Maybe I could've used
+      it as a lockpick.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296757
-    m_Localized: "I must keep an eye out to find more lockpicks"
+    m_Localized: I must keep an eye out to find more lockpicks
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34286902860185600
+    m_Localized: A lockpick... I could pick that padlock with this.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34286903040540672
+    m_Localized: Another lockpick. If he catches me, I can use it to get out of the
+      cage again.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34292293547458560
+    m_Localized: Picked up Lighter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34292666949566464
+    m_Localized: Lighter
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34365368158781440
+    m_Localized: It's jammed. Force it, or pull out and shove again to loosen it.
     m_Metadata:
       m_Items: []
   references:

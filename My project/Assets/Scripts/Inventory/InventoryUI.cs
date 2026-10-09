@@ -20,7 +20,28 @@ public class InventoryUI : MonoBehaviour
     [SerializeField] private float dropThrowUpward = 0.6f;
     [SerializeField] private float dropItemMass = 1f;
 
+    [Header("Drop place (hold G)")]
+    [Tooltip("Holding G this long shows the placement preview; releasing then sets the item down there instead of throwing it.")]
+    [Min(0.05f)]
+    [SerializeField] private float holdToPlaceSeconds = 0.3f;
+    [Tooltip("Material for the ghost of the item shown where it will be placed.")]
+    [SerializeField] private Material placePreviewMaterial;
+    [Tooltip("Length of the aim ray. Placement itself is limited to the player's interact reach (from the camera or the feet), so the item can be picked up again from the same spot.")]
+    [SerializeField] private float placeRayLength = 3f;
+    [Tooltip("Kept inside the interact reach by this much.")]
+    [SerializeField] private float placeReachMargin = 0.1f;
+    [Tooltip("When aiming at a wall, the item is set on the floor at most this far in front of the player.")]
+    [SerializeField] private float placeFloorAhead = 0.5f;
+    [Tooltip("Minimum surface normal Y to count as something the item can rest on.")]
+    [Range(0f, 1f)]
+    [SerializeField] private float placeMinSurfaceUp = 0.6f;
+    [SerializeField] private LayerMask placeSurfaceMask = Physics.DefaultRaycastLayers;
+
     private int selectedIndex = -1;
+    private float _dropHeldTime = -1f;
+    private InventoryItem _dropHeldItem;
+    private int _dropClickFrame = -1;
+    private PlacementPreview _placePreview;
     TextMeshProUGUI[] _stackLabels;
 
     private void Awake()
@@ -43,6 +64,7 @@ public class InventoryUI : MonoBehaviour
     {
         if (Instance == this)
             Instance = null;
+        _placePreview?.Dispose();
     }
 
     private void Update()
@@ -51,7 +73,10 @@ public class InventoryUI : MonoBehaviour
             || ReadPanelUI.IsBlockingPlayerInput
             || JumpscareManager.CaptureUiActive
             || (GameOverUI.Instance != null && GameOverUI.Instance.IsShowing))
+        {
+            CancelDropHold();
             return;
+        }
 
         if (Input.GetKeyDown(KeyCode.Alpha1)) SelectSlot(0);
         if (Input.GetKeyDown(KeyCode.Alpha2)) SelectSlot(1);
@@ -67,13 +92,95 @@ public class InventoryUI : MonoBehaviour
                 CycleSelectedSlot(1);
         }
 
-        if (WasUseItemPressedThisFrame())
+        bool clickPlacedItem = TickDropKey();
+
+        if (!clickPlacedItem && WasUseItemPressedThisFrame())
             HandleInteractPress(isPrimaryClick: true);
 
         if (WasUseItemOnInteractKeyThisFrame())
             HandleInteractPress(isPrimaryClick: false);
+    }
 
-        if (Input.GetKeyDown(KeyCode.G)) TryDropSelectedItem();
+    /// <summary>True while G is held for a drop (and on the frame a left-click placed from it); left-click then places the item instead of using it.</summary>
+    public bool IsDropKeyHeld => _dropHeldTime >= 0f || _dropClickFrame == Time.frameCount;
+
+    /// <summary>
+    /// Tap G throws the selected item on release. Holding G shows a ghost of it on the aimed surface;
+    /// releasing (or left-clicking while G is held) sets it down there. Nothing happens if no valid surface is aimed at.
+    /// Returns true when this frame's left-click was used to place the item.
+    /// </summary>
+    bool TickDropKey()
+    {
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            _dropHeldTime = 0f;
+            _dropHeldItem = GetSelectedItem();
+        }
+        if (_dropHeldTime < 0f)
+            return false;
+
+        if (GetSelectedItem() != _dropHeldItem)
+        {
+            CancelDropHold();
+            return false;
+        }
+
+        if (WasUseItemPressedThisFrame())
+        {
+            _dropClickFrame = Time.frameCount;
+            UpdatePlacePreview();
+            PlaceAtPreviewAndEndHold();
+            return true;
+        }
+
+        if (!Input.GetKey(KeyCode.G))
+        {
+            if (_dropHeldTime < holdToPlaceSeconds)
+            {
+                CancelDropHold();
+                TryDropSelectedItem(place: false);
+            }
+            else
+                PlaceAtPreviewAndEndHold();
+            return false;
+        }
+
+        _dropHeldTime += Time.unscaledDeltaTime;
+        if (_dropHeldTime >= holdToPlaceSeconds)
+            UpdatePlacePreview();
+        return false;
+    }
+
+    /// <summary>Places the item where the preview shows (before the hold reset hides it), or warns if it can't be dropped.</summary>
+    void PlaceAtPreviewAndEndHold()
+    {
+        if (_placePreview != null && _placePreview.IsVisible)
+            TryDropSelectedItem(place: true);
+        else
+            TryGetDroppableSelected(warn: true, out _, out _);
+        CancelDropHold();
+    }
+
+    void CancelDropHold()
+    {
+        _dropHeldTime = -1f;
+        _dropHeldItem = null;
+        _placePreview?.Hide();
+    }
+
+    void UpdatePlacePreview()
+    {
+        Camera cam = Camera.main;
+        if (cam == null
+            || !TryGetDroppableSelected(warn: false, out _, out GameObject dropPrefab)
+            || !TryGetPlacePoint(cam.transform, out Vector3 point, out Vector3 normal))
+        {
+            _placePreview?.Hide();
+            return;
+        }
+
+        _placePreview ??= new PlacementPreview(placePreviewMaterial);
+        _placePreview.Show(dropPrefab, point, normal, GetDropSpawnRotation(cam.transform).eulerAngles.y);
     }
 
     public void RefreshUI()
@@ -190,7 +297,14 @@ public class InventoryUI : MonoBehaviour
         if (hider != null && hider.isHidden)
             return;
 
-        if (GetSelectedItem() != null)
+        InventoryItem selected = GetSelectedItem();
+        if (selected != null && selected.hasPrimaryAction)
+        {
+            // LMB belongs to the item itself (e.g. HeldLighter); E interacts with the world.
+            if (!isPrimaryClick)
+                PlayerInteractor.Instance?.TryInteract();
+        }
+        else if (selected != null)
             TryUseSelectedItem(isPrimaryClick);
         else
             PlayerInteractor.Instance?.TryInteract();
@@ -346,33 +460,47 @@ public class InventoryUI : MonoBehaviour
             : Loc.Get(DefaultBoneOnScrewdriverHintKey);
     }
 
-    private void TryDropSelectedItem()
+    bool TryGetDroppableSelected(bool warn, out InventoryItem selected, out GameObject dropPrefab)
     {
+        selected = null;
+        dropPrefab = null;
+
         var hider = PlayerInteractor.Instance != null
             ? PlayerInteractor.Instance.GetComponent<PlayerHider>()
             : null;
         if (hider != null && hider.isHidden)
-            return;
+            return false;
 
         if (InventoryManager.Instance == null)
-            return;
+            return false;
 
-        InventoryItem selected = GetSelectedItem();
+        selected = GetSelectedItem();
         if (selected == null)
-            return;
+            return false;
 
         if (!selected.canDrop)
         {
-            ShowWarning("You cannot drop that item.", 2.5f);
-            return;
+            if (warn)
+                ShowWarning("You cannot drop that item.", 2.5f);
+            return false;
         }
 
-        GameObject dropPrefab = selected.GetDropPrefab();
+        dropPrefab = selected.GetDropPrefab();
         if (dropPrefab == null)
         {
-            ShowWarning("This item has no drop prefab assigned.", 2.5f);
-            return;
+            if (warn)
+                ShowWarning("This item has no drop prefab assigned.", 2.5f);
+            return false;
         }
+
+        return true;
+    }
+
+    /// <summary>Throws the selected item, or with <paramref name="place"/> sets it down at the shown placement preview.</summary>
+    private void TryDropSelectedItem(bool place)
+    {
+        if (!TryGetDroppableSelected(warn: true, out InventoryItem selected, out GameObject dropPrefab))
+            return;
 
         if (Camera.main == null)
             return;
@@ -380,31 +508,127 @@ public class InventoryUI : MonoBehaviour
         Transform cam = Camera.main.transform;
         int dropIndex = selectedIndex;
 
+        if (place && (_placePreview == null || !_placePreview.IsVisible))
+            return;
+        Vector3 placePosition = place ? _placePreview.Position : default;
+        Quaternion placeRotation = place ? _placePreview.Rotation : default;
+        _placePreview?.Hide();
+
+        // Read before removal: the held view puts the flame out when it is hidden.
+        HeldItemView heldView = HeldItemController.Instance != null ? HeldItemController.Instance.CurrentView : null;
+        if (heldView != null && heldView.Item != selected)
+            heldView = null;
+        bool heldLit = heldView != null && heldView.TryGetComponent(out HeldLighter heldLighter) && heldLighter.IsLit;
+
         if (!InventoryManager.Instance.RemoveItemAt(dropIndex, refreshUI: false))
             return;
 
         AdjustSelectionAfterRemove();
         RefreshUI();
 
-        Vector3 spawnPos = GetDropThrowSpawnPosition(cam);
-        Quaternion spawnRot = GetDropSpawnRotation(cam);
-        Vector3 throwDir = cam.forward;
+        GameObject dropped;
+        if (place)
+        {
+            // The item appears on the surface right away, so skip the put-down animation of the held view.
+            if (heldView != null)
+                heldView.HolsterImmediate();
 
-        GameObject dropped = ItemDropHelper.SpawnAndThrow(
-            dropPrefab,
-            spawnPos,
-            spawnRot,
-            throwDir,
-            dropThrowForce,
-            dropThrowUpward,
-            dropItemMass,
-            selected.dropLandSFX);
+            dropped = ItemDropHelper.SpawnPlaced(dropPrefab, placePosition, placeRotation, dropItemMass, selected.dropLandSFX);
+        }
+        else
+        {
+            dropped = ItemDropHelper.SpawnAndThrow(
+                dropPrefab,
+                GetDropThrowSpawnPosition(cam),
+                GetDropSpawnRotation(cam),
+                cam.forward,
+                dropThrowForce,
+                dropThrowUpward,
+                dropItemMass,
+                selected.dropLandSFX);
+        }
+
+        if (dropped.TryGetComponent(out WorldLighter worldLighter))
+            worldLighter.SetLit(place && heldLit);
 
         if (selected.pickUpSFX != null && SoundManager.Instance != null)
             SoundManager.Instance.PlaySFXAt(selected.pickUpSFX, dropped.transform.position);
 
-        string msg = Loc.Format("gameplay.item_dropped", selected.GetLocalizedName());
-        HudManager.Instance?.ShowSubtitle(msg, 2f);
+        if (!place)
+        {
+            string msg = Loc.Format("gameplay.item_dropped", selected.GetLocalizedName());
+            HudManager.Instance?.ShowSubtitle(msg, 2f);
+        }
+    }
+
+    /// <summary>
+    /// Surface point and normal to set the item down on: the aimed surface if it faces up enough and is within
+    /// reach. Aiming at a wall in reach uses the floor just in front of it. Nothing otherwise.
+    /// </summary>
+    bool TryGetPlacePoint(Transform cam, out Vector3 point, out Vector3 normal)
+    {
+        point = default;
+        normal = Vector3.up;
+
+        var interactor = PlayerInteractor.Instance;
+        float reach = (interactor != null ? interactor.GetWorldInteractRange() : 1.5f) - placeReachMargin;
+
+        Transform player = interactor != null ? interactor.transform : null;
+        if (!RaycastPlaceSurface(cam.position, cam.forward, placeRayLength, player, out RaycastHit hit)
+            || !IsWithinPlaceReach(interactor, cam, hit.point, reach))
+            return false;
+
+        if (hit.normal.y >= placeMinSurfaceUp)
+        {
+            point = hit.point;
+            normal = hit.normal;
+            return true;
+        }
+
+        Vector3 toWall = hit.point - cam.position;
+        toWall.y = 0f;
+        if (toWall.sqrMagnitude < 0.0001f)
+            return false;
+
+        float ahead = Mathf.Max(0f, Mathf.Min(placeFloorAhead, toWall.magnitude - 0.15f));
+        Vector3 origin = cam.position + toWall.normalized * ahead;
+        if (!RaycastPlaceSurface(origin, Vector3.down, 3f, player, out hit)
+            || hit.normal.y < placeMinSurfaceUp
+            || !IsWithinPlaceReach(interactor, cam, hit.point, reach))
+            return false;
+
+        point = hit.point;
+        normal = hit.normal;
+        return true;
+    }
+
+    readonly RaycastHit[] _placeHits = new RaycastHit[16];
+
+    /// <summary>Nearest hit that is not part of the player.</summary>
+    bool RaycastPlaceSurface(Vector3 origin, Vector3 direction, float length, Transform player, out RaycastHit nearest)
+    {
+        nearest = default;
+        int count = Physics.RaycastNonAlloc(origin, direction, _placeHits, length, placeSurfaceMask, QueryTriggerInteraction.Ignore);
+        bool found = false;
+        for (int i = 0; i < count; i++)
+        {
+            RaycastHit hit = _placeHits[i];
+            if (player != null && hit.collider.transform.IsChildOf(player))
+                continue;
+            if (!found || hit.distance < nearest.distance)
+            {
+                nearest = hit;
+                found = true;
+            }
+        }
+        return found;
+    }
+
+    static bool IsWithinPlaceReach(PlayerInteractor interactor, Transform cam, Vector3 point, float reach)
+    {
+        if (Vector3.Distance(cam.position, point) <= reach)
+            return true;
+        return interactor != null && Vector3.Distance(interactor.GetFeetPosition(), point) <= reach;
     }
 
     private Vector3 GetDropThrowSpawnPosition(Transform cam)
