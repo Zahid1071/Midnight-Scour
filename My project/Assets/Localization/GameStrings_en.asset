@@ -813,6 +813,22 @@ MonoBehaviour:
     m_Localized: It's jammed. Force it, or pull out and shove again to loosen it.
     m_Metadata:
       m_Items: []
+  - m_Id: 34392063293128704
+    m_Localized: I have to get out of here.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34396260386340864
+    m_Localized: What kind of place is this?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34614680490999808
+    m_Localized: I need a flame to light it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34614680591663104
+    m_Localized: I should light the lighter first.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -812,6 +812,22 @@ MonoBehaviour:
     m_Localized: "C'est coinc\xE9. Force, ou retire et renfonce pour le desserrer."
     m_Metadata:
       m_Items: []
+  - m_Id: 34392063293128704
+    m_Localized: Je dois sortir d'ici.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34396260386340864
+    m_Localized: C'est quoi, cet endroit ?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34614680490999808
+    m_Localized: Il me faut une flamme pour l'allumer.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34614680591663104
+    m_Localized: Je dois d'abord allumer le briquet.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -807,6 +807,22 @@ MonoBehaviour:
     m_Localized: Travou. Force, ou tira e enfia de novo para soltar.
     m_Metadata:
       m_Items: []
+  - m_Id: 34392063293128704
+    m_Localized: Eu preciso sair daqui.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34396260386340864
+    m_Localized: "Que lugar \xE9 esse?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34614680490999808
+    m_Localized: "Preciso de uma chama para acend\xEA-la."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34614680591663104
+    m_Localized: Preciso acender o isqueiro primeiro.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

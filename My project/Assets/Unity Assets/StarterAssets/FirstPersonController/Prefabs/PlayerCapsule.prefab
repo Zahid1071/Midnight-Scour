@@ -605,6 +605,14 @@ MonoBehaviour:
   RotationSpeed: 1
   SpeedChangeRate: 2
   SneakSpeed: 1
+  SprintStrafeMultiplier: 0.9
+  SprintBackwardMultiplier: 0.6
+  DirectionResponsiveness: 12
+  DirectionChangeMinAngle: 60
+  DirectionChangeDropPerStreak: 0.15
+  DirectionChangeMaxDrop: 0.5
+  DirectionChangeStreakDecay: 1
+  DirectionChangeRecovery: 0.6
   MaxExternalPushSpeed: 5
   JumpHeight: 0
   Gravity: -25
@@ -722,8 +730,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   footstepController: {fileID: 4452460983465209085}
   walkStepDistance: 2
-  runStepDistance: 1.8
-  sneakStepDistance: 3
+  runStepDistance: 1.29
+  sneakStepDistance: 1.2
   runThreshold: 3
   walkThreshold: 2
   sneakThreshold: 0.1
@@ -747,11 +755,15 @@ MonoBehaviour:
   interactCrosshairImage: {fileID: 0}
   doorCrosshairImage: {fileID: 0}
   outOfReachCrosshairImage: {fileID: 0}
+  dotCrosshairImage: {fileID: 0}
   buttonPromptImage: {fileID: 0}
   buttonPromptSprite: {fileID: 21300000, guid: 5c20b4d9fe053e14a9f8a30c304b1ed1, type: 3}
   shakeDuration: 0.22
   failShakeStrength: 6
   successScalePeak: 1.5
+  fadeDefaultCrosshair: 1
+  defaultFadeDuration: 0.35
+  targetFadeInDuration: 0.2
 --- !u!114 &7829341056284017392
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -767,16 +779,22 @@ MonoBehaviour:
   controller: {fileID: 8616685848737228382}
   bobTarget: {fileID: 4135013735270702856}
   crouchStance: {fileID: 8847291056384729103}
-  walkBobSpeed: 15
-  runBobSpeed: 20
-  sneakBobSpeed: 6
-  walkBobAmountY: 0.05
-  runBobAmountY: 0.08
-  sneakBobAmountY: 0.03
+  footsteps: {fileID: 8782256225151303304}
+  sneakBobAmountY: 0.035
+  walkBobAmountY: 0.06
+  runBobAmountY: 0.06
+  sneakBobAmountX: 0.015
+  walkBobAmountX: 0.025
+  runBobAmountX: 0.024
+  sneakSpeed: 1
+  walkSpeed: 2.6
+  runSpeed: 4
+  impactSharpness: 1.5
+  blendIn: 6
+  blendOut: 4
   minSpeed: 0.1
-  runThreshold: 4
-  walkThreshold: 2
-  strength: 0.25
+  fallbackStepDistance: 1.8
+  strength: 1
 --- !u!114 &750681375347046963
 MonoBehaviour:
   m_ObjectHideFlags: 0

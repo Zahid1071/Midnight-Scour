@@ -9,7 +9,7 @@ public class PlayerFootstepRhythm : MonoBehaviour
 
     [Header("Step Distances (meters)")]
     public float walkStepDistance = 2.0f;
-    public float runStepDistance = 2.7f;
+    public float runStepDistance = 1.29f;
     public float sneakStepDistance = 1.3f;
 
     [Header("Movement Thresholds")]
@@ -24,6 +24,11 @@ public class PlayerFootstepRhythm : MonoBehaviour
 
     private Vector3 lastFramePosition;
     private float distanceAccumulator = 0f;
+    private float lastStepDistance = -1f;
+    private int stepsTaken;
+
+    /// <summary>Footsteps played plus progress toward the next one; whole numbers land on a footstep.</summary>
+    public float StepProgress => stepsTaken + (lastStepDistance > 0f ? distanceAccumulator / lastStepDistance : 0f);
 
     void Awake()
     {
@@ -50,6 +55,10 @@ public class PlayerFootstepRhythm : MonoBehaviour
         }
 
         float stepDistance = GetStepDistanceForSpeed(speed);
+        // Keep the fraction of the current step when the stride changes, so the head bob doesn't jump.
+        if (lastStepDistance > 0f && !Mathf.Approximately(stepDistance, lastStepDistance))
+            distanceAccumulator *= stepDistance / lastStepDistance;
+        lastStepDistance = stepDistance;
         float volume = GetVolumeForSpeed(speed);
         bool useRunClips = speed > runThreshold;
 
@@ -70,6 +79,7 @@ public class PlayerFootstepRhythm : MonoBehaviour
 
 
             distanceAccumulator -= stepDistance; // keep remainder for smooth rhythm
+            stepsTaken++;
         }
     }
 

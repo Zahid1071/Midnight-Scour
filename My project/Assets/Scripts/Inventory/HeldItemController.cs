@@ -1,14 +1,28 @@
 using System.Collections.Generic;
+using StarterAssets;
 using UnityEngine;
 
 /// <summary>
 /// Lives under the gameplay camera. Shows the HeldItemView (placed in the scene under this object)
-/// of the selected inventory item and draws it on equip.
+/// of the selected inventory item and draws it on equip. Sprinting puts the item away; it is drawn
+/// again once the player stops running.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class HeldItemController : MonoBehaviour
 {
     public static HeldItemController Instance { get; private set; }
+
+    [Header("Sprint holster")]
+    [SerializeField] private bool holsterWhileSprinting = true;
+
+    [Tooltip("Horizontal speed (m/s) a sprint has to reach before the item is put away. Keep in line with the " +
+             "footsteps' run threshold so it goes away as the running steps start.")]
+    [Min(0f)]
+    [SerializeField] private float sprintHolsterSpeed = 3f;
+
+    [Tooltip("Seconds after the sprint ends before the item is drawn again, so short gaps don't flicker it.")]
+    [Min(0f)]
+    [SerializeField] private float sprintDrawDelay = 0.25f;
 
     private readonly Dictionary<InventoryItem, HeldItemView> _views = new();
     private InventoryItem _current;
@@ -16,6 +30,12 @@ public sealed class HeldItemController : MonoBehaviour
     private bool _shown;
     private PlayerHider _hider;
     private bool _hiderLookedUp;
+    private FirstPersonController _player;
+    private StarterAssetsInputs _input;
+    private CharacterController _body;
+    private bool _playerLookedUp;
+    private bool _sprintHolstered;
+    private float _sprintEndedTime = -1f;
 
     public InventoryItem CurrentItem => _shown ? _current : null;
     public HeldItemView CurrentView => _currentView;
@@ -46,11 +66,13 @@ public sealed class HeldItemController : MonoBehaviour
     {
         InventoryItem selected = InventoryUI.Instance != null ? InventoryUI.Instance.GetSelectedItem() : null;
         bool hiding = IsHiding();
-        bool canShow = !hiding && CanShowHeldItem();
+        bool sprinting = UpdateSprintHolster();
+        bool canShow = !hiding && !sprinting && CanShowHeldItem();
+        bool animatedPutDown = canShow || hiding || sprinting;
 
         if (_currentView != null && _currentView.IsHolstering)
         {
-            if (canShow || hiding)
+            if (animatedPutDown)
                 return;
             _currentView.HolsterImmediate();
         }
@@ -61,8 +83,8 @@ public sealed class HeldItemController : MonoBehaviour
 
         if (viewShown)
         {
-            // Switching items or starting to hide: the put-down plays first.
-            if (canShow || hiding)
+            // Switching items, starting to hide or sprinting: the put-down plays first.
+            if (animatedPutDown)
             {
                 _currentView.Holster();
                 if (_currentView.IsHolstering)
@@ -91,6 +113,47 @@ public sealed class HeldItemController : MonoBehaviour
             _hiderLookedUp = true;
         }
         return _hider != null && (_hider.isHidden || _hider.IsHidingEngaged);
+    }
+
+    // Holsters once a sprint is actually up to running speed (Shift against a wall or sprinting backwards at
+    // walking pace doesn't count), and stays holstered while Shift and a move key are held.
+    private bool UpdateSprintHolster()
+    {
+        if (!holsterWhileSprinting || !FindPlayer())
+            return _sprintHolstered = false;
+
+        bool sprintHeld = _input.sprint && _input.move != Vector2.zero && !_player.IsSneaking
+                          && !PlayerControlGate.IsInputBlocked;
+        if (!_sprintHolstered)
+        {
+            Vector3 v = _body.velocity;
+            _sprintHolstered = sprintHeld && new Vector2(v.x, v.z).magnitude >= sprintHolsterSpeed;
+            _sprintEndedTime = -1f;
+            return _sprintHolstered;
+        }
+
+        if (sprintHeld)
+            _sprintEndedTime = -1f;
+        else if (_sprintEndedTime < 0f)
+            _sprintEndedTime = Time.time;
+        else if (Time.time - _sprintEndedTime >= sprintDrawDelay)
+            _sprintHolstered = false;
+        return _sprintHolstered;
+    }
+
+    private bool FindPlayer()
+    {
+        if (!_playerLookedUp)
+        {
+            _player = FindFirstObjectByType<FirstPersonController>();
+            if (_player != null)
+            {
+                _input = _player.GetComponent<StarterAssetsInputs>();
+                _body = _player.GetComponent<CharacterController>();
+            }
+            _playerLookedUp = true;
+        }
+        return _player != null && _input != null && _body != null;
     }
 
     public bool TryGetView(InventoryItem item, out HeldItemView view)

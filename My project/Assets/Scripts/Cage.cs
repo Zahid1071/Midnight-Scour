@@ -78,6 +78,14 @@ public class Cage : MonoBehaviour
     [Min(0f)]
     public float doorSoundMinHearDistance = 5f;
 
+    [Header("Escape voice line")]
+    [Tooltip("Player line played once, the first time they walk out of the open cage.")]
+    [SerializeField] private AudioClip firstExitVoice;
+    [SerializeField, Range(0f, 1f)] private float firstExitVoiceVolume = 1f;
+    [Min(0f)][SerializeField] private float firstExitVoiceDelay = 0.6f;
+    [SerializeField] private string firstExitSubtitleKey = "player.voice.what_place";
+    private bool _firstExitVoicePlayed;
+
     // Hardcoded layer ID as requested
     private const int CAPTIVE_LAYER = 12;
     private static int HiddenPlayerLayer = -1;
@@ -254,7 +262,10 @@ public class Cage : MonoBehaviour
         {
             // Only arm the escape cue if they were actually inside — empty cages are the default.
             if (isOccupied && playerRef != null)
+            {
                 PendingEscapeSighting = true;
+                TryPlayFirstExitVoice();
+            }
 
             isOccupied = false;
 
@@ -356,12 +367,41 @@ public class Cage : MonoBehaviour
         // Player teleported / forced out without OnTriggerExit — clear stale hold.
         if (isOccupied && playerRef == root)
         {
+            TryPlayFirstExitVoice();
             isOccupied = false;
             playerRef.layer = SanitizeOriginalLayer(originalLayerIndex);
             playerRef = null;
             // Same as a real exit: start basement grace if it was armed for cage-exit.
             InteractionController.NotifyPlayerLeftCage();
         }
+    }
+
+    // Door must be open: trigger-boundary flicker can fake an exit while the player is still locked in.
+    void TryPlayFirstExitVoice()
+    {
+        if (_firstExitVoicePlayed || firstExitVoice == null || cageDoor == null || !cageDoor.objectOpen)
+            return;
+        _firstExitVoicePlayed = true;
+        StartCoroutine(FirstExitVoiceRoutine());
+    }
+
+    System.Collections.IEnumerator FirstExitVoiceRoutine()
+    {
+        if (firstExitVoiceDelay > 0f)
+            yield return new WaitForSeconds(firstExitVoiceDelay);
+
+        var player = GameObject.FindWithTag("Player");
+        if (player != null && IsPlayerInsideAnyCage(player.transform))
+        {
+            _firstExitVoicePlayed = false;
+            yield break;
+        }
+
+        if (SoundManager.Instance == null)
+            yield break;
+        SoundManager.Instance.PlaySFX(firstExitVoice, firstExitVoiceVolume);
+        if (HudManager.Instance != null && !string.IsNullOrEmpty(firstExitSubtitleKey))
+            HudManager.Instance.ShowSubtitle(Loc.Get(firstExitSubtitleKey), firstExitVoice.length + 1.5f);
     }
 
     /// <summary>

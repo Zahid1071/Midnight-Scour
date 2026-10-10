@@ -817,6 +817,22 @@ MonoBehaviour:
       i wepchnij ponownie, \u017Ceby poluzowa\u0107."
     m_Metadata:
       m_Items: []
+  - m_Id: 34392063293128704
+    m_Localized: "Musz\u0119 si\u0119 st\u0105d wydosta\u0107."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34396260386340864
+    m_Localized: Co to za miejsce?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34614680490999808
+    m_Localized: "Potrzebuj\u0119 ognia, \u017Ceby j\u0105 zapali\u0107."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34614680591663104
+    m_Localized: "Najpierw musz\u0119 zapali\u0107 zapalniczk\u0119."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

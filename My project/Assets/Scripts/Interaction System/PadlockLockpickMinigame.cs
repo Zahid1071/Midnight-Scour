@@ -19,6 +19,9 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
 {
     public static PadlockLockpickMinigame Active { get; private set; }
 
+    /// <summary>Fired each time a pin sets (any padlock).</summary>
+    public static event Action<PadlockLockpickMinigame> PinSet;
+
     public enum Stage
     {
         Idle,
@@ -711,6 +714,7 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
             SoundManager.Instance?.PlaySFXAt(pinSetSfx, transform.position, sfxVolume);
 
         RefreshProgressUi();
+        PinSet?.Invoke(this);
 
         if (AllPinsSet())
         {

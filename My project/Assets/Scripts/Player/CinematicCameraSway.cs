@@ -10,32 +10,32 @@ public class CinematicCameraSway : CinemachineExtension
 {
     [SerializeField] CharacterController controller;
     [SerializeField] HeadBobController headBob;
-    [Range(0f, 2f)]
+    [Range(0f, 3f)]
     [SerializeField] float strength = 1f;
 
     [Header("Breathing (always on)")]
-    [SerializeField] float breathePitchDegrees = 0.25f;
-    [SerializeField] float breatheYawDegrees = 0.18f;
-    [SerializeField] float breatheRollDegrees = 0.12f;
+    [SerializeField] float breathePitchDegrees = 0.6f;
+    [SerializeField] float breatheYawDegrees = 0.45f;
+    [SerializeField] float breatheRollDegrees = 0.35f;
     [Tooltip("Breaths per second.")]
     [SerializeField] float breatheRate = 0.22f;
 
     [Header("Walk sway (in step with the head bob)")]
-    [Tooltip("Roll at walking speed; one full side-to-side per two steps.")]
-    [SerializeField] float walkRollDegrees = 0.55f;
-    [SerializeField] float walkYawDegrees = 0.25f;
+    [Tooltip("Roll at walking speed; leans over the planted foot, one full side-to-side per two steps.")]
+    [SerializeField] float walkRollDegrees = 1.4f;
+    [SerializeField] float walkYawDegrees = 0.6f;
     [Tooltip("Small nod on each step, on top of the head bob's height change.")]
-    [SerializeField] float walkPitchDegrees = 0.2f;
+    [SerializeField] float walkPitchDegrees = 0.5f;
     [Tooltip("Speed (m/s) at which the walk sway reaches its full amount; faster scales it up a little.")]
     [SerializeField] float walkReferenceSpeed = 3f;
     [SerializeField] float maxSpeedScale = 1.4f;
 
     [Header("Strafe lean")]
-    [SerializeField] float strafeRollDegrees = 1f;
+    [SerializeField] float strafeRollDegrees = 2.5f;
     [SerializeField] float strafeReferenceSpeed = 4f;
 
     [Header("Turn roll")]
-    [SerializeField] float turnRollDegrees = 1.2f;
+    [SerializeField] float turnRollDegrees = 2.5f;
     [Tooltip("Turn speed (deg/s) that reaches the full turn roll.")]
     [SerializeField] float turnReferenceSpeed = 360f;
 
@@ -114,14 +114,24 @@ public class CinematicCameraSway : CinemachineExtension
             _speedScale = Mathf.Lerp(_speedScale,
                 Mathf.Clamp(speed / Mathf.Max(0.01f, walkReferenceSpeed), 1f, maxSpeedScale),
                 1f - Mathf.Exp(-moveSmooth * dt));
-            // Follow the head bob's phase while it runs; it resets to 0 on stopping, so hold the last phase then.
-            _phase = headBob != null ? headBob.BobPhase : _phase + dt * 10f;
+            if (headBob == null)
+                _phase += dt * 10f;
         }
 
         float sway = _moveBlend * _speedScale;
-        offset.x += Mathf.Sin(_phase) * walkPitchDegrees * sway;
-        offset.y += Mathf.Sin(_phase * 0.5f) * walkYawDegrees * sway;
-        offset.z += Mathf.Sin(_phase * 0.5f) * walkRollDegrees * sway;
+        if (headBob != null)
+        {
+            // Nod down into each footfall and lean over the planted foot, matching the head bob.
+            offset.x += (headBob.StepImpact - 0.5f) * 2f * walkPitchDegrees * sway;
+            offset.y += headBob.StepSide * walkYawDegrees * sway;
+            offset.z -= headBob.StepSide * walkRollDegrees * sway;
+        }
+        else
+        {
+            offset.x += Mathf.Sin(_phase) * walkPitchDegrees * sway;
+            offset.y += Mathf.Sin(_phase * 0.5f) * walkYawDegrees * sway;
+            offset.z += Mathf.Sin(_phase * 0.5f) * walkRollDegrees * sway;
+        }
 
         float strafeTarget = blocked ? 0f : Mathf.Clamp(localVelocity.x / Mathf.Max(0.01f, strafeReferenceSpeed), -1f, 1f);
         _strafe = Mathf.Lerp(_strafe, strafeTarget, 1f - Mathf.Exp(-leanSmooth * dt));

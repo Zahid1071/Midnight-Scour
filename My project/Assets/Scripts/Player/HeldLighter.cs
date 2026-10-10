@@ -82,6 +82,9 @@ public sealed class HeldLighter : MonoBehaviour
     [Tooltip("Optional extra object switched on at ignition.")]
     [SerializeField] private GameObject flame;
 
+    [Tooltip("Flint sparks played at the strike frame, whether or not the flame catches.")]
+    [SerializeField] private LighterSparks strikeSparks;
+
     [Header("Audio")]
     [Tooltip("Played as the lid starts opening (left-click or the end of the draw). Trimmed so the clink lands as the lid flips.")]
     [SerializeField] private AudioClip lidOpenSfx;
@@ -89,6 +92,18 @@ public sealed class HeldLighter : MonoBehaviour
     [Tooltip("Played when the strike starts; its flick peaks where the flame catches.")]
     [SerializeField] private AudioClip strikeSfx;
     [SerializeField, Range(0f, 1f)] private float strikeVolume = 1f;
+
+    [Header("First light voice line")]
+    [Tooltip("Player line played once, the first time the lighter is struck.")]
+    [SerializeField] private AudioClip firstStrikeVoice;
+    [SerializeField, Range(0f, 1f)] private float firstStrikeVoiceVolume = 1f;
+    [Tooltip("Seconds after the flame catches before the line starts.")]
+    [Min(0f)]
+    [SerializeField] private float firstStrikeVoiceDelay = 0.6f;
+    [SerializeField] private string firstStrikeSubtitleKey = "player.voice.get_out";
+
+    /// <summary>A strike caught (not a lighter drawn already burning).</summary>
+    public static event System.Action<HeldLighter> StruckAlight;
 
     public bool IsLit { get; private set; }
     public bool IsLidOpen { get; private set; } = true;
@@ -103,6 +118,8 @@ public sealed class HeldLighter : MonoBehaviour
     private bool _litDraw;
     private bool _litDrawHandedOff;
     private float _lastDrawTime = -1f;
+    private bool _firstStrikeVoicePlayed;
+    private int _misfires;
 
     private void Awake()
     {
@@ -133,6 +150,9 @@ public sealed class HeldLighter : MonoBehaviour
     /// comes up, then it goes straight to the lit idle without opening the lid or striking.
     /// </summary>
     public void DrawLitNextTime() => _drawLitNext = true;
+
+    /// <summary>The next <paramref name="count"/> strikes only spark; the one after catches.</summary>
+    public void MisfireNextStrikes(int count) => _misfires = Mathf.Max(0, count);
 
     private void OnEnable()
     {
@@ -279,6 +299,31 @@ public sealed class HeldLighter : MonoBehaviour
         IsLit = true;
         if (flame != null)
             flame.SetActive(true);
+        if (!_litDraw)
+        {
+            PlayFirstStrikeVoice();
+            StruckAlight?.Invoke(this);
+        }
+    }
+
+    // Runs on the SoundManager so holstering or putting the flame out doesn't cut the line off.
+    private void PlayFirstStrikeVoice()
+    {
+        if (_firstStrikeVoicePlayed || firstStrikeVoice == null || SoundManager.Instance == null)
+            return;
+        _firstStrikeVoicePlayed = true;
+        SoundManager.Instance.StartCoroutine(FirstStrikeVoiceRoutine());
+    }
+
+    private IEnumerator FirstStrikeVoiceRoutine()
+    {
+        if (firstStrikeVoiceDelay > 0f)
+            yield return new WaitForSeconds(firstStrikeVoiceDelay);
+        if (SoundManager.Instance == null)
+            yield break;
+        SoundManager.Instance.PlaySFX(firstStrikeVoice, firstStrikeVoiceVolume);
+        if (HudManager.Instance != null && !string.IsNullOrEmpty(firstStrikeSubtitleKey))
+            HudManager.Instance.ShowSubtitle(Loc.Get(firstStrikeSubtitleKey), firstStrikeVoice.length + 1.5f);
     }
 
     public void Extinguish()
@@ -373,6 +418,15 @@ public sealed class HeldLighter : MonoBehaviour
                 break;
 
             yield return null;
+        }
+
+        if (strikeSparks != null)
+            strikeSparks.Play(_view);
+        if (_misfires > 0)
+        {
+            _misfires--;
+            _striking = false;
+            yield break;
         }
         Ignite();
     }

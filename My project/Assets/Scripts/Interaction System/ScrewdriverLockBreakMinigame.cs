@@ -104,7 +104,9 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
     [Tooltip("Loops while forcing the final jam. Falls back to Stuck Loop Sfx.")]
     [SerializeField] AudioClip finalJamLoopSfx;
     [SerializeField, Range(0f, 1f)] float finalLoopMinVolume = 0f;
-    [SerializeField, Range(0f, 1f)] float finalLoopMaxVolume = 0.9f;
+    [SerializeField, Range(0f, 1f)] float finalLoopMaxVolume = 0.5f;
+    [Tooltip("Scales the stuck crack one-shot while forcing the final jam.")]
+    [SerializeField, Range(0f, 1f)] float finalJamCrackVolumeScale = 0.5f;
 
     [Header("Jam camera feel (tension -> release)")]
     [Tooltip("FOV narrows by up to this many degrees as force builds.")]
@@ -713,7 +715,8 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         if (clip == null)
             return;
         float pitch = UnityEngine.Random.Range(stuckCrackPitchRange.x, stuckCrackPitchRange.y);
-        SoundManager.Instance.PlaySFXAt(clip, keyhole.position, stuckCrackVolume, pitch);
+        float volume = _finalJam ? stuckCrackVolume * finalJamCrackVolumeScale : stuckCrackVolume;
+        SoundManager.Instance.PlaySFXAt(clip, keyhole.position, volume, pitch);
     }
 
     /// <summary>1 inside the steady push range, fading to 0 at twice the max speed; 0 below the min.</summary>

@@ -795,6 +795,22 @@ MonoBehaviour:
     m_Key: gameplay.screwdriver_force
     m_Metadata:
       m_Items: []
+  - m_Id: 34392063293128704
+    m_Key: player.voice.get_out
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34396260386340864
+    m_Key: player.voice.what_place
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34614680490999808
+    m_Key: gameplay.candle_need_flame
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34614680591663104
+    m_Key: gameplay.candle_light_lighter
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

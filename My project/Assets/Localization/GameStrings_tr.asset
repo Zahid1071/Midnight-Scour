@@ -820,6 +820,22 @@ MonoBehaviour:
       tekrar sokarak gev\u015Fet."
     m_Metadata:
       m_Items: []
+  - m_Id: 34392063293128704
+    m_Localized: "Buradan \xE7\u0131kmam laz\u0131m."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34396260386340864
+    m_Localized: "Buras\u0131 da neresi?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34614680490999808
+    m_Localized: "Yakmak i\xE7in bir ate\u015Fe ihtiyac\u0131m var."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34614680591663104
+    m_Localized: "\xD6nce \xE7akma\u011F\u0131 yakmal\u0131y\u0131m."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -1,6 +1,5 @@
 # Auto detect text files by default
 * text=auto
-
 # Unity YAML / code (safe as text)
 *.unity text eol=lf
 *.prefab text eol=lf
@@ -15,11 +14,9 @@
 *.inputactions text eol=lf
 *.uxml text eol=lf
 *.uss text eol=lf
-
 # .asset is MIXED: ScriptableObjects are YAML, but Terrain / LightingData /
 # NavMesh / Occlusion / etc. are BINARY. Forcing text corrupts those files.
 *.asset -text
-
 # Other common Unity binaries
 *.terrainlayer -text
 *.bytes -text
@@ -50,3 +47,4 @@
 *.mp4 binary
 *.mov binary
 *.avi binary
+My[[:space:]]project/Assets/Prefabs/Characters/Zombie[[:space:]]Hitman/Zombie[[:space:]]Hitman.fbx filter=lfs diff=lfs merge=lfs -text

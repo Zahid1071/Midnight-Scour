@@ -807,6 +807,22 @@ MonoBehaviour:
       aflojarlo."
     m_Metadata:
       m_Items: []
+  - m_Id: 34392063293128704
+    m_Localized: "Tengo que salir de aqu\xED."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34396260386340864
+    m_Localized: "\xBFQu\xE9 clase de lugar es este?"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34614680490999808
+    m_Localized: Necesito una llama para encenderla.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 34614680591663104
+    m_Localized: Primero tengo que encender el encendedor.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
