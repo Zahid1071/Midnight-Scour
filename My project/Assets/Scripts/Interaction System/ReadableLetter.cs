@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(Collider))]
 public class ReadableLetter : MonoBehaviour, IInteractable
@@ -10,6 +11,8 @@ public class ReadableLetter : MonoBehaviour, IInteractable
     [TextArea(4, 12)]
     [SerializeField] private string letterText = "Letter text goes here.";
     [SerializeField] private AudioClip interactSFX;
+    [Tooltip("Invoked every time the player closes the letter.")]
+    [SerializeField] private UnityEvent onClosed;
 
     public bool Interact()
     {
@@ -28,10 +31,12 @@ public class ReadableLetter : MonoBehaviour, IInteractable
 
         InteractionFeedback.PlaySound(interactSFX, transform.position);
 
-        bool padlockLetter = string.Equals(letterKey, PadlockHairpinLetterKey, StringComparison.Ordinal);
-        ReadPanelUI.Instance.Show(text, padlockLetter
-            ? () => GameplayHintManager.Instance?.NotifyPadlockHairpinLetterClosed()
-            : null);
+        Action closed = null;
+        if (string.Equals(letterKey, PadlockHairpinLetterKey, StringComparison.Ordinal))
+            closed += () => GameplayHintManager.Instance?.NotifyPadlockHairpinLetterClosed();
+        if (onClosed != null && onClosed.GetPersistentEventCount() > 0)
+            closed += onClosed.Invoke;
+        ReadPanelUI.Instance.Show(text, closed);
         return true;
     }
 }

@@ -823,6 +823,11 @@ MonoBehaviour:
     m_Localized: Preciso acender o isqueiro primeiro.
     m_Metadata:
       m_Items: []
+  - m_Id: 35779292372533248
+    m_Localized: "A barra da morsa n\xE3o est\xE1 aqui. Da \xFAltima vez que a vi,
+      estava perto da jaula."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

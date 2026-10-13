@@ -102,9 +102,6 @@ public sealed class HeldLighter : MonoBehaviour
     [SerializeField] private float firstStrikeVoiceDelay = 0.6f;
     [SerializeField] private string firstStrikeSubtitleKey = "player.voice.get_out";
 
-    /// <summary>A strike caught (not a lighter drawn already burning).</summary>
-    public static event System.Action<HeldLighter> StruckAlight;
-
     public bool IsLit { get; private set; }
     public bool IsLidOpen { get; private set; } = true;
 
@@ -300,10 +297,7 @@ public sealed class HeldLighter : MonoBehaviour
         if (flame != null)
             flame.SetActive(true);
         if (!_litDraw)
-        {
             PlayFirstStrikeVoice();
-            StruckAlight?.Invoke(this);
-        }
     }
 
     // Runs on the SoundManager so holstering or putting the flame out doesn't cut the line off.

@@ -103,6 +103,14 @@ public class HangingHook : MonoBehaviour
         Excite(collision.relativeVelocity.magnitude);
     }
 
+    /// <summary>Swing the hook as if something brushed past it, at this velocity (m/s).</summary>
+    public void Knock(Vector3 velocity)
+    {
+        _rb.WakeUp();
+        _rb.AddForce(velocity, ForceMode.VelocityChange);
+        Excite(velocity.magnitude);
+    }
+
     /// <summary>Restart the chain burst (a push or a knock). Stronger hits give a louder burst.</summary>
     void Excite(float speed)
     {

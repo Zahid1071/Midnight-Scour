@@ -823,6 +823,11 @@ MonoBehaviour:
     m_Localized: Primero tengo que encender el encendedor.
     m_Metadata:
       m_Items: []
+  - m_Id: 35779292372533248
+    m_Localized: "La barra de la prensa no est\xE1 aqu\xED. La \xFAltima vez que
+      la vi, estaba junto a la jaula."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

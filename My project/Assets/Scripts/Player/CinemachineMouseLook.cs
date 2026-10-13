@@ -93,6 +93,17 @@ public class CinemachineMouseLook : MonoBehaviour
         transform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
     }
 
+    /// <summary>Points the view along a world rotation: its yaw goes on the body, its pitch on this root.</summary>
+    public void SetLook(Quaternion rotation)
+    {
+        Vector3 euler = rotation.eulerAngles;
+        if (playerBody != null)
+            playerBody.rotation = Quaternion.Euler(0f, euler.y, 0f);
+        float x = euler.x > 180f ? euler.x - 360f : euler.x;
+        pitch = Mathf.Clamp(x, minPitch, maxPitch);
+        transform.localRotation = Quaternion.Euler(pitch, 0f, 0f);
+    }
+
     /// <summary>Sets camera-root local rotation to (0,0,0) and clears stored pitch.</summary>
     public void ResetLocalRotation()
     {

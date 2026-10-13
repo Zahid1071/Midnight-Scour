@@ -2,28 +2,35 @@ using System.Collections;
 using UnityEngine;
 
 /// <summary>
-/// Bench vise: insert bar (LMB) → bar won't turn (E) → strike with hammer (LMB) → wrench can be picked up.
-/// Hammer strikes only succeed during the thunder mask; strikes in the wider pre/post window alert the butcher.
+/// Bench vise with the wrench clamped in its jaws: insert the bar (LMB), then turn it (E). The handle spins,
+/// the jaw opens and the wrench drops out to the floor, where it can be picked up.
 /// </summary>
 public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
 {
     public static BenchVicePuzzle Instance { get; private set; }
 
     [SerializeField] InventoryItem barItem;
-    [SerializeField] InventoryItem hammerItem;
     [SerializeField] GameObject barVisual;
+    [Tooltip("Handle hub; spins about its local Y (the screw) while the bar turns.")]
     [SerializeField] Transform dialTransform;
-    [SerializeField] Animator animator;
-    [SerializeField] string strikeAnimatorTrigger = "Strike";
-    [Header("Dial strike (used when no Animator)")]
-    [SerializeField] float dialStrikeDegrees = 45f;
-    [SerializeField] float dialStrikeDuration = 0.35f;
-    [SerializeField] AudioClip strikeSound;
-    [Header("NPC Suspicion")]
-    [Tooltip("Footstep-suspicion added to NPCs when a mistimed hammer strike lands in the thunder window.")]
-    [Min(0f)]
-    [SerializeField] float npcSuspicionOnStrike = 300f;
-    [SerializeField] float strikeSfxVolume = 1f;
+    [Tooltip("Moving jaw; slides out along its local Z as the screw opens.")]
+    [SerializeField] Transform clampTransform;
+
+    [Header("Turning")]
+    [SerializeField] float turnDegrees = 540f;
+    [SerializeField] float turnDuration = 1.8f;
+    [SerializeField] float jawOpenDistance = 0.025f;
+    [SerializeField] AudioClip turnSound;
+    [SerializeField, Range(0f, 1f)] float turnVolume = 0.8f;
+
+    [Header("Wrench")]
+    [SerializeField] Transform wrench;
+    [Tooltip("Rest pose the wrench falls to.")]
+    [SerializeField] Transform wrenchLanding;
+    [Tooltip("Fraction of the turn at which the jaw lets go of the wrench.")]
+    [SerializeField, Range(0f, 1f)] float wrenchReleaseAt = 0.65f;
+    [SerializeField] AudioClip wrenchDropSound;
+    [SerializeField, Range(0f, 1f)] float wrenchDropVolume = 0.9f;
 
     [Header("Post-completion")]
     [Tooltip("Objects moved off the Interactable layer once the wrench is released (defaults to this + bar visual).")]
@@ -32,7 +39,6 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
     bool _barInserted;
     bool _wrenchReleased;
     bool _isAnimating;
-    int _mistimedStrikeCount;
 
     public bool IsWrenchReleased => _wrenchReleased;
     public bool BarInserted => _barInserted;
@@ -52,49 +58,45 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
 
     public bool Interact()
     {
-        if (_wrenchReleased)
+        if (_wrenchReleased || _isAnimating)
             return false;
 
-        ShowContextualHint(InventoryUI.Instance?.GetSelectedItem());
-        return false;
+        if (!_barInserted)
+        {
+            ShowContextualHint();
+            return false;
+        }
+
+        StartCoroutine(TurnRoutine());
+        return true;
     }
 
     public string GetContextualHintMessage(InventoryItem held)
     {
-        if (_wrenchReleased)
+        if (_wrenchReleased || _barInserted)
             return null;
-
-        if (!_barInserted)
-            return Loc.Get("gameplay.need_bar");
-
-        if (held == hammerItem)
-            return Loc.Get("gameplay.use_hammer_bar");
-
-        return Loc.Get("gameplay.bar_stuck_rusty");
+        return Loc.Get("gameplay.need_bar");
     }
 
-    void ShowContextualHint(InventoryItem held)
+    void ShowContextualHint()
     {
-        string message = GetContextualHintMessage(held);
+        string message = GetContextualHintMessage(null);
         if (!string.IsNullOrWhiteSpace(message))
             InteractionFeedback.Fail(message, 3f);
     }
 
     public bool ReceiveItem(InventoryItem item)
     {
-        if (_isAnimating)
-            return false;
-
-        if (item == null)
+        if (_isAnimating || item == null || _wrenchReleased)
             return false;
 
         if (!_barInserted && item == barItem)
             return TryInsertBar(item);
 
-        if (_barInserted && !_wrenchReleased && item == hammerItem)
-            return TryStrikeWithHammer(item);
+        if (_barInserted)
+            return Interact();
 
-        ShowContextualHint(item);
+        ShowContextualHint();
         return false;
     }
 
@@ -121,127 +123,82 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
         return true;
     }
 
-    bool TryStrikeWithHammer(InventoryItem item)
-    {
-        var inventory = InventoryManager.Instance?.GetInventory();
-        if (inventory == null || !inventory.Contains(item))
-        {
-            InteractionFeedback.Fail(Loc.Get("gameplay.dont_have_item"), 2.5f);
-            return false;
-        }
-
-        // Outside the 3s-pre / 3s-post thunder window: refuse the strike entirely.
-        if (!ThunderManager.IsViseHammerWindowOpen)
-        {
-            InteractionFeedback.Fail(Loc.Get("gameplay.hammer_too_loud_now"), 3f);
-            return false;
-        }
-
-        bool perfectTiming = ThunderManager.ArePlayerNoisesMasked;
-        bool earlyMiss = !perfectTiming && ThunderManager.IsViseHammerEarly;
-        StartCoroutine(StrikeRoutine(item, perfectTiming, earlyMiss));
-        return true;
-    }
-
-    IEnumerator StrikeRoutine(InventoryItem hammer, bool perfectTiming, bool earlyMiss)
+    IEnumerator TurnRoutine()
     {
         _isAnimating = true;
+        Vector3 soundAt = dialTransform != null ? dialTransform.position : transform.position;
+        if (turnSound != null && SoundManager.Instance != null)
+            SoundManager.Instance.PlaySFXAt(turnSound, soundAt, turnVolume);
+        InteractionUIManager.Instance?.PlaySuccessShake();
 
-        Vector3 noisePos = transform.position;
-
-        if (!perfectTiming)
+        Quaternion dialStart = dialTransform != null ? dialTransform.localRotation : Quaternion.identity;
+        Vector3 clampStart = clampTransform != null ? clampTransform.localPosition : Vector3.zero;
+        bool dropped = false;
+        for (float t = 0f; t < turnDuration; t += Time.deltaTime)
         {
-            // Same path as vase/flush: suspicion → search/chase.
-            WorldNoiseAlert.Notify(noisePos, npcSuspicionOnStrike);
-        }
-
-        AudioClip hitSfx = strikeSound != null ? strikeSound : hammer.useSuccessSound;
-        if (hitSfx != null && SoundManager.Instance != null)
-            SoundManager.Instance.PlaySFXAt(hitSfx, noisePos, strikeSfxVolume);
-
-        if (perfectTiming)
-            InteractionUIManager.Instance?.PlaySuccessShake();
-        else
-            InteractionUIManager.Instance?.PlayFailShake();
-
-        // Dial/rotate anim only on a successful timed hit — misses still play SFX / noise / subtitles.
-        if (perfectTiming)
-        {
-            if (animator != null)
+            float u = t / turnDuration;
+            float eased = Mathf.SmoothStep(0f, 1f, u);
+            if (dialTransform != null)
+                dialTransform.localRotation = dialStart * Quaternion.Euler(0f, turnDegrees * eased, 0f);
+            if (clampTransform != null)
+                clampTransform.localPosition = clampStart + Vector3.forward * (jawOpenDistance * eased);
+            if (!dropped && u >= wrenchReleaseAt)
             {
-                if (!animator.enabled)
-                    animator.enabled = true;
-                animator.SetTrigger(strikeAnimatorTrigger);
-                yield return new WaitForSeconds(dialStrikeDuration);
+                dropped = true;
+                StartCoroutine(DropWrenchRoutine());
             }
-            else if (dialTransform != null)
-            {
-                Quaternion start = dialTransform.localRotation;
-                Quaternion end = start * Quaternion.Euler(0f, 0f, dialStrikeDegrees);
-                float t = 0f;
-                while (t < dialStrikeDuration)
-                {
-                    t += Time.deltaTime;
-                    float p = Mathf.SmoothStep(0f, 1f, t / dialStrikeDuration);
-                    dialTransform.localRotation = Quaternion.Slerp(start, end, p);
-                    yield return null;
-                }
-            }
-            else
-            {
-                yield return new WaitForSeconds(dialStrikeDuration);
-            }
-
-            _wrenchReleased = true;
-            ClearInteractableLayers();
-            ThunderManager.Instance?.NotifyHammerUsedSuccessfully();
-
-            if (hammer.consumeOnUse)
-                InventoryManager.Instance?.RemoveItem(hammer);
-
-            var hud = HudManager.Instance;
-            if (hud != null)
-                hud.ShowSubtitle(Loc.Get("gameplay.hammer_perfect_timing"), 3.5f, hud.SuccessColor);
+            yield return null;
         }
-        else
-        {
-            _mistimedStrikeCount++;
-            ShowMissTimingSubtitle(earlyMiss);
-            // First two misses: normal noise only. Third miss: guaranteed catch hunt.
-            if (_mistimedStrikeCount >= 3)
-                ForceButcherHuntPlayer();
-        }
+        if (dialTransform != null)
+            dialTransform.localRotation = dialStart * Quaternion.Euler(0f, turnDegrees, 0f);
+        if (clampTransform != null)
+            clampTransform.localPosition = clampStart + Vector3.forward * jawOpenDistance;
+        if (!dropped)
+            yield return DropWrenchRoutine();
 
+        ClearInteractableLayers();
         _isAnimating = false;
     }
 
-    static void ShowMissTimingSubtitle(bool early)
+    IEnumerator DropWrenchRoutine()
     {
-        var hud = HudManager.Instance;
-        if (hud == null)
-            return;
-
-        string key = early ? "gameplay.hammer_hit_too_early" : "gameplay.hammer_hit_too_late";
-        string fallback = early
-            ? "I hit it too early, I'll get caught"
-            : "I hit it too late, I'll get caught";
-        string msg = Loc.Get(key);
-        if (string.IsNullOrEmpty(msg) || msg == key)
-            msg = fallback;
-
-        SoundManager.Instance?.PlayActionFail();
-        InteractionUIManager.Instance?.PlayFailShake();
-        hud.ShowSubtitle(msg, 4.5f, hud.ErrorColor, HudManager.PriorityHigh);
-    }
-
-    static void ForceButcherHuntPlayer()
-    {
-        var npcs = Object.FindObjectsByType<NPCController>(FindObjectsSortMode.None);
-        for (int i = 0; i < npcs.Length; i++)
+        if (wrench == null || wrenchLanding == null)
         {
-            if (npcs[i] != null)
-                npcs[i].ForceHuntPlayerForViseMiss();
+            _wrenchReleased = true;
+            yield break;
         }
+
+        Vector3 from = wrench.position;
+        Quaternion fromRot = wrench.rotation;
+        Vector3 to = wrenchLanding.position;
+        Quaternion toRot = wrenchLanding.rotation;
+        float drop = Mathf.Max(0.05f, from.y - to.y);
+        float fallTime = Mathf.Sqrt(2f * drop / 9.81f);
+        for (float t = 0f; t < fallTime; t += Time.deltaTime)
+        {
+            float u = t / fallTime;
+            Vector3 p = Vector3.Lerp(from, to, u);
+            p.y = from.y - 0.5f * 9.81f * t * t;
+            wrench.SetPositionAndRotation(p, Quaternion.Slerp(fromRot, toRot, u));
+            yield return null;
+        }
+        wrench.SetPositionAndRotation(to, toRot);
+        if (wrenchDropSound != null && SoundManager.Instance != null)
+            SoundManager.Instance.PlaySFXAt(wrenchDropSound, to, wrenchDropVolume);
+
+        // One small hop off the concrete before it settles.
+        const float hopTime = 0.16f;
+        const float hopHeight = 0.035f;
+        Quaternion tilted = toRot * Quaternion.Euler(0f, 0f, 8f);
+        for (float t = 0f; t < hopTime; t += Time.deltaTime)
+        {
+            float u = t / hopTime;
+            wrench.SetPositionAndRotation(to + Vector3.up * (4f * hopHeight * u * (1f - u)),
+                Quaternion.Slerp(tilted, toRot, u));
+            yield return null;
+        }
+        wrench.SetPositionAndRotation(to, toRot);
+        _wrenchReleased = true;
     }
 
     void ClearInteractableLayers()

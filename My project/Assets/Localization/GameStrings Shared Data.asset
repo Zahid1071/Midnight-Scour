@@ -811,6 +811,10 @@ MonoBehaviour:
     m_Key: gameplay.candle_light_lighter
     m_Metadata:
       m_Items: []
+  - m_Id: 35779292372533248
+    m_Key: letter.vise_bar
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

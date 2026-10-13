@@ -836,6 +836,11 @@ MonoBehaviour:
     m_Localized: "\xD6nce \xE7akma\u011F\u0131 yakmal\u0131y\u0131m."
     m_Metadata:
       m_Items: []
+  - m_Id: 35779292372533248
+    m_Localized: "Mengenenin kolu burada de\u011Fil. En son kafesin yan\u0131nda
+      g\xF6rm\xFC\u015Ft\xFCm."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

@@ -64,6 +64,8 @@ public class ThunderManager : MonoBehaviour
 
     [Header("Auto Schedule")]
     [SerializeField] bool autoPlay = true;
+    [Tooltip("Off = no ambient or cage-door thunder; it only strikes to help at the vise and the toilet.")]
+    [SerializeField] bool ambientThunder = true;
     [Tooltip("Seconds between ambient thunders (min/max).")]
     [SerializeField] Vector2 calmInterval = new Vector2(40f, 60f);
     [Tooltip("Seconds between thunders while the player is set up at the vise (see Vise Assist conditions).")]
@@ -378,7 +380,7 @@ public class ThunderManager : MonoBehaviour
 
     void OnTrackedDoorOpened()
     {
-        if (_firstDoorThunderPlayed)
+        if (_firstDoorThunderPlayed || !ambientThunder)
             return;
 
         _firstDoorThunderPlayed = true;
@@ -615,7 +617,7 @@ public class ThunderManager : MonoBehaviour
         if (!autoPlay || !isActiveAndEnabled)
             return;
         // No ambient loop until the cage door (or an explicit unlock) has happened.
-        if (!_stormScheduleUnlocked)
+        if (ambientThunder ? !_stormScheduleUnlocked : !_usingViseAssistCadence)
             return;
         // Plunger-toilet story cue owns timing until both strikes finish.
         if (_plungerToiletThunderRoutine != null)
@@ -659,6 +661,9 @@ public class ThunderManager : MonoBehaviour
 
             while (IsStormPlaying)
                 yield return null;
+
+            if (!ambientThunder && !_usingViseAssistCadence)
+                break;
 
             bool assistStrike = _usingViseAssistCadence;
             PlayFullThunder();

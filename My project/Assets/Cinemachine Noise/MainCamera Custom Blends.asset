@@ -188,21 +188,54 @@ MonoBehaviour:
         m_PostInfinity: 2
         m_RotationOrder: 4
   - From: Player Virutal Camera
-    To: Corpse Focus Camera
+    To: Wall Reveal Camera
     Blend:
-      Style: 1
-      Time: 1.2
+      Style: 0
+      Time: 0
       CustomCurve:
         serializedVersion: 2
         m_Curve: []
         m_PreInfinity: 2
         m_PostInfinity: 2
         m_RotationOrder: 4
-  - From: Corpse Focus Camera
+  - From: Wall Reveal Camera
     To: Player Virutal Camera
     Blend:
       Style: 1
-      Time: 1
+      Time: 0.8
+      CustomCurve:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+  - From: Player Virutal Camera
+    To: Door Look Back Camera
+    Blend:
+      Style: 0
+      Time: 0
+      CustomCurve:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+  - From: Door Look Back Camera
+    To: Player Virutal Camera
+    Blend:
+      Style: 1
+      Time: 0.8
+      CustomCurve:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+  - From: Screwdriver Minigame Camera (Corridor Door)
+    To: Door Look Back Camera
+    Blend:
+      Style: 0
+      Time: 0
       CustomCurve:
         serializedVersion: 2
         m_Curve: []

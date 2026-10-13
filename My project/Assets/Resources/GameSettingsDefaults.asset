@@ -17,12 +17,12 @@ MonoBehaviour:
     displayModeIndex: 0
     resolutionIndex: -1
     qualityIndex: 2
-    masterVolume: 0.8
-    musicVolume: 0.2
-    sfxVolume: 0.8
+    masterVolume: 1
+    musicVolume: 1
+    sfxVolume: 1
     mouseSensitivity: 0.1
     micSensitivity: 0.5
     invertYAxis: 0
-    brightness: 3
+    brightness: 1
     difficultyIndex: 1
     subtitlesEnabled: 1

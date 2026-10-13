@@ -171,6 +171,10 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
     [Tooltip("Mouse travel that reaches max stuck-loop volume.")]
     [SerializeField] float stuckLoopMouseForMaxVolume = 25f;
 
+    [Header("Progress")]
+    [Tooltip("Leaving the minigame keeps the bar where it was; the next attempt picks up from there.")]
+    [SerializeField] bool keepProgressOnExit = true;
+
     [Header("Hints")]
     [SerializeField] string aimHintKey = "gameplay.screwdriver_aim";
     [SerializeField] string holdHintKey = "gameplay.screwdriver_shake";
@@ -220,8 +224,14 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
     float _holdLoopMoveSmoothed;
     float _holdLoopVolumeSmoothed;
 
+    /// <summary>A jam (not the last one) was forced through; the argument counts them on this lock, starting at 1.</summary>
+    public event Action<int> JamBroken;
+
+    int _jamsBroken;
+
     public Stage CurrentStage => _stage;
     public bool IsRunning => _stage == Stage.Playing;
+    public int JamsBroken => _jamsBroken;
     public bool IsHoldingBreak => IsRunning && Mouse.current != null && Mouse.current.leftButton.isPressed;
     public float BreakNormalized => Mathf.Clamp01(_breakFill);
 
@@ -280,14 +290,20 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         _onCancel = onCancel;
         _aimAngles = Vector2.zero;
         _insertProgress = 0f;
-        _breakFill = 0f;
-        _sessionFillLeft = Mathf.Max(0.01f, maxFillPerPush);
+        // Resuming keeps the jam and the wiggle left, so leaving and coming back can't skip a breakthrough.
+        if (!keepProgressOnExit || _breakFill <= 0f)
+        {
+            _breakFill = 0f;
+            _sessionFillLeft = Mathf.Max(0.01f, maxFillPerPush);
+            _jammed = false;
+            _finalJam = false;
+            _jamForceRequired = 0f;
+            _jamBaseRequired = 0f;
+        }
+        else if (_jammed)
+            _jamForceRequired = _jamBaseRequired;
         _sessionArmed = false;
-        _jammed = false;
-        _finalJam = false;
         _jamForce = 0f;
-        _jamForceRequired = 0f;
-        _jamBaseRequired = 0f;
         _jamDirection = Vector2.zero;
         _jamDirectionProbe = Vector2.zero;
         _pushSpeedSmoothed = 0f;
@@ -607,6 +623,8 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
                 {
                     AddBreakFill(stuckBreakFill);
                     PlayJamBreak();
+                    _jamsBroken++;
+                    JamBroken?.Invoke(_jamsBroken);
                 }
                 _release = 1f;
                 _tension = 0f;
@@ -1004,13 +1022,19 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         _holdLoopVolumeSmoothed = 0f;
     }
 
-    void CancelAndExit()
+    /// <summary>Leaves the minigame as if the player cancelled it (progress is kept if Keep Progress On Exit).</summary>
+    public void ForceExit(bool playCancelSfx = false)
+    {
+        CancelAndExit(playCancelSfx);
+    }
+
+    void CancelAndExit(bool playCancelSfx = true)
     {
         if (_stage == Stage.Idle || _stage == Stage.Exiting)
             return;
 
         StopHoldLoop();
-        if (cancelSfx != null)
+        if (playCancelSfx && cancelSfx != null)
             SoundManager.Instance?.PlaySFXAt(cancelSfx, keyhole.position, sfxVolume);
 
         var cancel = _onCancel;
@@ -1136,7 +1160,8 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         _tool = null;
         _onSuccess = null;
         _onCancel = null;
-        _breakFill = 0f;
+        if (!keepProgressOnExit)
+            _breakFill = 0f;
         _stage = Stage.Idle;
 
         if (Active == this)

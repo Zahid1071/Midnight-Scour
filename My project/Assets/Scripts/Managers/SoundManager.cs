@@ -195,6 +195,8 @@ public class SoundManager : MonoBehaviour
 
     // ---------- PUBLIC API ----------
 
+    public bool IsChaseMusicActive => _chaseMusicActive;
+
     /// <summary>NPC chase/search started — tension music overrides layer music until cleared.</summary>
     public void SetChaseMusicActive(bool active)
     {
@@ -676,7 +678,12 @@ public class SoundManager : MonoBehaviour
 
         AudioClip clip = ResolveGameplayMusicClip();
         if (clip == null)
+        {
+            // No exploration track: let chase music fade out instead of looping on after the hunt.
+            if (CurrentMusicClip != null && !(IsPlayerHiddenForMusic() && _chaseMusicActive))
+                StopMusic(gameplayMusicFade);
             return;
+        }
 
         if (CurrentMusicClip == clip)
             return;

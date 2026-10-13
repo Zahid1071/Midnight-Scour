@@ -97,7 +97,7 @@ public class GameSettingsManager : MonoBehaviour
     /// Scene components (e.g. BrightnessApplier) consume <see cref="BrightnessExposure"/>.
     /// </summary>
     public const float MIN_BRIGHTNESS_EXPOSURE = -2f;
-    public const float MAX_BRIGHTNESS_EXPOSURE =  2f;
+    public const float MAX_BRIGHTNESS_EXPOSURE =  1f;
 
     // =========================================================================
     // EVENTS
@@ -222,9 +222,9 @@ public class GameSettingsManager : MonoBehaviour
             displayModeIndex = 0,
             resolutionIndex = -1,
             qualityIndex = 2,
-            masterVolume = 0.8f,
-            musicVolume = 0.8f,
-            sfxVolume = 0.8f,
+            masterVolume = 1f,
+            musicVolume = 1f,
+            sfxVolume = 1f,
             mouseSensitivity = 0.5f,
             micSensitivity = 0.5f,
             invertYAxis = false,

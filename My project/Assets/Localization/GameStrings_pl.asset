@@ -833,6 +833,11 @@ MonoBehaviour:
     m_Localized: "Najpierw musz\u0119 zapali\u0107 zapalniczk\u0119."
     m_Metadata:
       m_Items: []
+  - m_Id: 35779292372533248
+    m_Localized: "Nie ma tu dr\u0105\u017Cka od imad\u0142a. Ostatnio widzia\u0142em
+      go przy klatce."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

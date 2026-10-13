@@ -829,6 +829,11 @@ MonoBehaviour:
     m_Localized: I should light the lighter first.
     m_Metadata:
       m_Items: []
+  - m_Id: 35779292372533248
+    m_Localized: The bar for the vise isn't here. Last time I saw it, it was by the
+      cage.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
