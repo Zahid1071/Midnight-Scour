@@ -186,7 +186,10 @@ public sealed class ViewmodelSway : MonoBehaviour
             return;
 
         // CharacterController velocity jitters frame to frame; smooth it so the bob doesn't flicker.
-        Vector3 rawLocal = body.transform.InverseTransformDirection(body.velocity);
+        // It also keeps the last move's value once nothing moves the body (cinematics), so blocked = standing.
+        Vector3 rawLocal = PlayerControlGate.IsInputBlocked
+            ? Vector3.zero
+            : body.transform.InverseTransformDirection(body.velocity);
         _moveVelocity = Vector3.Lerp(_moveVelocity, rawLocal, 1f - Mathf.Exp(-dt * 10f));
         Vector3 v = _moveVelocity;
 

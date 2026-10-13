@@ -10,19 +10,19 @@ using UnityEngine.Events;
 /// Cage room corpse scare (scripted):
 /// 1. The first padlock pin the player sets: a faint scratch from the body, quiet enough to doubt.
 /// 2. The player walks out of the open cage (this arms the door); a second faint sound follows a moment later.
-/// 3. The player opens the cage room door, then walks up to the next door: the body is gone, the lighter (and any
+/// 3. The player opens the cage room door (then, if set, walks up to the next door): the body is gone, the lighter (and any
 ///    lit candles near the body or the player) go out in a gust, the tool the player needs starts to glint, and running
 ///    footsteps tear away from where he lay, kicking a tin can halfway. The lighter then only sparks for a few
 ///    strikes before it catches again. When the steps end (or later, once something calls ShowWallStander) he's
 ///    standing, face to the wall, across the room.
 /// 4. The first time the lit lighter shows him (WallStanderSeenEvent), then a step closer: a sting and a quick dolly
 ///    zoom on him, then the shot hands back to the player's view as it tilts down onto the bar left behind him.
-/// 5. Taking the bar sets BarTaken (the corridor music goes silent on it).
+/// 5. Taking the bar sets BarTaken (the corridor music goes silent on it; WallStanderChase arms on it).
 /// </summary>
 [DisallowMultipleComponent]
 public class CorpseVanishEvent : MonoBehaviour
 {
-    public enum Stage { WaitingForPin, WaitingForExit, WaitingForDoor, WaitingForNextDoor, Done }
+    public enum Stage { WaitingForPin, WaitingForExit, WaitingForDoor, WaitingForNextDoor, WaitingForLightsOut, Done }
 
     const string CinematicLockReason = "corpse_wall_reveal";
 
@@ -161,7 +161,6 @@ public class CorpseVanishEvent : MonoBehaviour
     bool _wallSeen;
     float _wallSeenDistance;
     bool _barShown;
-    readonly List<Renderer> _hiddenViewmodel = new List<Renderer>();
 
     void Awake()
     {
@@ -301,7 +300,6 @@ public class CorpseVanishEvent : MonoBehaviour
         float halfTan = Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
 
         BeginCinematic();
-        HideViewmodel(cam);
         PoseWallZoomCamera(start, startRot, cam.fieldOfView);
         wallZoomCamera.Priority = wallZoomPriority;
 
@@ -319,7 +317,6 @@ public class CorpseVanishEvent : MonoBehaviour
 
         // The brain blends back to the player's view while that view is already tilting down onto the bar.
         wallZoomCamera.Priority = 0;
-        ShowViewmodel();
         if (mouseLook != null && barBehindHim != null && barBehindHim.activeInHierarchy)
         {
             Renderer barRenderer = barBehindHim.GetComponentInChildren<Renderer>();
@@ -365,27 +362,6 @@ public class CorpseVanishEvent : MonoBehaviour
         lensCam.Lens = lens;
     }
 
-    // Hands and lighter ride on the main camera; hidden for the dolly zoom (the wide lens would stretch them) but
-    // their lights stay on.
-    void HideViewmodel(Camera cam)
-    {
-        _hiddenViewmodel.Clear();
-        foreach (Renderer r in cam.GetComponentsInChildren<Renderer>())
-            if (r.enabled)
-            {
-                r.enabled = false;
-                _hiddenViewmodel.Add(r);
-            }
-    }
-
-    void ShowViewmodel()
-    {
-        foreach (Renderer r in _hiddenViewmodel)
-            if (r != null)
-                r.enabled = true;
-        _hiddenViewmodel.Clear();
-    }
-
     // The pin clue is optional for the exit: a player who somehow skips it can still trigger the door.
     void TickCageExit()
     {
@@ -425,7 +401,7 @@ public class CorpseVanishEvent : MonoBehaviour
                 _stage = Stage.WaitingForNextDoor;
             else
             {
-                _stage = Stage.Done;
+                _stage = Stage.WaitingForLightsOut;
                 StartCoroutine(LightsOutRoutine());
             }
         }
@@ -441,7 +417,7 @@ public class CorpseVanishEvent : MonoBehaviour
         offset.y = 0f;
         if (offset.magnitude > nextDoorDistance)
             return;
-        _stage = Stage.Done;
+        _stage = Stage.WaitingForLightsOut;
         StartCoroutine(LightsOutRoutine());
     }
 
@@ -460,7 +436,6 @@ public class CorpseVanishEvent : MonoBehaviour
 
         if (wallZoomCamera != null)
             wallZoomCamera.Priority = 0;
-        ShowViewmodel();
         GameplayHudVisibility.Instance?.ShowGameplayHud();
         PlayerControlGate.Release(CinematicLockReason);
     }
@@ -469,6 +444,7 @@ public class CorpseVanishEvent : MonoBehaviour
     {
         if (lightsOutDelay > 0f)
             yield return new WaitForSeconds(lightsOutDelay);
+        _stage = Stage.Done;
 
         Camera cam = Camera.main;
         if (blowOutClip != null && cam != null)

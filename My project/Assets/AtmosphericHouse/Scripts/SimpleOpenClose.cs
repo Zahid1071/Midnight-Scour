@@ -194,7 +194,18 @@ namespace FS_Atmo
         }
 
 
-        public bool Interact() => ObjectClicked(bypassLock: false);
+        /// <summary>Off = the player can open this but not close it (scripted sequences). AI and scripts still can.</summary>
+        public bool PlayerCanClose { get; set; } = true;
+
+        public bool Interact()
+        {
+            if (objectOpen && !PlayerCanClose)
+            {
+                InteractionFeedback.Fail(Loc.Get("gameplay.stuck"), 2f);
+                return false;
+            }
+            return ObjectClicked(bypassLock: false);
+        }
 
         public bool ObjectClicked() => ObjectClicked(bypassLock: false);
 

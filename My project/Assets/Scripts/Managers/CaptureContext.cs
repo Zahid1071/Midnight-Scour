@@ -112,6 +112,9 @@ public static class CaptureContinue
 
     public static void ClearSpawnCache() => _haveSpawn = false;
 
+    /// <summary>Raised at the end of <see cref="Apply"/>, for scripted threats outside the NPC system to reset.</summary>
+    public static event System.Action Applied;
+
     public static void Apply()
     {
         JumpscareManager.Instance?.EndJumpscare();
@@ -147,6 +150,7 @@ public static class CaptureContinue
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
         ReplayGameplayTimeline();
+        Applied?.Invoke();
     }
 
     static void HoldBasementGraceForContinueIntro()

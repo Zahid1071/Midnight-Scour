@@ -358,13 +358,7 @@ public class SoundManager : MonoBehaviour
     {
         if (!clip || threeDPool.Count == 0) return;
 
-        WorldSfxOcclusion.Result occlusion = WorldSfxOcclusion.Evaluate(
-            position,
-            occlusionLayers,
-            occludedVolumeMultiplier,
-            occludedLowpassCutoff,
-            clearLowpassCutoff,
-            ignoreOcclusionRoot);
+        WorldSfxOcclusion.Result occlusion = EvaluateOcclusion(position, ignoreOcclusionRoot);
 
         var src = threeDPool.Dequeue();
         var go = src.gameObject;
@@ -388,13 +382,7 @@ public class SoundManager : MonoBehaviour
     {
         if (!clip || follow == null || threeDPool.Count == 0) return;
 
-        WorldSfxOcclusion.Result occlusion = WorldSfxOcclusion.Evaluate(
-            follow.position,
-            occlusionLayers,
-            occludedVolumeMultiplier,
-            occludedLowpassCutoff,
-            clearLowpassCutoff,
-            follow);
+        WorldSfxOcclusion.Result occlusion = EvaluateOcclusion(follow.position, follow);
 
         var src = threeDPool.Dequeue();
         var go = src.gameObject;
@@ -416,6 +404,20 @@ public class SoundManager : MonoBehaviour
 
         if (!IsClipPlayingAt(clip, position))
             PlaySFXAt(clip, position, volume, pitch);
+    }
+
+    // SpatialAudioCues muffles every 3D source continuously (including these) while it's active.
+    WorldSfxOcclusion.Result EvaluateOcclusion(Vector3 position, Transform ignoreRoot)
+    {
+        if (SpatialAudioCues.Active)
+            return new WorldSfxOcclusion.Result { IsOccluded = false, VolumeMultiplier = 1f, LowpassCutoff = clearLowpassCutoff };
+        return WorldSfxOcclusion.Evaluate(
+            position,
+            occlusionLayers,
+            occludedVolumeMultiplier,
+            occludedLowpassCutoff,
+            clearLowpassCutoff,
+            ignoreRoot);
     }
 
     void ApplyOcclusionToSource(AudioSource src, WorldSfxOcclusion.Result occlusion, float reverbZoneMix)

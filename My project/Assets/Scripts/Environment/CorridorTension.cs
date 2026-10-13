@@ -6,11 +6,13 @@ using UnityEngine.Audio;
 /// - a low drone that swells while they force the lock, and drops to dead silence just before the steps come;
 /// - sparse creaks, drips and rattles somewhere behind them, never while the lock scenes play;
 /// - walking out through the door: the room lights flick on by themselves and the corridor falls quiet.
+/// Coming back for the bar: once the player is back in the cage room with the guy standing there, the drone and the
+/// sounds come back around them, until the bar is picked up (then dead silence).
 /// </summary>
 [DisallowMultipleComponent]
 public class CorridorTension : MonoBehaviour
 {
-    enum State { Waiting, Active, Done }
+    enum State { Waiting, Active, Left, Return, Done }
 
     [Tooltip("Starts when this event is done (the lights went out).")]
     [SerializeField] CorpseVanishEvent startAfter;
@@ -49,6 +51,15 @@ public class CorridorTension : MonoBehaviour
     [SerializeField] float exitMargin = 1f;
     [SerializeField] LightSwitch lightsOnExit;
 
+    [Header("Back in the cage room")]
+    [Tooltip("The cage room (world space): stepping back into it while the guy stands there brings the drone and the sounds back, kept inside this box.")]
+    [SerializeField] Bounds returnArea = new Bounds(new Vector3(10.4f, -2f, 9f), new Vector3(9f, 2.5f, 7f));
+    [SerializeField, Range(0f, 1f)] float returnDroneVolume = 0.3f;
+    [SerializeField] float returnFadeIn = 4f;
+    [SerializeField] float returnFirstDarkDelay = 2.5f;
+    [Tooltip("Seconds to cut to silence when the bar is picked up.")]
+    [SerializeField] float returnCutTime = 0.12f;
+
     State _state;
     AudioSource _drone;
     float _droneLevel;
@@ -56,6 +67,7 @@ public class CorridorTension : MonoBehaviour
     float _droneRampTime;
     bool _cut;
     float _nextDark;
+    float _fadeOutTime;
     Transform _player;
 
     void OnEnable()
@@ -90,11 +102,10 @@ public class CorridorTension : MonoBehaviour
     {
         if (_state == State.Done)
         {
-            FadeDrone(0f, droneFadeOut);
-            if (_drone != null && _droneLevel <= 0f)
+            FadeDrone(0f, _fadeOutTime);
+            if (_drone == null || _droneLevel <= 0f)
             {
-                Destroy(_drone.gameObject);
-                _drone = null;
+                StopDrone();
                 enabled = false;
             }
             return;
@@ -115,6 +126,36 @@ public class CorridorTension : MonoBehaviour
             _player = p.transform;
         }
 
+        if (_state == State.Left)
+        {
+            FadeDrone(0f, droneFadeOut);
+            if (_drone != null && _droneLevel <= 0f)
+                StopDrone();
+            if (startAfter == null)
+            {
+                _state = State.Done;
+                return;
+            }
+            if (startAfter.BarTaken)
+                return;
+            if (startAfter.WallStanderShown && returnArea.Contains(_player.position))
+                BeginReturn();
+            return;
+        }
+
+        if (_state == State.Return)
+        {
+            if (startAfter.BarTaken)
+            {
+                _state = State.Done;
+                _fadeOutTime = returnCutTime;
+                return;
+            }
+            TickDrone(returnDroneVolume);
+            TickDark(returnArea);
+            return;
+        }
+
         if (exitPlane != null
             && Vector3.Dot(_player.position - exitPlane.position, exitPlane.forward) > exitMargin)
         {
@@ -122,8 +163,8 @@ public class CorridorTension : MonoBehaviour
             return;
         }
 
-        TickDrone();
-        TickDark();
+        TickDrone(droneVolume);
+        TickDark(area);
     }
 
     void Begin()
@@ -132,6 +173,22 @@ public class CorridorTension : MonoBehaviour
         _droneScale = 0f;
         _droneRampTime = droneFadeIn;
         _nextDark = Time.time + firstDarkDelay;
+        StartDrone();
+    }
+
+    void BeginReturn()
+    {
+        _state = State.Return;
+        _cut = false;
+        _droneScale = 0f;
+        _droneRampTime = returnFadeIn;
+        _nextDark = Time.time + returnFirstDarkDelay;
+        if (_drone == null)
+            StartDrone();
+    }
+
+    void StartDrone()
+    {
         if (droneLoop == null)
             return;
         var go = new GameObject("Corridor Drone");
@@ -142,11 +199,20 @@ public class CorridorTension : MonoBehaviour
         _drone.playOnAwake = false;
         _drone.spatialBlend = 0f;
         _drone.volume = 0f;
+        _droneLevel = 0f;
         _drone.outputAudioMixerGroup = mixerGroup;
         _drone.Play();
     }
 
-    void TickDrone()
+    void StopDrone()
+    {
+        if (_drone != null)
+            Destroy(_drone.gameObject);
+        _drone = null;
+        _droneLevel = 0f;
+    }
+
+    void TickDrone(float baseVolume)
     {
         if (_drone == null)
             return;
@@ -158,7 +224,7 @@ public class CorridorTension : MonoBehaviour
             return;
         }
         _droneScale = Mathf.MoveTowards(_droneScale, 1f, Time.deltaTime / Mathf.Max(0.01f, _droneRampTime));
-        float target = Mathf.Lerp(droneVolume, droneLockVolume, bar) * _droneScale;
+        float target = Mathf.Lerp(baseVolume, droneLockVolume, bar) * _droneScale;
         _droneLevel = Mathf.MoveTowards(_droneLevel, target, Time.deltaTime * 0.25f);
         _drone.volume = _droneLevel;
         _drone.pitch = Mathf.MoveTowards(_drone.pitch, Mathf.Lerp(1f, droneLockPitch, bar), Time.deltaTime * 0.05f);
@@ -173,7 +239,7 @@ public class CorridorTension : MonoBehaviour
         _drone.volume = _droneLevel;
     }
 
-    void TickDark()
+    void TickDark(Bounds bounds)
     {
         if (darkSounds == null || darkSounds.Length == 0 || Time.time < _nextDark)
             return;
@@ -195,7 +261,7 @@ public class CorridorTension : MonoBehaviour
         Vector3 dir = Quaternion.Euler(0f, Random.Range(-70f, 70f), 0f) * back.normalized;
         Vector3 p = _player.position + dir * Random.Range(darkDistance.x, darkDistance.y);
         p.y = _player.position.y + Random.Range(0.2f, 2f);
-        p = area.ClosestPoint(p);
+        p = bounds.ClosestPoint(p);
 
         var go = new GameObject(clip.name + " (Corridor Dark)");
         go.transform.SetParent(transform, false);
@@ -215,7 +281,7 @@ public class CorridorTension : MonoBehaviour
 
     void Leave()
     {
-        _state = State.Done;
+        _state = State.Left;
         if (lightsOnExit != null && !lightsOnExit.IsOn)
             lightsOnExit.Interact();
     }
