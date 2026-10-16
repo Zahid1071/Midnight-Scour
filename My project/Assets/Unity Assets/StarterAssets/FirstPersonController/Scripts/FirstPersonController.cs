@@ -99,6 +99,11 @@ namespace StarterAssets
 		private bool _directionChangedThisFrame;
 		private const float InputMemorySeconds = 0.3f;
 
+		// control gate
+		private bool _wasInputBlocked;
+		private bool _resumeFromRest;
+		private const float ResumeMaxDeltaTime = 1f / 30f;
+
 		// timeout deltatime
 		private float _jumpTimeoutDelta;
 		private float _fallTimeoutDelta;
@@ -155,10 +160,43 @@ namespace StarterAssets
 		{
 
 			if (PlayerControlGate.IsInputBlocked)
-        		return;
+			{
+				_wasInputBlocked = true;
+				return;
+			}
+			if (_wasInputBlocked)
+			{
+				_wasInputBlocked = false;
+				ResumeAfterBlock();
+			}
 			JumpAndGravity();
 			GroundedCheck();
 			Move();
+		}
+
+		// Nothing called Move while the gate was held, so the controller's velocity and the cached move direction
+		// are still the ones from before it, and a cinematic may have turned the body since. Start again from
+		// standing, on the keys actually held now.
+		private void ResumeAfterBlock()
+		{
+			_speed = 0f;
+			_moveDirection = Vector3.zero;
+			_speedCap = 1f;
+			_directionChangeStreak = 0f;
+			_lastInputTime = -1f;
+			_resumeFromRest = true;
+
+#if ENABLE_INPUT_SYSTEM
+			if (_input == null || _playerInput == null || _playerInput.actions == null)
+				return;
+			InputAction move = _playerInput.actions.FindAction("Move");
+			if (move != null)
+				_input.move = move.enabled ? move.ReadValue<Vector2>() : Vector2.zero;
+			InputAction sprint = _playerInput.actions.FindAction("Sprint");
+			if (sprint != null)
+				_input.sprint = sprint.enabled && sprint.IsPressed();
+			_input.jump = false;
+#endif
 		}
 
 		private void LateUpdate()
@@ -223,8 +261,13 @@ namespace StarterAssets
 			// if there is no input, set the target speed to 0
 			if (_input.move == Vector2.zero) targetSpeed = 0.0f;
 
+			// The first frame back from the gate also carries whatever hitch ended it (the auto-save writes right as
+			// the wall reveal hands control back), so it doesn't get to cover the whole stalled frame in one step.
+			float dt = _resumeFromRest ? Mathf.Min(Time.deltaTime, ResumeMaxDeltaTime) : Time.deltaTime;
+
 			// a reference to the players current horizontal velocity
-			float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
+			float currentHorizontalSpeed = _resumeFromRest ? 0f : new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
+			_resumeFromRest = false;
 
 			float speedOffset = 0.1f;
 			float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
@@ -234,7 +277,7 @@ namespace StarterAssets
 			{
 				// creates curved result rather than a linear one giving a more organic speed change
 				// note T in Lerp is clamped, so we don't need to clamp our speed
-				_speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude, Time.deltaTime * SpeedChangeRate);
+				_speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude, dt * SpeedChangeRate);
 
 				// round speed to 3 decimal places
 				_speed = Mathf.Round(_speed * 1000f) / 1000f;
@@ -254,7 +297,7 @@ namespace StarterAssets
 				inputDirection = (transform.right * _input.move.x + transform.forward * _input.move.y).normalized;
 			if (DirectionResponsiveness > 0f && _input.move != Vector2.zero && _moveDirection != Vector3.zero)
 			{
-				Vector3 blended = Vector3.Lerp(_moveDirection, inputDirection, 1f - Mathf.Exp(-DirectionResponsiveness * Time.deltaTime));
+				Vector3 blended = Vector3.Lerp(_moveDirection, inputDirection, 1f - Mathf.Exp(-DirectionResponsiveness * dt));
 				_moveDirection = blended.sqrMagnitude > 0.01f ? blended.normalized : inputDirection;
 			}
 			else
@@ -263,12 +306,12 @@ namespace StarterAssets
 			}
 
 			// move the player
-			Vector3 horizontalMove = _moveDirection * (_speed * Time.deltaTime);
+			Vector3 horizontalMove = _moveDirection * (_speed * dt);
 			Vector3 positionBeforeMove = transform.position;
 
-			_controller.Move(horizontalMove + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+			_controller.Move(horizontalMove + new Vector3(0.0f, _verticalVelocity, 0.0f) * dt);
 
-			ClampSuddenPush(positionBeforeMove, horizontalMove);
+			ClampSuddenPush(positionBeforeMove, horizontalMove, dt);
 		}
 
 		// Full sprint straight ahead; any left/right key held costs a flat amount, straight back costs more.
@@ -320,13 +363,13 @@ namespace StarterAssets
 		// Here we let the push happen (so the player still gets physically ejected, and never gets
 		// stuck overlapping geometry), but clamp how far it's allowed to move us in one frame so it
 		// never exceeds a sane speed.
-		private void ClampSuddenPush(Vector3 positionBeforeMove, Vector3 intendedHorizontalMove)
+		private void ClampSuddenPush(Vector3 positionBeforeMove, Vector3 intendedHorizontalMove, float dt)
 		{
 			Vector3 actualDelta = transform.position - positionBeforeMove;
 			Vector3 actualHorizontal = new Vector3(actualDelta.x, 0.0f, actualDelta.z);
 
-			float maxHorizontal = intendedHorizontalMove.magnitude + MaxExternalPushSpeed * Time.deltaTime;
-			float maxVertical = Mathf.Abs(_verticalVelocity) * Time.deltaTime + MaxExternalPushSpeed * Time.deltaTime;
+			float maxHorizontal = intendedHorizontalMove.magnitude + MaxExternalPushSpeed * dt;
+			float maxVertical = Mathf.Abs(_verticalVelocity) * dt + MaxExternalPushSpeed * dt;
 
 			Vector3 clamped = actualDelta;
 

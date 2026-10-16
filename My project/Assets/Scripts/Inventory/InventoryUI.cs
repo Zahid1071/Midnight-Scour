@@ -310,6 +310,8 @@ public class InventoryUI : MonoBehaviour
             PlayerInteractor.Instance?.TryInteract();
     }
 
+    public int SelectedIndex => selectedIndex;
+
     public void SelectSlot(int index)
     {
         selectedIndex = index;

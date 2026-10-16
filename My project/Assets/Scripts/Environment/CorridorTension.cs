@@ -70,6 +70,17 @@ public class CorridorTension : MonoBehaviour
     float _fadeOutTime;
     Transform _player;
 
+    /// <summary>The player has walked out through the far door at least once.</summary>
+    public bool HasLeftCorridor => _state == State.Left || _state == State.Return || _state == State.Done;
+
+    /// <summary>Checkpoint load: the corridor was already left; back in the cage room with him there, it returns.</summary>
+    public void RestoreLeft()
+    {
+        StopDrone();
+        _cut = false;
+        _state = State.Left;
+    }
+
     void OnEnable()
     {
         if (doorScare != null)

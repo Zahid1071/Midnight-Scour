@@ -56,6 +56,21 @@ public class TensionMusicCues : MonoBehaviour
     float _doorTime;
     Transform _player;
 
+    public bool ReturnMusicPlaying => _returnState == Cue.Playing;
+
+    /// <summary>Checkpoint load: the walk back for the bar had already started its music.</summary>
+    public void RestoreReturnMusic()
+    {
+        if (_returnState != Cue.Waiting || returnMusic == null || wallStanderEvent == null || wallStanderEvent.BarTaken)
+            return;
+        GameObject p = GameObject.FindWithTag("Player");
+        if (p == null)
+            return;
+        _player = p.transform;
+        _returnState = Cue.Playing;
+        _return = CreateSource("Return Music", returnMusic);
+    }
+
     void OnEnable()
     {
         if (doorScare != null)

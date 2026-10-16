@@ -535,21 +535,22 @@ MonoBehaviour:
 
     ENVIRONMENT
 
-    Textures: Poly Haven (polyhaven.com)
+    Textures:
+    Poly Haven (polyhaven.com)
 
-    Environment
-    pack: Finward Studios
+    Environment pack: Finward Studios
 
-    Character: ZectorLab
+    Character:
+    ZectorLab
 
 
     TOOLS
 
-    Kino Glitch
-    / Noise Shader - Keijiro Takahashi (MIT)
+    Kino Glitch / Noise Shader - Keijiro Takahashi (MIT)
 
 
-    Thank you for playing!'
+    Thank
+    you for playing!'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fca6355ee4a564c4ca900e2eeb4a9ad6, type: 2}
   m_sharedMaterial: {fileID: 1517768226830932575, guid: fca6355ee4a564c4ca900e2eeb4a9ad6, type: 2}
@@ -674,7 +675,9 @@ MonoBehaviour:
   settingsPanel: {fileID: 4964380222593726888}
   settingsMenu: {fileID: 3134859446041087628}
   creditsPanel: {fileID: 7244247626408767064}
+  continueButton: {fileID: 9017255887138716110}
   gameSceneName: Main Scene
+  checkpointSceneName: Main Scene
 --- !u!1 &6231795670802862541
 GameObject:
   m_ObjectHideFlags: 0
@@ -1762,7 +1765,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2445310951551854071, guid: 4602c755b9f9b8a4fb2045a0eb9e23e6, type: 3}
       propertyPath: m_fontSize
-      value: 25
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 2445310951551854071, guid: 4602c755b9f9b8a4fb2045a0eb9e23e6, type: 3}
       propertyPath: m_fontAsset
@@ -1774,7 +1777,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2445310951551854071, guid: 4602c755b9f9b8a4fb2045a0eb9e23e6, type: 3}
       propertyPath: m_fontSizeBase
-      value: 25
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 2445310951551854071, guid: 4602c755b9f9b8a4fb2045a0eb9e23e6, type: 3}
       propertyPath: m_sharedMaterial
@@ -1806,7 +1809,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7348778625021604567, guid: 4602c755b9f9b8a4fb2045a0eb9e23e6, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7348778625021604567, guid: 4602c755b9f9b8a4fb2045a0eb9e23e6, type: 3}
       propertyPath: m_AnchorMin.x
@@ -1814,15 +1817,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7348778625021604567, guid: 4602c755b9f9b8a4fb2045a0eb9e23e6, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7348778625021604567, guid: 4602c755b9f9b8a4fb2045a0eb9e23e6, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 150
+      value: 800
       objectReference: {fileID: 0}
     - target: {fileID: 7348778625021604567, guid: 4602c755b9f9b8a4fb2045a0eb9e23e6, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 25
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 7348778625021604567, guid: 4602c755b9f9b8a4fb2045a0eb9e23e6, type: 3}
       propertyPath: m_LocalScale.x
@@ -1866,11 +1869,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7348778625021604567, guid: 4602c755b9f9b8a4fb2045a0eb9e23e6, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -483
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7348778625021604567, guid: 4602c755b9f9b8a4fb2045a0eb9e23e6, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -12.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7348778625021604567, guid: 4602c755b9f9b8a4fb2045a0eb9e23e6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1985,17 +1988,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7348778625021604567, guid: 4602c755b9f9b8a4fb2045a0eb9e23e6, type: 3}
   m_PrefabInstance: {fileID: 5271329343568471735}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &3793014782408639864 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9044627467334591439, guid: 4602c755b9f9b8a4fb2045a0eb9e23e6, type: 3}
-  m_PrefabInstance: {fileID: 5271329343568471735}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &3949152911311408846 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 9217095739993712761, guid: 4602c755b9f9b8a4fb2045a0eb9e23e6, type: 3}
@@ -2015,6 +2007,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   entryKey: ui.menu.continue
   formatArgs: []
+--- !u!1 &9017255887138716110 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3748187240687083385, guid: 4602c755b9f9b8a4fb2045a0eb9e23e6, type: 3}
+  m_PrefabInstance: {fileID: 5271329343568471735}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5934736726630361550
 PrefabInstance:
   m_ObjectHideFlags: 0

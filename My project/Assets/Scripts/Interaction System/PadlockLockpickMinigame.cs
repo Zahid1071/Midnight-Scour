@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using TMPro;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.Events;
@@ -107,6 +108,23 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
     [Tooltip("Cylinder must be this far into the bind (0-1) to set a pin — like real tension.")]
     [SerializeField, Range(0f, 1f)] float minTensionToSetPin = 0.55f;
 
+    [Header("Level digit (3D, above the padlock)")]
+    [Tooltip("3D text that shows the stage the pick is at (1-4) while picking. Hidden outside the minigame.")]
+    [SerializeField] TMP_Text levelText;
+    [SerializeField] bool showLevelText = true;
+    [SerializeField] Color levelTextColor = new Color(1f, 0.85f, 0.2f, 1f);
+    [Tooltip("Colour of a stage whose pin is already set.")]
+    [SerializeField] Color levelFoundColor = new Color(0.35f, 1f, 0.4f, 1f);
+    [Tooltip("Extra scale the digit pops to when the pick moves to another stage.")]
+    [SerializeField] float levelTextPunch = 0.3f;
+    [Tooltip("Peak extra scale of the elastic bounce when a pin is set.")]
+    [SerializeField] float levelTextSuccessPunch = 0.6f;
+    [SerializeField] float levelTextSuccessDuration = 0.5f;
+    [Tooltip("Metres the digit shakes side to side when the wrong pin is pushed.")]
+    [SerializeField] float levelTextShakeDistance = 0.006f;
+    [SerializeField] float levelTextShakeDuration = 0.35f;
+    [SerializeField] float levelTextShakeFrequency = 55f;
+
     [Header("Progress UI (screwdriver-style). Leave empty to auto-create.")]
     [SerializeField] GameObject progressPanel;
     [SerializeField] Slider progressSlider;
@@ -207,8 +225,16 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
 
     bool _ownsProgressUi;
     UIFadeHelper _progressFade;
-    bool _showedPressureGuide;
-    bool _showedFindPinsGuide;
+    enum Guide { None, Pressure, FindPins }
+    Guide _guide;
+    /// <summary>Guide stays off until this (unscaled) time so pin feedback lines can be read.</summary>
+    float _guideResumeTime;
+
+    float _levelTextPop;
+    float _levelTextBounceLeft;
+    float _levelTextShakeLeft;
+    Vector3 _levelTextBaseScale = Vector3.one;
+    Vector3 _levelTextBasePosition;
 
     public Stage CurrentStage => _stage;
     public bool IsRunning => _stage == Stage.Playing || _stage == Stage.Presenting;
@@ -241,6 +267,13 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
             progressSlider.interactable = false;
 
         SetProgressVisible(false);
+
+        if (levelText != null)
+        {
+            _levelTextBaseScale = levelText.transform.localScale;
+            _levelTextBasePosition = levelText.transform.localPosition;
+            levelText.gameObject.SetActive(false);
+        }
     }
 
     /// <summary>Called by ContinuePadlockSpawner after Instantiate.</summary>
@@ -270,6 +303,11 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
             ForceAbortCleanup(snapPose: true);
         else
             TeardownOwnedProgressUi();
+    }
+
+    void LateUpdate()
+    {
+        UpdateLevelText();
     }
 
     void Update()
@@ -402,8 +440,8 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
         _visualStageDepth01 = GetSnappedStageDepth01();
         _pinsComplete = false;
         _tensionWasHeld = false;
-        _showedPressureGuide = false;
-        _showedFindPinsGuide = false;
+        _guide = Guide.None;
+        _guideResumeTime = 0f;
         ResetPins();
         RefreshPinSlotFromTravel();
 
@@ -433,10 +471,7 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 
-        ShowLockpickGuide(
-            LocOrFallback("gameplay.lockpick_guide_pressure", "Hold right mouse click to apply pressure"),
-            10f);
-        _showedPressureGuide = true;
+        ShowGuide(Guide.Pressure);
         return true;
     }
 
@@ -485,7 +520,7 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
             ResetPinsAfterTensionLost();
         _tensionWasHeld = tensionHeld;
 
-        TryShowFindPinsGuide();
+        TickGuide(tensionHeld);
 
         if (_pickLift01 <= liftReleaseBeforeNextPin)
             _liftArmedForNextPin = true;
@@ -524,6 +559,75 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
         if (slot < 0)
             slot = 0;
         _pinSlot = slot;
+    }
+
+    bool IsSlotFound(int slot)
+    {
+        if (_pinsComplete)
+            return true;
+        if (_depthOrder == null || _pinSet == null || slot < 0 || slot >= _depthOrder.Length)
+            return false;
+        int pin = _depthOrder[slot];
+        return pin >= 0 && pin < _pinSet.Length && _pinSet[pin];
+    }
+
+    void UpdateLevelText()
+    {
+        bool visible = showLevelText && _stage == Stage.Playing && pins != null && pins.Length > 0;
+        if (levelText == null)
+            return;
+
+        if (!visible)
+        {
+            if (levelText.gameObject.activeSelf)
+            {
+                levelText.gameObject.SetActive(false);
+                levelText.transform.localScale = _levelTextBaseScale;
+                levelText.transform.localPosition = _levelTextBasePosition;
+            }
+            return;
+        }
+
+        if (!levelText.gameObject.activeSelf)
+        {
+            levelText.gameObject.SetActive(true);
+            _levelTextPop = 0f;
+            _levelTextBounceLeft = 0f;
+            _levelTextShakeLeft = 0f;
+        }
+
+        string digit = (_pinSlot + 1).ToString();
+        if (levelText.text != digit)
+        {
+            levelText.text = digit;
+            _levelTextPop = 1f;
+        }
+        levelText.color = IsSlotFound(_pinSlot) ? levelFoundColor : levelTextColor;
+
+        float dt = Time.unscaledDeltaTime;
+        _levelTextPop = Mathf.MoveTowards(_levelTextPop, 0f, dt * 6f);
+        float pop = 1f + levelTextPunch * _levelTextPop * _levelTextPop;
+
+        if (_levelTextBounceLeft > 0f)
+        {
+            _levelTextBounceLeft = Mathf.Max(0f, _levelTextBounceLeft - dt);
+            float p = 1f - _levelTextBounceLeft / Mathf.Max(0.01f, levelTextSuccessDuration);
+            pop += levelTextSuccessPunch * Mathf.Sin(p * Mathf.PI * 2.5f) * (1f - p);
+        }
+        levelText.transform.localScale = _levelTextBaseScale * pop;
+
+        Vector3 position = _levelTextBasePosition;
+        if (_levelTextShakeLeft > 0f)
+        {
+            _levelTextShakeLeft = Mathf.Max(0f, _levelTextShakeLeft - dt);
+            float fade = _levelTextShakeLeft / Mathf.Max(0.01f, levelTextShakeDuration);
+            float elapsed = levelTextShakeDuration - _levelTextShakeLeft;
+            float offset = Mathf.Sin(elapsed * levelTextShakeFrequency) * levelTextShakeDistance * fade;
+            Transform t = levelText.transform;
+            Vector3 side = t.parent != null ? t.parent.InverseTransformVector(t.right * offset) : t.right * offset;
+            position += side;
+        }
+        levelText.transform.localPosition = position;
     }
 
     void PlayWrongPinSfx()
@@ -703,10 +807,12 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
         if (_depthOrder[_pinSlot] != binder)
         {
             PlayWrongPinSfx();
+            _levelTextShakeLeft = levelTextShakeDuration;
             return;
         }
 
         _pinSet[binder] = true;
+        _levelTextBounceLeft = levelTextSuccessDuration;
         _bindingOrderIndex++;
         _liftArmedForNextPin = false;
 
@@ -716,45 +822,59 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
         RefreshProgressUi();
         PinSet?.Invoke(this);
 
+        float feedbackSeconds;
         if (AllPinsSet())
         {
             _pinsComplete = true;
+            feedbackSeconds = 2.5f;
             HudManager.Instance?.ShowSubtitle(
                 LocOrFallback("gameplay.lockpick_pins_set", "Unlocked key"),
-                2.5f,
+                feedbackSeconds,
                 HudManager.Instance != null ? HudManager.Instance.SuccessColor : Color.white);
         }
         else
         {
+            feedbackSeconds = 1.8f;
             HudManager.Instance?.ShowSubtitle(
                 LocOrFallback("gameplay.lockpick_pin_set", "Pin set"),
-                1.8f,
+                feedbackSeconds,
                 HudManager.Instance != null ? HudManager.Instance.SuccessColor : Color.white);
         }
+        _guide = Guide.None;
+        _guideResumeTime = Time.unscaledTime + feedbackSeconds;
     }
 
-    void TryShowFindPinsGuide()
+    // Keeps the hint for the current phase on screen: no tension → apply pressure, tension built → find pins.
+    // While tension is still building, or all pins are set and held, the current hint is left as is.
+    void TickGuide(bool tensionHeld)
     {
-        if (_showedFindPinsGuide || _pinsComplete)
+        if (Time.unscaledTime < _guideResumeTime)
             return;
 
-        if (GetBindTension01() < minTensionToSetPin)
+        Guide want = _guide;
+        if (!tensionHeld)
+            want = Guide.Pressure;
+        else if (!_pinsComplete && GetBindTension01() >= minTensionToSetPin)
+            want = Guide.FindPins;
+
+        ShowGuide(want);
+    }
+
+    void ShowGuide(Guide guide)
+    {
+        _guide = guide;
+        if (guide == Guide.None)
             return;
 
-        _showedFindPinsGuide = true;
-        ShowLockpickGuide(
-            LocOrFallback(
+        string message = guide == Guide.Pressure
+            ? LocOrFallback("gameplay.lockpick_guide_pressure", "Hold right mouse click to apply pressure")
+            : LocOrFallback(
                 "gameplay.lockpick_guide_find_pins",
-                "Use your mouse to move the lockpick and press left mouse button to pick pins"),
-            15f);
-    }
-
-    void ShowLockpickGuide(string message, float durationSeconds)
-    {
+                "Use your mouse to move the lockpick and press left mouse button to pick pins");
         Color yellow = HudManager.Instance != null
             ? HudManager.Instance.WarningColor
             : new Color(1f, 0.92f, 0.35f, 1f);
-        HudManager.Instance?.ShowSubtitle(message, durationSeconds, yellow);
+        HudManager.Instance?.ShowPersistentSubtitle(message, yellow);
     }
 
     float GetBindTension01()
@@ -1384,7 +1504,16 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
         onUnlocked?.Invoke();
     }
 
-    void ApplyUnlockRelease()
+    /// <summary>Checkpoint load: already picked. Opens silently and frees the door, no lockpick spent.</summary>
+    public void RestoreUnlocked()
+    {
+        if (!isLocked)
+            return;
+        isLocked = false;
+        ApplyUnlockRelease(silent: true);
+    }
+
+    void ApplyUnlockRelease(bool silent = false)
     {
         if (shackle != null)
         {
@@ -1408,7 +1537,7 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
             }
         }
 
-        if (chainFallSfx != null)
+        if (chainFallSfx != null && !silent)
             SoundManager.Instance?.PlaySFXAt(chainFallSfx, transform.position, sfxVolume);
 
         // Silent — padlock already showed unlock feedback.

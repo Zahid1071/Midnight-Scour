@@ -684,11 +684,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296733
-    m_Localized: Enfie a chave de fenda.
+    m_Localized: "Enfie a chave de fenda para for\xE7ar a fechadura."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296734
-    m_Localized: "Agite com for\xE7a para quebrar a tranca."
+    m_Localized: "Mexa at\xE9 a chave de fenda travar."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296735
@@ -804,7 +804,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 34365368158781440
-    m_Localized: Travou. Force, ou tira e enfia de novo para soltar.
+    m_Localized: "Encontre a dire\xE7\xE3o certa e depois puxe a chave de fenda para
+      esse lado at\xE9 a fechadura quebrar."
     m_Metadata:
       m_Items: []
   - m_Id: 34392063293128704
@@ -826,6 +827,31 @@ MonoBehaviour:
   - m_Id: 35779292372533248
     m_Localized: "A barra da morsa n\xE3o est\xE1 aqui. Da \xFAltima vez que a vi,
       estava perto da jaula."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35880272732749824
+    m_Localized: Preciso me esconder.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656387112960
+    m_Localized: Acenda as velas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656521330688
+    m_Localized: "Voc\xEA pode usar o isqueiro para acender as velas ao redor."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656521330689
+    m_Localized: OK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069135712256
+    m_Localized: "Fique em sil\xEAncio"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069202821120
+    m_Localized: "Em algumas \xE1reas, voc\xEA precisa tomar cuidado com o barulho
+      que faz, sen\xE3o eles podem te ouvir."
     m_Metadata:
       m_Items: []
   references:

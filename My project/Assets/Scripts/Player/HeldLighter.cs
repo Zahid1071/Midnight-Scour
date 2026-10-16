@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -102,6 +103,9 @@ public sealed class HeldLighter : MonoBehaviour
     [SerializeField] private float firstStrikeVoiceDelay = 0.6f;
     [SerializeField] private string firstStrikeSubtitleKey = "player.voice.get_out";
 
+    /// <summary>The player struck a lighter alight (not raised from a burning pickup).</summary>
+    public static event Action Struck;
+
     public bool IsLit { get; private set; }
     public bool IsLidOpen { get; private set; } = true;
 
@@ -114,6 +118,7 @@ public sealed class HeldLighter : MonoBehaviour
     private bool _drawLitNext;
     private bool _litDraw;
     private bool _litDrawHandedOff;
+    private bool _strikeAfterDraw;
     private float _lastDrawTime = -1f;
     private bool _firstStrikeVoicePlayed;
     private int _misfires;
@@ -148,8 +153,21 @@ public sealed class HeldLighter : MonoBehaviour
     /// </summary>
     public void DrawLitNextTime() => _drawLitNext = true;
 
+    /// <summary>
+    /// Strikes on its own once the current draw has opened the lid (relighting after a sprint put it away lit).
+    /// Call after the view's Draw().
+    /// </summary>
+    public void StrikeAfterDraw() => _strikeAfterDraw = true;
+
     /// <summary>The next <paramref name="count"/> strikes only spark; the one after catches.</summary>
     public void MisfireNextStrikes(int count) => _misfires = Mathf.Max(0, count);
+
+    public int PendingMisfires => _misfires;
+
+    /// <summary>The first-light voice line has played.</summary>
+    public bool HasStruckBefore => _firstStrikeVoicePlayed;
+
+    public void MarkStruckBefore() => _firstStrikeVoicePlayed = true;
 
     private void OnEnable()
     {
@@ -169,6 +187,7 @@ public sealed class HeldLighter : MonoBehaviour
     {
         _closing = false;
         _litDraw = false;
+        _strikeAfterDraw = false;
         Extinguish();
     }
 
@@ -192,10 +211,12 @@ public sealed class HeldLighter : MonoBehaviour
         if (_view.IsHolstering)
         {
             _litDraw = false;
+            _strikeAfterDraw = false;
             return;
         }
 
         TickLitDraw();
+        TickStrikeAfterDraw();
         if (_litDraw || Mouse.current == null || Cursor.lockState != CursorLockMode.Locked)
             return;
         // Left-click while G is held places the lighter (InventoryUI); don't strike or open the lid too.
@@ -264,6 +285,21 @@ public sealed class HeldLighter : MonoBehaviour
             _litDraw = false;
     }
 
+    private void TickStrikeAfterDraw()
+    {
+        if (!_strikeAfterDraw || _litDraw)
+            return;
+        if (IsLit || _striking || !IsLidOpen || _misfires > 0)
+        {
+            _strikeAfterDraw = false;
+            return;
+        }
+        if (!InState(idleState))
+            return;
+        _strikeAfterDraw = false;
+        Strike();
+    }
+
     public void OpenLid()
     {
         IsLidOpen = true;
@@ -297,7 +333,10 @@ public sealed class HeldLighter : MonoBehaviour
         if (flame != null)
             flame.SetActive(true);
         if (!_litDraw)
+        {
             PlayFirstStrikeVoice();
+            Struck?.Invoke();
+        }
     }
 
     // Runs on the SoundManager so holstering or putting the flame out doesn't cut the line off.

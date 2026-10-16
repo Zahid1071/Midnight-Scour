@@ -815,6 +815,30 @@ MonoBehaviour:
     m_Key: letter.vise_bar
     m_Metadata:
       m_Items: []
+  - m_Id: 35880272732749824
+    m_Key: gameplay.gotta_hide
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656387112960
+    m_Key: tutorial.candles.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656521330688
+    m_Key: tutorial.candles.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656521330689
+    m_Key: tutorial.ok
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069135712256
+    m_Key: tutorial.mic.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069202821120
+    m_Key: tutorial.mic.body
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

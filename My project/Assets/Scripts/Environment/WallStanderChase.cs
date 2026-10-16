@@ -4,21 +4,29 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Audio;
+using UnityEngine.Serialization;
 
 /// <summary>
 /// The guy at the wall, once the bar behind him is taken: the moment the player turns their back on him and faces the
 /// way out, the lighter dies and he turns and screams. A second after the scream ends (at once if they look back at him)
-/// he comes after them with the Butcher's run, faster than the player walks but slower than they sprint. The cage room door can't be closed behind them. Shutting the corridor door with him on the
-/// other side ends it: he pounds on it and is gone for good. If he reaches the doorway before it's shut he shoves it back
-/// open and comes on faster than they can sprint. Reaching them plays the Butcher's capture (axe swing,
-/// headbutt, bite) through the jumpscare camera and the normal game over. Continue puts him back at the wall, waiting
-/// again once the player is out of the cage.
+/// he comes after them with the Butcher's run, faster than the player walks but slower than they sprint. The cage room door can't be closed behind them. If he reaches the
+/// corridor doorway before it's shut he shoves it back open and comes on faster than they can sprint.
+/// Shutting it with him on the other side: he pounds on it while a shot shows the player where to hide, and keeps
+/// pounding until they've hidden (or run out of time), then breaks in. Hidden, they're safe: he runs in, checks the
+/// hiding spots (theirs last) without finding them, and goes back to his wall, closing the doors behind him through
+/// the Butcher's door-aware Navigator. Out in the open, or leaving their spot in his sight, he runs them down.
+/// Reaching them plays the Butcher's capture (axe swing, headbutt, bite) through the jumpscare camera and the normal
+/// game over. Continue puts him back at the wall, waiting again once the player is out of the cage.
+/// Coming back for the bar: once he's placed (the note was read), stepping into the corridor through the escape door
+/// brings up the hiding spot's mic bar. It only shows until the reveal on him is over and the bar is taken; after
+/// that, a loud noise sets him off just like turning away with the bar. Once he's after them it goes away as they
+/// reach the escape door.
 /// </summary>
 [DisallowMultipleComponent]
 [RequireComponent(typeof(NavMeshAgent))]
 public class WallStanderChase : MonoBehaviour
 {
-    enum State { Waiting, Roaring, Chasing, Captured, Gone }
+    enum State { Waiting, Roaring, Chasing, Captured, Pounding, Searching, Returning, Gone }
 
     [SerializeField] CorpseVanishEvent wallStanderEvent;
     [SerializeField] Animator animator;
@@ -106,6 +114,8 @@ public class WallStanderChase : MonoBehaviour
     [SerializeField] Vector2 bangGap = new Vector2(0.9f, 1.5f);
     [Tooltip("Longest wait for the door to finish swinging shut before the first pound.")]
     [SerializeField] float maxDoorCloseWait = 1.2f;
+    [Tooltip("Getting this close (m, beyond his radius) to the escape door before it's shut gets him through; the closing door's obstacle keeps him from touching it.")]
+    [SerializeField] float breachReach = 0.35f;
     [Tooltip("Metres per second once he's through the escape door before it shut; faster than the player sprints (4).")]
     [SerializeField] float breachSpeed = 5.5f;
     [SerializeField] float breachAcceleration = 20f;
@@ -116,6 +126,31 @@ public class WallStanderChase : MonoBehaviour
     [SerializeField] float bangShakeDuration = 0.35f;
     [Tooltip("No shake from this far away.")]
     [SerializeField] float bangShakeMaxDistance = 15f;
+
+    [Header("Shut out: hide, he breaks in and searches")]
+    [Tooltip("Shows the player where to hide as the pounding starts.")]
+    [SerializeField] HideOptionsShot hideShot;
+    [Tooltip("Seconds after the shot before he breaks in, if the player hasn't hidden.")]
+    [SerializeField] float hideTime = 10f;
+    [Tooltip("Seconds after the player hides before he breaks in.")]
+    [SerializeField] float breakInAfterHidden = 2.5f;
+    [SerializeField] float breakInShakeDegrees = 1.6f;
+    [Tooltip("Seconds he stands in the doorway after breaking in.")]
+    [SerializeField] float doorwayPause = 0.8f;
+    [Tooltip("Hiding spots he checks, the player's last. He never finds them there.")]
+    [SerializeField] HidingSpot[] searchSpots;
+    [SerializeField] float searchWait = 2.5f;
+    [Tooltip("Seconds he lingers at the player's spot.")]
+    [SerializeField] float searchWaitAtPlayer = 4f;
+    [Tooltip("Leaving their spot in his sight within this distance brings him after them.")]
+    [SerializeField] float spotDistance = 12f;
+    [Tooltip("Metres per second while he searches and heads home. The Butcher's blend tree walks at 2.5 and runs from 3.")]
+    [FormerlySerializedAs("walkSpeed")]
+    [SerializeField] float searchSpeed = 3.6f;
+    [Tooltip("Base layer state with the Butcher's idle / walk / jog blend tree, driven by Speed Parameter.")]
+    [SerializeField] string locomotionState = "Base Blend";
+    [SerializeField] string speedParameter = "Speed";
+    [SerializeField] float walkBlend = 0.3f;
 
     [Header("Capture")]
     [Tooltip("Flat distance to the player at which he catches them.")]
@@ -128,7 +163,24 @@ public class WallStanderChase : MonoBehaviour
     [Tooltip("Seconds between pulling the player out of a hiding spot and the capture.")]
     [SerializeField] float hideExitSecondsBeforeCapture = 1.5f;
 
+    [Header("Mic bar on the way back for the bar")]
+    [Tooltip("Half the corridor's width at the escape door, so walking past the doorway outside doesn't count.")]
+    [SerializeField] float corridorHalfWidth = 1.5f;
+    [Tooltip("Once he's after them, the bar goes away when the player is this close (m, flat) to the escape door.")]
+    [SerializeField] float micRemoveDistance = 1f;
+    [Tooltip("Tutorial card shown once, this many seconds after the bar first comes up.")]
+    [SerializeField] float micTutorialDelay = 0.75f;
+    [SerializeField] string micTutorialId = "Microphone";
+    [SerializeField] string micTutorialTitleKey = "tutorial.mic.title";
+    [SerializeField] string micTutorialBodyKey = "tutorial.mic.body";
+    [Tooltip("Loops on the card. Empty = the mic icon.")]
+    [SerializeField] UnityEngine.Video.VideoClip micTutorialVideo;
+
+    enum Mic { Off, Shown, Done }
+
     State _state;
+    Mic _mic;
+    HidingStamina _stamina;
     bool _needsCageExit;
     NavMeshAgent _agent;
     Transform _player;
@@ -158,6 +210,15 @@ public class WallStanderChase : MonoBehaviour
     Coroutine _shake;
     CinemachineCamera _shakeCam;
     float _shakeBaseDutch;
+    Navigator _nav;
+    DoorController _escapeDoorAI;
+    Coroutine _hideShotRoutine;
+    bool _hideShotDone;
+    int _speedId;
+    bool _hasSpeed;
+    float _animSpeed;
+    string _locomotion;
+    readonly System.Collections.Generic.List<Renderer> _hiddenRenderers = new System.Collections.Generic.List<Renderer>();
 
     public bool IsChasing => _state == State.Chasing;
 
@@ -166,6 +227,11 @@ public class WallStanderChase : MonoBehaviour
         _agent = GetComponent<NavMeshAgent>();
         _agent.enabled = false;
         _baseAcceleration = _agent.acceleration;
+        _nav = GetComponent<Navigator>();
+        if (_nav == null)
+            _nav = null;
+        _escapeDoorAI = escapeDoor != null ? escapeDoor.GetComponentInParent<DoorController>() : null;
+        _speedId = Animator.StringToHash(speedParameter);
         if (captureLight != null)
             captureLight.enabled = false;
         if (animator == null)
@@ -176,17 +242,31 @@ public class WallStanderChase : MonoBehaviour
         _runSpeedId = Animator.StringToHash(runSpeedParameter);
         if (animator != null)
             foreach (AnimatorControllerParameter p in animator.parameters)
+            {
                 _hasRunSpeed |= p.nameHash == _runSpeedId && p.type == AnimatorControllerParameterType.Float;
+                _hasSpeed |= p.nameHash == _speedId && p.type == AnimatorControllerParameterType.Float;
+            }
     }
 
-    void OnEnable() => CaptureContinue.Applied += ResetToWall;
+    void OnEnable()
+    {
+        CaptureContinue.Applied += ResetToWall;
+        if (_stamina != null)
+            _stamina.NoiseAlert += OnNoise;
+    }
 
     void OnDisable()
     {
         CaptureContinue.Applied -= ResetToWall;
+        if (_stamina != null)
+        {
+            _stamina.NoiseAlert -= OnNoise;
+            _stamina.SetOpenListening(false);
+        }
         ReleaseEffects();
         StopMusic();
         StopShake();
+        StopHideShot();
     }
 
     void Update()
@@ -200,13 +280,16 @@ public class WallStanderChase : MonoBehaviour
         }
 
         if (noCloseDoor != null && noCloseDoor.PlayerCanClose && _state != State.Gone
-            && wallStanderEvent != null && wallStanderEvent.BarTaken)
+            && (_state != State.Waiting || (wallStanderEvent != null && wallStanderEvent.BarTaken)))
             noCloseDoor.PlayerCanClose = false;
 
+        TickMic();
         if (_state == State.Waiting)
             TickTrigger();
         else if (_state == State.Chasing)
             TickChase();
+        else if (_state == State.Searching || _state == State.Returning)
+            TickSearch();
         TickMusic();
         TickEffects();
     }
@@ -240,6 +323,55 @@ public class WallStanderChase : MonoBehaviour
             return;
         if (Vector3.Angle(view, Flat(exitPoint.position - cam.transform.position)) > facingExitAngle
             || Vector3.Angle(view, Flat(transform.position - cam.transform.position)) < awayFromHimAngle)
+            return;
+        _routine = StartCoroutine(RoarRoutine());
+    }
+
+    void TickMic()
+    {
+        if (_mic == Mic.Done || wallStanderEvent == null || escapeSide == null)
+            return;
+        if (_stamina == null)
+        {
+            _stamina = FindFirstObjectByType<HidingStamina>();
+            if (_stamina == null)
+                return;
+            _stamina.NoiseAlert += OnNoise;
+        }
+
+        if (_mic == Mic.Off)
+        {
+            // A checkpoint picks up after the reveal, already past the corridor.
+            if (!wallStanderEvent.WallStanderShown || (!InCorridor() && !wallStanderEvent.WallRevealPlayed))
+                return;
+            _mic = Mic.Shown;
+            _stamina.SetOpenListening(true);
+            TutorialPopupUI.ShowOnce(micTutorialId, micTutorialTitleKey, micTutorialBodyKey,
+                micTutorialVideo, _stamina.MicrophoneIcon, micTutorialDelay);
+        }
+
+        bool after = _state != State.Waiting && _state != State.Captured;
+        if (_state == State.Pounding || _state == State.Gone
+            || (after && Flat(_player.position - escapeSide.position).magnitude <= micRemoveDistance))
+        {
+            _mic = Mic.Done;
+            _stamina.SetOpenListening(false);
+        }
+    }
+
+    bool InCorridor()
+    {
+        Vector3 offset = _player.position - escapeSide.position;
+        return Vector3.Dot(offset, escapeSide.forward) < 0f
+               && Mathf.Abs(Vector3.Dot(offset, escapeSide.right)) <= corridorHalfWidth;
+    }
+
+    // Loud on the mic once the reveal on him is over and the bar is in hand: he hears them and comes.
+    void OnNoise()
+    {
+        if (_mic != Mic.Shown || _state != State.Waiting || !wallStanderEvent.WallRevealOver || !wallStanderEvent.BarTaken
+            || PlayerControlGate.IsInputBlocked || ThunderManager.ArePlayerNoisesMasked
+            || _player == null || Cage.IsPlayerInsideAnyCage(_player))
             return;
         _routine = StartCoroutine(RoarRoutine());
     }
@@ -379,10 +511,10 @@ public class WallStanderChase : MonoBehaviour
         float rate = effectSmoothing;
         if (_state == State.Captured)
             target = 1f;
-        else if ((_state == State.Roaring || _state == State.Chasing) && _player != null)
+        else if ((_state == State.Roaring || _state == State.Chasing || Searching) && _player != null)
             target = 1f - Mathf.InverseLerp(effectMinDistance, effectMaxDistance,
                 Vector3.Distance(transform.position, _player.position));
-        else if (_state == State.Gone)
+        else if (_state == State.Gone || _state == State.Pounding)
             rate = 1f / Mathf.Max(0.01f, effectFadeOut);
 
         _effectLevel = Mathf.MoveTowards(_effectLevel, target, rate * Time.deltaTime);
@@ -438,7 +570,7 @@ public class WallStanderChase : MonoBehaviour
 
         if (!_breached && escapeDoor != null && escapeSide != null && TickEscapeDoor())
         {
-            _routine = StartCoroutine(ShutOutRoutine());
+            _routine = StartCoroutine(PoundRoutine());
             return;
         }
 
@@ -482,7 +614,7 @@ public class WallStanderChase : MonoBehaviour
         }
 
         float his = SideOfEscape(transform.position);
-        if (his > -_agent.radius)
+        if (his > -_agent.radius - breachReach)
         {
             MakeItThrough(his);
             return false;
@@ -515,63 +647,356 @@ public class WallStanderChase : MonoBehaviour
         StartMusic();
         escapeDoor.PlayerCanClose = false;
         if (side < _agent.radius + 0.3f && !escapeDoor.objectOpen)
+        {
             escapeDoor.ForceOpenAfterUnlock();
+            if (_escapeDoorAI != null)
+                _escapeDoorAI.ForceOpenInstant();
+        }
     }
 
-    // The moment the door is shut he slams into it, then pounds on it a few more times, and that's the last of him.
-    IEnumerator ShutOutRoutine()
+    // The moment the door is shut he slams into it and keeps pounding while the shot shows the player where to hide.
+    // Once they've hidden (or had their chance) he breaks in.
+    IEnumerator PoundRoutine()
     {
-        _state = State.Gone;
+        _state = State.Pounding;
 
         // Behind the shut door, out of sight.
         if (_agent.isOnNavMesh)
             _agent.ResetPath();
         _agent.enabled = false;
-        foreach (Renderer r in GetComponentsInChildren<Renderer>())
-            r.enabled = false;
+        SetVisible(false);
         FadeOutMusic(musicCutOnFirstBang);
 
         Collider doorCollider = escapeDoor.GetComponentInChildren<Collider>();
         // On the player's face of the door: the door itself booms, it isn't heard through a wall.
         Vector3 bangPoint = (doorCollider != null ? doorCollider.bounds.center : escapeDoor.transform.position)
                             + escapeSide.forward * 0.15f;
-        if (bangClips != null)
-            for (int i = 0; i < bangClips.Length; i++)
-            {
-                AudioClip clip = bangClips[i];
-                if (clip == null)
-                    continue;
-                if (i > 0)
-                    yield return new WaitForSeconds(Random.Range(bangGap.x, bangGap.y));
-                var go = new GameObject("Door Bang Audio");
-                go.transform.position = bangPoint;
-                var src = go.AddComponent<AudioSource>();
-                src.playOnAwake = false;
-                src.outputAudioMixerGroup = mixerGroup;
-                src.spatialBlend = 1f;
-                src.rolloffMode = AudioRolloffMode.Logarithmic;
-                src.minDistance = bangMinDistance;
-                src.maxDistance = 25f;
-                src.dopplerLevel = 0f;
-                src.pitch = Random.Range(0.94f, 1.02f);
-                SpatialAudioCues.Ignore(src);
-                src.PlayOneShot(clip, bangVolume);
-                Destroy(go, clip.length / src.pitch + 0.25f);
-                BangShake(bangPoint);
-            }
 
+        _hideShotDone = hideShot == null;
+        int bangs = 0;
+        float nextBang = 0f;
+        float waited = 0f;
+        float hiddenFor = 0f;
+        while (!escapeDoor.objectOpen)
+        {
+            if (Time.time >= nextBang)
+            {
+                Bang(bangs, bangPoint, bangShakeDegrees);
+                bangs++;
+                nextBang = Time.time + Random.Range(bangGap.x, bangGap.y);
+                if (bangs == 1 && hideShot != null)
+                    _hideShotRoutine = StartCoroutine(HideShotRoutine());
+            }
+            if (_hideShotDone)
+            {
+                waited += Time.deltaTime;
+                hiddenFor = PlayerHidden() ? hiddenFor + Time.deltaTime : 0f;
+                if (hiddenFor >= breakInAfterHidden || waited >= hideTime)
+                    break;
+            }
+            yield return null;
+        }
+
+        // He bursts through.
+        StopHideShot();
+        Bang(bangs, bangPoint, breakInShakeDegrees);
+        escapeDoor.ForceOpenAfterUnlock();
+        if (_escapeDoorAI != null)
+            _escapeDoorAI.ForceOpenInstant();
+        escapeDoor.PlayerCanClose = false;
+
+        Vector3 entry = escapeSide.position - escapeSide.forward * 1.2f;
+        if (NavMesh.SamplePosition(entry, out NavMeshHit hit, 1.5f, NavMesh.AllAreas))
+            entry = hit.position;
+        transform.SetPositionAndRotation(entry, Quaternion.LookRotation(Flat(escapeSide.forward)));
+        SetVisible(true);
+        if (keepAwayBarrier != null)
+            keepAwayBarrier.enabled = false;
+        _agent.enabled = true;
+        _agent.Warp(entry);
+        _agent.speed = searchSpeed;
+        _agent.acceleration = _baseAcceleration;
+        _agent.isStopped = false;
+        _breached = true;
+        _locomotion = null;
+        _animSpeed = 0f;
+        if (animator != null && _hasSpeed)
+            animator.SetFloat(_speedId, 0f);
+        PlayLocomotion(locomotionState);
+
+        if (!PlayerHidden())
+        {
+            BreakIntoChase();
+            yield break;
+        }
+
+        // Hidden: he runs in, checks the spots (theirs last) and never finds them.
+        _state = State.Searching;
+        yield return Linger(doorwayPause, null);
+        System.Collections.Generic.List<HidingSpot> order = SearchOrder();
+        HidingSpot theirs = PlayerSpot();
+        foreach (HidingSpot spot in order)
+        {
+            Transform pivot = spot.GetSearchPivot();
+            yield return WalkTo(pivot != null ? pivot.position : spot.transform.position, 40f);
+            Transform look = spot.ResolveSearchLookTarget();
+            Vector3 lookAt = look != null && look != pivot ? look.position : BoundsCenter(spot.transform);
+            yield return Linger(spot == theirs ? searchWaitAtPlayer : searchWait, lookAt);
+        }
+
+        // Back to his wall, closing the doors behind him.
+        _state = State.Returning;
+        Vector3 home = _startPosition;
+        if (NavMesh.SamplePosition(_startPosition, out NavMeshHit homeHit, 1.5f, NavMesh.AllAreas))
+            home = homeHit.position;
+        yield return WalkTo(home, 90f);
+
+        if (_agent.isOnNavMesh)
+            _agent.ResetPath();
+        _agent.enabled = false;
+        PlayLocomotion(wallState);
+        Vector3 fromPos = transform.position;
+        Quaternion fromRot = transform.rotation;
+        for (float t = 0f; t < 0.6f; t += Time.deltaTime)
+        {
+            float u = Mathf.SmoothStep(0f, 1f, t / 0.6f);
+            transform.SetPositionAndRotation(Vector3.Lerp(fromPos, _startPosition, u), Quaternion.Slerp(fromRot, _startRotation, u));
+            yield return null;
+        }
+        transform.SetPositionAndRotation(_startPosition, _startRotation);
+        if (keepAwayBarrier != null)
+            keepAwayBarrier.enabled = true;
+        _state = State.Gone;
         if (noCloseDoor != null)
             noCloseDoor.PlayerCanClose = true;
-        while (_music != null || _owningEffects || _shake != null)
-            yield return null;
+        escapeDoor.PlayerCanClose = true;
         _routine = null;
-        gameObject.SetActive(false);
     }
 
-    void BangShake(Vector3 bangPoint)
+    IEnumerator HideShotRoutine()
+    {
+        yield return hideShot.Play();
+        _hideShotRoutine = null;
+        _hideShotDone = true;
+    }
+
+    void StopHideShot()
+    {
+        if (_hideShotRoutine != null)
+            StopCoroutine(_hideShotRoutine);
+        _hideShotRoutine = null;
+        if (hideShot != null)
+            hideShot.Stop();
+    }
+
+    bool Searching => _state == State.Searching || _state == State.Returning;
+
+    // Walks there through the Butcher's Navigator: around by the room graph, opening each door on the way and
+    // closing it once through.
+    IEnumerator WalkTo(Vector3 point, float timeout)
+    {
+        if (!_agent.isOnNavMesh)
+            yield break;
+        if (_nav != null)
+            _nav.GoToPoint(point);
+        else
+            _agent.SetDestination(point);
+        yield return null;
+        float t = 0f;
+        for (; t < timeout && Searching; t += Time.deltaTime)
+        {
+            bool arrived = _nav != null
+                ? !_nav.IsFollowingRoute
+                : !_agent.pathPending && _agent.remainingDistance <= _agent.stoppingDistance + 0.2f;
+            if (arrived)
+                break;
+            yield return null;
+        }
+        if (!Searching || !_agent.isOnNavMesh)
+            yield break;
+        if (_nav != null)
+            _nav.ClearRoute();
+
+        // Short of it (a route given up on the way): the rest of the way straight there.
+        if (Flat(point - transform.position).magnitude > 0.6f)
+        {
+            _agent.SetDestination(point);
+            yield return null;
+            for (; t < timeout && Searching && _agent.isOnNavMesh; t += Time.deltaTime)
+            {
+                if (!_agent.pathPending && _agent.remainingDistance <= _agent.stoppingDistance + 0.2f)
+                    break;
+                yield return null;
+            }
+        }
+        if (Searching && _agent.isOnNavMesh)
+            _agent.ResetPath();
+    }
+
+    // Stands looking around, turned toward lookAt if there is one.
+    IEnumerator Linger(float seconds, Vector3? lookAt)
+    {
+        Quaternion from = transform.rotation;
+        Quaternion to = from;
+        if (lookAt.HasValue)
+        {
+            Vector3 dir = Flat(lookAt.Value - transform.position);
+            if (dir.sqrMagnitude > 1e-4f)
+                to = Quaternion.LookRotation(dir);
+        }
+        for (float t = 0f; t < seconds && Searching; t += Time.deltaTime)
+        {
+            transform.rotation = Quaternion.Slerp(from, to, Mathf.SmoothStep(0f, 1f, t / 0.6f));
+            yield return null;
+        }
+    }
+
+    // The spots he checks: the free ones nearest first, then the player's (whichever it is).
+    System.Collections.Generic.List<HidingSpot> SearchOrder()
+    {
+        var order = new System.Collections.Generic.List<HidingSpot>();
+        HidingSpot theirs = PlayerSpot();
+        if (searchSpots != null)
+            foreach (HidingSpot spot in searchSpots)
+                if (spot != null && spot != theirs && !order.Contains(spot))
+                    order.Add(spot);
+        Vector3 from = transform.position;
+        order.Sort((a, b) => (a.transform.position - from).sqrMagnitude.CompareTo((b.transform.position - from).sqrMagnitude));
+        if (theirs != null)
+            order.Add(theirs);
+        return order;
+    }
+
+    HidingSpot PlayerSpot()
+    {
+        PlayerHider hider = _player != null ? _player.GetComponent<PlayerHider>() : null;
+        return hider != null && hider.isHidden ? hider.CurrentHidingSpot : null;
+    }
+
+    bool PlayerHidden() => PlayerSpot() != null;
+
+    // The Butcher's idle / walk blend while he searches and heads home, fed his speed the way the Butcher's
+    // InteractionController feeds it; out of their spot in his sight, he runs them down.
+    void TickSearch()
+    {
+        if (!_agent.enabled)
+            return;
+        PlayLocomotion(locomotionState);
+        _animSpeed = Mathf.Lerp(_animSpeed, _agent.velocity.magnitude, Time.deltaTime * 6f);
+        if (_animSpeed < 0.01f)
+            _animSpeed = 0f;
+        if (animator != null && _hasSpeed)
+            animator.SetFloat(_speedId, _animSpeed);
+
+        if (!PlayerHidden() && SeesPlayer())
+            BreakIntoChase();
+    }
+
+    void PlayLocomotion(string state)
+    {
+        if (state == _locomotion)
+            return;
+        _locomotion = state;
+        if (animator == null || string.IsNullOrEmpty(state) || !animator.HasState(0, Animator.StringToHash(state)))
+            return;
+        animator.applyRootMotion = false;
+        animator.CrossFadeInFixedTime(state, walkBlend, 0);
+    }
+
+    bool SeesPlayer()
+    {
+        Camera cam = Camera.main;
+        if (cam == null)
+            return false;
+        Vector3 eye = _head != null ? _head.position : transform.position + Vector3.up * 1.6f;
+        Vector3 target = cam.transform.position;
+        Vector3 toPlayer = target - eye;
+        if (toPlayer.magnitude > spotDistance || Vector3.Angle(Flat(transform.forward), Flat(toPlayer)) > 75f)
+            return false;
+        RaycastHit[] hits = Physics.RaycastAll(eye, toPlayer.normalized, toPlayer.magnitude, ~0, QueryTriggerInteraction.Ignore);
+        foreach (RaycastHit h in hits)
+            if (!h.transform.IsChildOf(transform) && !h.transform.IsChildOf(_player) && !h.transform.IsChildOf(cam.transform))
+                return false;
+        return true;
+    }
+
+    // Seen, or not hidden when he gets in: the Butcher's run, after them.
+    void BreakIntoChase()
+    {
+        if (_routine != null)
+            StopCoroutine(_routine);
+        _routine = null;
+        StopHideShot();
+        if (_nav != null && _agent.isOnNavMesh)
+            _nav.ClearRoute();
+        if (animator != null)
+        {
+            animator.applyRootMotion = false;
+            animator.CrossFadeInFixedTime(runState, runBlend, 0);
+        }
+        _locomotion = null;
+        _agent.speed = chaseSpeed;
+        _agent.acceleration = _baseAcceleration;
+        _agent.isStopped = false;
+        _nextRepath = 0f;
+        _breached = true;
+        _state = State.Chasing;
+        StartMusic();
+    }
+
+    void SetVisible(bool visible)
+    {
+        if (!visible)
+        {
+            _hiddenRenderers.Clear();
+            foreach (Renderer r in GetComponentsInChildren<Renderer>())
+                if (r.enabled)
+                {
+                    r.enabled = false;
+                    _hiddenRenderers.Add(r);
+                }
+            return;
+        }
+        foreach (Renderer r in _hiddenRenderers)
+            if (r != null)
+                r.enabled = true;
+        _hiddenRenderers.Clear();
+    }
+
+    static Vector3 BoundsCenter(Transform t)
+    {
+        Collider c = t.GetComponentInChildren<Collider>();
+        return c != null ? c.bounds.center : t.position;
+    }
+
+    void Bang(int index, Vector3 bangPoint, float shakeDegrees)
+    {
+        if (bangClips == null || bangClips.Length == 0)
+            return;
+        AudioClip clip = bangClips[index % bangClips.Length];
+        if (clip == null)
+            return;
+        var go = new GameObject("Door Bang Audio");
+        go.transform.position = bangPoint;
+        var src = go.AddComponent<AudioSource>();
+        src.playOnAwake = false;
+        src.outputAudioMixerGroup = mixerGroup;
+        src.spatialBlend = 1f;
+        src.rolloffMode = AudioRolloffMode.Logarithmic;
+        src.minDistance = bangMinDistance;
+        src.maxDistance = 25f;
+        src.dopplerLevel = 0f;
+        src.pitch = Random.Range(0.94f, 1.02f);
+        SpatialAudioCues.Ignore(src);
+        src.PlayOneShot(clip, bangVolume);
+        Destroy(go, clip.length / src.pitch + 0.25f);
+        BangShake(bangPoint, shakeDegrees);
+    }
+
+    void BangShake(Vector3 bangPoint, float degrees)
     {
         float strength = 1f - Mathf.InverseLerp(bangMinDistance, bangShakeMaxDistance, Vector3.Distance(_player.position, bangPoint));
-        if (strength <= 0f || bangShakeDegrees <= 0f)
+        if (strength <= 0f || degrees <= 0f)
             return;
         StopShake();
         Camera cam = Camera.main;
@@ -580,7 +1005,7 @@ public class WallStanderChase : MonoBehaviour
         if (_shakeCam == null)
             return;
         _shakeBaseDutch = _shakeCam.Lens.Dutch;
-        _shake = StartCoroutine(ShakeRoutine(bangShakeDegrees * strength));
+        _shake = StartCoroutine(ShakeRoutine(degrees * strength));
     }
 
     IEnumerator ShakeRoutine(float degrees)
@@ -617,7 +1042,8 @@ public class WallStanderChase : MonoBehaviour
     void OpenDoorsInTheWay()
     {
         foreach (DoorController door in FindObjectsByType<DoorController>(FindObjectsSortMode.None))
-            if (!door.IsOpen && Vector3.Distance(door.transform.position, transform.position) <= doorOpenDistance)
+            if (!door.IsOpen && (_breached || door != _escapeDoorAI)
+                && Vector3.Distance(door.transform.position, transform.position) <= doorOpenDistance)
                 door.RequestOpen(bypassLock: true);
     }
 
@@ -688,9 +1114,15 @@ public class WallStanderChase : MonoBehaviour
 
     void ResetToWall()
     {
+        if (_state == State.Gone)
+            return;
         if (_routine != null)
             StopCoroutine(_routine);
         _routine = null;
+        StopHideShot();
+        if (_nav != null && _agent.enabled && _agent.isOnNavMesh)
+            _nav.ClearRoute();
+        SetVisible(true);
 
         if (_jumpscareCam != null)
         {
@@ -726,6 +1158,8 @@ public class WallStanderChase : MonoBehaviour
         _state = State.Waiting;
         _needsCageExit = true;
         _haveBarSpot = false;
+        if (_mic == Mic.Done)
+            _mic = Mic.Off;
     }
 
     static Vector3 Flat(Vector3 v)

@@ -10,7 +10,7 @@ using UnityEngine.Events;
 /// Cage room corpse scare (scripted):
 /// 1. The first padlock pin the player sets: a faint scratch from the body, quiet enough to doubt.
 /// 2. The player walks out of the open cage (this arms the door); a second faint sound follows a moment later.
-/// 3. The player opens the cage room door (then, if set, walks up to the next door): the body is gone, the lighter (and any
+/// 3. The player steps out through the cage room doorway (then, if set, walks up to the next door): the body is gone, the lighter (and any
 ///    lit candles near the body or the player) go out in a gust, the tool the player needs starts to glint, and running
 ///    footsteps tear away from where he lay, kicking a tin can halfway. The lighter then only sparks for a few
 ///    strikes before it catches again. When the steps end (or later, once something calls ShowWallStander) he's
@@ -51,9 +51,14 @@ public class CorpseVanishEvent : MonoBehaviour
     [Tooltip("Seconds after leaving the cage before the clue.")]
     [SerializeField] float exitClueDelay = 1f;
 
-    [Header("3. Opening the cage room door, then the next door")]
-    [SerializeField] SimpleOpenClose exitDoor;
-    [Tooltip("Once the door is open, the lights go out when the player gets this close to it. Empty = as the door opens.")]
+    [Header("3. Leaving through the cage room doorway, then the next door")]
+    [Tooltip("The cage room's doorframe; the side the body is on counts as inside the room.")]
+    [SerializeField] Transform exitDoorway;
+    [Tooltip("Half the width of the opening, measured along the doorframe.")]
+    [SerializeField] float doorwayHalfWidth = 0.8f;
+    [Tooltip("Metres past the doorframe the player has to be before it counts as crossed.")]
+    [SerializeField] float doorwayCrossDepth = 0.3f;
+    [Tooltip("Once through the doorway, the lights go out when the player gets this close to it. Empty = as the doorway is crossed.")]
     [SerializeField] Transform nextDoor;
     [SerializeField] float nextDoorDistance = 2f;
     [Tooltip("Seconds after the trigger before the lights go out.")]
@@ -145,16 +150,24 @@ public class CorpseVanishEvent : MonoBehaviour
     /// <summary>True once the bar behind him has been picked up.</summary>
     public bool BarTaken => _barTaken;
     public Vector3 WallStanderPosition => wallStander != null ? wallStander.transform.position : transform.position;
+    public bool WallRevealPlayed => _wallRevealPlayed;
+    /// <summary>The reveal on him has finished and the player has control again.</summary>
+    public bool WallRevealOver => _wallRevealOver;
     public event System.Action WallStanderSeenEvent;
+    /// <summary>The reveal on him is over and the player has control again.</summary>
+    public event System.Action WallRevealFinished;
+    /// <summary>The bar behind him was just picked up (the auto-save checkpoint).</summary>
+    public event System.Action BarPickedUp;
 
     Stage _stage;
     Vector3 _lookPoint;
     AudioSource _bodySource;
     bool _wasInCage;
     float _outsideTimer;
-    bool _exitDoorWasOpen;
+    bool _wasInsideRoom;
     bool _cinematicActive;
     bool _wallRevealPlayed;
+    bool _wallRevealOver;
     bool _barTaken;
     bool _runFinished;
     bool _wallStanderCalled;
@@ -226,8 +239,10 @@ public class CorpseVanishEvent : MonoBehaviour
     // The bar destroys itself when picked up.
     void TickBarTaken()
     {
-        if (!_barTaken && _barShown && barBehindHim == null)
-            _barTaken = true;
+        if (_barTaken || !_barShown || barBehindHim != null)
+            return;
+        _barTaken = true;
+        BarPickedUp?.Invoke();
     }
 
     static float SmootherStep(float u) => u * u * u * (u * (u * 6f - 15f) + 10f);
@@ -270,6 +285,11 @@ public class CorpseVanishEvent : MonoBehaviour
         }
         if (wallZoomCamera != null && !PlayerControlGate.IsInputBlocked)
             StartCoroutine(WallRevealRoutine(cam, point));
+        else
+        {
+            _wallRevealOver = true;
+            WallRevealFinished?.Invoke();
+        }
     }
 
     bool HasLineOfSight(Vector3 from, Vector3 to)
@@ -343,6 +363,31 @@ public class CorpseVanishEvent : MonoBehaviour
         else if (wallZoomBlendOut > 0f)
             yield return new WaitForSeconds(wallZoomBlendOut);
         EndCinematic();
+        _wallRevealOver = true;
+        WallRevealFinished?.Invoke();
+    }
+
+    /// <summary>
+    /// Checkpoint load: straight to the end of the reveal. The body is gone, the lights are out (the lighter and
+    /// candles come back from the save), he stands at the wall, and the reveal won't replay. With
+    /// <paramref name="barTaken"/> the bar is already in hand (the save removes it from the world), so he waits to go.
+    /// </summary>
+    public void RestoreAfterWallReveal(bool barTaken)
+    {
+        _barTaken = barTaken;
+        StopAllCoroutines();
+        EndCinematic();
+        _stage = Stage.Done;
+        _runFinished = true;
+        _wallStanderCalled = true;
+        _wallSeen = true;
+        _wallRevealPlayed = true;
+        _wallRevealOver = true;
+        foreach (Renderer r in bodyRenderers)
+            if (r != null)
+                r.enabled = false;
+        AddHighlights();
+        SetWallStanderActive(true);
     }
 
     void PoseWallZoomCamera(Vector3 position, Quaternion rotation, float fov)
@@ -386,7 +431,7 @@ public class CorpseVanishEvent : MonoBehaviour
         _outsideTimer += Time.deltaTime;
         if (_outsideTimer < exitConfirmTime)
             return;
-        _exitDoorWasOpen = exitDoor != null && exitDoor.objectOpen;
+        _wasInsideRoom = false;
         _stage = Stage.WaitingForDoor;
         // Delay counts from the moment the player stepped out, not from the confirmation.
         StartCoroutine(PlayClue(exitClue, exitClueVolume, exitClueDelay - exitConfirmTime));
@@ -394,18 +439,37 @@ public class CorpseVanishEvent : MonoBehaviour
 
     void TickExitDoor()
     {
-        bool open = exitDoor != null && exitDoor.objectOpen;
-        if (open && !_exitDoorWasOpen)
+        if (exitDoorway == null)
+            return;
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player == null)
+            return;
+
+        Vector3 normal = exitDoorway.forward;
+        normal.y = 0f;
+        normal.Normalize();
+        if (Vector3.Dot(_lookPoint - exitDoorway.position, normal) < 0f)
+            normal = -normal;
+
+        Vector3 offset = player.transform.position - exitDoorway.position;
+        offset.y = 0f;
+        float depth = Vector3.Dot(offset, normal);
+        if (depth >= 0f)
         {
-            if (nextDoor != null)
-                _stage = Stage.WaitingForNextDoor;
-            else
-            {
-                _stage = Stage.WaitingForLightsOut;
-                StartCoroutine(LightsOutRoutine());
-            }
+            _wasInsideRoom = true;
+            return;
         }
-        _exitDoorWasOpen = open;
+        float across = (offset - normal * depth).magnitude;
+        if (!_wasInsideRoom || depth > -doorwayCrossDepth || across > doorwayHalfWidth)
+            return;
+
+        if (nextDoor != null)
+            _stage = Stage.WaitingForNextDoor;
+        else
+        {
+            _stage = Stage.WaitingForLightsOut;
+            StartCoroutine(LightsOutRoutine());
+        }
     }
 
     void TickNextDoor()

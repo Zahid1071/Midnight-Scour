@@ -36,6 +36,7 @@ public sealed class HeldItemController : MonoBehaviour
     private bool _playerLookedUp;
     private bool _sprintHolstered;
     private float _sprintEndedTime = -1f;
+    private HeldLighter _relightAfterSprint;
 
     public InventoryItem CurrentItem => _shown ? _current : null;
     public HeldItemView CurrentView => _currentView;
@@ -69,6 +70,8 @@ public sealed class HeldItemController : MonoBehaviour
         bool sprinting = UpdateSprintHolster();
         bool canShow = !hiding && !sprinting && CanShowHeldItem();
         bool animatedPutDown = canShow || hiding || sprinting;
+        if (hiding || !CanShowHeldItem())
+            _relightAfterSprint = null;
 
         if (_currentView != null && _currentView.IsHolstering)
         {
@@ -86,6 +89,9 @@ public sealed class HeldItemController : MonoBehaviour
             // Switching items, starting to hide or sprinting: the put-down plays first.
             if (animatedPutDown)
             {
+                // A lighter put away burning for a sprint lights itself again when it comes back up.
+                if (sprinting && !hiding && _currentView.TryGetComponent(out HeldLighter lighter) && lighter.IsLit)
+                    _relightAfterSprint = lighter;
                 _currentView.Holster();
                 if (_currentView.IsHolstering)
                     return;
@@ -98,7 +104,12 @@ public sealed class HeldItemController : MonoBehaviour
         _shown = canShow;
         _currentView = canShow ? GetView(selected) : null;
         if (_currentView != null)
+        {
             _currentView.Draw();
+            if (_relightAfterSprint != null && _currentView.gameObject == _relightAfterSprint.gameObject)
+                _relightAfterSprint.StrikeAfterDraw();
+            _relightAfterSprint = null;
+        }
     }
 
     private static bool CanShowHeldItem() =>

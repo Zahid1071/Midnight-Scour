@@ -7,9 +7,13 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private SettingsMenu settingsMenu;
     [SerializeField] private GameObject creditsPanel;
+    [Tooltip("Shown only while there is an auto-save to continue from.")]
+    [SerializeField] private GameObject continueButton;
 
     [Header("Scenes")]
     [SerializeField] private string gameSceneName = "Cinematics";
+    [Tooltip("Where Continue goes if the save doesn't name its scene.")]
+    [SerializeField] private string checkpointSceneName = "Main Scene";
 
     void Awake() => ResolveReferences();
 
@@ -33,6 +37,13 @@ public class MainMenuUI : MonoBehaviour
             if (buttons != null)
                 mainMenuPanel = buttons.gameObject;
         }
+
+        if (continueButton == null)
+        {
+            var cont = transform.Find("Buttons/Continue");
+            if (cont != null)
+                continueButton = cont.gameObject;
+        }
     }
 
     private void Start()
@@ -42,6 +53,8 @@ public class MainMenuUI : MonoBehaviour
         if (mainMenuPanel != null)
             mainMenuPanel.SetActive(true);
         if (settingsPanel) settingsPanel.SetActive(false);
+        if (continueButton != null)
+            continueButton.SetActive(Checkpoint.Exists);
 
         // Safety net: PlayerControlGate is a static lock that persists across scene loads
         // (only a full process restart resets it). If a previous gameplay session ended
@@ -57,6 +70,7 @@ public class MainMenuUI : MonoBehaviour
     /// <summary>Start a brand-new game.</summary>
     public void NewGame()
     {
+        Checkpoint.Delete();
         PlayerControlGate.Clear();
         GameplayHintManager.ResetAllHints();
         InventoryManager.ResetForNewGame();
@@ -64,6 +78,25 @@ public class MainMenuUI : MonoBehaviour
         // Async load behind the loading screen (also warms up shaders there)
         // instead of an instant load that stalls on first-time shader compilation.
         LoadingScreenController.LoadScene(gameSceneName);
+    }
+
+    /// <summary>Pick the run back up from the auto-save.</summary>
+    public void ContinueGame()
+    {
+        Checkpoint.RequestRestore();
+        if (!Checkpoint.RestorePending)
+        {
+            if (continueButton != null)
+                continueButton.SetActive(false);
+            return;
+        }
+
+        PlayerControlGate.Clear();
+        GameplayHintManager.ResetAllHints();
+        InventoryManager.ResetForNewGame();
+
+        string scene = Checkpoint.SavedScene;
+        LoadingScreenController.LoadScene(string.IsNullOrEmpty(scene) ? checkpointSceneName : scene);
     }
 
     /// <summary>Placeholder — wire to your online / multiplayer flow later.</summary>

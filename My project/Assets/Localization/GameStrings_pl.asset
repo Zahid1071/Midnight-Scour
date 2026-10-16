@@ -691,11 +691,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296733
-    m_Localized: "Wepchnij \u015Brubokr\u0119t."
+    m_Localized: "Wepchnij \u015Brubokr\u0119t, aby sforsowa\u0107 zamek."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296734
-    m_Localized: "Szarp gwa\u0142townie, by z\u0142ama\u0107 zamek."
+    m_Localized: "Poruszaj nim, a\u017C \u015Brubokr\u0119t si\u0119 zablokuje."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296735
@@ -813,8 +813,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 34365368158781440
-    m_Localized: "Zablokowa\u0142o si\u0119. Przepchnij na si\u0142\u0119 albo wyjmij
-      i wepchnij ponownie, \u017Ceby poluzowa\u0107."
+    m_Localized: "Znajd\u017A w\u0142a\u015Bciwy kierunek, a potem ci\u0105gnij \u015Brubokr\u0119t
+      w t\u0119 stron\u0119, a\u017C zamek p\u0119knie."
     m_Metadata:
       m_Items: []
   - m_Id: 34392063293128704
@@ -836,6 +836,32 @@ MonoBehaviour:
   - m_Id: 35779292372533248
     m_Localized: "Nie ma tu dr\u0105\u017Cka od imad\u0142a. Ostatnio widzia\u0142em
       go przy klatce."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35880272732749824
+    m_Localized: "Musz\u0119 si\u0119 schowa\u0107."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656387112960
+    m_Localized: "Zapal \u015Bwiece"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656521330688
+    m_Localized: "Mo\u017Cesz u\u017Cy\u0107 zapalniczki, aby zapali\u0107 \u015Bwiece
+      w okolicy."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656521330689
+    m_Localized: OK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069135712256
+    m_Localized: "B\u0105d\u017A cicho"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069202821120
+    m_Localized: "W niekt\xF3rych miejscach musisz uwa\u017Ca\u0107, ile ha\u0142asu
+      robisz, inaczej mog\u0105 ci\u0119 us\u0142ysze\u0107."
     m_Metadata:
       m_Items: []
   references:

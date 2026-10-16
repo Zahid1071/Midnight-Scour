@@ -9,7 +9,7 @@ using UnityEngine.UI;
 /// Screwdriver lock break:
 /// Aim — tip stays on the keyhole; move the butt in a limited cone.
 /// Hold LMB — shove in; mouse travel slowly fills the break bar until it jams.
-/// Jammed — force it (hard mouse movement) to break through for a big chunk of progress.
+/// Jammed — push the mouse steadily to one side to pry through for a big chunk of progress.
 /// Pulling fully out and shoving back returns to the same jam, but each re-seat loosens it.
 /// </summary>
 [DisallowMultipleComponent]
@@ -136,6 +136,37 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
     [Tooltip("How fast the tension follows the applied force (per second).")]
     [SerializeField] float tensionSmooth = 8f;
 
+    [Header("Direction arrow (rides a circle around the keyhole, points where the mouse pushes)")]
+    [Tooltip("Arrow sprite pointing up. Leave empty for no arrow.")]
+    [SerializeField] Sprite arrowSprite;
+    [SerializeField] Color arrowColor = new Color(1f, 0.85f, 0.2f, 1f);
+    [Tooltip("Colour while jammed and pushing the way the jam gives.")]
+    [SerializeField] Color arrowAlignedColor = new Color(0f, 1f, 0.05f, 1f);
+    [Tooltip("Within this many degrees of the pry direction the arrow is fully green.")]
+    [SerializeField, Range(0f, 180f)] float arrowFullGreenDegrees = 35f;
+    [Tooltip("Angle away from the pry direction at which the arrow is fully back to its base colour.")]
+    [SerializeField, Range(1f, 180f)] float arrowAlignedConeDegrees = 80f;
+    [SerializeField] float arrowColorSmooth = 12f;
+    [Tooltip("How fast the arrow fades in when the screwdriver jams and out when the jam ends (per second).")]
+    [SerializeField] float arrowFadeSpeed = 6f;
+    [Tooltip("Radius (m) of the circle around the keyhole the arrow sits on.")]
+    [SerializeField] float arrowCircleRadius = 0.09f;
+    [Tooltip("Arrow length (m).")]
+    [SerializeField] float arrowSize = 0.06f;
+    [Tooltip("How far (m) the circle sits in front of the keyhole, toward the player.")]
+    [SerializeField] float arrowSurfaceOffset = 0.005f;
+    [Tooltip("Mouse travel (pixels/frame) needed before the arrow turns to follow it.")]
+    [SerializeField] float arrowTurnMinPixels = 1.5f;
+    [SerializeField] float arrowTurnSmooth = 14f;
+    [Tooltip("How far (m) past the circle the arrow is pushed when the jam is about to break.")]
+    [SerializeField] float arrowPushDistance = 0.05f;
+    [Tooltip("Fastest the arrow slides out while pushing (share of Arrow Push Distance per second).")]
+    [SerializeField] float arrowPushOutSpeed = 1.5f;
+    [Tooltip("Spring pulling the arrow back onto the circle once the push stops.")]
+    [SerializeField] float arrowSpringStiffness = 260f;
+    [Tooltip("Lower = more bounce when the arrow snaps back.")]
+    [SerializeField, Range(0.05f, 1f)] float arrowSpringDamping = 0.3f;
+
     [Header("Progress UI (mic-style). Leave empty to auto-create.")]
     [SerializeField] GameObject progressPanel;
     [SerializeField] Slider progressSlider;
@@ -187,6 +218,12 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
 
     Transform _screwdriver;
     GameObject _spawnedVisual;
+    SpriteRenderer _arrow;
+    Vector2 _arrowDir;
+    float _arrowPush;
+    float _arrowPushVelocity;
+    float _arrowVisibility;
+    Color _arrowTint;
     Vector3 _resolvedTipLocal;
     Quaternion _tipAxisFix;
 
@@ -283,6 +320,7 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
             return false;
         }
 
+        SpawnArrow();
         EnsureProgressUi();
 
         _tool = tool;
@@ -482,6 +520,109 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         }
 
         _screwdriver = null;
+
+        if (_arrow != null)
+        {
+            Destroy(_arrow.sharedMaterial);
+            Destroy(_arrow.gameObject);
+            _arrow = null;
+        }
+    }
+
+    void SpawnArrow()
+    {
+        _arrowDir = Vector2.up;
+        _arrowPush = 0f;
+        _arrowPushVelocity = 0f;
+        _arrowVisibility = 0f;
+        _arrowTint = arrowColor;
+        if (arrowSprite == null)
+            return;
+
+        var go = new GameObject("LockBreakDirectionArrow");
+        _arrow = go.AddComponent<SpriteRenderer>();
+        _arrow.sprite = arrowSprite;
+        // The keyhole sits inside the door mesh and the handle sticks out, so draw over everything.
+        var overlay = new Material(Canvas.GetDefaultCanvasMaterial());
+        overlay.SetInt("unity_GUIZTestMode", (int)UnityEngine.Rendering.CompareFunction.Always);
+        _arrow.sharedMaterial = overlay;
+        _arrow.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        _arrow.receiveShadows = false;
+        _arrow.color = new Color(arrowColor.r, arrowColor.g, arrowColor.b, 0f);
+        float spriteLength = arrowSprite.bounds.size.y;
+        go.transform.localScale = Vector3.one * (spriteLength > 1e-5f ? arrowSize / spriteLength : 1f);
+        PlaceArrow();
+    }
+
+    /// <summary>
+    /// Shown only while jammed. Points along the mouse push, green when pushing the way the jam gives;
+    /// slides outward with the built-up force only while that push counts (the jam loop is audible).
+    /// </summary>
+    void UpdateArrow(Vector2 mouseDelta, bool stuck, float strain)
+    {
+        if (_arrow == null)
+            return;
+
+        float dt = Mathf.Min(Time.deltaTime, 0.05f);
+
+        if (mouseDelta.magnitude >= arrowTurnMinPixels)
+        {
+            float current = Mathf.Atan2(_arrowDir.y, _arrowDir.x) * Mathf.Rad2Deg;
+            float target = Mathf.Atan2(mouseDelta.y, mouseDelta.x) * Mathf.Rad2Deg;
+            float angle = Mathf.LerpAngle(current, target, 1f - Mathf.Exp(-arrowTurnSmooth * dt)) * Mathf.Deg2Rad;
+            _arrowDir = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+        }
+
+        // Before the player commits, either side counts; after, only the picked side.
+        float aligned = 0f;
+        if (stuck)
+        {
+            float off = _jamDirection != Vector2.zero
+                ? Vector2.Angle(_arrowDir, _jamDirection)
+                : Mathf.Min(Vector2.Angle(_arrowDir, Vector2.right), Vector2.Angle(_arrowDir, Vector2.left));
+            aligned = 1f - Mathf.InverseLerp(arrowFullGreenDegrees, Mathf.Max(arrowFullGreenDegrees + 1f, arrowAlignedConeDegrees), off);
+        }
+        Color targetTint = Color.Lerp(arrowColor, arrowAlignedColor, aligned);
+        _arrowTint = Color.Lerp(_arrowTint, targetTint, 1f - Mathf.Exp(-arrowColorSmooth * dt));
+
+        if (stuck && _pushGain > 0f)
+        {
+            _arrowPush = Mathf.MoveTowards(_arrowPush, strain, arrowPushOutSpeed * dt);
+            _arrowPushVelocity = 0f;
+        }
+        else
+        {
+            float k = Mathf.Max(1f, arrowSpringStiffness);
+            float c = 2f * arrowSpringDamping * Mathf.Sqrt(k);
+            _arrowPushVelocity += (-k * _arrowPush - c * _arrowPushVelocity) * dt;
+            _arrowPush += _arrowPushVelocity * dt;
+        }
+
+        _arrowVisibility = Mathf.MoveTowards(_arrowVisibility, stuck ? 1f : 0f, arrowFadeSpeed * dt);
+        Color shown = _arrowTint;
+        shown.a *= _arrowVisibility;
+        _arrow.color = shown;
+        PlaceArrow();
+    }
+
+    void PlaceArrow()
+    {
+        if (_arrow == null || keyhole == null)
+            return;
+
+        Vector3 intoLock = keyhole.forward;
+        Vector3 viewRight = lockpickCamera != null ? lockpickCamera.transform.right : keyhole.right;
+        Vector3 right = Vector3.ProjectOnPlane(viewRight, intoLock);
+        if (right.sqrMagnitude < 1e-6f)
+            right = Vector3.ProjectOnPlane(keyhole.right, intoLock);
+        right.Normalize();
+        Vector3 up = Vector3.Cross(intoLock, right);
+
+        Vector3 radial = (right * _arrowDir.x + up * _arrowDir.y).normalized;
+        float radius = arrowCircleRadius + _arrowPush * arrowPushDistance;
+        _arrow.transform.SetPositionAndRotation(
+            keyhole.position - intoLock * arrowSurfaceOffset + radial * radius,
+            Quaternion.LookRotation(intoLock, radial));
     }
 
     void Update()
@@ -685,6 +826,7 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
             UpdateHoldLoopVolume(mouseDelta, stuck);
 
         RefreshMinigameHint(holding, seated, stuck);
+        UpdateArrow(mouseDelta, stuck, strain);
 
         _wasHolding = holding;
         _wasStuck = stuck;
@@ -1176,17 +1318,17 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         if (stuck)
         {
             key = stuckHintKey;
-            fallback = "It's jammed. Force it, or pull out and shove again to loosen it.";
+            fallback = "Find the right direction, then pull the screwdriver that way until the lock breaks.";
         }
         else if (seated && holding)
         {
             key = holdHintKey;
-            fallback = "Shake violently to break it.";
+            fallback = "Move it around until the screwdriver jams.";
         }
         else
         {
             key = aimHintKey;
-            fallback = "Shove the screwdriver in.";
+            fallback = "Shove the screwdriver in to force the lock.";
         }
 
         string msg = !string.IsNullOrEmpty(key) ? Loc.Get(key) : fallback;

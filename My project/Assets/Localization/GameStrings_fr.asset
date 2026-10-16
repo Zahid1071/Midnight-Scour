@@ -687,11 +687,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296733
-    m_Localized: Enfonce le tournevis.
+    m_Localized: Enfonce le tournevis pour forcer la serrure.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296734
-    m_Localized: Secoue violemment pour briser la serrure.
+    m_Localized: "Bouge-le jusqu'\xE0 ce que le tournevis se coince."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296735
@@ -809,7 +809,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 34365368158781440
-    m_Localized: "C'est coinc\xE9. Force, ou retire et renfonce pour le desserrer."
+    m_Localized: "Trouve la bonne direction, puis tire le tournevis dans ce sens
+      jusqu'\xE0 ce que la serrure c\xE8de."
     m_Metadata:
       m_Items: []
   - m_Id: 34392063293128704
@@ -831,6 +832,31 @@ MonoBehaviour:
   - m_Id: 35779292372533248
     m_Localized: "La barre de l'\xE9tau n'est pas l\xE0. La derni\xE8re fois que
       je l'ai vue, elle \xE9tait pr\xE8s de la cage."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35880272732749824
+    m_Localized: Il faut que je me cache.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656387112960
+    m_Localized: Allume les bougies
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656521330688
+    m_Localized: Tu peux utiliser le briquet pour allumer les bougies aux alentours.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656521330689
+    m_Localized: OK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069135712256
+    m_Localized: Reste silencieux
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069202821120
+    m_Localized: Dans certaines zones, tu dois faire attention au bruit que tu fais,
+      sinon ils pourraient t'entendre.
     m_Metadata:
       m_Items: []
   references:

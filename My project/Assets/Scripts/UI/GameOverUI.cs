@@ -11,6 +11,7 @@ using UnityEngine.InputSystem.UI;
 /// Game-over: Restart / Main Menu with no lockpicks;
 /// Continue / Main Menu when the player has at least one lockpick in inventory.
 /// Continue = in-scene day reset (keeps inventory + puzzle progress; lockpick is kept for the padlock).
+/// Once an auto-save <see cref="Checkpoint"/> exists, Continue reloads the scene from it instead.
 /// </summary>
 [DefaultExecutionOrder(32000)]
 public class GameOverUI : MonoBehaviour
@@ -19,7 +20,8 @@ public class GameOverUI : MonoBehaviour
     {
         Restart,
         MainMenu,
-        Continue
+        Continue,
+        RetryCheckpoint
     }
 
     public static GameOverUI Instance { get; private set; }
@@ -35,6 +37,7 @@ public class GameOverUI : MonoBehaviour
     bool _choiceMade;
     Choice _choice;
     bool _canContinue;
+    bool _hasCheckpoint;
 
     public bool IsShowing => _showing;
 
@@ -57,6 +60,7 @@ public class GameOverUI : MonoBehaviour
 
     public IEnumerator WaitForChoiceRoutine(CaptureReason reason)
     {
+        _hasCheckpoint = Checkpoint.Exists;
         _canContinue = HasLockpickForContinue();
         EnsureUi();
         RefreshPrimaryButton();
@@ -92,7 +96,14 @@ public class GameOverUI : MonoBehaviour
         CaptureContinue.ClearSpawnCache();
         CaptureContext.Clear();
 
-        if (chosen == Choice.Restart)
+        if (chosen == Choice.RetryCheckpoint)
+        {
+            Checkpoint.RequestRestore();
+            if (!Checkpoint.RestorePending)
+                chosen = Choice.Restart;
+        }
+
+        if (chosen == Choice.Restart || chosen == Choice.RetryCheckpoint)
             LoadingScreenController.LoadScene(reloadSceneName);
         else
             LoadingScreenController.LoadScene(mainMenuSceneName);
@@ -178,7 +189,7 @@ public class GameOverUI : MonoBehaviour
 
     void OnPrimary()
     {
-        _choice = _canContinue ? Choice.Continue : Choice.Restart;
+        _choice = _hasCheckpoint ? Choice.RetryCheckpoint : _canContinue ? Choice.Continue : Choice.Restart;
         _choiceMade = true;
     }
 
@@ -193,7 +204,7 @@ public class GameOverUI : MonoBehaviour
         if (_primaryLabel == null)
             return;
 
-        string label = _canContinue
+        string label = _hasCheckpoint || _canContinue
             ? LocOrFallback("gameover.continue", "Continue")
             : LocOrFallback("gameover.restart", "Restart");
         UIFont.SetText(_primaryLabel, label);

@@ -68,6 +68,20 @@ public class LightSwitch : MonoBehaviour, IInteractable
         return true;
     }
 
+    /// <summary>Sets the lights with no sound or flicker (checkpoint load).</summary>
+    public void SetOnInstant(bool on)
+    {
+        if (_flicker != null)
+        {
+            StopCoroutine(_flicker);
+            _flicker = null;
+        }
+        if (on != IsOn && rocker != null)
+            rocker.Rotate(0f, 0f, 180f, Space.Self);
+        IsOn = on;
+        Apply(on);
+    }
+
     IEnumerator FlickerOn()
     {
         bool lit = true;

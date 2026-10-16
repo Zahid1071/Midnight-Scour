@@ -694,11 +694,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296733
-    m_Localized: "Tornaviday\u0131 i\xE7eri sok."
+    m_Localized: "Kilidi zorlamak i\xE7in tornaviday\u0131 sok."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296734
-    m_Localized: "Kilidi k\u0131rmak i\xE7in \u015Fiddetle salla."
+    m_Localized: "Tornavida tak\u0131lana kadar hareket ettir."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296735
@@ -772,8 +772,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296752
-    m_Localized: "Maymuncu\u011Fu mouse ile hareket ettir ve pinleri kald\u0131rmak
-      i\xE7in sol t\u0131kla"
+    m_Localized: "Fareyi kullanarak maymuncu\u011Fu ileri geri hareket ettir ve s\u0131rayla
+      pinleri bul"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296753
@@ -816,8 +816,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 34365368158781440
-    m_Localized: "S\u0131k\u0131\u015Ft\u0131. Zorla, ya da \xE7\u0131kar\u0131p
-      tekrar sokarak gev\u015Fet."
+    m_Localized: "Do\u011Fru y\xF6n\xFC bul ve daha sonra kilit k\u0131r\u0131lana
+      dek tornaviday\u0131 o y\xF6ne do\u011Fru \xE7ek."
     m_Metadata:
       m_Items: []
   - m_Id: 34392063293128704
@@ -839,6 +839,32 @@ MonoBehaviour:
   - m_Id: 35779292372533248
     m_Localized: "Mengenenin kolu burada de\u011Fil. En son kafesin yan\u0131nda
       g\xF6rm\xFC\u015Ft\xFCm."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35880272732749824
+    m_Localized: "Saklanmam laz\u0131m."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656387112960
+    m_Localized: "Mumlar\u0131 Yak"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656521330688
+    m_Localized: "\xC7akma\u011F\u0131 kullanarak \xE7evredeki \xE7e\u015Fitli mumlar\u0131
+      ayd\u0131nlatabilirsin."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656521330689
+    m_Localized: Tamam
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069135712256
+    m_Localized: Sessiz Ol
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069202821120
+    m_Localized: "Baz\u0131 b\xF6lgelerde ne kadar ses yapt\u0131\u011F\u0131na dikkat
+      etmek zorundas\u0131n, yoksa seni duyabilirler."
     m_Metadata:
       m_Items: []
   references:

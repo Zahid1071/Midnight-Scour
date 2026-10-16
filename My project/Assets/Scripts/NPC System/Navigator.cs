@@ -20,12 +20,17 @@ namespace FS_Atmo
         [Tooltip("Seconds to linger after the door is open when entering footstepDeafnessEnterRoomId (basement). Other doors are unaffected.")]
         [SerializeField] float basementDoorPostOpenHold = 2f;
 
+        [Tooltip("For an NPC without NPCData: the zone (parent of the room anchors) it finds its way around.")]
+        [SerializeField] string homeZoneID;
+
         [Header("DEBUG")]
         [SerializeField] bool logPlannedRoute = true;
 
         private NavMeshAgent agent;
         private InteractionController interaction;
         private RoomAnchor _cachedCurrentRoom;
+
+        string HomeZoneID => interaction != null && interaction.data != null ? interaction.data.homeID : homeZoneID;
 
         public readonly List<Transform> route = new();
         private readonly List<Transform> tempPoints = new();
@@ -35,11 +40,17 @@ namespace FS_Atmo
         // Door-transit lock: prevents replans while crossing
         private bool isDoorTransit;
         public bool IsInDoorTransit => isDoorTransit;
+        /// <summary>True while a GoToRoom / GoToPoint walk is under way.</summary>
+        public bool IsFollowingRoute => following;
+        private bool following;
 
         void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
             interaction = GetComponent<InteractionController>();
+            // A missing component comes back as a fake null in the editor, which the ?. calls below don't catch.
+            if (interaction == null)
+                interaction = null;
         }
 
         void Start()
@@ -108,9 +119,6 @@ namespace FS_Atmo
                 return;
             }
 
-            if (logPlannedRoute)
-                //Debug.Log($"[Navigator] TryGetRoute SUCCESS: route has {route.Count} waypoints before adding final point");
-
             if (finalPoint.HasValue)
                 route.Add(CreateTempPoint(finalPoint.Value, destinationName, parentName));
 
@@ -121,7 +129,7 @@ namespace FS_Atmo
         {
             if (isDoorTransit) return; // do not re-route mid-door
 
-            var home = interaction?.data?.homeID;
+            var home = HomeZoneID;
             Transform targetAnchorT = null;
             RoomAnchor targetRoom = null;
 
@@ -163,7 +171,8 @@ namespace FS_Atmo
                     Debug.LogWarning($"[Navigator] GoToPoint: Failed to find target room for {destinationName ?? "point"}, falling back to direct NavMesh");
                 if (followCo != null) StopCoroutine(followCo);
                 isDoorTransit = false;
-                followCo = StartCoroutine(MoveToReached(worldPoint, -1f, _ => { }));
+                following = true;
+                followCo = StartCoroutine(MoveToReached(worldPoint, -1f, _ => following = false));
                 return;
             }
 
@@ -182,6 +191,7 @@ namespace FS_Atmo
             if (logPlannedRoute)
                 LogPlannedRoute();
 
+            following = true;
             followCo = StartCoroutine(FollowRoute());
         }
 
@@ -280,6 +290,7 @@ namespace FS_Atmo
             }
 
             CleanupTempPoints();
+            following = false;
         }
 
         private IEnumerator EnsureDoorOpenForCrossing(DoorController door, bool grantFootstepDeafnessOnOpenSound = false)
@@ -453,6 +464,7 @@ namespace FS_Atmo
 
         private void AbortRouteInPlace()
         {
+            following = false;
             CleanupTempPoints();
             route.Clear();
             idx = -1;
@@ -476,7 +488,7 @@ namespace FS_Atmo
 
         private RoomAnchor FindCurrentRoom()
         {
-            string home = interaction?.data?.homeID ?? "";
+            string home = HomeZoneID ?? "";
 
             if (NPCAnchorManager.Instance == null)
                 return _cachedCurrentRoom;
@@ -589,6 +601,7 @@ namespace FS_Atmo
                 followCo = null;
             }
 
+            following = false;
             route.Clear();
             idx = -1;
             isDoorTransit = false;

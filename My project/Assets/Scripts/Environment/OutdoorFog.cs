@@ -15,6 +15,9 @@ public class OutdoorFog : MonoBehaviour
     [Tooltip("Camera height (world Y) at or above which fog is at full density.")]
     [SerializeField] float outdoorEyeY = 0.3f;
 
+    /// <summary>Multiplies the outdoor density; shots thin the fog with it to show something far off.</summary>
+    public static float DensityScale { get; set; } = 1f;
+
     Camera _camera;
     float _startDensity;
 
@@ -42,6 +45,6 @@ public class OutdoorFog : MonoBehaviour
             return;
 
         float outside = Mathf.SmoothStep(0f, 1f, Mathf.InverseLerp(indoorEyeY, outdoorEyeY, _camera.transform.position.y));
-        RenderSettings.fogDensity = outdoorDensity * outside;
+        RenderSettings.fogDensity = outdoorDensity * outside * DensityScale;
     }
 }

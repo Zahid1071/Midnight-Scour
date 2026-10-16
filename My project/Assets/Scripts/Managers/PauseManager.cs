@@ -85,6 +85,10 @@ public class PauseManager : MonoBehaviour
         if (demoEnd != null && demoEnd.IsShowing)
             return;
 
+        // The tutorial popup owns the frozen time scale until OK.
+        if (TutorialPopupUI.IsShowing)
+            return;
+
         if (IsPaused)
         {
             if (IsSettingsOpen())

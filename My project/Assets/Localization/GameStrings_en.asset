@@ -690,11 +690,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296733
-    m_Localized: Shove the screwdriver in.
+    m_Localized: Shove the screwdriver in to force the lock.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296734
-    m_Localized: Shake violently to break it.
+    m_Localized: Move it around until the screwdriver jams.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296735
@@ -810,7 +810,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 34365368158781440
-    m_Localized: It's jammed. Force it, or pull out and shove again to loosen it.
+    m_Localized: Find the right direction, then pull the screwdriver that way until
+      the lock breaks.
     m_Metadata:
       m_Items: []
   - m_Id: 34392063293128704
@@ -832,6 +833,31 @@ MonoBehaviour:
   - m_Id: 35779292372533248
     m_Localized: The bar for the vise isn't here. Last time I saw it, it was by the
       cage.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35880272732749824
+    m_Localized: I gotta hide.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656387112960
+    m_Localized: Light the Candles
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656521330688
+    m_Localized: You can use the lighter to light up the candles around you.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656521330689
+    m_Localized: OK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069135712256
+    m_Localized: Stay Quiet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069202821120
+    m_Localized: In some areas you have to watch how much noise you make, or they
+      might hear you.
     m_Metadata:
       m_Items: []
   references:

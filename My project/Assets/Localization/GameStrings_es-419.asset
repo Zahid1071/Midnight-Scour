@@ -683,11 +683,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296733
-    m_Localized: Empuja el destornillador.
+    m_Localized: Mete el destornillador para forzar la cerradura.
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296734
-    m_Localized: Agita con fuerza para romper la cerradura.
+    m_Localized: "Mu\xE9velo hasta que el destornillador se atasque."
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296735
@@ -803,8 +803,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 34365368158781440
-    m_Localized: "Se atasc\xF3. Fu\xE9rzalo, o s\xE1calo y vuelve a empujarlo para
-      aflojarlo."
+    m_Localized: "Encuentra la direcci\xF3n correcta y luego jala el destornillador
+      hacia ese lado hasta que la cerradura se rompa."
     m_Metadata:
       m_Items: []
   - m_Id: 34392063293128704
@@ -826,6 +826,31 @@ MonoBehaviour:
   - m_Id: 35779292372533248
     m_Localized: "La barra de la prensa no est\xE1 aqu\xED. La \xFAltima vez que
       la vi, estaba junto a la jaula."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35880272732749824
+    m_Localized: Tengo que esconderme.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656387112960
+    m_Localized: Enciende las velas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656521330688
+    m_Localized: Puedes usar el encendedor para encender las velas a tu alrededor.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36824656521330689
+    m_Localized: OK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069135712256
+    m_Localized: Mantente en silencio
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069202821120
+    m_Localized: "En algunas zonas tienes que cuidar cu\xE1nto ruido haces, o podr\xEDan
+      o\xEDrte."
     m_Metadata:
       m_Items: []
   references:

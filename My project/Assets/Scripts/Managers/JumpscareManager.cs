@@ -304,6 +304,7 @@ public class JumpscareManager : MonoBehaviour
         Time.timeScale = 1f;
         AudioListener.pause = false;
 
+        Checkpoint.RequestRestore();
         LoadingScreenController.LoadScene(reloadSceneName);
     }
 

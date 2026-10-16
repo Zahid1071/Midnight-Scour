@@ -444,19 +444,23 @@ namespace FS_Atmo
         }
 
         /// <summary>Snap shut immediately — used after lockpick Continue day-reset.</summary>
-        public void ForceCloseInstant()
+        public void ForceCloseInstant() => SnapOpenState(false);
+
+        /// <summary>Snap fully open or shut with no sound (checkpoint load, Continue reset).</summary>
+        public void SnapOpenState(bool open)
         {
             _moving = false;
             _reverting = false;
-            objectOpen = false;
+            objectOpen = open;
 
+            int hash = open ? openHash : closeHash;
             if (myAnimator != null)
-                myAnimator.Play(closeHash, 0, 1f);
+                myAnimator.Play(hash, 0, 1f);
 
             if (hasAdditional && additionalAnimator != null)
-                additionalAnimator.Play(closeHash, 0, 1f);
+                additionalAnimator.Play(hash, 0, 1f);
 
-            SyncAdditionalFlags(open: false);
+            SyncAdditionalFlags(open);
         }
 
         private void ToggleSelf(float openAmount)

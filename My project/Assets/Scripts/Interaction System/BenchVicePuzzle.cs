@@ -32,6 +32,10 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
     [SerializeField] AudioClip wrenchDropSound;
     [SerializeField, Range(0f, 1f)] float wrenchDropVolume = 0.9f;
 
+    [Header("Stuck Wrench Shot")]
+    [Tooltip("Closes in on the stuck wrench the first time ShowStuckWrench is called (e.g. by the vise note's On Closed).")]
+    [SerializeField] HideOptionsShot stuckWrenchShot;
+
     [Header("Post-completion")]
     [Tooltip("Objects moved off the Interactable layer once the wrench is released (defaults to this + bar visual).")]
     [SerializeField] GameObject[] disableInteractLayers;
@@ -39,6 +43,7 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
     bool _barInserted;
     bool _wrenchReleased;
     bool _isAnimating;
+    bool _stuckWrenchShown;
 
     public bool IsWrenchReleased => _wrenchReleased;
     public bool BarInserted => _barInserted;
@@ -69,6 +74,15 @@ public class BenchVicePuzzle : MonoBehaviour, IInteractable, IItemReceiver
 
         StartCoroutine(TurnRoutine());
         return true;
+    }
+
+    /// <summary>Plays the shot on the wrench in the jaws, only the first time and only while it is still stuck.</summary>
+    public void ShowStuckWrench()
+    {
+        if (_stuckWrenchShown || _wrenchReleased || _isAnimating || stuckWrenchShot == null || !stuckWrenchShot.isActiveAndEnabled)
+            return;
+        _stuckWrenchShown = true;
+        stuckWrenchShot.StartCoroutine(stuckWrenchShot.Play());
     }
 
     public string GetContextualHintMessage(InventoryItem held)

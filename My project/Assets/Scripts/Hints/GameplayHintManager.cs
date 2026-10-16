@@ -1088,8 +1088,43 @@ public class GameplayHintManager : MonoBehaviour
         return false;
     }
 
+    /// <summary>One-time hints already done this run, by name (checkpoint save).</summary>
+    public List<string> GetShownHints()
+    {
+        var shown = new List<string>();
+        if (_hidingSpotHintShown) shown.Add("hiding_spot");
+        if (_soundHintShown) shown.Add("sound");
+        if (_killerPatternHintShown) shown.Add("killer_pattern");
+        if (_lockpickHintShown) shown.Add("lockpick");
+        if (_lockpickLetterFollowupDone) shown.Add("lockpick_letter");
+        if (_combineFinished) shown.Add("combine");
+        if (_vaseDropHintFinished) shown.Add("vase_drop");
+        return shown;
+    }
+
+    /// <summary>Checkpoint load: hints from <see cref="GetShownHints"/> don't show again.</summary>
+    public void RestoreShownHints(IEnumerable<string> shown)
+    {
+        if (shown == null)
+            return;
+        foreach (string id in shown)
+        {
+            switch (id)
+            {
+                case "hiding_spot": _hidingSpotHintShown = true; break;
+                case "sound": _soundHintShown = true; break;
+                case "killer_pattern": _killerPatternHintShown = true; break;
+                case "lockpick": _lockpickHintShown = true; _lockpickHintRequested = false; break;
+                case "lockpick_letter": _lockpickLetterFollowupDone = true; break;
+                case "combine": _combineFinished = true; _combineHintShown = true; break;
+                case "vase_drop": _vaseDropHintFinished = true; break;
+            }
+        }
+    }
+
     public static void ResetAllHints()
     {
+        TutorialPopupUI.ResetShown();
         if (Instance == null)
         {
             // New game from menu before instance exists — drop death-hint carryover.

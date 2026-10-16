@@ -321,6 +321,13 @@ public class Cage : MonoBehaviour
             root.layer = playerLayer;
     }
 
+    /// <summary>Takes the door's current state as already known, so a restored door doesn't count as opened or slammed.</summary>
+    public void SyncDoorState()
+    {
+        if (cageDoor != null)
+            _doorWasOpen = cageDoor.objectOpen;
+    }
+
     /// <summary>Rebind every cage after a Continue teleport.</summary>
     public static void RebindAllAfterContinueTeleport(GameObject player)
     {

@@ -7,6 +7,7 @@ using UnityEngine.UI;
 /// While hidden, samples the microphone and drives the hide meter from loudness
 /// (Fear to Fathom–style). Loud spikes / sustained noise send nearby NPCs to the
 /// hide spot for a guaranteed capture (same path as being seen entering a hide).
+/// Scripted scenes can also show the bar out of hiding (SetOpenListening) and react to NoiseAlert.
 /// </summary>
 [DisallowMultipleComponent]
 public class HidingStamina : MonoBehaviour
@@ -70,9 +71,30 @@ public class HidingStamina : MonoBehaviour
     float alertCooldownRemaining;
     bool wasHidden;
     bool micUnavailableWarned;
+    bool openListening;
 
     /// <summary>0 = silent, 1 = loud (smoothed). Also drives the bar fill.</summary>
     public float Loudness => smoothedLoudness;
+
+    /// <summary>Raised on every loud spike / sustained noise, hidden or open listening.</summary>
+    public event System.Action NoiseAlert;
+
+    /// <summary>
+    /// On: the bar shows and the mic is listened to out of hiding too (kept off while input is blocked).
+    /// Hiding spot captures still only come from noise made while hidden.
+    /// </summary>
+    public void SetOpenListening(bool on)
+    {
+        if (on == openListening)
+            return;
+        openListening = on;
+        sustainedTimer = 0f;
+    }
+
+    bool OpenListeningActive => openListening && !PlayerControlGate.IsInputBlocked;
+
+    /// <summary>The icon shown under the bar.</summary>
+    public Sprite MicrophoneIcon => microphoneIcon;
 
     void Awake()
     {
@@ -135,8 +157,8 @@ public class HidingStamina : MonoBehaviour
             wasHidden = hidden;
         }
 
-        if (hidden)
-            TickWhileHidden();
+        if (hidden || OpenListeningActive)
+            TickListening();
         else
             smoothedLoudness = Mathf.MoveTowards(smoothedLoudness, 0f, Time.deltaTime * loudnessSmoothSpeed);
 
@@ -169,7 +191,7 @@ public class HidingStamina : MonoBehaviour
         GameplayHudVisibility.Instance?.SetHiddenDuringHiding(false);
     }
 
-    void TickWhileHidden()
+    void TickListening()
     {
         float raw = SampleMicrophoneLoudness();
         float sens = sensitivity;
@@ -212,7 +234,10 @@ public class HidingStamina : MonoBehaviour
     void TriggerButcherHideCheck()
     {
         alertCooldownRemaining = alertCooldownSeconds;
+        NoiseAlert?.Invoke();
 
+        if (hider == null || !hider.isHidden)
+            return;
         HidingSpot spot = hider != null ? hider.CurrentHidingSpot : null;
         if (spot == null || spot.searchCheckpointOnly)
             return;
@@ -386,9 +411,12 @@ public class HidingStamina : MonoBehaviour
     {
         EnsureRuntimeUi();
 
-        bool hidden = hider != null && hider.isHidden
-            && !PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured);
-        SetPanelVisible(hidden);
+        bool captured = PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured);
+        bool hidden = hider != null && hider.isHidden && !captured;
+        // Stays up behind a tutorial card, which may be explaining it.
+        bool shown = hidden || (openListening && !captured
+                                && (!PlayerControlGate.IsInputBlocked || TutorialPopupUI.IsShowing));
+        SetPanelVisible(shown);
 
         float loudness = smoothedLoudness;
 
@@ -399,7 +427,7 @@ public class HidingStamina : MonoBehaviour
         if (staminaFillImage != null)
             staminaFillImage.color = Color.Lerp(fullColor, emptyColor, loudness);
 
-        ApplyBarShake(hidden);
+        ApplyBarShake(shown);
         ApplyCameraNoise(hidden);
     }
 
