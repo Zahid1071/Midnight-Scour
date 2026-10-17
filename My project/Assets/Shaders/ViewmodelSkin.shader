@@ -32,6 +32,9 @@ Shader "Midnight Scour/Viewmodel Skin"
         _ScatterColor("Scatter Color", Color) = (0.55, 0.16, 0.08, 1)
         _AmbientFloor("Ambient Floor", Color) = (0.02, 0.016, 0.013, 1)
 
+        [Header(Lights)]
+        _IgnoreLightLayers("Ignore Lights On Rendering Layers (bitmask, 4 = Not Viewmodel)", Float) = 4
+
         [Header(Metal)]
         _ReflectFillTop("Reflection Fill Above", Color) = (0, 0, 0, 1)
         _ReflectFillBottom("Reflection Fill Below", Color) = (0, 0, 0, 1)

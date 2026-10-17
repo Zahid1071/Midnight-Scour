@@ -9,10 +9,11 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Auto-save for the gameplay scene. Saves a <see cref="Checkpoint"/> when the bar behind the man at the wall
-/// (<see cref="CorpseVanishEvent"/>) is picked up, and on a load that asked for it (capture retry, main menu Continue)
-/// puts the fresh scene back the way it was: the corpse scare finished, the bar in hand with him waiting at the wall,
-/// items taken or dropped, doors, padlocks, lights, inventory, the player where they stood. The butcher starts his
-/// day over.
+/// (<see cref="CorpseVanishEvent"/>) is picked up, and again once the escape door is shut on him after the chase and
+/// the hide shot is over (<see cref="WallStanderChase"/>). On a load that asked for it (capture retry, main menu
+/// Continue) puts the fresh scene back the way it was: the corpse scare finished, the bar in hand with him waiting at
+/// the wall (or pounding on the shut door), items taken or dropped, doors, padlocks, lights, inventory, the player
+/// where they stood. The butcher starts his day over.
 /// Installs itself in any scene with a CorpseVanishEvent. Loading that scene without a pending restore starts a new
 /// run, so the old checkpoint is deleted.
 /// </summary>
@@ -46,6 +47,7 @@ public class CheckpointManager : MonoBehaviour
     readonly Dictionary<Scene, GameObject[]> _roots = new Dictionary<Scene, GameObject[]>();
 
     CorpseVanishEvent _corpse;
+    WallStanderChase _chase;
     CanvasGroup _indicator;
     Coroutine _indicatorRoutine;
 
@@ -81,7 +83,10 @@ public class CheckpointManager : MonoBehaviour
 
         _corpse = FindFirstObjectByType<CorpseVanishEvent>(FindObjectsInactive.Include);
         if (_corpse != null)
-            _corpse.BarPickedUp += OnBarPickedUp;
+            _corpse.BarPickedUp += Save;
+        _chase = FindFirstObjectByType<WallStanderChase>(FindObjectsInactive.Include);
+        if (_chase != null)
+            _chase.ShutOut += Save;
 
         if (Checkpoint.RestorePending)
         {
@@ -96,10 +101,12 @@ public class CheckpointManager : MonoBehaviour
     void OnDestroy()
     {
         if (_corpse != null)
-            _corpse.BarPickedUp -= OnBarPickedUp;
+            _corpse.BarPickedUp -= Save;
+        if (_chase != null)
+            _chase.ShutOut -= Save;
     }
 
-    void OnBarPickedUp()
+    void Save()
     {
         if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured) || JumpscareManager.CaptureUiActive)
             return;
@@ -228,6 +235,7 @@ public class CheckpointManager : MonoBehaviour
 
         d.wallStanderRevealed = _corpse != null && _corpse.WallRevealPlayed;
         d.barTaken = _corpse != null && _corpse.BarTaken;
+        d.wallStanderShutOut = _chase != null && _chase.IsShutOut;
         CorridorTension corridor = FindFirstObjectByType<CorridorTension>();
         d.corridorLeft = corridor != null && corridor.HasLeftCorridor;
         TensionMusicCues music = FindFirstObjectByType<TensionMusicCues>();
@@ -327,6 +335,10 @@ public class CheckpointManager : MonoBehaviour
             TutorialPopupUI.MarkShown(id);
 
         RestoreInventory(d);
+
+        // After the doors and the player: he pounds on the door as it was saved, at the distance they stand from it.
+        if (d.wallStanderShutOut && _chase != null && _chase.isActiveAndEnabled)
+            _chase.RestoreShutOut();
 
         CinematicPlayerControlLock.KickNpcNaturalRoutines();
     }

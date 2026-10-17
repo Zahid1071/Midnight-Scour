@@ -18,8 +18,20 @@ half4 _AmbientFloor;
 half4 _ReflectFillTop;
 half4 _ReflectFillBottom;
 half _ReflectFillUnlit;
+// Rendering layer bits that mark a light as world-only (camera-mounted lights that would blow out the arms).
+float _IgnoreLightLayers;
 // Global, set by ViewmodelReflectionScale on the flame light: 1 = flame at base brightness, 0 = no flame.
 half _ViewmodelReflectScale;
+
+bool LightsViewmodel(Light light, uint meshRenderingLayers)
+{
+#ifdef _LIGHT_LAYERS
+    return IsMatchingLightLayer(light.layerMask, meshRenderingLayers)
+        && (light.layerMask & (uint)_IgnoreLightLayers) == 0;
+#else
+    return true;
+#endif
+}
 
 half3 SkinDirectLight(BRDFData brdfData, Light light, half3 normalWS, half3 viewDirWS, bool softenNear)
 {
@@ -109,12 +121,8 @@ void ViewmodelSkinFragment(
     half fresnelTerm = Pow4(1.0 - saturate(dot(inputData.normalWS, inputData.viewDirectionWS)));
     color += reflectFill * EnvironmentBRDFSpecular(brdfData, fresnelTerm) * aoFactor.indirectAmbientOcclusion;
 
-#ifdef _LIGHT_LAYERS
-    if (IsMatchingLightLayer(mainLight.layerMask, meshRenderingLayers))
-#endif
-    {
+    if (LightsViewmodel(mainLight, meshRenderingLayers))
         color += SkinDirectLight(brdfData, mainLight, inputData.normalWS, inputData.viewDirectionWS, false);
-    }
 
 #if defined(_ADDITIONAL_LIGHTS)
     uint pixelLightCount = GetAdditionalLightsCount();
@@ -125,23 +133,15 @@ void ViewmodelSkinFragment(
         FORWARD_PLUS_SUBTRACTIVE_LIGHT_CHECK
 
         Light light = GetAdditionalLight(lightIndex, inputData, shadowMask, aoFactor);
-#ifdef _LIGHT_LAYERS
-        if (IsMatchingLightLayer(light.layerMask, meshRenderingLayers))
-#endif
-        {
+        if (LightsViewmodel(light, meshRenderingLayers))
             color += SkinDirectLight(brdfData, light, inputData.normalWS, inputData.viewDirectionWS, false);
-        }
     }
     #endif
 
     LIGHT_LOOP_BEGIN(pixelLightCount)
         Light light = GetAdditionalLight(lightIndex, inputData, shadowMask, aoFactor);
-#ifdef _LIGHT_LAYERS
-        if (IsMatchingLightLayer(light.layerMask, meshRenderingLayers))
-#endif
-        {
+        if (LightsViewmodel(light, meshRenderingLayers))
             color += SkinDirectLight(brdfData, light, inputData.normalWS, inputData.viewDirectionWS, true);
-        }
     LIGHT_LOOP_END
 #endif
 

@@ -839,6 +839,10 @@ MonoBehaviour:
     m_Key: tutorial.mic.body
     m_Metadata:
       m_Items: []
+  - m_Id: 36908069202821121
+    m_Key: hint.run
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

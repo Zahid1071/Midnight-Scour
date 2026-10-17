@@ -138,6 +138,7 @@ public class CheckpointData
     [Header("Story")]
     public bool wallStanderRevealed;
     public bool barTaken;
+    public bool wallStanderShutOut;
     public bool corridorLeft;
     public bool returnMusicPlaying;
 

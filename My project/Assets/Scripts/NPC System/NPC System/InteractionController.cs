@@ -18,7 +18,9 @@ public class InteractionController : MonoBehaviour
     private string lastZoneID = null;
     private string lastHotspotID = null;
 
-    const string BasementExcludedRoom = "Basement_Room";
+    static readonly HashSet<string> BasementRooms = new() { "Basement_Main_Room", "Basement_Cage_Room", "Cage" };
+
+    static bool IsBasementRoom(string roomAnchorId) => roomAnchorId != null && BasementRooms.Contains(roomAnchorId);
 
     [Tooltip("After the player leaves the cage, Natural routines wait this long before the butcher may pick/enter the basement. Chase from noise is not blocked.")]
     [SerializeField] float basementRoutineDelaySeconds = 30f;
@@ -346,7 +348,7 @@ public class InteractionController : MonoBehaviour
         {
             var zonesWithUpstairs = boostedZones
                 .Where(z => z.roomPlans != null
-                    && z.roomPlans.Any(r => r.roomAnchorID != BasementExcludedRoom))
+                    && z.roomPlans.Any(r => !IsBasementRoom(r.roomAnchorID)))
                 .ToList();
             if (zonesWithUpstairs.Count > 0)
                 boostedZones = zonesWithUpstairs;
@@ -369,7 +371,7 @@ public class InteractionController : MonoBehaviour
         if (IsBasementRoutineDelayed)
         {
             var withoutBasement = roomOptions
-                .Where(r => r.roomAnchorID != BasementExcludedRoom)
+                .Where(r => !IsBasementRoom(r.roomAnchorID))
                 .ToList();
             if (withoutBasement.Count > 0)
                 roomOptions = withoutBasement;

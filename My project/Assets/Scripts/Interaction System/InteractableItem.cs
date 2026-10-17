@@ -7,7 +7,6 @@ public class InteractableItem : MonoBehaviour, IInteractable, IItemReceiver
     [SerializeField] bool blockedUntilBenchViceReleased;
     [SerializeField] string benchViceStuckMessage = "It is stuck.";
     [SerializeField] string blockedMessage = "It is too far.";
-    [SerializeField] DemoEndDirector demoEndOnPickup;
 
     [Header("Pickup feedback (optional)")]
     [Tooltip("Loc key shown instead of the item's default pickup text.")]
@@ -112,10 +111,6 @@ public class InteractableItem : MonoBehaviour, IInteractable, IItemReceiver
                 HudManager.Instance?.ShowSubtitle(msg);
             }
             SoundManager.Instance.PlaySFXAt(itemData.pickUpSFX, transform.position);
-
-            demoEndOnPickup?.NotifyItemPickedUp(itemData);
-            if (demoEndOnPickup == null)
-                FindFirstObjectByType<DemoEndDirector>()?.NotifyItemPickedUp(itemData);
 
             if (!suppressPickupHint)
                 GameplayHintManager.Instance?.NotifyItemPickedUp(itemData);

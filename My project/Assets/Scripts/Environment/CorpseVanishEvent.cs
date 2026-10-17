@@ -15,8 +15,9 @@ using UnityEngine.Events;
 ///    footsteps tear away from where he lay, kicking a tin can halfway. The lighter then only sparks for a few
 ///    strikes before it catches again. When the steps end (or later, once something calls ShowWallStander) he's
 ///    standing, face to the wall, across the room.
-/// 4. The first time the lit lighter shows him (WallStanderSeenEvent), then a step closer: a sting and a quick dolly
-///    zoom on him, then the shot hands back to the player's view as it tilts down onto the bar left behind him.
+/// 4. The first time the lit lighter shows him (WallStanderSeenEvent), then a step closer (or right up close, lit or
+///    not, before the bar can be reached): a sting and a quick dolly zoom on him, then the shot hands back to the
+///    player's view as it tilts down onto the bar left behind him.
 /// 5. Taking the bar sets BarTaken (the corridor music goes silent on it; WallStanderChase arms on it).
 /// </summary>
 [DisallowMultipleComponent]
@@ -102,7 +103,7 @@ public class CorpseVanishEvent : MonoBehaviour
     [SerializeField] bool wallStanderWaitsForCall;
     [Tooltip("Kept off until he shows up, then turned on with him (e.g. an item left behind him).")]
     [SerializeField] GameObject[] appearWithWallStander;
-    [Tooltip("The lighter's light; the reveal only happens while it's burning.")]
+    [Tooltip("The lighter's light; the reveal only happens while it (or the flashlight's beam) reaches him.")]
     [SerializeField] Light wallRevealLight;
     [Tooltip("Height on him (from his feet) the reveal checks and the zoom looks at.")]
     [SerializeField] float wallRevealHeight = 1.4f;
@@ -114,6 +115,10 @@ public class CorpseVanishEvent : MonoBehaviour
     [SerializeField] float wallSeenScreenRadius = 0.35f;
     [Tooltip("The reveal also waits until the camera is this much closer to him than where he was first seen.")]
     [SerializeField] float wallRevealCloser = 0.3f;
+    [Tooltip("...or until he's been held within the reveal distance and screen radius this many seconds (his barrier can stop the step closer).")]
+    [SerializeField] float wallRevealLookTime = 1f;
+    [Tooltip("Any part of him on screen and in sight this close to the camera plays the reveal at once, lit or not, so the bar behind him can't be taken first.")]
+    [SerializeField] float wallRevealNearDistance = 2.6f;
     [Tooltip("Played as the zoom on him starts.")]
     [SerializeField] AudioClip wallStingClip;
     [SerializeField, Range(0f, 1f)] float wallStingVolume = 1f;
@@ -173,6 +178,7 @@ public class CorpseVanishEvent : MonoBehaviour
     bool _wallStanderCalled;
     bool _wallSeen;
     float _wallSeenDistance;
+    float _wallRevealHeld;
     bool _barShown;
 
     void Awake()
@@ -230,9 +236,19 @@ public class CorpseVanishEvent : MonoBehaviour
             TickNextDoor();
         else if (_stage == Stage.Done)
         {
-            if (!_wallRevealPlayed)
-                TickWallReveal();
             TickBarTaken();
+            if (!_wallRevealPlayed)
+            {
+                // Bar grabbed without the reveal: it would only cut into the chase now.
+                if (_barTaken)
+                {
+                    _wallRevealPlayed = true;
+                    _wallRevealOver = true;
+                    WallRevealFinished?.Invoke();
+                }
+                else
+                    TickWallReveal();
+            }
         }
     }
 
@@ -249,30 +265,35 @@ public class CorpseVanishEvent : MonoBehaviour
 
     void TickWallReveal()
     {
-        if (wallStander == null || !wallStander.activeInHierarchy || wallRevealLight == null || !wallRevealLight.isActiveAndEnabled)
+        if (wallStander == null || !wallStander.activeInHierarchy)
             return;
         Camera cam = Camera.main;
         if (cam == null)
             return;
 
         Vector3 point = wallStander.transform.position + Vector3.up * wallRevealHeight;
-        if (Vector3.Distance(wallRevealLight.transform.position, point) > wallRevealLight.range)
+        float distance = Vector3.Distance(cam.transform.position, point);
+        bool near = distance <= wallRevealNearDistance && PartlyInView(cam);
+        if (!near && !LitByPlayer(point))
             return;
         Vector3 vp = cam.WorldToViewportPoint(point);
         float fromCentre = new Vector2(vp.x - 0.5f, vp.y - 0.5f).magnitude;
-        float distance = Vector3.Distance(cam.transform.position, point);
 
         if (!_wallSeen)
         {
-            if (vp.z <= 0f || fromCentre > wallSeenScreenRadius || !HasLineOfSight(cam.transform.position, point))
+            if (!near && (vp.z <= 0f || fromCentre > wallSeenScreenRadius || !HasLineOfSight(cam.transform.position, point)))
                 return;
             _wallSeen = true;
             _wallSeenDistance = distance;
             WallStanderSeenEvent?.Invoke();
         }
 
-        if (vp.z <= 0f || fromCentre > wallRevealScreenRadius
-            || distance > Mathf.Min(wallRevealDistance, _wallSeenDistance - wallRevealCloser))
+        bool framed = vp.z > 0f && fromCentre <= wallRevealScreenRadius && distance <= wallRevealDistance;
+        _wallRevealHeld = framed ? _wallRevealHeld + Time.deltaTime : 0f;
+        if (!near && (!framed || (distance > _wallSeenDistance - wallRevealCloser && _wallRevealHeld < wallRevealLookTime)))
+            return;
+        // A tutorial card or note open right now: wait for it rather than lose the zoom.
+        if (wallZoomCamera != null && PlayerControlGate.IsInputBlocked)
             return;
 
         _wallRevealPlayed = true;
@@ -290,6 +311,36 @@ public class CorpseVanishEvent : MonoBehaviour
             _wallRevealOver = true;
             WallRevealFinished?.Invoke();
         }
+    }
+
+    bool LitByPlayer(Vector3 point)
+    {
+        if (wallRevealLight != null && wallRevealLight.isActiveAndEnabled
+            && Vector3.Distance(wallRevealLight.transform.position, point) <= wallRevealLight.range)
+            return true;
+        foreach (HeldFlashlight flashlight in FindObjectsByType<HeldFlashlight>(FindObjectsSortMode.None))
+        {
+            Light beam = flashlight.Beam;
+            if (flashlight.IsOn && beam != null && beam.isActiveAndEnabled
+                && Vector3.Distance(beam.transform.position, point) <= beam.range)
+                return true;
+        }
+        return false;
+    }
+
+    // Looking down at the bar behind him only his legs may be on screen.
+    bool PartlyInView(Camera cam)
+    {
+        Vector3 feet = wallStander.transform.position;
+        for (int i = 1; i <= 3; i++)
+        {
+            Vector3 p = feet + Vector3.up * (wallRevealHeight * i / 3f);
+            Vector3 vp = cam.WorldToViewportPoint(p);
+            if (vp.z > 0f && vp.x > 0.05f && vp.x < 0.95f && vp.y > 0.05f && vp.y < 0.95f
+                && HasLineOfSight(cam.transform.position, p))
+                return true;
+        }
+        return false;
     }
 
     bool HasLineOfSight(Vector3 from, Vector3 to)

@@ -45,7 +45,7 @@ TagManager:
   m_RenderingLayers:
   - Default
   - Viewmodel
-  - Light Layer 2
+  - Not Viewmodel
   - Light Layer 3
   - Light Layer 4
   - Light Layer 5

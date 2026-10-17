@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b3fb6c1c8058a749b2a30a3514c38f4, type: 3}
+  m_Name: Flashlight
+  m_EditorClassIdentifier: 
+  itemName: Flashlight
+  icon: {fileID: 21300000, guid: 751aa1b6637101946b2fdbb7aa27d6ad, type: 3}
+  worldPrefab: {fileID: 419004816898259260, guid: f8b01a30c5f2e774fa9fd690be3c68e1, type: 3}
+  dropLandSFX: {fileID: 0}
+  canDrop: 1
+  pickUpSFX: {fileID: 0}
+  useSuccessSound: {fileID: 0}
+  consumeOnUse: 0
+  maxStack: 1
+  interactionReachBonus: 0
+  reachAttemptFailMessage: 
+  hasPrimaryAction: 1
+  breaksOnWrongUse: 0
+  breakOnWrongUseSound: {fileID: 0}
+  breakOnWrongUseMessage: The screwdriver snapped.
+  nameKey: 
+  pickupKey: 
+  breakMessageKey: 
+  pickUpText: 
+  description: 

@@ -14,33 +14,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   npcName: Butcher
   npcPrefab: {fileID: 4884186263421869, guid: 9c0bee0b90b73ca45b439d3bf212e837, type: 3}
-  homeID: House_001
+  homeID: Demo_Environment
   captureChance: 0
   searchPositionWaitRange: {x: 2, y: 3}
   searchExtraSpotChances:
   - 0.35
   - 0.12
   weightedRoutinePlans:
-  - zoneID: House_001
+  - zoneID: Demo_Environment
     weight: 1
     roomPlans:
-    - roomAnchorID: Basement_Room
-      weight: 0.2
-      hotspots:
-      - hotspotID: hotspot_bed
-        weight: 1
-        duration: 8
-        actionType: 0
-        requiresVisualOffset: 1
-      - hotspotID: hotspot_bench
-        weight: 0
-        duration: 6
-        actionType: 10
-        requiresVisualOffset: 0
-    - roomAnchorID: Corridor-Kitchen_Room
+    - roomAnchorID: Basement_Main_Room
       weight: 0.3
       hotspots:
-      - hotspotID: Hotspot_Idle
+      - hotspotID: Hotspot_Idle_Basement
         weight: 0.266
         duration: 6
         actionType: 10
@@ -50,7 +37,7 @@ MonoBehaviour:
         duration: 6
         actionType: 12
         requiresVisualOffset: 0
-    - roomAnchorID: Living_room
+    - roomAnchorID: Livingroom_Room
       weight: 0.2
       hotspots:
       - hotspotID: Hotspot_Sofa
@@ -58,13 +45,18 @@ MonoBehaviour:
         duration: 10
         actionType: 0
         requiresVisualOffset: 1
-    - roomAnchorID: Garden_Room
-      weight: 0
+    - roomAnchorID: Outside_Room
+      weight: 0.2
       hotspots:
       - hotspotID: Hotspot_Idle
-        weight: 0.165
+        weight: 0.5
         duration: 3
         actionType: 10
+        requiresVisualOffset: 0
+      - hotspotID: Hotspot_JumpingJacks
+        weight: 0.5
+        duration: 6
+        actionType: 11
         requiresVisualOffset: 0
   patrolChance: 0
   patrolDuration: 10
@@ -90,7 +82,7 @@ MonoBehaviour:
     footstepDecayPerSecond: 10
   locomotion:
     walkingSpeed: 2.5
-    runningSpeed: 4
+    runningSpeed: 5
   chaseRetention:
     gracePeriod: 3
     keepChasingDistance: 5

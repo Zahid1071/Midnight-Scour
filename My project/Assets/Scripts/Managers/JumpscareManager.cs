@@ -35,6 +35,7 @@ public class JumpscareManager : MonoBehaviour
 
     Coroutine _endGameRoutine;
     Coroutine _impactPunchRoutine;
+    bool _endsDemo;
     float _impactBaseFov = 60f;
     float _impactBaseDutch;
 
@@ -91,9 +92,11 @@ public class JumpscareManager : MonoBehaviour
         }
     }
 
-    public void TriggerJumpscare(Transform jumpscarePoint, Transform npcFace)
+    /// <param name="endsDemo">Show the demo end screen afterwards instead of the game over.</param>
+    public void TriggerJumpscare(Transform jumpscarePoint, Transform npcFace, bool endsDemo = false)
     {
         BeginCaptureUi();
+        _endsDemo = endsDemo;
 
         if (npcFace != null)
         {
@@ -238,7 +241,7 @@ public class JumpscareManager : MonoBehaviour
         if (demoEndScreen == null)
             demoEndScreen = FindFirstObjectByType<DemoEndScreenUI>(FindObjectsInactive.Include);
 
-        if (DemoEndDirector.IsDemoFinaleActive && demoEndScreen != null)
+        if ((_endsDemo || DemoEndDirector.IsDemoFinaleActive) && demoEndScreen != null)
         {
             CaptureContext.Clear();
             ShowWishlistBanner();

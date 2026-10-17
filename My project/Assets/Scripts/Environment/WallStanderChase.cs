@@ -144,6 +144,8 @@ public class WallStanderChase : MonoBehaviour
     [SerializeField] float searchWaitAtPlayer = 4f;
     [Tooltip("Leaving their spot in his sight within this distance brings him after them.")]
     [SerializeField] float spotDistance = 12f;
+    [Tooltip("Loud on the mic while hidden, with their spot within this distance of him as he searches or heads home: he goes straight to it and drags them out.")]
+    [SerializeField] float hearingDistance = 15f;
     [Tooltip("Metres per second while he searches and heads home. The Butcher's blend tree walks at 2.5 and runs from 3.")]
     [FormerlySerializedAs("walkSpeed")]
     [SerializeField] float searchSpeed = 3.6f;
@@ -155,6 +157,8 @@ public class WallStanderChase : MonoBehaviour
     [Header("Capture")]
     [Tooltip("Flat distance to the player at which he catches them.")]
     [SerializeField] float captureDistance = 1.2f;
+    [Tooltip("Stopped within this distance (m, flat) of the player's hiding spot, as close as the navmesh lets him get, he drags them out.")]
+    [SerializeField] float hiddenCaptureReach = 3f;
     [SerializeField] string captureTrigger = "Jumpscare";
     [Tooltip("Under his head bone, turned to match the Butcher's head, so the jumpscare camera sits where it does for the Butcher.")]
     [SerializeField] Transform jumpscareAnchor;
@@ -217,10 +221,15 @@ public class WallStanderChase : MonoBehaviour
     int _speedId;
     bool _hasSpeed;
     float _animSpeed;
+    float _stillFor;
     string _locomotion;
     readonly System.Collections.Generic.List<Renderer> _hiddenRenderers = new System.Collections.Generic.List<Renderer>();
 
     public bool IsChasing => _state == State.Chasing;
+    /// <summary>He's behind the shut escape door, pounding on it.</summary>
+    public bool IsShutOut => _state == State.Pounding;
+    /// <summary>The door is shut on him and the hide shot is over (the auto-save checkpoint).</summary>
+    public event System.Action ShutOut;
 
     void Awake()
     {
@@ -265,6 +274,7 @@ public class WallStanderChase : MonoBehaviour
         }
         ReleaseEffects();
         StopMusic();
+        RunPromptUI.Hide();
         StopShake();
         StopHideShot();
     }
@@ -283,6 +293,7 @@ public class WallStanderChase : MonoBehaviour
             && (_state != State.Waiting || (wallStanderEvent != null && wallStanderEvent.BarTaken)))
             noCloseDoor.PlayerCanClose = false;
 
+        FindStamina();
         TickMic();
         if (_state == State.Waiting)
             TickTrigger();
@@ -327,17 +338,19 @@ public class WallStanderChase : MonoBehaviour
         _routine = StartCoroutine(RoarRoutine());
     }
 
+    void FindStamina()
+    {
+        if (_stamina != null)
+            return;
+        _stamina = FindFirstObjectByType<HidingStamina>();
+        if (_stamina != null)
+            _stamina.NoiseAlert += OnNoise;
+    }
+
     void TickMic()
     {
-        if (_mic == Mic.Done || wallStanderEvent == null || escapeSide == null)
+        if (_mic == Mic.Done || wallStanderEvent == null || escapeSide == null || _stamina == null)
             return;
-        if (_stamina == null)
-        {
-            _stamina = FindFirstObjectByType<HidingStamina>();
-            if (_stamina == null)
-                return;
-            _stamina.NoiseAlert += OnNoise;
-        }
 
         if (_mic == Mic.Off)
         {
@@ -369,6 +382,11 @@ public class WallStanderChase : MonoBehaviour
     // Loud on the mic once the reveal on him is over and the bar is in hand: he hears them and comes.
     void OnNoise()
     {
+        if (Searching)
+        {
+            HeardInHiding();
+            return;
+        }
         if (_mic != Mic.Shown || _state != State.Waiting || !wallStanderEvent.WallRevealOver || !wallStanderEvent.BarTaken
             || PlayerControlGate.IsInputBlocked || ThunderManager.ArePlayerNoisesMasked
             || _player == null || Cage.IsPlayerInsideAnyCage(_player))
@@ -376,9 +394,24 @@ public class WallStanderChase : MonoBehaviour
         _routine = StartCoroutine(RoarRoutine());
     }
 
+    // Loud in their spot while he searches or heads home: he runs to it and the chase drags them out.
+    void HeardInHiding()
+    {
+        HidingSpot spot = PlayerSpot();
+        if (spot == null || !_agent.enabled || ThunderManager.ArePlayerNoisesMasked)
+            return;
+        Transform pivot = spot.GetSearchPivot();
+        Vector3 noisePos = pivot != null ? pivot.position : spot.transform.position;
+        if (Vector3.Distance(transform.position, noisePos) > hearingDistance)
+            return;
+        CaptureContext.Set(CaptureReason.HideNoise);
+        BreakIntoChase();
+    }
+
     IEnumerator RoarRoutine()
     {
         _state = State.Roaring;
+        RunPromptUI.Show();
         HeldLighter lighter = FindFirstObjectByType<HeldLighter>(FindObjectsInactive.Include);
         if (lighter != null)
         {
@@ -439,11 +472,9 @@ public class WallStanderChase : MonoBehaviour
     {
         if (keepAwayBarrier != null)
             keepAwayBarrier.enabled = false;
-        if (animator != null)
-        {
-            animator.applyRootMotion = false;
-            animator.CrossFadeInFixedTime(runState, runBlend, 0);
-        }
+        _locomotion = null;
+        _stillFor = 0f;
+        PlayLocomotion(runState, runBlend);
 
         _agent.enabled = true;
         if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 2f, NavMesh.AllAreas))
@@ -591,12 +622,32 @@ public class WallStanderChase : MonoBehaviour
                 OpenDoorsInTheWay();
         }
 
-        if (animator != null && _hasRunSpeed)
-            animator.SetFloat(_runSpeedId, Mathf.Clamp(_agent.velocity.magnitude / Mathf.Max(0.01f, runClipSpeed), 0.6f, 2f));
+        TickChaseAnimation();
 
         Vector3 offset = target - transform.position;
-        if (Flat(offset).magnitude <= captureDistance + (hidden ? 0.5f : 0f) && Mathf.Abs(offset.y) < 1.5f)
+        float flat = Flat(offset).magnitude;
+        bool reached = flat <= captureDistance + (hidden ? 0.5f : 0f);
+        // The spot's pivot can sit off the navmesh, inside the hiding place: stopped as close as he can get counts.
+        if (hidden && !reached && flat <= hiddenCaptureReach)
+            reached = _stillFor >= 0.3f
+                      || (!_agent.pathPending && _agent.remainingDistance <= _agent.stoppingDistance + 0.3f);
+        if (reached && Mathf.Abs(offset.y) < 1.5f)
             _routine = StartCoroutine(CaptureRoutine(hider, hidden));
+    }
+
+    // The Butcher's run while he's moving; held up (a door, the end of his path) he drops to the idle of the blend tree.
+    void TickChaseAnimation()
+    {
+        float speed = _agent.velocity.magnitude;
+        _stillFor = speed < 0.3f ? _stillFor + Time.deltaTime : 0f;
+        bool still = _stillFor >= 0.2f;
+        PlayLocomotion(still ? locomotionState : runState, still ? walkBlend : runBlend);
+        if (animator == null)
+            return;
+        if (still && _hasSpeed)
+            animator.SetFloat(_speedId, 0f);
+        if (_hasRunSpeed)
+            animator.SetFloat(_runSpeedId, Mathf.Clamp(speed / Mathf.Max(0.01f, runClipSpeed), 0.6f, 2f));
     }
 
     float SideOfEscape(Vector3 point) => Vector3.Dot(point - escapeSide.position, escapeSide.forward);
@@ -654,11 +705,41 @@ public class WallStanderChase : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Checkpoint load: back to him pounding on the shut escape door, the hide shot already seen. The player gets the
+    /// usual time to hide before he breaks in.
+    /// </summary>
+    public void RestoreShutOut()
+    {
+        if (escapeDoor == null || escapeSide == null)
+            return;
+        if (_player == null)
+        {
+            GameObject p = GameObject.FindWithTag("Player");
+            if (p == null)
+                return;
+            _player = p.transform;
+        }
+        if (_routine != null)
+            StopCoroutine(_routine);
+        if (keepAwayBarrier != null)
+            keepAwayBarrier.enabled = false;
+        _mic = Mic.Done;
+        if (_stamina != null)
+            _stamina.SetOpenListening(false);
+        _breached = false;
+        _doorShutting = false;
+        transform.SetPositionAndRotation(escapeSide.position - escapeSide.forward * 1.2f,
+            Quaternion.LookRotation(Flat(escapeSide.forward)));
+        _routine = StartCoroutine(PoundRoutine(resumed: true));
+    }
+
     // The moment the door is shut he slams into it and keeps pounding while the shot shows the player where to hide.
-    // Once they've hidden (or had their chance) he breaks in.
-    IEnumerator PoundRoutine()
+    // Once they've hidden (or had their chance) he breaks in. Resumed from a checkpoint, the slam and the shot are past.
+    IEnumerator PoundRoutine(bool resumed = false)
     {
         _state = State.Pounding;
+        RunPromptUI.Hide();
 
         // Behind the shut door, out of sight.
         if (_agent.isOnNavMesh)
@@ -672,9 +753,10 @@ public class WallStanderChase : MonoBehaviour
         Vector3 bangPoint = (doorCollider != null ? doorCollider.bounds.center : escapeDoor.transform.position)
                             + escapeSide.forward * 0.15f;
 
-        _hideShotDone = hideShot == null;
-        int bangs = 0;
-        float nextBang = 0f;
+        _hideShotDone = resumed || hideShot == null;
+        bool checkpointed = resumed;
+        int bangs = resumed ? 1 : 0;
+        float nextBang = resumed ? Time.time + bangGap.y : 0f;
         float waited = 0f;
         float hiddenFor = 0f;
         while (!escapeDoor.objectOpen)
@@ -689,6 +771,11 @@ public class WallStanderChase : MonoBehaviour
             }
             if (_hideShotDone)
             {
+                if (!checkpointed)
+                {
+                    checkpointed = true;
+                    ShutOut?.Invoke();
+                }
                 waited += Time.deltaTime;
                 hiddenFor = PlayerHidden() ? hiddenFor + Time.deltaTime : 0f;
                 if (hiddenFor >= breakInAfterHidden || waited >= hideTime)
@@ -892,7 +979,9 @@ public class WallStanderChase : MonoBehaviour
             BreakIntoChase();
     }
 
-    void PlayLocomotion(string state)
+    void PlayLocomotion(string state) => PlayLocomotion(state, walkBlend);
+
+    void PlayLocomotion(string state, float blend)
     {
         if (state == _locomotion)
             return;
@@ -900,7 +989,7 @@ public class WallStanderChase : MonoBehaviour
         if (animator == null || string.IsNullOrEmpty(state) || !animator.HasState(0, Animator.StringToHash(state)))
             return;
         animator.applyRootMotion = false;
-        animator.CrossFadeInFixedTime(state, walkBlend, 0);
+        animator.CrossFadeInFixedTime(state, blend, 0);
     }
 
     bool SeesPlayer()
@@ -929,12 +1018,9 @@ public class WallStanderChase : MonoBehaviour
         StopHideShot();
         if (_nav != null && _agent.isOnNavMesh)
             _nav.ClearRoute();
-        if (animator != null)
-        {
-            animator.applyRootMotion = false;
-            animator.CrossFadeInFixedTime(runState, runBlend, 0);
-        }
         _locomotion = null;
+        _stillFor = 0f;
+        PlayLocomotion(runState, runBlend);
         _agent.speed = chaseSpeed;
         _agent.acceleration = _baseAcceleration;
         _agent.isStopped = false;
@@ -942,6 +1028,7 @@ public class WallStanderChase : MonoBehaviour
         _breached = true;
         _state = State.Chasing;
         StartMusic();
+        RunPromptUI.Show();
     }
 
     void SetVisible(bool visible)
@@ -1051,6 +1138,7 @@ public class WallStanderChase : MonoBehaviour
     IEnumerator CaptureRoutine(PlayerHider hider, bool hidden)
     {
         _state = State.Captured;
+        RunPromptUI.Hide();
         FadeOutMusic(1f);
         if (_agent.isOnNavMesh)
         {
@@ -1065,6 +1153,12 @@ public class WallStanderChase : MonoBehaviour
 
         if (hidden && hider.CurrentHidingSpot != null)
         {
+            PlayLocomotion(locomotionState, walkBlend);
+            if (animator != null && _hasSpeed)
+                animator.SetFloat(_speedId, 0f);
+            Vector3 toSpot = Flat(hider.CurrentHidingSpot.transform.position - transform.position);
+            if (toSpot.sqrMagnitude > 1e-4f)
+                transform.rotation = Quaternion.LookRotation(toSpot);
             hider.CurrentHidingSpot.RevealPlayerForCapture(_player.gameObject);
             if (hideExitSecondsBeforeCapture > 0f)
                 yield return new WaitForSeconds(hideExitSecondsBeforeCapture);
@@ -1148,7 +1242,10 @@ public class WallStanderChase : MonoBehaviour
             animator.Play(wallState, 0, 0f);
             animator.Update(0f);
         }
+        _locomotion = wallState;
+        _stillFor = 0f;
         StopMusic();
+        RunPromptUI.Hide();
         ReleaseEffects();
         StopShake();
         _breached = false;

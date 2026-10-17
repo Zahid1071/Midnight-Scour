@@ -37,9 +37,10 @@ public sealed class HeldItemView : MonoBehaviour
 
     [SerializeField] private bool castShadows;
 
-    [Tooltip("Rendering layers for every renderer of this view. Lights only affect it if they share a layer, " +
-             "which keeps camera-mounted fill lights from flattening and blowing out the arms.")]
-    [SerializeField] private uint renderingLayers = 1u << 1;
+    [Tooltip("Rendering layers for every renderer of this view. Lights only affect it if they share a layer: " +
+             "Default for the scene's lights, Viewmodel for arm-only lights. Camera-mounted lights that would " +
+             "blow out the arms go on the Not Viewmodel layer, which the Viewmodel Skin shader ignores.")]
+    [SerializeField] private uint renderingLayers = (1u << 0) | (1u << 1);
 
     private readonly Dictionary<string, Transform> _sockets = new();
     private float _putDownTimer;

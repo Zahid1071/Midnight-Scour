@@ -16,7 +16,7 @@ namespace FS_Atmo
         [SerializeField] float doorOpenWaitTimeout = 2.5f;    // wait for carve to clear before crossing
         [SerializeField] float doorTransitTimeout = 12f;      // abort A↔B loop if crossing stalls
         [Tooltip("Room ID that grants brief player-footstep deafness when this NPC opens a door to enter it.")]
-        [SerializeField] string footstepDeafnessEnterRoomId = "Basement_Room";
+        [SerializeField] string footstepDeafnessEnterRoomId = "Basement_Main_Room";
         [Tooltip("Seconds to linger after the door is open when entering footstepDeafnessEnterRoomId (basement). Other doors are unaffected.")]
         [SerializeField] float basementDoorPostOpenHold = 2f;
 

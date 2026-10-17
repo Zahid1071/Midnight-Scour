@@ -403,7 +403,7 @@ MonoBehaviour:
   stuckTimeout: 3
   doorOpenWaitTimeout: 2.5
   doorTransitTimeout: 12
-  footstepDeafnessEnterRoomId: Basement_Room
+  footstepDeafnessEnterRoomId: Basement_Main_Room
   basementDoorPostOpenHold: 2
   logPlannedRoute: 1
 --- !u!114 &8822441100112233501

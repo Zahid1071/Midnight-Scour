@@ -864,6 +864,10 @@ MonoBehaviour:
       robisz, inaczej mog\u0105 ci\u0119 us\u0142ysze\u0107."
     m_Metadata:
       m_Items: []
+  - m_Id: 36908069202821121
+    m_Localized: UCIEKAJ
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

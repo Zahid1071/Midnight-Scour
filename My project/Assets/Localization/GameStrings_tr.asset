@@ -867,6 +867,10 @@ MonoBehaviour:
       etmek zorundas\u0131n, yoksa seni duyabilirler."
     m_Metadata:
       m_Items: []
+  - m_Id: 36908069202821121
+    m_Localized: "KA\xC7"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

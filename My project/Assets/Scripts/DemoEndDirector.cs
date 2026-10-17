@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 /// <summary>
-/// Demo finale: when the player picks up the basement key, the butcher stops reacting to
+/// Demo finale: when <see cref="BeginDoorAmbush"/> is called, the butcher stops reacting to
 /// noise, abandons routine, moves to a door ambush point, and waits for line-of-sight
 /// before chasing into the existing capture / jumpscare / menu flow.
 /// </summary>
@@ -16,7 +16,6 @@ public class DemoEndDirector : MonoBehaviour
     [Header("References")]
     [SerializeField] NPCController butcher;
     [SerializeField] Transform doorAmbushPoint;
-    [SerializeField] InventoryItem triggerKey;
 
     [Header("Movement")]
     [SerializeField] float arriveDistance = 0.4f;
@@ -34,14 +33,6 @@ public class DemoEndDirector : MonoBehaviour
     {
         if (Instance == this)
             Instance = null;
-    }
-
-    public void NotifyItemPickedUp(InventoryItem item)
-    {
-        if (item == null || triggerKey == null || item != triggerKey)
-            return;
-
-        BeginDoorAmbush();
     }
 
     public void BeginDoorAmbush()
