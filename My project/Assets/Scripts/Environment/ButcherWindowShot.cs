@@ -11,8 +11,9 @@ using UnityEngine.SceneManagement;
 /// in on the car the way the hide shot does, a light coming up over it, then turns heavily to a window of the house where the
 /// butcher stands lit from behind, staring out.
 /// It is the real butcher, moved there and held for the stare: he wheels round and sets off on a relentless hunt for
-/// the player, and control returns once the view has blended back.
-/// Installs itself in any scene with Outdoor Fog; left empty, the car, window and butcher are found when it plays.
+/// the player, and control returns once the view has blended back, his chase music taking over until the hunt ends.
+/// Installs itself in any scene with Outdoor Fog unless the scene already has one (put it in the scene to assign the
+/// sounds); left empty, the car, window and butcher are found when it plays.
 /// The object must be named "Butcher Window Camera": the brain's custom blends cut into it and ease out of it by name.
 /// </summary>
 [DisallowMultipleComponent]
@@ -47,6 +48,9 @@ public class ButcherWindowShot : MonoBehaviour
              "its size while the camera keeps moving (widening as it pushes in, narrowing as it pulls back).")]
     [SerializeField, Range(0.05f, 1f)] float carZoom = 0.45f;
     [SerializeField] float carHold = 0.5f;
+    [Tooltip("Shown as the view lands on the car.")]
+    [SerializeField] string carSubtitleKey = "gameplay.thats_my_car";
+    [SerializeField] float carSubtitleSeconds = 2.5f;
 
     [Header("Car Light")]
     [Tooltip("Comes up over the car as the view closes in so it reads in the dark, and dies as the view turns away.")]
@@ -95,18 +99,45 @@ public class ButcherWindowShot : MonoBehaviour
     [SerializeField, Range(0.5f, 1f)] float stareCreep = 0.85f;
     [Tooltip("Outdoor fog density while on the window, as a share of normal, so he reads from across the yard.")]
     [SerializeField, Range(0f, 1f)] float windowFog = 0.25f;
-    [Tooltip("Played as the view turns onto the window.")]
+
+    [Header("Sound (all played flat, through the SFX mixer)")]
+    [Tooltip("Played as the shot cuts in from the player's view.")]
+    [SerializeField] AudioClip startSfx;
+    [SerializeField, Range(0f, 1f)] float startVolume = 1f;
+    [Tooltip("Played as the view lands on the car and its light is full.")]
+    [SerializeField] AudioClip carSfx;
+    [SerializeField, Range(0f, 1f)] float carVolume = 1f;
+    [Tooltip("Played as the view starts turning from the car to the window.")]
+    [SerializeField] AudioClip turnSfx;
+    [SerializeField, Range(0f, 1f)] float turnVolume = 1f;
+    [Tooltip("Played as the butcher comes into view in the window (Sting At, under Window).")]
     [SerializeField] AudioClip sting;
     [SerializeField, Range(0f, 1f)] float stingVolume = 1f;
+    [Tooltip("Played as he wheels round and sets off after the player.")]
+    [SerializeField] AudioClip butcherTurnSfx;
+    [SerializeField, Range(0f, 1f)] float butcherTurnVolume = 1f;
+    [Tooltip("Played as the light in the empty window dies.")]
+    [SerializeField] AudioClip lightOutSfx;
+    [SerializeField, Range(0f, 1f)] float lightOutVolume = 1f;
+
+    [Header("Chase Music")]
+    [Tooltip("Takes over the music as the view blends back to the player, until the hunt ends (capture or Continue).")]
+    [SerializeField] AudioClip chaseMusic;
 
     [Header("Run")]
     [Tooltip("Played on him when he is put at the window, so a seat or routine pose doesn't carry over.")]
     [SerializeField] string locomotionState = "Base Blend";
     [Tooltip("Seconds he takes to wheel round toward the way out before the hunt starts.")]
     [SerializeField] float turnTime = 0.25f;
-    [Tooltip("Seconds the view stays on the window after he turns, watching him set off after the player.")]
-    [SerializeField] float runTime = 0.9f;
-    [Tooltip("Seconds on the empty window, the light dying, before the view goes back.")]
+    [Tooltip("Seconds the view follows him after he turns, panning with him as he runs off after the player.")]
+    [SerializeField] float runTime = 2f;
+    [Tooltip("Height on him (metres above his feet) the view follows.")]
+    [SerializeField] float followHeight = 1.4f;
+    [Tooltip("How tightly the view keeps up with him; lower lags further behind, like a head swinging after him.")]
+    [SerializeField] float followSharpness = 5f;
+    [Tooltip("Field of view at the end of the follow, as a multiple of the stare's, so his run reads in the frame.")]
+    [SerializeField, Range(1f, 2f)] float followWiden = 1.35f;
+    [Tooltip("Seconds the window light takes to die once he has gone, the view still on him, before it goes back.")]
     [SerializeField] float emptyHold = 0.45f;
     [Tooltip("Seconds of the blend back to the player view (the brain's custom blend); control returns after it.")]
     [SerializeField] float blendOut = 0.8f;
@@ -119,12 +150,21 @@ public class ButcherWindowShot : MonoBehaviour
     [SerializeField] Vector2 backlightOffset = new Vector2(1.6f, 1.9f);
     [SerializeField, Range(0f, 1f)] float flicker = 0.15f;
 
+    /// <summary>True once the shot has played in this scene and handed control back to the player.</summary>
+    public static bool HasFinished { get; private set; }
+
+    /// <summary>The player is out of the basement and the shot is about to take over; nothing has moved yet.</summary>
+    public event Action Triggered;
+
     CinemachineCamera _cam;
     NPCController[] _npcs;
     bool _played;
     bool _locked;
     NPCController _held;
     bool _heldHearingDisabled;
+    NPCController _hunter;
+    bool _chaseMusicOn;
+    bool _runPromptOn;
     Light _backlight;
     Light _carLight;
     bool _hasExit;
@@ -146,6 +186,7 @@ public class ButcherWindowShot : MonoBehaviour
 
     static void Install()
     {
+        HasFinished = false;
         if (FindFirstObjectByType<OutdoorFog>() == null || FindFirstObjectByType<ButcherWindowShot>(FindObjectsInactive.Include) != null)
             return;
         new GameObject(CameraName).AddComponent<ButcherWindowShot>();
@@ -192,10 +233,20 @@ public class ButcherWindowShot : MonoBehaviour
     bool OutOfBasement(Vector3 eye) =>
         eye.y >= outdoorEyeY && (!_hasExit || Vector3.Dot(Flat(eye - _exitPoint), _exitOut) >= exitClearance);
 
-    void OnDisable() => Stop();
+    void OnDisable()
+    {
+        Stop();
+        HideRunPrompt();
+        EndChaseMusic();
+    }
 
     void Update()
     {
+        // Before the music: ending it forgets the hunter.
+        if (_runPromptOn && !Hunting())
+            HideRunPrompt();
+        if (_chaseMusicOn && !Hunting())
+            EndChaseMusic();
         if (_played)
             return;
         if (_player == null)
@@ -206,8 +257,10 @@ public class ButcherWindowShot : MonoBehaviour
         // The butcher is spawned in after the scene loads.
         if (_npcs == null || _npcs.Length == 0)
             _npcs = FindObjectsByType<NPCController>(FindObjectsSortMode.None);
-        if (!Chased())
-            StartCoroutine(Play());
+        if (Chased())
+            return;
+        Triggered?.Invoke();
+        StartCoroutine(Play());
     }
 
     struct Aim
@@ -250,6 +303,7 @@ public class ButcherWindowShot : MonoBehaviour
         float fov = main.fieldOfView;
         Pose(pos, rot, fov);
         _cam.Priority = priority;
+        PlaySfx(startSfx, startVolume);
 
         // The car, in one move: turn to it (landing early) while the camera travels and the lens zooms at once, the
         // light coming up over it. A push stops where holding the frame would need a lens wider than the player's.
@@ -271,9 +325,16 @@ public class ButcherWindowShot : MonoBehaviour
             Vector3 to = pos + dir * travel;
             Quaternion fromRot = rot;
             float fromFill = size / (distance * Mathf.Tan(fov * 0.5f * Mathf.Deg2Rad));
+            bool landed = false;
             for (float t = 0f; t < carMoveTime; t += Time.deltaTime)
             {
                 float k = t / carMoveTime;
+                if (!landed && k >= carTurn)
+                {
+                    landed = true;
+                    PlaySfx(carSfx, carVolume);
+                    ShowCarSubtitle();
+                }
                 float u = SmootherStep(k);
                 pos = Vector3.Lerp(from, to, u);
                 rot = Quaternion.Slerp(fromRot, Quaternion.LookRotation(look - pos), SmootherStep(k / carTurn));
@@ -287,6 +348,11 @@ public class ButcherWindowShot : MonoBehaviour
             rot = Quaternion.LookRotation(look - pos);
             Pose(pos, rot, fov);
             SetCarLight(1f);
+            if (!landed)
+            {
+                PlaySfx(carSfx, carVolume);
+                ShowCarSubtitle();
+            }
             if (carHold > 0f)
                 yield return new WaitForSeconds(carHold);
         }
@@ -331,6 +397,7 @@ public class ButcherWindowShot : MonoBehaviour
             float x = 0f, v = 0f;
             bool stung = false;
             float total = headTime + stareTime;
+            PlaySfx(turnSfx, turnVolume);
             for (float t = 0f; t < total; t += Time.deltaTime)
             {
                 const float step = 1f / 240f;
@@ -358,8 +425,7 @@ public class ButcherWindowShot : MonoBehaviour
                 if (!stung && t >= stingAt * headTime)
                 {
                     stung = true;
-                    if (sting != null)
-                        AudioSource.PlayClipAtPoint(sting, main.transform.position, stingVolume);
+                    PlaySfx(sting, stingVolume);
                 }
                 if (_held != null)
                     _held.poiLookDirector?.TickLockedPlayerLook();
@@ -374,44 +440,70 @@ public class ButcherWindowShot : MonoBehaviour
         }
 
         // The run: he wheels round toward the way out and goes after the player for real.
+        Transform runner = null;
         if (_held != null)
         {
-            Transform body = _held.transform;
-            Quaternion facing = body.rotation;
-            Quaternion away = Quaternion.LookRotation(RunDirection(_held, body.position, -outward));
+            PlaySfx(butcherTurnSfx, butcherTurnVolume);
+            runner = _held.transform;
+            Quaternion facing = runner.rotation;
+            Quaternion away = Quaternion.LookRotation(RunDirection(_held, runner.position, -outward));
             for (float t = 0f; t < turnTime && _held != null; t += Time.deltaTime)
             {
-                body.rotation = Quaternion.Slerp(facing, away, SmootherStep(t / Mathf.Max(0.01f, turnTime)));
+                runner.rotation = Quaternion.Slerp(facing, away, SmootherStep(t / Mathf.Max(0.01f, turnTime)));
                 FlickerBacklight(1f);
                 yield return null;
             }
             ReleaseIntoHunt();
         }
-        for (float t = 0f; t < runTime; t += Time.deltaTime)
+
+        // The view swings after him as he runs, lagging a little, the lens easing wider; once he's gone the window
+        // light dies behind him while the view stays on him.
+        Vector3 lastSeen = windowLook;
         {
-            FlickerBacklight(1f);
-            yield return null;
+            float fromFov = fov;
+            float followTotal = runTime + emptyHold;
+            bool lightOut = false;
+            for (float t = 0f; t < followTotal; t += Time.deltaTime)
+            {
+                if (runner != null)
+                    lastSeen = runner.position + Vector3.up * followHeight;
+                Vector3 toTarget = lastSeen - pos;
+                if (toTarget.sqrMagnitude > 0.01f)
+                    rot = Quaternion.Slerp(rot, Quaternion.LookRotation(toTarget), 1f - Mathf.Exp(-followSharpness * Time.deltaTime));
+                fov = Mathf.Lerp(fromFov, Mathf.Min(fromFov * followWiden, 60f), SmootherStep(t / Mathf.Max(0.01f, runTime)));
+                Pose(pos, rot, fov);
+
+                if (t < runTime)
+                    FlickerBacklight(1f);
+                else
+                {
+                    if (!lightOut)
+                    {
+                        lightOut = true;
+                        PlaySfx(lightOutSfx, lightOutVolume);
+                    }
+                    FlickerBacklight(1f - (t - runTime) / Mathf.Max(0.01f, emptyHold));
+                }
+                yield return null;
+            }
+            if (!lightOut)
+                PlaySfx(lightOutSfx, lightOutVolume);
+            FlickerBacklight(0f);
         }
 
-        // The empty window, the light dying.
-        for (float t = 0f; t < emptyHold; t += Time.deltaTime)
-        {
-            FlickerBacklight(1f - t / emptyHold);
-            yield return null;
-        }
-        FlickerBacklight(0f);
-
-        // The player is left facing the window as the view blends back.
+        // The player is left facing where he was last seen as the view blends back.
         CinemachineMouseLook mouseLook = FindFirstObjectByType<CinemachineMouseLook>();
         if (mouseLook != null)
-            mouseLook.SetLook(Quaternion.LookRotation(Flat(windowLook - eye)));
+            mouseLook.SetLook(Quaternion.LookRotation(Flat(lastSeen - eye)));
         _cam.Priority = 0;
+        StartChaseMusic();
         for (float t = 0f; t < blendOut; t += Time.deltaTime)
         {
             OutdoorFog.DensityScale = Mathf.Lerp(windowFog, 1f, SmootherStep(t / blendOut));
             yield return null;
         }
         Stop();
+        ShowRunPrompt();
     }
 
     /// <summary>Ends the shot at once and gives control back.</summary>
@@ -429,6 +521,8 @@ public class ButcherWindowShot : MonoBehaviour
             if (r != null)
                 r.enabled = true;
         _hiddenViewmodel.Clear();
+        if (_played)
+            HasFinished = true;
         if (!_locked)
             return;
         _locked = false;
@@ -619,7 +713,64 @@ public class ButcherWindowShot : MonoBehaviour
             Debug.LogWarning($"ButcherWindowShot: {butcher.name} didn't start the hunt (state {butcher.currentState}).", this);
             butcher.poiLookDirector?.UnlockLookFromPlayer();
             butcher.EnsureNaturalRoutineStarted();
+            return;
         }
+        _hunter = butcher;
+    }
+
+    // Capture can drop back into the chase (he breaks off to drag them from a hiding spot), so it still counts.
+    bool Hunting() =>
+        _hunter != null && !PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured)
+        && (_hunter.currentState == NPCController.AIState.Chase || _hunter.currentState == NPCController.AIState.Capture);
+
+    void StartChaseMusic()
+    {
+        if (chaseMusic == null || SoundManager.Instance == null || !Hunting())
+            return;
+        _chaseMusicOn = true;
+        SoundManager.Instance.SetChaseMusicActive(true, chaseMusic);
+    }
+
+    void EndChaseMusic()
+    {
+        _hunter = null;
+        if (!_chaseMusicOn)
+            return;
+        _chaseMusicOn = false;
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.SetChaseMusicActive(false);
+    }
+
+    void ShowRunPrompt()
+    {
+        if (!Hunting())
+            return;
+        _runPromptOn = true;
+        RunPromptUI.Show();
+    }
+
+    void HideRunPrompt()
+    {
+        if (!_runPromptOn)
+            return;
+        _runPromptOn = false;
+        RunPromptUI.Hide();
+    }
+
+    static void PlaySfx(AudioClip clip, float volume)
+    {
+        if (clip == null)
+            return;
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlaySFX(clip, volume);
+        else if (Camera.main != null)
+            AudioSource.PlayClipAtPoint(clip, Camera.main.transform.position, volume);
+    }
+
+    void ShowCarSubtitle()
+    {
+        if (HudManager.Instance != null && !string.IsNullOrEmpty(carSubtitleKey))
+            HudManager.Instance.ShowSubtitle(Loc.Get(carSubtitleKey), carSubtitleSeconds);
     }
 
     // First leg of his way from the window to the player, so the turn already points where the hunt will take him.

@@ -871,6 +871,27 @@ MonoBehaviour:
     m_Localized: "KA\xC7"
     m_Metadata:
       m_Items: []
+  - m_Id: 36908069202821122
+    m_Localized: "Mikrofon Ayarlar\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069202821123
+    m_Localized: "Oyun \xE7ok fazla ya da \xE7ok az ses alg\u0131l\u0131yorsa, mikrofon
+      hassasiyetini ayarlardan de\u011Fi\u015Ftirebilirsin."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913856
+    m_Localized: Mikrofon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913857
+    m_Localized: Arabam orada duruyor.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913858
+    m_Localized: Ceset nereye gitti?
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

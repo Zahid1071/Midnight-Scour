@@ -25,28 +25,85 @@ MonoBehaviour:
     weight: 1
     roomPlans:
     - roomAnchorID: Basement_Main_Room
-      weight: 0.3
+      weight: 0.25
       hotspots:
       - hotspotID: Hotspot_Idle_Basement
-        weight: 0.266
+        weight: 0.4
         duration: 6
         actionType: 10
         requiresVisualOffset: 0
       - hotspotID: Hotspot_SearchPockets
-        weight: 0.693
+        weight: 0.6
         duration: 6
         actionType: 12
         requiresVisualOffset: 0
-    - roomAnchorID: Livingroom_Room
+    - roomAnchorID: Living_Room
       weight: 0.2
       hotspots:
-      - hotspotID: Hotspot_Sofa
-        weight: 0.605
+      - hotspotID: Hotspot_Living_Sofa
+        weight: 0.6
         duration: 10
         actionType: 0
         requiresVisualOffset: 1
+      - hotspotID: Hotspot_Living_Fireplace
+        weight: 0.4
+        duration: 6
+        actionType: 10
+        requiresVisualOffset: 0
+    - roomAnchorID: Main_Room
+      weight: 0.15
+      hotspots:
+      - hotspotID: Hotspot_Hall_Idle
+        weight: 0.4
+        duration: 5
+        actionType: 10
+        requiresVisualOffset: 0
+      - hotspotID: Hotspot_MainBedroom_Chair
+        weight: 0.3
+        duration: 10
+        actionType: 0
+        requiresVisualOffset: 1
+      - hotspotID: Hotspot_MainBedroom_Search
+        weight: 0.3
+        duration: 6
+        actionType: 12
+        requiresVisualOffset: 0
+    - roomAnchorID: Dining_Room
+      weight: 0.15
+      hotspots:
+      - hotspotID: Hotspot_Dining_Idle
+        weight: 0.4
+        duration: 5
+        actionType: 10
+        requiresVisualOffset: 0
+      - hotspotID: Hotspot_Kitchen_Search
+        weight: 0.6
+        duration: 6
+        actionType: 12
+        requiresVisualOffset: 0
+    - roomAnchorID: Child_Room
+      weight: 0.1
+      hotspots:
+      - hotspotID: Hotspot_Bedroom_Chair
+        weight: 0.5
+        duration: 10
+        actionType: 0
+        requiresVisualOffset: 1
+      - hotspotID: Hotspot_Bedroom_Search
+        weight: 0.5
+        duration: 6
+        actionType: 12
+        requiresVisualOffset: 0
+    - roomAnchorID: Bathroom_Room
+      weight: 0.05
+      hotspots:
+      - hotspotID: Hotspot_Bathroom_Idle
+        weight: 1
+        duration: 5
+        actionType: 10
+        requiresVisualOffset: 0
     - roomAnchorID: Outside_Room
-      weight: 0.2
+      weight: 0.1
       hotspots:
       - hotspotID: Hotspot_Idle
         weight: 0.5

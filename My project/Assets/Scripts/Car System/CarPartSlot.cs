@@ -8,6 +8,22 @@ public class CarPartSlot : MonoBehaviour, IInteractable
 
     private bool isInstalled = false;
 
+    void Start()
+    {
+        var escape = FindFirstObjectByType<CarEscapePoint>();
+        if (escape == null || !escape.RepairDisabledForDemo)
+            return;
+
+        if (requiredItem != null)
+        {
+            foreach (var pickup in FindObjectsByType<InteractableItem>(FindObjectsSortMode.None))
+                if (pickup.itemData == requiredItem)
+                    pickup.gameObject.SetActive(false);
+        }
+
+        gameObject.SetActive(false);
+    }
+
     public bool Interact()
     {
         if (requiredItem == null)

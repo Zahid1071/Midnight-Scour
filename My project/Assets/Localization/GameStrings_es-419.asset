@@ -857,6 +857,27 @@ MonoBehaviour:
     m_Localized: CORRE
     m_Metadata:
       m_Items: []
+  - m_Id: 36908069202821122
+    m_Localized: "Ajustes del micr\xF3fono"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069202821123
+    m_Localized: "Si el juego capta demasiado o muy poco ruido, puedes ajustar la
+      sensibilidad del micr\xF3fono en los ajustes."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913856
+    m_Localized: "Micr\xF3fono"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913857
+    m_Localized: Ese es mi auto.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913858
+    m_Localized: "\xBFD\xF3nde est\xE1 el cuerpo?"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

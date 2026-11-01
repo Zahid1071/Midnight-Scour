@@ -13,7 +13,7 @@ public static class Checkpoint
     public const int Version = 2;
     const string FileName = "checkpoint.json";
 
-    static string FilePath => Path.Combine(Application.persistentDataPath, FileName);
+    public static string FilePath => Path.Combine(Application.persistentDataPath, FileName);
 
     /// <summary>The next gameplay scene load restores the saved checkpoint instead of starting fresh.</summary>
     public static bool RestorePending { get; private set; }

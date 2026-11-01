@@ -134,7 +134,7 @@ public sealed class HeldItemController : MonoBehaviour
             return _sprintHolstered = false;
 
         bool sprintHeld = _input.sprint && _input.move != Vector2.zero && !_player.IsSneaking
-                          && !PlayerControlGate.IsInputBlocked;
+                          && !_player.SprintLocked && !PlayerControlGate.IsInputBlocked;
         if (!_sprintHolstered)
         {
             Vector3 v = _body.velocity;

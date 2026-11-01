@@ -16,6 +16,9 @@ public class GameplayHintManager : MonoBehaviour
 {
     public static GameplayHintManager Instance { get; private set; }
 
+    [Tooltip("Master switch. Off: no hint panels, reminders, or the lockpick subtitle ever show.")]
+    [SerializeField] bool hintsEnabled = false;
+
     [Serializable]
     struct HintEntry
     {
@@ -182,6 +185,9 @@ public class GameplayHintManager : MonoBehaviour
 
     void Update()
     {
+        if (!hintsEnabled)
+            return;
+
         if (PlayerControlGate.IsInputBlocked)
         {
             if (_activeHintId != null || _pendingHints.Count > 0)
@@ -209,7 +215,7 @@ public class GameplayHintManager : MonoBehaviour
     /// <summary>Closed the padlock/hairpin letter — subtitle only (hint is on lockpick pickup / first death).</summary>
     public void NotifyPadlockHairpinLetterClosed()
     {
-        if (_lockpickLetterFollowupDone)
+        if (!hintsEnabled || _lockpickLetterFollowupDone)
             return;
 
         _lockpickLetterFollowupDone = true;
@@ -492,7 +498,7 @@ public class GameplayHintManager : MonoBehaviour
 
     public bool Show(string hintId)
     {
-        if (PlayerControlGate.IsInputBlocked)
+        if (!hintsEnabled || PlayerControlGate.IsInputBlocked)
             return false;
 
         if (string.IsNullOrEmpty(hintId) || !_groups.TryGetValue(hintId, out var group) || group == null)

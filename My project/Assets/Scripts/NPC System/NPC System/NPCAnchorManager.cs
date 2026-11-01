@@ -14,6 +14,12 @@ public class NPCAnchorManager : MonoBehaviour
     [Tooltip("Player/target votes only: ignore room anchors whose Y differs from the grounded floor by more than this. Separates Basement≈-2.6 from Corridor-Kitchen≈0.")]
     [SerializeField] float maxFloorYDelta = 1.0f;
 
+    [Header("Door crossing")]
+    [Tooltip("A path segment only counts as passing a doorway when its height comes within this of the doorway's PrePoints. Keeps outdoor paths over the basement from 'crossing' basement doors below them.")]
+    [SerializeField] float doorCrossMaxYDelta = 1.5f;
+    [Tooltip("Half the width of a doorway: a path crossing a door's plane closer than this to the doorway centre went through the door.")]
+    [SerializeField] float doorwayHalfWidth = 1.25f;
+
     [Header("DEBUG")]
     [SerializeField] bool logRoomVoteResult = true;
 
@@ -153,6 +159,13 @@ public class NPCAnchorManager : MonoBehaviour
             }
         }
 
+        // A failed target vote falls back to the last result, which any caller may have written
+        // (search spots, ambush points). Never hand back a room from another floor — over the
+        // basement that sent the chase down the basement stairs.
+        if (bestRoom == null && clampToPlayerFloor
+            && _lastRoomPlayer != null && !IsSameFloor(_lastRoomPlayer.position.y, playerFloorY))
+            return null;
+
         return LogVoteResult(bestRoom != null ? bestRoom.transform : null, isNpcSelf);
     }
 
@@ -195,6 +208,12 @@ public class NPCAnchorManager : MonoBehaviour
         // Must be clearly on this prepoint's side of its door. Open doors used to make the
         // far-side room look immediate (path only crossed the skipped target door).
         if (!IsClearlySameSideOfPrepointDoor(from, prepoint))
+            return false;
+
+        // The side test above is a plane through the whole map: outdoors, everywhere past the basement
+        // door's line reads as "basement side", and with the door open the path just walks round and in.
+        // A path that goes through this prepoint's own doorway started in the other room.
+        if (PathGoesThroughOwnDoorway(path, prepoint))
             return false;
 
         // Same door: path that goes past the opposite PrePoint means we crossed the doorway
@@ -245,6 +264,9 @@ public class NPCAnchorManager : MonoBehaviour
         // Skip the final corner (the target). Only earlier geometry counts as "passing through".
         for (int i = 0; i < path.corners.Length - 1; i++)
         {
+            if (!SegmentNearHeight(path.corners[i], path.corners[i + 1], opposite.position.y))
+                continue;
+
             Vector2 a = new Vector2(path.corners[i].x, path.corners[i].z);
             Vector2 b = new Vector2(path.corners[i + 1].x, path.corners[i + 1].z);
 
@@ -289,6 +311,54 @@ public class NPCAnchorManager : MonoBehaviour
         float sideFrom = Vector3.Dot(from - mid, through);
         float sidePrep = Vector3.Dot(prepoint.position - mid, through);
         return sideFrom * sidePrep > 0f;
+    }
+
+    /// <summary>
+    /// True if a path segment crosses the door plane of <paramref name="prepoint"/>'s edge within
+    /// <see cref="doorwayHalfWidth"/> of the doorway centre, at the doorway's height.
+    /// </summary>
+    bool PathGoesThroughOwnDoorway(NavMeshPath path, Transform prepoint)
+    {
+        if (path.corners == null || path.corners.Length < 2)
+            return false;
+        if (RoomGraph.Instance == null || RoomGraph.Instance.edges == null)
+            return false;
+
+        DoorEdge edge = null;
+        foreach (var e in RoomGraph.Instance.edges)
+        {
+            if (e.prePointA == prepoint || e.prePointB == prepoint)
+            {
+                edge = e;
+                break;
+            }
+        }
+        if (edge == null || !edge.prePointA || !edge.prePointB)
+            return false;
+
+        Vector3 mid = (edge.prePointA.position + edge.prePointB.position) * 0.5f;
+        Vector3 through = edge.prePointB.position - edge.prePointA.position;
+        through.y = 0f;
+        if (through.sqrMagnitude < 0.0001f)
+            return false;
+        through.Normalize();
+
+        var corners = path.corners;
+        for (int i = 0; i < corners.Length - 1; i++)
+        {
+            float sp = Vector3.Dot(corners[i] - mid, through);
+            float sq = Vector3.Dot(corners[i + 1] - mid, through);
+            if (sp * sq >= 0f)
+                continue;
+
+            Vector3 hit = Vector3.Lerp(corners[i], corners[i + 1], sp / (sp - sq));
+            Vector3 lateral = hit - mid;
+            lateral.y = 0f;
+            if (lateral.magnitude <= doorwayHalfWidth && Mathf.Abs(hit.y - mid.y) <= doorCrossMaxYDelta)
+                return true;
+        }
+
+        return false;
     }
 
     Transform LogVoteResult(Transform roomT, bool isNpcSelf)
@@ -364,12 +434,26 @@ public class NPCAnchorManager : MonoBehaviour
                 Vector3 doorStart = edge.prePointA.position;
                 Vector3 doorEnd = edge.prePointB.position;
 
+                if (!SegmentNearHeight(segmentStart, segmentEnd, (doorStart.y + doorEnd.y) * 0.5f))
+                    continue;
+
                 if (LineSegmentsIntersect(segmentStart, segmentEnd, doorStart, doorEnd, threshold))
                     return true;
             }
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// True when the segment's height range comes within <see cref="doorCrossMaxYDelta"/> of <paramref name="y"/>.
+    /// The crossing tests below are XZ-only; this keeps them to doorways on the path's own floor.
+    /// </summary>
+    bool SegmentNearHeight(Vector3 a, Vector3 b, float y)
+    {
+        float lo = Mathf.Min(a.y, b.y) - doorCrossMaxYDelta;
+        float hi = Mathf.Max(a.y, b.y) + doorCrossMaxYDelta;
+        return y >= lo && y <= hi;
     }
 
     /// <summary>

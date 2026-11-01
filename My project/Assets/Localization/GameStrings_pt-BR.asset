@@ -858,6 +858,27 @@ MonoBehaviour:
     m_Localized: CORRA
     m_Metadata:
       m_Items: []
+  - m_Id: 36908069202821122
+    m_Localized: "Configura\xE7\xF5es do microfone"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069202821123
+    m_Localized: "Se o jogo captar barulho demais ou de menos, voc\xEA pode ajustar
+      a sensibilidade do microfone nas configura\xE7\xF5es."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913856
+    m_Localized: Microfone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913857
+    m_Localized: "Aquele \xE9 o meu carro."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913858
+    m_Localized: "Cad\xEA o corpo?"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

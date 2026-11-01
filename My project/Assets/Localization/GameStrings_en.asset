@@ -864,6 +864,27 @@ MonoBehaviour:
     m_Localized: RUN
     m_Metadata:
       m_Items: []
+  - m_Id: 36908069202821122
+    m_Localized: Microphone Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069202821123
+    m_Localized: If the game picks up too much or too little noise, you can adjust
+      your microphone sensitivity in the settings.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913856
+    m_Localized: Microphone
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913857
+    m_Localized: That's my car.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913858
+    m_Localized: Where is the body?
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

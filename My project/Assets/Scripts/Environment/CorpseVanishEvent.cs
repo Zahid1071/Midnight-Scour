@@ -19,6 +19,8 @@ using UnityEngine.Events;
 ///    not, before the bar can be reached): a sting and a quick dolly zoom on him, then the shot hands back to the
 ///    player's view as it tilts down onto the bar left behind him.
 /// 5. Taking the bar sets BarTaken (the corridor music goes silent on it; WallStanderChase arms on it).
+/// 6. Once the note has called ShowWallStander, the first step back into the cage room through the doorway turns the
+///    view onto the empty spot where the body lay, drifting in as the lens tightens, under "Where is the body?".
 /// </summary>
 [DisallowMultipleComponent]
 public class CorpseVanishEvent : MonoBehaviour
@@ -51,6 +53,11 @@ public class CorpseVanishEvent : MonoBehaviour
     [SerializeField, Range(0f, 1f)] float exitClueVolume = 0.4f;
     [Tooltip("Seconds after leaving the cage before the clue.")]
     [SerializeField] float exitClueDelay = 1f;
+    [Tooltip("A second sound from the body after leaving the cage. Empty = nothing.")]
+    [SerializeField] AudioClip exitFollowUpClip;
+    [SerializeField, Range(0f, 1f)] float exitFollowUpVolume = 1f;
+    [Tooltip("Seconds after leaving the cage before the second sound.")]
+    [SerializeField] float exitFollowUpDelay = 2f;
 
     [Header("3. Leaving through the cage room doorway, then the next door")]
     [Tooltip("The cage room's doorframe; the side the body is on counts as inside the room.")]
@@ -59,6 +66,11 @@ public class CorpseVanishEvent : MonoBehaviour
     [SerializeField] float doorwayHalfWidth = 0.8f;
     [Tooltip("Metres past the doorframe the player has to be before it counts as crossed.")]
     [SerializeField] float doorwayCrossDepth = 0.3f;
+    [Tooltip("Played the moment the player reaches the doorframe after leaving the cage. Empty = nothing.")]
+    [SerializeField] AudioClip doorwayClip;
+    [SerializeField, Range(0f, 1f)] float doorwayClipVolume = 1f;
+    [Tooltip("Where it plays from. Empty = flat, not from a point.")]
+    [SerializeField] Transform doorwayClipPoint;
     [Tooltip("Once through the doorway, the lights go out when the player gets this close to it. Empty = as the doorway is crossed.")]
     [SerializeField] Transform nextDoor;
     [SerializeField] float nextDoorDistance = 2f;
@@ -95,6 +107,12 @@ public class CorpseVanishEvent : MonoBehaviour
     [SerializeField, Range(0f, 1f)] float midRunVolume = 1f;
     [Tooltip("Point in the run (0-1) where the mid-run clip plays.")]
     [SerializeField, Range(0f, 1f)] float midRunTime = 0.5f;
+    [Tooltip("Steps played one after another along the run path once the rise clip ends. Empty = none.")]
+    [SerializeField] AudioClip[] runUpSteps;
+    [Tooltip("Above 1 boosts the steps past the clip's own level.")]
+    [SerializeField, Range(0f, 2f)] float runUpVolume = 2f;
+    [SerializeField] int runUpStepCount = 5;
+    [SerializeField] float runUpStepInterval = 0.3f;
 
     [Header("Standing at the wall")]
     [Tooltip("Placed in the scene (standing with his face to the wall across from the door) and kept off until the steps end; then he stays.")]
@@ -143,6 +161,32 @@ public class CorpseVanishEvent : MonoBehaviour
     [Tooltip("Seconds the lens takes to ease back before control returns.")]
     [SerializeField] float wallBarReturnTime = 0.8f;
 
+    [Header("6. Coming back for the body")]
+    [Tooltip("After the note calls ShowWallStander, stepping back into the cage room through the doorway plays a shot on " +
+             "where the body lay (on the wall zoom camera).")]
+    [SerializeField] bool returnShot = true;
+    [SerializeField] string returnSubtitleKey = "gameplay.where_is_the_body";
+    [SerializeField] float returnSubtitleSeconds = 3f;
+    [Tooltip("Share of the turn (0-1) at which the subtitle shows.")]
+    [SerializeField, Range(0f, 1f)] float returnSubtitleAt = 0.6f;
+    [Tooltip("Played flat as the view starts turning. Empty = nothing.")]
+    [SerializeField] AudioClip returnClip;
+    [SerializeField, Range(0f, 1f)] float returnClipVolume = 1f;
+    [Tooltip("Seconds the view takes to turn onto the empty spot.")]
+    [SerializeField] float returnTurnTime = 1.6f;
+    [Tooltip("Metres the camera drifts in toward the spot over the shot (less if something is in the way).")]
+    [SerializeField] float returnPush = 0.6f;
+    [Tooltip("The lens narrows to this fraction of its FOV by the end of the hold.")]
+    [SerializeField, Range(0.4f, 1f)] float returnZoom = 0.7f;
+    [Tooltip("Seconds the view stays on the spot after the turn, still drifting in.")]
+    [SerializeField] float returnHold = 1.8f;
+    [Tooltip("Seconds of the blend back to the player view; control returns after it.")]
+    [SerializeField] float returnBlendOut = 0.8f;
+    [Tooltip("A faint light comes up over the spot so the empty floor reads in the dark. 0 = none.")]
+    [SerializeField] float returnLightIntensity = 1.5f;
+    [SerializeField] float returnLightRange = 3.5f;
+    [SerializeField] Color returnLightColor = new Color(0.6f, 0.7f, 1f);
+
     [Header("Audio")]
     [SerializeField] AudioMixerGroup mixerGroup;
 
@@ -170,6 +214,7 @@ public class CorpseVanishEvent : MonoBehaviour
     bool _wasInCage;
     float _outsideTimer;
     bool _wasInsideRoom;
+    bool _doorwayClipPlayed;
     bool _cinematicActive;
     bool _wallRevealPlayed;
     bool _wallRevealOver;
@@ -180,6 +225,9 @@ public class CorpseVanishEvent : MonoBehaviour
     float _wallSeenDistance;
     float _wallRevealHeld;
     bool _barShown;
+    bool _wasOutsideRoom;
+    bool _returnShotPlayed;
+    Light _returnLight;
 
     void Awake()
     {
@@ -237,6 +285,8 @@ public class CorpseVanishEvent : MonoBehaviour
         else if (_stage == Stage.Done)
         {
             TickBarTaken();
+            if (returnShot && !_returnShotPlayed && _runFinished && _wallStanderCalled && !_wallRevealPlayed && !_cinematicActive)
+                TickReturnDoorway();
             if (!_wallRevealPlayed)
             {
                 // Bar grabbed without the reveal: it would only cut into the chase now.
@@ -434,6 +484,7 @@ public class CorpseVanishEvent : MonoBehaviour
         _wallSeen = true;
         _wallRevealPlayed = true;
         _wallRevealOver = true;
+        _returnShotPlayed = true;
         foreach (Renderer r in bodyRenderers)
             if (r != null)
                 r.enabled = false;
@@ -486,6 +537,7 @@ public class CorpseVanishEvent : MonoBehaviour
         _stage = Stage.WaitingForDoor;
         // Delay counts from the moment the player stepped out, not from the confirmation.
         StartCoroutine(PlayClue(exitClue, exitClueVolume, exitClueDelay - exitConfirmTime));
+        StartCoroutine(PlayClue(exitFollowUpClip, exitFollowUpVolume, exitFollowUpDelay - exitConfirmTime));
     }
 
     void TickExitDoor()
@@ -496,12 +548,7 @@ public class CorpseVanishEvent : MonoBehaviour
         if (player == null)
             return;
 
-        Vector3 normal = exitDoorway.forward;
-        normal.y = 0f;
-        normal.Normalize();
-        if (Vector3.Dot(_lookPoint - exitDoorway.position, normal) < 0f)
-            normal = -normal;
-
+        Vector3 normal = DoorwayInward();
         Vector3 offset = player.transform.position - exitDoorway.position;
         offset.y = 0f;
         float depth = Vector3.Dot(offset, normal);
@@ -511,6 +558,11 @@ public class CorpseVanishEvent : MonoBehaviour
             return;
         }
         float across = (offset - normal * depth).magnitude;
+        if (_wasInsideRoom && !_doorwayClipPlayed && across <= doorwayHalfWidth)
+        {
+            _doorwayClipPlayed = true;
+            PlayDoorwayClip();
+        }
         if (!_wasInsideRoom || depth > -doorwayCrossDepth || across > doorwayHalfWidth)
             return;
 
@@ -521,6 +573,167 @@ public class CorpseVanishEvent : MonoBehaviour
             _stage = Stage.WaitingForLightsOut;
             StartCoroutine(LightsOutRoutine());
         }
+    }
+
+    void PlayDoorwayClip()
+    {
+        if (doorwayClip == null)
+            return;
+        Camera cam = Camera.main;
+        Vector3 at = doorwayClipPoint != null ? doorwayClipPoint.position
+            : cam != null ? cam.transform.position : exitDoorway.position;
+        AudioSource src = CreateSource("Doorway Audio", at);
+        if (doorwayClipPoint == null)
+            src.spatialBlend = 0f;
+        src.PlayOneShot(doorwayClip, doorwayClipVolume);
+        Destroy(src.gameObject, doorwayClip.length + 0.25f);
+    }
+
+    // Flat normal of the doorframe, pointing into the room (the side the body is on).
+    Vector3 DoorwayInward()
+    {
+        Vector3 normal = exitDoorway.forward;
+        normal.y = 0f;
+        normal.Normalize();
+        if (Vector3.Dot(_lookPoint - exitDoorway.position, normal) < 0f)
+            normal = -normal;
+        return normal;
+    }
+
+    void TickReturnDoorway()
+    {
+        if (exitDoorway == null)
+            return;
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player == null)
+            return;
+
+        Vector3 normal = DoorwayInward();
+        Vector3 offset = player.transform.position - exitDoorway.position;
+        offset.y = 0f;
+        float depth = Vector3.Dot(offset, normal);
+        if (depth <= -doorwayCrossDepth)
+        {
+            _wasOutsideRoom = true;
+            return;
+        }
+        float across = (offset - normal * depth).magnitude;
+        // A note still open as they step in: the shot waits for it to close.
+        if (!_wasOutsideRoom || depth < doorwayCrossDepth || across > doorwayHalfWidth || PlayerControlGate.IsInputBlocked)
+            return;
+
+        _returnShotPlayed = true;
+        Camera cam = Camera.main;
+        if (wallZoomCamera != null && cam != null)
+            StartCoroutine(ReturnShotRoutine(cam));
+        else
+            ShowReturnSubtitle();
+    }
+
+    // The head turns onto where he lay while the camera drifts in and the lens tightens on the empty floor, a faint
+    // light coming up over it; then the shot hands back with the player still facing the spot.
+    IEnumerator ReturnShotRoutine(Camera cam)
+    {
+        CinemachineMouseLook mouseLook = FindFirstObjectByType<CinemachineMouseLook>();
+        Vector3 start = cam.transform.position;
+        Quaternion startRot = cam.transform.rotation;
+        float baseFov = cam.fieldOfView;
+        Vector3 look = _lookPoint;
+        Vector3 dir = (look - start).normalized;
+        float push = Mathf.Clamp(Mathf.Min(returnPush, Vector3.Distance(start, look) - wallZoomMinDistance, Clearance(start, dir, returnPush + 0.4f)), 0f, returnPush);
+        Vector3 end = start + dir * push;
+
+        BeginCinematic();
+        PoseWallZoomCamera(start, startRot, baseFov);
+        wallZoomCamera.Priority = wallZoomPriority;
+        SpawnReturnLight(look + Flat(start - look).normalized * 0.8f + Vector3.up * 1.2f);
+        if (returnClip != null)
+        {
+            AudioSource src = CreateSource("Return Shot Audio", start);
+            src.spatialBlend = 0f;
+            src.PlayOneShot(returnClip, returnClipVolume);
+            Destroy(src.gameObject, returnClip.length + 0.25f);
+        }
+
+        float turnTime = Mathf.Max(0.05f, returnTurnTime);
+        float total = turnTime + Mathf.Max(0f, returnHold);
+        bool subtitled = false;
+        for (float t = 0f; t < total; t += Time.deltaTime)
+        {
+            float k = Mathf.Clamp01(t / turnTime);
+            float u = SmootherStep(Mathf.Clamp01(t / total));
+            Vector3 pos = Vector3.Lerp(start, end, u);
+            Quaternion rot = Quaternion.Slerp(startRot, Quaternion.LookRotation(look - pos), SmootherStep(k));
+            PoseWallZoomCamera(pos, rot, baseFov * Mathf.Lerp(1f, returnZoom, u));
+            SetReturnLight(k);
+            if (!subtitled && k >= returnSubtitleAt)
+            {
+                subtitled = true;
+                ShowReturnSubtitle();
+            }
+            yield return null;
+        }
+        if (!subtitled)
+            ShowReturnSubtitle();
+
+        if (mouseLook != null)
+            mouseLook.SetLook(Quaternion.LookRotation(look - start));
+        wallZoomCamera.Priority = 0;
+        for (float t = 0f; t < returnBlendOut; t += Time.deltaTime)
+        {
+            SetReturnLight(1f - t / returnBlendOut);
+            yield return null;
+        }
+        EndCinematic();
+    }
+
+    void ShowReturnSubtitle()
+    {
+        if (HudManager.Instance != null && !string.IsNullOrEmpty(returnSubtitleKey))
+            HudManager.Instance.ShowSubtitle(Loc.Get(returnSubtitleKey), returnSubtitleSeconds);
+    }
+
+    void SpawnReturnLight(Vector3 position)
+    {
+        if (returnLightIntensity <= 0f)
+            return;
+        var go = new GameObject("Return Shot Light");
+        go.transform.SetParent(transform, false);
+        go.transform.position = position;
+        _returnLight = go.AddComponent<Light>();
+        _returnLight.type = LightType.Point;
+        _returnLight.color = returnLightColor;
+        _returnLight.range = returnLightRange;
+        _returnLight.shadows = LightShadows.Soft;
+        SetReturnLight(0f);
+    }
+
+    void SetReturnLight(float level)
+    {
+        if (_returnLight == null)
+            return;
+        level = Mathf.Clamp01(level);
+        _returnLight.intensity = returnLightIntensity * level;
+        _returnLight.enabled = level > 0f;
+    }
+
+    // Free distance along the move before anything solid.
+    static float Clearance(Vector3 from, Vector3 dir, float distance)
+    {
+        float free = distance;
+        foreach (RaycastHit hit in Physics.SphereCastAll(from, 0.25f, dir, distance, ~0, QueryTriggerInteraction.Ignore))
+        {
+            if (hit.distance <= 0f || hit.collider.GetComponentInParent<CharacterController>() != null)
+                continue;
+            free = Mathf.Min(free, hit.distance - 0.4f);
+        }
+        return free;
+    }
+
+    static Vector3 Flat(Vector3 v)
+    {
+        v.y = 0f;
+        return v;
     }
 
     void TickNextDoor()
@@ -545,6 +758,8 @@ public class CorpseVanishEvent : MonoBehaviour
 
     void EndCinematic()
     {
+        if (_returnLight != null)
+            Destroy(_returnLight.gameObject);
         if (!_cinematicActive)
             return;
         _cinematicActive = false;
@@ -623,9 +838,36 @@ public class CorpseVanishEvent : MonoBehaviour
     {
         if (riseClip != null)
             _bodySource.PlayOneShot(riseClip, riseVolume);
-        if (runClip == null)
-            yield break;
+        Coroutine runUp = StartCoroutine(RunUpStepsRoutine(riseClip != null ? riseClip.length : 0f));
+        if (runClip != null)
+            yield return RunClipRoutine();
+        yield return runUp;
+    }
 
+    IEnumerator RunUpStepsRoutine(float delay)
+    {
+        if (runUpSteps == null || runUpSteps.Length == 0)
+            yield break;
+        if (delay > 0f)
+            yield return new WaitForSeconds(delay);
+        for (int i = 0; i < runUpStepCount; i++)
+        {
+            float u = runUpStepCount > 1 ? (float)i / (runUpStepCount - 1) : 1f;
+            AudioClip step = runUpSteps[i % runUpSteps.Length];
+            if (step != null)
+            {
+                AudioSource src = CreateSource("Corpse Run Up Audio", PointOnPath(u));
+                src.minDistance = runMinDistance;
+                src.pitch = UnityEngine.Random.Range(0.9f, 0.98f);
+                src.PlayOneShot(step, runUpVolume);
+                Destroy(src.gameObject, step.length / src.pitch + 0.25f);
+            }
+            yield return new WaitForSeconds(runUpStepInterval * Mathf.Lerp(1.15f, 0.85f, u));
+        }
+    }
+
+    IEnumerator RunClipRoutine()
+    {
         AudioSource steps = CreateSource("Corpse Run Audio", _lookPoint);
         steps.clip = runClip;
         steps.volume = runVolume;

@@ -6,11 +6,12 @@ using UnityEngine;
 using UnityEngine.Audio;
 
 /// <summary>
-/// While the player breaks a lock open with the screwdriver, something moves in the dark behind them:
-/// - First jam forced through: a hook behind them swings and something snarls in the dark.
-/// - Second: a false alarm, a few dull knocks from further off, then nothing.
-/// - Third: quick bare steps come up behind them; the player drops the lock, turns round on a sting and the
-///   view pushes into the dark. Nothing's there. The view stays turned round; the lock keeps its progress.
+/// While the player breaks a lock open with the screwdriver, something moves in the dark behind them. Each beat fires
+/// on its own jam number (0 = never):
+/// - Look back (first jam): something comes up behind them; a second later the player drops the lock, turns round on a
+///   sting and the view pushes into the dark. Nothing's there. The view stays turned round; the lock keeps its progress.
+/// - False alarm (third jam): a few dull knocks from further off, then nothing.
+/// - Hook (off): a hook behind them swings and something snarls in the dark.
 /// </summary>
 [DisallowMultipleComponent]
 public class DoorBreakScare : MonoBehaviour
@@ -24,7 +25,9 @@ public class DoorBreakScare : MonoBehaviour
     [SerializeField] Transform behindPoint;
     [SerializeField] AudioMixerGroup mixerGroup;
 
-    [Header("First breakthrough")]
+    [Header("Hook swing")]
+    [Tooltip("Jam forced through that swings the hook. 0 = never.")]
+    [SerializeField] int hookOnJam = 0;
     [SerializeField] HangingHook hook;
     [Tooltip("Speed (m/s) the hook is shoved at, across the room.")]
     [SerializeField] float hookKnockSpeed = 1.2f;
@@ -35,7 +38,9 @@ public class DoorBreakScare : MonoBehaviour
     [Tooltip("Seconds after the jam breaks, so the crack of the lock doesn't cover it.")]
     [SerializeField] float firstDelay = 0.9f;
 
-    [Header("Second breakthrough (false alarm)")]
+    [Header("False alarm")]
+    [Tooltip("Jam forced through that plays the knocks. 0 = never.")]
+    [SerializeField] int falseAlarmOnJam = 3;
     [SerializeField] AudioClip secondClip;
     [SerializeField, Range(0f, 1f)] float secondVolume = 0.8f;
     [Tooltip("Where the knocks come from. Empty = the behind point.")]
@@ -43,27 +48,23 @@ public class DoorBreakScare : MonoBehaviour
     [SerializeField] float secondMinDistance = 3f;
     [SerializeField] float secondDelay = 1.6f;
 
-    [Header("Third breakthrough")]
-    [SerializeField] int lookBackJam = 3;
-    [Tooltip("Seconds after the jam breaks, so the crack of the lock doesn't cover the first step.")]
+    [Header("Approach and look back")]
+    [Tooltip("Jam forced through that brings the steps and the look back. 0 = never.")]
+    [SerializeField] int lookBackOnJam = 1;
+    [Tooltip("Seconds after the jam breaks, so the crack of the lock doesn't cover the sound.")]
     [SerializeField] float approachDelay = 0.9f;
-    [SerializeField] AudioClip[] approachSteps;
-    [SerializeField, Range(0f, 1f)] float approachVolume = 1f;
-    [Tooltip("Steps stay at full volume within this distance, so the lock's own noise doesn't bury them.")]
+    [Tooltip("Comes up behind the player, moving from the start distance to the stop distance over its length.")]
+    [SerializeField] AudioClip approachClip;
+    [Tooltip("Above 1 boosts the sound past the clip's own level.")]
+    [SerializeField, Range(0f, 2f)] float approachVolume = 2f;
+    [Tooltip("Full volume within this distance, so the lock's own noise doesn't bury it.")]
     [SerializeField] float approachMinDistance = 4f;
-    [SerializeField] int approachStepCount = 5;
-    [SerializeField] float approachStepInterval = 0.3f;
-    [Tooltip("The first step is at most this far behind the player.")]
+    [Tooltip("The sound starts at most this far behind the player.")]
     [SerializeField] float approachStartDistance = 4.5f;
-    [Tooltip("The steps stop this far behind the player.")]
+    [Tooltip("The sound stops this far behind the player.")]
     [SerializeField] float approachStopDistance = 1.8f;
-    [Tooltip("Played right behind the player after the steps stop. Empty = turn right after the last step.")]
-    [SerializeField] AudioClip closeClip;
-    [SerializeField, Range(0f, 1f)] float closeVolume = 0.9f;
-    [SerializeField] float closeDistance = 0.8f;
-    [SerializeField] float closeDelay = 0.25f;
-    [Tooltip("Seconds between the close sound (or the last step) and the head turn.")]
-    [SerializeField] float reactionDelay = 0.15f;
+    [Tooltip("Seconds after the sound starts before the head turns.")]
+    [SerializeField] float lookBackDelay = 1f;
 
     [Header("Look back")]
     [Tooltip("Dedicated camera; cuts in from the player's exact view (blend times come from the brain's custom blends).")]
@@ -81,13 +82,13 @@ public class DoorBreakScare : MonoBehaviour
     [Tooltip("Seconds of the blend back to the player view; control returns after it.")]
     [SerializeField] float lookBlendOut = 0.8f;
 
-    /// <summary>The steps start coming (third breakthrough).</summary>
+    /// <summary>The steps start coming.</summary>
     public event Action ApproachStarted;
     /// <summary>The look back is over and the player has control again.</summary>
     public event Action LookBackFinished;
 
-    bool _firstDone;
-    bool _secondDone;
+    bool _hookDone;
+    bool _falseAlarmDone;
     bool _lookDone;
     bool _locked;
     bool _hudHidden;
@@ -119,22 +120,25 @@ public class DoorBreakScare : MonoBehaviour
     {
         if (!Armed)
             return;
-        if (!_firstDone && count >= 1)
-        {
-            _firstDone = true;
-            StartCoroutine(FirstRoutine());
-        }
-        else if (!_secondDone && count >= 2 && count < lookBackJam)
-        {
-            _secondDone = true;
-            StartCoroutine(SecondRoutine());
-        }
-        else if (!_lookDone && count >= lookBackJam)
+        // One beat per jam; a beat whose jam was missed (not armed yet) plays on the next one, the look back first.
+        if (!_lookDone && Reached(lookBackOnJam, count))
         {
             _lookDone = true;
             StartCoroutine(LookBackRoutine());
         }
+        else if (!_hookDone && Reached(hookOnJam, count))
+        {
+            _hookDone = true;
+            StartCoroutine(FirstRoutine());
+        }
+        else if (!_falseAlarmDone && Reached(falseAlarmOnJam, count))
+        {
+            _falseAlarmDone = true;
+            StartCoroutine(SecondRoutine());
+        }
     }
+
+    static bool Reached(int jam, int count) => jam > 0 && count >= jam;
 
     IEnumerator FirstRoutine()
     {
@@ -166,35 +170,22 @@ public class DoorBreakScare : MonoBehaviour
         if (cam == null || behindPoint == null)
             yield break;
 
-        // Steps rush from the dark toward the player's back.
+        // Something rushes from the dark toward the player's back.
         Vector3 listener = cam.transform.position;
         Vector3 toPlayer = listener - behindPoint.position;
         toPlayer.y = 0f;
         Vector3 dir = toPlayer.normalized;
         float startDistance = Mathf.Min(toPlayer.magnitude, approachStartDistance);
-        Vector3 from = listener - dir * startDistance;
-        float run = Mathf.Max(0f, startDistance - approachStopDistance);
         float floorY = behindPoint.position.y - 1.4f;
-        if (approachSteps != null && approachSteps.Length > 0)
-        {
-            for (int i = 0; i < approachStepCount; i++)
-            {
-                float u = approachStepCount > 1 ? (float)i / (approachStepCount - 1) : 1f;
-                Vector3 p = from + dir * (run * u);
-                p.y = floorY;
-                AudioClip step = approachSteps[i % approachSteps.Length];
-                PlayAt(step, p, approachVolume * Mathf.Lerp(0.85f, 1f, u), approachMinDistance, UnityEngine.Random.Range(0.9f, 0.98f));
-                yield return new WaitForSeconds(approachStepInterval * Mathf.Lerp(1.15f, 0.85f, u));
-            }
-        }
-
-        if (closeClip != null)
-        {
-            yield return new WaitForSeconds(closeDelay);
-            PlayAt(closeClip, listener - dir * closeDistance, closeVolume, 0.6f);
-        }
-        if (reactionDelay > 0f)
-            yield return new WaitForSeconds(reactionDelay);
+        Vector3 from = listener - dir * startDistance;
+        Vector3 to = listener - dir * Mathf.Min(startDistance, approachStopDistance);
+        from.y = floorY;
+        to.y = floorY;
+        AudioSource approach = PlayAt(approachClip, from, approachVolume, approachMinDistance);
+        if (approach != null)
+            StartCoroutine(Glide(approach.transform, from, to, approachClip.length));
+        if (lookBackDelay > 0f)
+            yield return new WaitForSeconds(lookBackDelay);
 
         // Drop the lock and turn round straight from the lock view; the look camera outranks the exit blend.
         PlayerControlGate.Acquire(LockReason);
@@ -308,10 +299,19 @@ public class DoorBreakScare : MonoBehaviour
         Destroy(go, clip.length + 0.25f);
     }
 
-    void PlayAt(AudioClip clip, Vector3 position, float volume, float minDistance, float pitch = 1f)
+    static IEnumerator Glide(Transform t, Vector3 from, Vector3 to, float duration)
+    {
+        for (float e = 0f; e < duration && t != null; e += Time.deltaTime)
+        {
+            t.position = Vector3.Lerp(from, to, e / duration);
+            yield return null;
+        }
+    }
+
+    AudioSource PlayAt(AudioClip clip, Vector3 position, float volume, float minDistance, float pitch = 1f)
     {
         if (clip == null)
-            return;
+            return null;
         var go = new GameObject(clip.name + " (Door Scare)");
         go.transform.SetParent(transform, false);
         go.transform.position = position;
@@ -326,5 +326,6 @@ public class DoorBreakScare : MonoBehaviour
         src.pitch = pitch;
         src.PlayOneShot(clip, volume);
         Destroy(go, clip.length / Mathf.Max(0.1f, pitch) + 0.25f);
+        return src;
     }
 }

@@ -71,6 +71,7 @@ public class HidingStamina : MonoBehaviour
     float alertCooldownRemaining;
     bool wasHidden;
     bool micUnavailableWarned;
+    bool micWasOff;
     bool openListening;
 
     /// <summary>0 = silent, 1 = loud (smoothed). Also drives the bar fill.</summary>
@@ -92,6 +93,8 @@ public class HidingStamina : MonoBehaviour
     }
 
     bool OpenListeningActive => openListening && !PlayerControlGate.IsInputBlocked;
+
+    static bool MicDisabled => GameSettingsManager.Instance != null && GameSettingsManager.Instance.MicDisabled;
 
     /// <summary>The icon shown under the bar.</summary>
     public Sprite MicrophoneIcon => microphoneIcon;
@@ -115,6 +118,7 @@ public class HidingStamina : MonoBehaviour
         RefreshUI();
         // Warm the mic once at load. Start/Stop on every hide enter causes a main-thread hitch
         // on the same frame as stealth visuals/layer — feels like "mesh disable lag".
+        micWasOff = MicDisabled;
         StartMicrophone();
     }
 
@@ -157,7 +161,18 @@ public class HidingStamina : MonoBehaviour
             wasHidden = hidden;
         }
 
-        if (hidden || OpenListeningActive)
+        bool micOff = MicDisabled;
+        if (micOff != micWasOff)
+        {
+            micWasOff = micOff;
+            sustainedTimer = 0f;
+            if (micOff)
+                StopMicrophone();
+            else
+                StartMicrophone();
+        }
+
+        if (!micOff && (hidden || OpenListeningActive))
             TickListening();
         else
             smoothedLoudness = Mathf.MoveTowards(smoothedLoudness, 0f, Time.deltaTime * loudnessSmoothSpeed);
@@ -193,10 +208,14 @@ public class HidingStamina : MonoBehaviour
 
     void TickListening()
     {
-        float raw = SampleMicrophoneLoudness();
+        float gainDb = 0f;
         float sens = sensitivity;
         if (GameSettingsManager.Instance != null)
+        {
+            gainDb = GameSettingsManager.Instance.MicGainDb;
             sens *= GameSettingsManager.Instance.MicSensitivityMultiplier;
+        }
+        float raw = SampleMicrophoneLoudness(gainDb);
         float target = Mathf.Clamp01(raw * sens);
         float t = 1f - Mathf.Exp(-loudnessSmoothSpeed * Time.deltaTime);
         smoothedLoudness = Mathf.Lerp(smoothedLoudness, target, t);
@@ -299,7 +318,7 @@ public class HidingStamina : MonoBehaviour
 
     void StartMicrophone()
     {
-        if (micClip != null)
+        if (micClip != null || MicDisabled)
             return;
 
         if (Microphone.devices == null || Microphone.devices.Length == 0)
@@ -334,7 +353,7 @@ public class HidingStamina : MonoBehaviour
         micClip = null;
     }
 
-    float SampleMicrophoneLoudness()
+    float SampleMicrophoneLoudness(float gainDb)
     {
         if (micClip == null || string.IsNullOrEmpty(micDevice))
             return 0f;
@@ -364,7 +383,7 @@ public class HidingStamina : MonoBehaviour
         }
 
         float rms = Mathf.Sqrt(sum / sampleBuffer.Length);
-        float db = 20f * Mathf.Log10(Mathf.Max(rms, 1e-7f));
+        float db = 20f * Mathf.Log10(Mathf.Max(rms, 1e-7f)) + gainDb;
         return Mathf.InverseLerp(noiseFloorDb, peakDb, db);
     }
 
@@ -414,8 +433,9 @@ public class HidingStamina : MonoBehaviour
         bool captured = PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured);
         bool hidden = hider != null && hider.isHidden && !captured;
         // Stays up behind a tutorial card, which may be explaining it.
-        bool shown = hidden || (openListening && !captured
-                                && (!PlayerControlGate.IsInputBlocked || TutorialPopupUI.IsShowing));
+        bool shown = !MicDisabled
+                     && (hidden || (openListening && !captured
+                                    && (!PlayerControlGate.IsInputBlocked || TutorialPopupUI.IsShowing)));
         SetPanelVisible(shown);
 
         float loudness = smoothedLoudness;

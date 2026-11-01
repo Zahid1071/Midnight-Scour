@@ -43,6 +43,7 @@ public class PlayerCrouchStance : MonoBehaviour
     float _standEyeLocalY;
     float _crouchEyeLocalY;
     PlayerHider _hider;
+    StarterAssets.FirstPersonController _controller;
 
     public float CrouchBlend => _blend;
 
@@ -59,6 +60,7 @@ public class PlayerCrouchStance : MonoBehaviour
 
 
         _hider = GetComponent<PlayerHider>();
+        _controller = GetComponent<StarterAssets.FirstPersonController>();
 
         _standController = new CapsuleDimensions
         {
@@ -108,14 +110,16 @@ public class PlayerCrouchStance : MonoBehaviour
         ApplyStance(_blend);
     }
 
-    static bool WantsCrouch()
+    bool WantsCrouch()
     {
+        // Out of breath, Shift counts as released, so it no longer cancels the crouch.
+        bool sprintLocked = _controller != null && _controller.SprintLocked;
 #if ENABLE_INPUT_SYSTEM
         return Keyboard.current != null
             && Keyboard.current.leftCtrlKey.isPressed
-            && !Keyboard.current.leftShiftKey.isPressed;
+            && (sprintLocked || !Keyboard.current.leftShiftKey.isPressed);
 #else
-        return Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift);
+        return Input.GetKey(KeyCode.LeftControl) && (sprintLocked || !Input.GetKey(KeyCode.LeftShift));
 #endif
     }
 

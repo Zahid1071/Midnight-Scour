@@ -51,6 +51,15 @@ namespace StarterAssets
 
 		public bool IsSneaking => _isSneaking;
 
+		/// <summary>While true, holding sprint only walks (e.g. out of breath).</summary>
+		public bool SprintLocked { get; set; }
+
+		/// <summary>Top movement speed in m/s, whatever the stance (e.g. out of breath).</summary>
+		public float SpeedLimit { get; set; } = float.PositiveInfinity;
+
+		/// <summary>Sprint held with a move key, not sneaking and not locked — the player is trying to run.</summary>
+		public bool IsSprinting => _input != null && _input.sprint && _input.move != Vector2.zero && !_isSneaking && !SprintLocked;
+
 		[Space(10)]
 		[Tooltip("The height the player can jump")]
 		public float JumpHeight = 1.2f;
@@ -237,19 +246,20 @@ namespace StarterAssets
 		{
 			// Sneak while holding Ctrl; sprint overrides sneak
 #if ENABLE_INPUT_SYSTEM
-			_isSneaking = Keyboard.current.leftCtrlKey.isPressed && !Keyboard.current.leftShiftKey.isPressed;
+			_isSneaking = Keyboard.current.leftCtrlKey.isPressed && (SprintLocked || !Keyboard.current.leftShiftKey.isPressed);
 #else
-			_isSneaking = Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift);
+			_isSneaking = Input.GetKey(KeyCode.LeftControl) && (SprintLocked || !Input.GetKey(KeyCode.LeftShift));
 #endif
 
 			// set target speed based on move speed, sprint speed and if sprint is pressed
 			float targetSpeed;
 			if (_isSneaking)
 				targetSpeed = SneakSpeed;
-			else if (_input.sprint)
+			else if (_input.sprint && !SprintLocked)
 				targetSpeed = Mathf.Max(MoveSpeed, SprintSpeed * SprintDirectionMultiplier(_input.move));
 			else
 				targetSpeed = MoveSpeed;
+			targetSpeed = Mathf.Min(targetSpeed, SpeedLimit);
 
 			TrackDirectionChange();
 			targetSpeed *= _speedCap;

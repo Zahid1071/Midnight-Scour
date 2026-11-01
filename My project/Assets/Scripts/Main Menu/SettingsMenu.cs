@@ -43,6 +43,8 @@ public class SettingsMenu : MonoBehaviour
     [SerializeField] private SettingsSelector resolutionSelector;
     [SerializeField] private SettingsSelector qualitySelector;
     [SerializeField] private SettingsSelector fullscreenSelector;
+    [Tooltip("Enabled / Disabled. Built under the mic sensitivity row when left empty.")]
+    [SerializeField] private SettingsSelector micEnabledSelector;
 
     // =========================================================================
     // BACKWARD COMPATIBILITY
@@ -84,14 +86,55 @@ public class SettingsMenu : MonoBehaviour
     private void Awake()
     {
         // Save system removed — hide leftover Auto-Save row if present in prefab.
+        Transform autoSaveRow = null;
         foreach (var tr in GetComponentsInChildren<Transform>(true))
         {
             if (tr.name != "Row_AutoSave") continue;
             tr.gameObject.SetActive(false);
+            autoSaveRow = tr;
             break;
         }
 
         EnsureMicSensitivityRow();
+        EnsureMicEnabledRow(autoSaveRow);
+    }
+
+    /// <summary>
+    /// Clones the (hidden) Enabled/Disabled Auto-Save row into a microphone on/off control
+    /// placed just below the mic sensitivity row.
+    /// </summary>
+    void EnsureMicEnabledRow(Transform template)
+    {
+        if (micEnabledSelector != null || template == null || micSensitivitySlider == null)
+            return;
+
+        Transform micRow = micSensitivitySlider.transform;
+        while (micRow != null && !micRow.name.StartsWith("Row_"))
+            micRow = micRow.parent;
+        if (micRow == null || micRow.parent == null)
+            return;
+
+        Transform existing = micRow.parent.Find("Row_MicEnabled");
+        GameObject rowGo;
+        if (existing != null)
+        {
+            rowGo = existing.gameObject;
+        }
+        else
+        {
+            rowGo = Instantiate(template.gameObject, micRow.parent);
+            rowGo.name = "Row_MicEnabled";
+            rowGo.transform.SetSiblingIndex(micRow.GetSiblingIndex() + 1);
+        }
+        rowGo.SetActive(true);
+
+        micEnabledSelector = rowGo.GetComponentInChildren<SettingsSelector>(true);
+        if (micEnabledSelector != null)
+            micEnabledSelector.ConfigureAsCustom(new[] { "ui.option.enabled", "ui.option.disabled" });
+
+        var label = rowGo.GetComponentInChildren<LocalizedUILabel>(true);
+        if (label != null)
+            label.SetEntryKey("ui.settings.mic_enabled");
     }
 
     /// <summary>
@@ -413,6 +456,9 @@ public class SettingsMenu : MonoBehaviour
 
         if (fullscreenSelector)
             fullscreenSelector.SetIndex(Mathf.Clamp(s.displayModeIndex, 0, 2));
+
+        if (micEnabledSelector)
+            micEnabledSelector.SetIndex(s.micDisabled ? 1 : 0);
     }
 
     private void ReadUIInto(ref GameSettingsManager.SettingsData s)
@@ -427,6 +473,7 @@ public class SettingsMenu : MonoBehaviour
         if (resolutionSelector) s.resolutionIndex   = resolutionSelector.GetCurrentIndex();
         if (qualitySelector)    s.qualityIndex      = qualitySelector.GetCurrentIndex();
         if (fullscreenSelector) s.displayModeIndex  = fullscreenSelector.GetCurrentIndex();
+        if (micEnabledSelector) s.micDisabled       = micEnabledSelector.GetCurrentIndex() == 1;
     }
 
     // =========================================================================

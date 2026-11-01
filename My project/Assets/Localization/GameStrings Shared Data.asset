@@ -843,6 +843,26 @@ MonoBehaviour:
     m_Key: hint.run
     m_Metadata:
       m_Items: []
+  - m_Id: 36908069202821122
+    m_Key: tutorial.mic_settings.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069202821123
+    m_Key: tutorial.mic_settings.body
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913856
+    m_Key: ui.settings.mic_enabled
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913857
+    m_Key: gameplay.thats_my_car
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913858
+    m_Key: gameplay.where_is_the_body
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

@@ -48,6 +48,9 @@ public class InteractionController : MonoBehaviour
     static float s_basementRoutineUnlockTime = -1f;
     static float s_basementGraceDurationSeconds = 30f;
     static int s_basementDelaySceneHandle = -1;
+    /// <summary>Set the first time the player is through the basement exit; Natural can't pick the basement before.</summary>
+    static bool s_playerLeftBasement;
+    static Transform s_player;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void ResetBasementGraceStatics()
@@ -57,16 +60,62 @@ public class InteractionController : MonoBehaviour
         s_basementRoutineUnlockTime = -1f;
         s_basementGraceDurationSeconds = 30f;
         s_basementDelaySceneHandle = -1;
+        s_playerLeftBasement = false;
+        s_player = null;
     }
 
     /// <summary>
-    /// True while the butcher must not choose / enter the basement:
+    /// True while the butcher must not choose / enter the basement: the player hasn't been out of it yet,
     /// still in cage (timer not started), held for Continue intro, or within the post-exit grace window.
     /// </summary>
     public static bool IsBasementRoutineDelayed =>
-        s_basementGracePendingCageExit
+        !s_playerLeftBasement
+        || s_basementGracePendingCageExit
         || s_basementGraceHoldForManualStart
         || (s_basementRoutineUnlockTime > 0f && Time.time < s_basementRoutineUnlockTime);
+
+    /// <summary>
+    /// The basement exit is the RoomGraph door with a basement room on one side only. The player counts as out
+    /// once past its doorway on the outside, at the outside prepoint's height (the basement runs under the yard).
+    /// </summary>
+    static void TrackPlayerLeftBasement()
+    {
+        if (s_player == null)
+        {
+            var player = GameObject.FindGameObjectWithTag("Player");
+            if (player == null)
+                return;
+            s_player = player.transform;
+        }
+
+        if (RoomGraph.Instance == null || RoomGraph.Instance.edges == null)
+            return;
+
+        foreach (var edge in RoomGraph.Instance.edges)
+        {
+            if (edge == null || !edge.roomA || !edge.roomB || !edge.prePointA || !edge.prePointB)
+                continue;
+
+            bool aIn = IsBasementRoom(edge.roomA.name);
+            bool bIn = IsBasementRoom(edge.roomB.name);
+            if (aIn == bIn)
+                continue;
+
+            Vector3 inside = aIn ? edge.prePointA.position : edge.prePointB.position;
+            Vector3 outside = aIn ? edge.prePointB.position : edge.prePointA.position;
+            Vector3 outward = outside - inside;
+            outward.y = 0f;
+            Vector3 fromDoor = s_player.position - (inside + outside) * 0.5f;
+            fromDoor.y = 0f;
+
+            if (Vector3.Dot(fromDoor, outward.normalized) > 0.3f
+                && Mathf.Abs(s_player.position.y - outside.y) < 1.5f)
+            {
+                s_playerLeftBasement = true;
+                return;
+            }
+        }
+    }
 
     /// <summary>
     /// Arm basement block like thunder's cage gate: do not start the timer until the player
@@ -274,6 +323,8 @@ public class InteractionController : MonoBehaviour
         if (s_basementDelaySceneHandle != sceneHandle)
         {
             s_basementDelaySceneHandle = sceneHandle;
+            s_playerLeftBasement = false;
+            s_player = null;
             ArmBasementGraceUntilCageExit(basementRoutineDelaySeconds);
         }
     }
@@ -283,6 +334,8 @@ public class InteractionController : MonoBehaviour
         // Intro / Continue can arm grace before the player tag exists; keep checking until exit.
         if (s_basementGracePendingCageExit)
             TryStartBasementGraceCountdownIfPlayerOutsideCage();
+        if (!s_playerLeftBasement)
+            TrackPlayerLeftBasement();
 
         TickPlayerRoomLeaveCooldown();
         SetCurrentMovementState();
@@ -491,6 +544,18 @@ public class InteractionController : MonoBehaviour
 
             if (agent == null)
                 yield break;
+
+            // The navigator owns the agent while it walks a door route (it stops at prepoints to open doors).
+            // Nudging straight at the hotspot then drops the route and walks him into the wall nearest to it.
+            if (navigator != null && navigator.IsFollowingRoute)
+            {
+                nearStillTimer = 0f;
+                stuckFarTimer = 0f;
+                noProgressTimer = 0f;
+                bestDist = float.PositiveInfinity;
+                yield return null;
+                continue;
+            }
 
             if (nudgeCooldown > 0f)
                 nudgeCooldown -= Time.deltaTime;

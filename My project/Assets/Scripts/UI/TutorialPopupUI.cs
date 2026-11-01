@@ -18,6 +18,8 @@ public class TutorialPopupUI : MonoBehaviour
     const string LockReason = "tutorial_popup";
 
     static readonly HashSet<string> s_shown = new HashSet<string>();
+    // Requested through ShowOnce and not closed yet.
+    static readonly HashSet<string> s_queued = new HashSet<string>();
     static int s_openCount;
     static TutorialPopupUI s_instance;
 
@@ -86,6 +88,7 @@ public class TutorialPopupUI : MonoBehaviour
     static void ResetStatics()
     {
         s_shown.Clear();
+        s_queued.Clear();
         s_openCount = 0;
     }
 
@@ -104,14 +107,16 @@ public class TutorialPopupUI : MonoBehaviour
     /// <summary>
     /// Puts a card with these texts (and a looping clip, or else a still image) up on the scene's popup, once per run
     /// under id, after delay seconds and once nothing else holds the player (cinematic, note, minigame, pause, another card).
+    /// With afterId, it also waits for that card to be closed, so it comes up right after it.
     /// </summary>
     public static bool ShowOnce(string id, string titleKey, string bodyKey, VideoClip clip = null, Sprite image = null,
-        float delay = 0f)
+        float delay = 0f, string afterId = null)
     {
         TutorialPopupUI popup = s_instance != null ? s_instance : FindFirstObjectByType<TutorialPopupUI>(FindObjectsInactive.Include);
         if (popup == null || !popup.isActiveAndEnabled || string.IsNullOrEmpty(id) || s_shown.Contains(id))
             return false;
         s_shown.Add(id);
+        s_queued.Add(id);
         popup.StartCoroutine(popup.ShowWhenFree(new Card
         {
             id = id,
@@ -119,7 +124,7 @@ public class TutorialPopupUI : MonoBehaviour
             bodyKey = bodyKey,
             clip = clip,
             frames = image != null ? new[] { image } : null,
-        }, delay));
+        }, delay, afterId));
         return true;
     }
 
@@ -148,6 +153,7 @@ public class TutorialPopupUI : MonoBehaviour
     {
         HeldLighter.Struck -= OnLighterStruck;
         _pending = false;
+        s_queued.Clear();
         if (_open)
             Finish();
     }
@@ -168,12 +174,13 @@ public class TutorialPopupUI : MonoBehaviour
         StartCoroutine(ShowWhenFree(OwnCard, delayAfterStrike));
     }
 
-    IEnumerator ShowWhenFree(Card card, float delay)
+    IEnumerator ShowWhenFree(Card card, float delay, string afterId = null)
     {
         if (delay > 0f)
             yield return new WaitForSeconds(delay);
         // Not over a cinematic, a note, a minigame or the pause menu.
-        while (PlayerControlGate.IsInputBlocked || IsShowing)
+        while (PlayerControlGate.IsInputBlocked || IsShowing
+               || (!string.IsNullOrEmpty(afterId) && s_queued.Contains(afterId)))
             yield return null;
         if (card.id == popupId)
             _pending = false;
@@ -268,6 +275,8 @@ public class TutorialPopupUI : MonoBehaviour
         _open = false;
         _closing = false;
         s_openCount = Mathf.Max(0, s_openCount - 1);
+        if (_card.id != null)
+            s_queued.Remove(_card.id);
 
         StopMedia();
         if (panelRoot != null)

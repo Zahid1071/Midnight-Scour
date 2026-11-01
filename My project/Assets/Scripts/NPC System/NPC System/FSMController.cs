@@ -919,7 +919,7 @@ public class FSMController
             animator.SetTrigger("Jumpscare");
 
         if (JumpscareManager.Instance != null)
-            JumpscareManager.Instance.TriggerJumpscare(npc.jumpscarePoint, npc.transform, endsDemo: true);
+            JumpscareManager.Instance.TriggerJumpscare(npc.jumpscarePoint, npc.transform);
         else
             Debug.LogError("[FSMController] JumpscareManager.Instance is null - cannot trigger jumpscare/scene reload.");
 

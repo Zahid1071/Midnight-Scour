@@ -29,8 +29,8 @@ public class SpatialAudioCues : MonoBehaviour
     [SerializeField] float behindStartAngle = 95f;
     [Tooltip("Flat angle from the view direction where the behind cue is full.")]
     [SerializeField] float behindFullAngle = 165f;
-    [SerializeField] float behindCutoff = 2800f;
-    [SerializeField, Range(0f, 1f)] float behindGain = 0.75f;
+    [SerializeField] float behindCutoff = 6000f;
+    [SerializeField, Range(0f, 1f)] float behindGain = 0.9f;
     [Tooltip("Flat distances below this give no direction (e.g. the player's own footsteps under the camera).")]
     [SerializeField] float minFlatDistance = 0.5f;
 
@@ -40,6 +40,9 @@ public class SpatialAudioCues : MonoBehaviour
     [SerializeField, Range(0f, 1f)] float obstructedGain = 0.45f;
     [Tooltip("Sources closer than this are never obstructed.")]
     [SerializeField] float minObstructionDistance = 0.75f;
+    [Tooltip("Hits this close to the source don't count: the object making the sound (a bolt's grate, a picked-up " +
+             "item) or the wall/floor it sits in.")]
+    [SerializeField] float sourceClearance = 1f;
     [Tooltip("Seconds between line-of-sight checks per source.")]
     [SerializeField] float obstructionInterval = 0.1f;
 
@@ -174,10 +177,11 @@ public class SpatialAudioCues : MonoBehaviour
     {
         Vector3 delta = position - listener;
         float distance = delta.magnitude;
-        if (distance < minObstructionDistance)
+        float reach = distance - sourceClearance;
+        if (distance < minObstructionDistance || reach <= 0f)
             return false;
 
-        foreach (RaycastHit hit in Physics.RaycastAll(listener, delta / distance, distance, _mask, QueryTriggerInteraction.Ignore))
+        foreach (RaycastHit hit in Physics.RaycastAll(listener, delta / distance, reach, _mask, QueryTriggerInteraction.Ignore))
         {
             Transform h = hit.collider.transform;
             if (h.IsChildOf(source) || source.IsChildOf(h) || hit.collider.CompareTag("Player"))

@@ -135,9 +135,9 @@ namespace FS_Atmo
                 if (amount <= 0.05f)
                 {
                     // Never really left closed — stay at 0, do not push a partial open then fade.
-                    myAnimator.Play(closeHash, 0, 1f);
+                    myAnimator.Play(closeHash, 0, 0f);
                     if (hasAdditional && additionalAnimator != null)
-                        additionalAnimator.Play(closeHash, 0, 1f);
+                        additionalAnimator.Play(closeHash, 0, 0f);
                     SyncAdditionalFlags(open: false);
                     _reverting = false;
                 }
@@ -168,11 +168,11 @@ namespace FS_Atmo
                 else
                 {
                     _reverting = true;
-                    myAnimator.CrossFade(openHash, crossFadeDuration, 0, 1f - amount);
+                    myAnimator.CrossFade(openHash, crossFadeDuration, 0, amount);
                     if (hasAdditional && additionalAnimator != null)
                     {
                         float add = Mathf.Clamp01(GetOpenAmount(additionalAnimator));
-                        additionalAnimator.CrossFade(openHash, crossFadeDuration, 0, 1f - add);
+                        additionalAnimator.CrossFade(openHash, crossFadeDuration, 0, add);
                     }
                     SyncAdditionalFlags(open: true);
                 }
@@ -454,11 +454,12 @@ namespace FS_Atmo
             objectOpen = open;
 
             int hash = open ? openHash : closeHash;
+            float time = open ? 1f : 0f;
             if (myAnimator != null)
-                myAnimator.Play(hash, 0, 1f);
+                myAnimator.Play(hash, 0, time);
 
             if (hasAdditional && additionalAnimator != null)
-                additionalAnimator.Play(hash, 0, 1f);
+                additionalAnimator.Play(hash, 0, time);
 
             SyncAdditionalFlags(open);
         }
@@ -478,7 +479,7 @@ namespace FS_Atmo
             }
             else
             {
-                myAnimator.CrossFade(openHash, crossFadeDuration, 0, 1f - openAmount);
+                myAnimator.CrossFade(openHash, crossFadeDuration, 0, openAmount);
                 objectOpen = true;
                 _moving = true;
                 _movingOpen = true;
@@ -506,7 +507,7 @@ namespace FS_Atmo
             }
             else
             {
-                additionalAnimator.CrossFade(openHash, crossFadeDuration, 0, 1f - openAmount);
+                additionalAnimator.CrossFade(openHash, crossFadeDuration, 0, openAmount);
                 objectOpenAdditional = true;
                 other.objectOpen = true;
                 other.objectOpenAdditional = true;
@@ -552,12 +553,11 @@ namespace FS_Atmo
             return StateToOpenAmount(animator.GetCurrentAnimatorStateInfo(0));
         }
 
+        // Close plays the open clip in reverse (speed -1), so both states' normalized time is the open amount.
         float StateToOpenAmount(AnimatorStateInfo info)
         {
-            if (info.shortNameHash == openHash)
+            if (info.shortNameHash == openHash || info.shortNameHash == closeHash)
                 return GetClampedProgress(info);
-            if (info.shortNameHash == closeHash)
-                return 1f - GetClampedProgress(info);
             return objectOpen ? 1f : 0f;
         }
 

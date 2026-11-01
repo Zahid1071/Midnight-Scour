@@ -192,6 +192,14 @@ public class HangingHook : MonoBehaviour
         if (_loopSource == null)
             return;
 
+        // With time frozen (tutorial popup) the burst can't decay, so the loop would drone on at a fixed volume.
+        if (Time.timeScale <= 0f)
+        {
+            if (_loopSource.isPlaying)
+                _loopSource.Pause();
+            return;
+        }
+
         float dt = Time.deltaTime;
         float speed = _rb.IsSleeping() ? 0f : _rb.GetPointVelocity(_rb.worldCenterOfMass).magnitude;
         _burst *= Mathf.Exp(-swingLoopDecay * dt);

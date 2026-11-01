@@ -65,6 +65,11 @@ public class GameSettingsManager : MonoBehaviour
     public const string MIC_SENSITIVITY_KEY = "MicSensitivity";
 
     /// <summary>
+    /// PlayerPrefs key for turning the hide-spot microphone off entirely (1 = off).
+    /// </summary>
+    public const string MIC_DISABLED_KEY = "MicDisabled";
+
+    /// <summary>
     /// Single source-of-truth PlayerPrefs key for brightness.
     /// Stored as a NORMALIZED 0-1 value (== slider value directly).
     /// </summary>
@@ -86,9 +91,11 @@ public class GameSettingsManager : MonoBehaviour
     public const float MAX_SENSITIVITY_MULTIPLIER = 5f;
 
     /// <summary>
-    /// Hide mic sensitivity multiplier range. Slider 0.5 maps to 1× (neutral).
+    /// Hide mic sensitivity. Slider 0.5 is neutral. The lower half turns the mic signal down
+    /// (down to <see cref="MIN_MIC_GAIN_DB"/> at 0) before loudness is measured, so a loud
+    /// room or hot mic reads as quiet; the upper half multiplies loudness up to the max.
     /// </summary>
-    public const float MIN_MIC_SENSITIVITY_MULTIPLIER = 0.25f;
+    public const float MIN_MIC_GAIN_DB = -36f;
     public const float MAX_MIC_SENSITIVITY_MULTIPLIER = 3f;
 
     /// <summary>
@@ -114,6 +121,11 @@ public class GameSettingsManager : MonoBehaviour
     /// Fired whenever MicSensitivity changes. Subscribers get the new normalized [0,1] value.
     /// </summary>
     public static event Action<float> OnMicSensitivityChanged;
+
+    /// <summary>
+    /// Fired whenever MicDisabled changes.
+    /// </summary>
+    public static event Action<bool> OnMicDisabledChanged;
 
     /// <summary>
     /// Fired whenever InvertYAxis changes.
@@ -165,6 +177,7 @@ public class GameSettingsManager : MonoBehaviour
         // Controls
         public float mouseSensitivity;    // NORMALIZED 0.0 - 1.0 (slider value directly)
         public float micSensitivity;      // NORMALIZED 0.0 - 1.0 (hide mic loudness gain)
+        public bool micDisabled;          // true = the mic is never listened to
         public bool invertYAxis;
 
         // Display (continued) — brightness is stored alongside graphics conceptually
@@ -227,6 +240,7 @@ public class GameSettingsManager : MonoBehaviour
             sfxVolume = 1f,
             mouseSensitivity = 0.5f,
             micSensitivity = 0.5f,
+            micDisabled = false,
             invertYAxis = false,
             brightness = 0.5f,
             difficultyIndex = 1,
@@ -382,17 +396,43 @@ public class GameSettingsManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Multiplier applied to hide-spot mic loudness. Slider 0.5 maps to 1×;
-    /// low end → <see cref="MIN_MIC_SENSITIVITY_MULTIPLIER"/>, high end → max.
+    /// dB added to the raw mic level before it's mapped to loudness. 0 from the middle of the
+    /// slider up; falls to <see cref="MIN_MIC_GAIN_DB"/> at the low end.
+    /// </summary>
+    public float MicGainDb
+    {
+        get
+        {
+            float t = _currentSettings.micSensitivity;
+            return t >= 0.5f ? 0f : Mathf.Lerp(MIN_MIC_GAIN_DB, 0f, t * 2f);
+        }
+    }
+
+    /// <summary>
+    /// Multiplier applied to hide-spot mic loudness. 1× up to the middle of the slider,
+    /// rising to <see cref="MAX_MIC_SENSITIVITY_MULTIPLIER"/> at the high end.
     /// </summary>
     public float MicSensitivityMultiplier
     {
         get
         {
             float t = _currentSettings.micSensitivity;
-            if (t <= 0.5f)
-                return Mathf.Lerp(MIN_MIC_SENSITIVITY_MULTIPLIER, 1f, t * 2f);
-            return Mathf.Lerp(1f, MAX_MIC_SENSITIVITY_MULTIPLIER, (t - 0.5f) * 2f);
+            return t <= 0.5f ? 1f : Mathf.Lerp(1f, MAX_MIC_SENSITIVITY_MULTIPLIER, (t - 0.5f) * 2f);
+        }
+    }
+
+    /// <summary>
+    /// If true, the microphone is never recorded or listened to.
+    /// Setting this fires <see cref="OnMicDisabledChanged"/> when the value changes.
+    /// </summary>
+    public bool MicDisabled
+    {
+        get => _currentSettings.micDisabled;
+        set
+        {
+            if (_currentSettings.micDisabled == value) return;
+            _currentSettings.micDisabled = value;
+            OnMicDisabledChanged?.Invoke(value);
         }
     }
 
@@ -606,6 +646,7 @@ public class GameSettingsManager : MonoBehaviour
         PlayerPrefs.SetFloat("mouseSensitivity", _currentSettings.mouseSensitivity);
         PlayerPrefs.DeleteKey("settings_mouseSensitivity"); // remove stale [0.1..10] format
         PlayerPrefs.SetFloat(MIC_SENSITIVITY_KEY, _currentSettings.micSensitivity);
+        PlayerPrefs.SetInt(MIC_DISABLED_KEY, _currentSettings.micDisabled ? 1 : 0);
         PlayerPrefs.SetInt("settings_invertY", _currentSettings.invertYAxis ? 1 : 0);
         
         PlayerPrefs.SetInt("settings_difficulty", _currentSettings.difficultyIndex);
@@ -646,6 +687,7 @@ public class GameSettingsManager : MonoBehaviour
             
             mouseSensitivity = LoadMouseSensitivityFromPrefs(),
             micSensitivity = Mathf.Clamp01(PlayerPrefs.GetFloat(MIC_SENSITIVITY_KEY, DefaultSettings.micSensitivity)),
+            micDisabled = PlayerPrefs.GetInt(MIC_DISABLED_KEY, DefaultSettings.micDisabled ? 1 : 0) == 1,
             invertYAxis = PlayerPrefs.GetInt("settings_invertY", DefaultSettings.invertYAxis ? 1 : 0) == 1,
 
             brightness = LoadBrightnessFromPrefs(),
@@ -777,6 +819,7 @@ public class GameSettingsManager : MonoBehaviour
     {
         float prevSensitivity = _currentSettings.mouseSensitivity;
         float prevMicSensitivity = _currentSettings.micSensitivity;
+        bool prevMicDisabled = _currentSettings.micDisabled;
         bool prevInvertY = _currentSettings.invertYAxis;
         float prevBrightness = _currentSettings.brightness;
 
@@ -800,6 +843,8 @@ public class GameSettingsManager : MonoBehaviour
             OnMouseSensitivityChanged?.Invoke(_currentSettings.mouseSensitivity);
         if (!Mathf.Approximately(prevMicSensitivity, _currentSettings.micSensitivity))
             OnMicSensitivityChanged?.Invoke(_currentSettings.micSensitivity);
+        if (prevMicDisabled != _currentSettings.micDisabled)
+            OnMicDisabledChanged?.Invoke(_currentSettings.micDisabled);
         if (prevInvertY != _currentSettings.invertYAxis)
             OnInvertYAxisChanged?.Invoke(_currentSettings.invertYAxis);
         if (!Mathf.Approximately(prevBrightness, _currentSettings.brightness))

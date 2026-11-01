@@ -2,8 +2,22 @@ using UnityEngine;
 
 public class CarEscapePoint : MonoBehaviour, IInteractable
 {
+    [Header("Demo")]
+    [Tooltip("Demo build: the car door is just locked, and the part slots and part pickups are switched off.")]
+    [SerializeField] bool repairDisabledForDemo = true;
+    [SerializeField] AudioClip lockedSfx;
+    [SerializeField, Range(0f, 1f)] float lockedVolume = 1f;
+    [SerializeField] float lockedFeedbackCooldown = 1f;
+
+    public bool RepairDisabledForDemo => repairDisabledForDemo;
+
+    float _nextLockedTime;
+
     public bool Interact()
     {
+        if (repairDisabledForDemo)
+            return PlayLocked();
+
         var slots = transform.root.GetComponentsInChildren<CarPartSlot>(true);
         if (slots == null || slots.Length == 0)
         {
@@ -38,6 +52,19 @@ public class CarEscapePoint : MonoBehaviour, IInteractable
         string list = string.Join(", ", missing);
         HudManager.Instance?.ShowSubtitle(Loc.Format("gameplay.still_missing", list), 4f);
         Debug.Log("❌ You still need some parts to escape.");
+        return false;
+    }
+
+    bool PlayLocked()
+    {
+        if (Time.time < _nextLockedTime)
+            return false;
+
+        _nextLockedTime = Time.time + lockedFeedbackCooldown;
+        var hud = HudManager.Instance;
+        hud?.ShowSubtitle(Loc.Get("gameplay.locked"), 2.5f, hud.WarningColor);
+        if (lockedSfx != null && SoundManager.Instance != null)
+            SoundManager.Instance.PlaySFXAt(lockedSfx, transform.position, lockedVolume, 1f, -1f, transform);
         return false;
     }
 }

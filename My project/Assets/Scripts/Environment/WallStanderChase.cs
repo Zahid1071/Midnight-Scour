@@ -47,6 +47,8 @@ public class WallStanderChase : MonoBehaviour
     [Header("Roar")]
     [SerializeField] AudioClip roarClip;
     [SerializeField, Range(0f, 1f)] float roarVolume = 1f;
+    [Tooltip("Multiplies Roar Volume; above 1 plays the scream louder than the clip itself.")]
+    [SerializeField] float roarBoost = 2f;
     [SerializeField] float roarMinDistance = 4f;
     [Tooltip("Strikes of the lighter that only spark after it dies; the next one catches.")]
     [SerializeField] int lighterMisfires = 2;
@@ -75,12 +77,12 @@ public class WallStanderChase : MonoBehaviour
     [SerializeField] float doorOpenDistance = 2.5f;
 
     [Header("Chase music")]
-    [Tooltip("Starts as he starts running.")]
+    [Tooltip("Loops from the moment he screams until he heads for the player's own hiding spot in the search.")]
     [SerializeField] AudioClip chaseMusic;
     [SerializeField] AudioMixerGroup musicGroup;
     [SerializeField, Range(0f, 1f)] float chaseMusicVolume = 1f;
     [SerializeField] float chaseMusicFadeIn = 0.4f;
-    [Tooltip("Seconds it fades over once the escape door is shut.")]
+    [Tooltip("Seconds it fades over once he heads for the player's hiding spot (or has caught them).")]
     [SerializeField] float chaseMusicFadeOut = 1.5f;
 
     [Header("Close to him (same as the Butcher's proximity glitch and whisper)")]
@@ -119,8 +121,6 @@ public class WallStanderChase : MonoBehaviour
     [Tooltip("Metres per second once he's through the escape door before it shut; faster than the player sprints (4).")]
     [SerializeField] float breachSpeed = 5.5f;
     [SerializeField] float breachAcceleration = 20f;
-    [Tooltip("Seconds the chase music is cut over at the first pound, so nothing covers it.")]
-    [SerializeField] float musicCutOnFirstBang = 0.3f;
     [Tooltip("Camera roll (degrees) each pound gives the player, full within Bang Min Distance of the door.")]
     [SerializeField] float bangShakeDegrees = 0.8f;
     [SerializeField] float bangShakeDuration = 0.35f;
@@ -179,6 +179,12 @@ public class WallStanderChase : MonoBehaviour
     [SerializeField] string micTutorialBodyKey = "tutorial.mic.body";
     [Tooltip("Loops on the card. Empty = the mic icon.")]
     [SerializeField] UnityEngine.Video.VideoClip micTutorialVideo;
+    [Tooltip("Card shown right after the mic card is closed, pointing at the mic sensitivity setting.")]
+    [SerializeField] string micSettingsTutorialId = "Microphone Settings";
+    [SerializeField] string micSettingsTutorialTitleKey = "tutorial.mic_settings.title";
+    [SerializeField] string micSettingsTutorialBodyKey = "tutorial.mic_settings.body";
+    [Tooltip("Loops on the settings card. Empty = the mic icon.")]
+    [SerializeField] UnityEngine.Video.VideoClip micSettingsTutorialVideo;
 
     enum Mic { Off, Shown, Done }
 
@@ -359,8 +365,10 @@ public class WallStanderChase : MonoBehaviour
                 return;
             _mic = Mic.Shown;
             _stamina.SetOpenListening(true);
-            TutorialPopupUI.ShowOnce(micTutorialId, micTutorialTitleKey, micTutorialBodyKey,
-                micTutorialVideo, _stamina.MicrophoneIcon, micTutorialDelay);
+            if (TutorialPopupUI.ShowOnce(micTutorialId, micTutorialTitleKey, micTutorialBodyKey,
+                    micTutorialVideo, _stamina.MicrophoneIcon, micTutorialDelay))
+                TutorialPopupUI.ShowOnce(micSettingsTutorialId, micSettingsTutorialTitleKey, micSettingsTutorialBodyKey,
+                    micSettingsTutorialVideo, _stamina.MicrophoneIcon, micTutorialDelay, micTutorialId);
         }
 
         bool after = _state != State.Waiting && _state != State.Captured;
@@ -432,9 +440,11 @@ public class WallStanderChase : MonoBehaviour
             src.minDistance = roarMinDistance;
             src.maxDistance = 30f;
             src.dopplerLevel = 0f;
-            src.PlayOneShot(roarClip, roarVolume);
+            SpatialAudioCues.Ignore(src);
+            src.PlayOneShot(roarClip, roarVolume * roarBoost);
             Destroy(go, roarClip.length + 0.25f);
         }
+        StartMusic();
 
         // He turns to the player and screams, running a moment into it or the instant they look at him.
         // Watched from the start (they backed away), he skips the scream and the agent turns him as he runs.
@@ -486,7 +496,6 @@ public class WallStanderChase : MonoBehaviour
         _breached = false;
         _doorShutting = false;
         _state = State.Chasing;
-        StartMusic();
         TickChase();
     }
 
@@ -658,8 +667,6 @@ public class WallStanderChase : MonoBehaviour
     {
         if (escapeDoor.objectOpen || SideOfEscape(_player.position) <= 0f)
         {
-            if (_doorShutting)
-                StartMusic();
             _doorShutting = false;
             return false;
         }
@@ -678,7 +685,6 @@ public class WallStanderChase : MonoBehaviour
             _shutTime = 0f;
             _leafLast = leaf.rotation;
             _leafStill = 0;
-            FadeOutMusic(chaseMusicFadeOut);
             return false;
         }
 
@@ -695,7 +701,6 @@ public class WallStanderChase : MonoBehaviour
         _agent.speed = breachSpeed;
         _agent.acceleration = Mathf.Max(_baseAcceleration, breachAcceleration);
         _nextRepath = 0f;
-        StartMusic();
         escapeDoor.PlayerCanClose = false;
         if (side < _agent.radius + 0.3f && !escapeDoor.objectOpen)
         {
@@ -731,6 +736,7 @@ public class WallStanderChase : MonoBehaviour
         _doorShutting = false;
         transform.SetPositionAndRotation(escapeSide.position - escapeSide.forward * 1.2f,
             Quaternion.LookRotation(Flat(escapeSide.forward)));
+        StartMusic();
         _routine = StartCoroutine(PoundRoutine(resumed: true));
     }
 
@@ -746,7 +752,6 @@ public class WallStanderChase : MonoBehaviour
             _agent.ResetPath();
         _agent.enabled = false;
         SetVisible(false);
-        FadeOutMusic(musicCutOnFirstBang);
 
         Collider doorCollider = escapeDoor.GetComponentInChildren<Collider>();
         // On the player's face of the door: the door itself booms, it isn't heard through a wall.
@@ -824,6 +829,8 @@ public class WallStanderChase : MonoBehaviour
         HidingSpot theirs = PlayerSpot();
         foreach (HidingSpot spot in order)
         {
+            if (spot == theirs)
+                FadeOutMusic(chaseMusicFadeOut);
             Transform pivot = spot.GetSearchPivot();
             yield return WalkTo(pivot != null ? pivot.position : spot.transform.position, 40f);
             Transform look = spot.ResolveSearchLookTarget();
@@ -1139,7 +1146,7 @@ public class WallStanderChase : MonoBehaviour
     {
         _state = State.Captured;
         RunPromptUI.Hide();
-        FadeOutMusic(1f);
+        FadeOutMusic(chaseMusicFadeOut);
         if (_agent.isOnNavMesh)
         {
             _agent.isStopped = true;

@@ -78,10 +78,6 @@ namespace StarterAssets
 			if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured))
 				return;
 
-			var demoEnd = DemoEndScreenUI.Instance;
-			if (demoEnd != null && demoEnd.IsShowing)
-				return;
-
 			if (!hasFocus)
 				return;
 

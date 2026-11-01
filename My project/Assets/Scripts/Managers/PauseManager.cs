@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -24,7 +23,6 @@ public class PauseManager : MonoBehaviour
 
     GameObject _mainButtons;
     GameObject _promoLogo;
-    GameObject _wishlistBanner;
     Vector2 _logoRestSize;
     Vector2 _logoRestPos;
     bool _logoRestCached;
@@ -81,10 +79,6 @@ public class PauseManager : MonoBehaviour
         if (GameOverUI.Instance != null && GameOverUI.Instance.IsShowing)
             return;
 
-        var demoEnd = DemoEndScreenUI.Instance;
-        if (demoEnd != null && demoEnd.IsShowing)
-            return;
-
         // The tutorial popup owns the frozen time scale until OK.
         if (TutorialPopupUI.IsShowing)
             return;
@@ -137,17 +131,14 @@ public class PauseManager : MonoBehaviour
             if (t == null)
                 continue;
 
-            if (_promoLogo == null && t.name == "Logo")
+            if (t.name == "Logo")
+            {
                 _promoLogo = t.gameObject;
-            if (_wishlistBanner == null && t.name == "Wishlist Banner")
-                _wishlistBanner = t.gameObject;
-
-            if (_promoLogo != null && _wishlistBanner != null)
                 break;
+            }
         }
 
         SteamStoreLink.EnsureOn(_promoLogo);
-        SteamStoreLink.EnsureOn(_wishlistBanner);
 
         CacheLogoRestLayout();
     }
@@ -168,7 +159,7 @@ public class PauseManager : MonoBehaviour
 
     void SetPromoVisible(bool visible)
     {
-        if (_promoLogo == null && _wishlistBanner == null)
+        if (_promoLogo == null)
             ResolvePromoUi();
 
         if (_promoLogo != null)
@@ -176,62 +167,9 @@ public class PauseManager : MonoBehaviour
             _promoLogo.SetActive(visible);
             if (visible)
                 ApplyPauseLogoLayout();
-            else if (!ShouldKeepPromoVisible())
+            else
                 RestoreLogoLayout();
         }
-
-        if (_wishlistBanner != null)
-        {
-            _wishlistBanner.SetActive(visible);
-            if (visible)
-                PrepareWishlistBannerStaticVisible();
-        }
-    }
-
-    /// <summary>
-    /// Banner Enter anim starts off-screen (x=-75) and loops; with timeScale 0 it freezes hidden.
-    /// Pause needs a static fully-visible banner at the final slot.
-    /// </summary>
-    void PrepareWishlistBannerStaticVisible()
-    {
-        if (_wishlistBanner == null)
-            return;
-
-        var anim = _wishlistBanner.GetComponent<Animation>();
-        if (anim != null)
-        {
-            anim.Stop();
-            anim.enabled = false;
-            anim.playAutomatically = false;
-        }
-
-        var rt = _wishlistBanner.GetComponent<RectTransform>();
-        if (rt != null)
-        {
-            // Final key of Banner Enter.anim
-            rt.anchoredPosition = new Vector2(75f, rt.anchoredPosition.y);
-            rt.localScale = Vector3.one;
-        }
-
-        var raw = _wishlistBanner.GetComponent<UnityEngine.UI.RawImage>();
-        if (raw != null)
-        {
-            Color c = raw.color;
-            c.a = 1f;
-            raw.color = c;
-        }
-
-        var img = _wishlistBanner.GetComponent<UnityEngine.UI.Image>();
-        if (img != null)
-        {
-            Color c = img.color;
-            c.a = 1f;
-            img.color = c;
-        }
-
-        var cg = _wishlistBanner.GetComponent<CanvasGroup>();
-        if (cg != null)
-            cg.alpha = 1f;
     }
 
     void ApplyPauseLogoLayout()
@@ -249,7 +187,7 @@ public class PauseManager : MonoBehaviour
         rt.anchoredPosition = new Vector2(_logoRestPos.x - PauseLogoLeftShift, _logoRestPos.y);
     }
 
-    /// <summary>Demo end / resume — original prefab size and corner position.</summary>
+    /// <summary>Resume — original prefab size and corner position.</summary>
     public void RestoreLogoLayout()
     {
         if (!_logoRestCached || _promoLogo == null)
@@ -263,12 +201,6 @@ public class PauseManager : MonoBehaviour
 
         rt.sizeDelta = _logoRestSize;
         rt.anchoredPosition = _logoRestPos;
-    }
-
-    bool ShouldKeepPromoVisible()
-    {
-        var demoEnd = DemoEndScreenUI.Instance;
-        return demoEnd != null && demoEnd.IsShowing;
     }
 
     void WireSettingsBackButton()
@@ -373,12 +305,7 @@ public class PauseManager : MonoBehaviour
 
     public void OnQuitToMenu()
     {
-        StartCoroutine(QuitToMenuRoutine());
-    }
-
-    IEnumerator QuitToMenuRoutine()
-    {
-        // Leave pause so the demo-end fade / UI can run, but keep control locked.
+        // Leave pause, but keep control locked until the menu loads.
         IsPaused = false;
         PlayerControlGate.Release(PlayerControlGate.ReasonPause);
         Time.timeScale = 1f;
@@ -392,23 +319,6 @@ public class PauseManager : MonoBehaviour
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
-
-        if (!DemoEndScreenUI.HasBeenSeen)
-        {
-            var demoEnd = DemoEndScreenUI.Instance;
-            if (demoEnd == null)
-                demoEnd = FindFirstObjectByType<DemoEndScreenUI>(FindObjectsInactive.Include);
-
-            if (demoEnd != null)
-            {
-                JumpscareManager.Instance?.EndJumpscare();
-                yield return demoEnd.WaitForExitRoutine();
-
-                // Alt+F4 during the panel → quit the app instead of loading the menu.
-                if (DemoEndScreenUI.TryFinishWithApplicationQuit())
-                    yield break;
-            }
-        }
 
         // Keep input blocked until the load starts so UI/interact code can't NRE on a cleared inventory.
         InventoryManager.ResetForNewGame();
@@ -456,8 +366,7 @@ public class PauseManager : MonoBehaviour
         Cursor.visible = false;
         Cursor.lockState = lockModeWhilePlaying;
 
-        if (!ShouldKeepPromoVisible())
-            SetPromoVisible(false);
+        SetPromoVisible(false);
     }
 
     bool IsSettingsOpen() =>

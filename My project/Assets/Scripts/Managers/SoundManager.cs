@@ -87,6 +87,7 @@ public class SoundManager : MonoBehaviour
     int _lastPlayerLayer = -1;
     bool _playerOnCaptiveLayer;
     bool _chaseMusicActive;
+    AudioClip _chaseMusicOverride;
     bool _wasPlayerHiddenForMusic;
     bool _inGameplayScene;
     bool _gameplayMusicReady;
@@ -198,12 +199,17 @@ public class SoundManager : MonoBehaviour
     public bool IsChaseMusicActive => _chaseMusicActive;
 
     /// <summary>NPC chase/search started — tension music overrides layer music until cleared.</summary>
-    public void SetChaseMusicActive(bool active)
+    public void SetChaseMusicActive(bool active) => SetChaseMusicActive(active, null);
+
+    /// <summary>Same, with clip played instead of <see cref="chaseMusic"/> while active (null = chaseMusic).</summary>
+    public void SetChaseMusicActive(bool active, AudioClip clip)
     {
-        if (_chaseMusicActive == active)
+        AudioClip overrideClip = active ? clip : null;
+        if (_chaseMusicActive == active && _chaseMusicOverride == overrideClip)
             return;
 
         _chaseMusicActive = active;
+        _chaseMusicOverride = overrideClip;
 
         if (!_inGameplayScene)
             return;
@@ -301,6 +307,7 @@ public class SoundManager : MonoBehaviour
         StopMusic(0.25f);
         StopSearchTension();
         _chaseMusicActive = false;
+        _chaseMusicOverride = null;
 
         if (!mixer)
             return;
@@ -596,6 +603,7 @@ public class SoundManager : MonoBehaviour
         _lastPlayerLayer = -1;
         _playerOnCaptiveLayer = false;
         _chaseMusicActive = false;
+        _chaseMusicOverride = null;
         _wasPlayerHiddenForMusic = false;
 
         SilenceMusicSources();
@@ -704,6 +712,8 @@ public class SoundManager : MonoBehaviour
 
     AudioClip ResolveGameplayMusicClip()
     {
+        if (_chaseMusicActive && _chaseMusicOverride != null)
+            return _chaseMusicOverride;
         if (_chaseMusicActive && chaseMusic != null)
             return chaseMusic;
 

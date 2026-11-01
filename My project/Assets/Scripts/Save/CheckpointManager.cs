@@ -9,11 +9,12 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Auto-save for the gameplay scene. Saves a <see cref="Checkpoint"/> when the bar behind the man at the wall
-/// (<see cref="CorpseVanishEvent"/>) is picked up, and again once the escape door is shut on him after the chase and
-/// the hide shot is over (<see cref="WallStanderChase"/>). On a load that asked for it (capture retry, main menu
-/// Continue) puts the fresh scene back the way it was: the corpse scare finished, the bar in hand with him waiting at
-/// the wall (or pounding on the shut door), items taken or dropped, doors, padlocks, lights, inventory, the player
-/// where they stood. The butcher starts his day over.
+/// (<see cref="CorpseVanishEvent"/>) is picked up, again once the escape door is shut on him after the chase and
+/// the hide shot is over (<see cref="WallStanderChase"/>), and again as the player steps out of the basement, just
+/// before the butcher window shot (<see cref="ButcherWindowShot"/>). On a load that asked for it (capture retry, main
+/// menu Continue) puts the fresh scene back the way it was: the corpse scare finished, the bar in hand with him waiting
+/// at the wall (or pounding on the shut door), items taken or dropped, doors, padlocks, lights, inventory, the player
+/// where they stood. The butcher starts his day over; loaded outside the basement, the window shot plays again.
 /// Installs itself in any scene with a CorpseVanishEvent. Loading that scene without a pending restore starts a new
 /// run, so the old checkpoint is deleted.
 /// </summary>
@@ -48,6 +49,7 @@ public class CheckpointManager : MonoBehaviour
 
     CorpseVanishEvent _corpse;
     WallStanderChase _chase;
+    ButcherWindowShot _windowShot;
     CanvasGroup _indicator;
     Coroutine _indicatorRoutine;
 
@@ -87,6 +89,9 @@ public class CheckpointManager : MonoBehaviour
         _chase = FindFirstObjectByType<WallStanderChase>(FindObjectsInactive.Include);
         if (_chase != null)
             _chase.ShutOut += Save;
+        _windowShot = FindFirstObjectByType<ButcherWindowShot>(FindObjectsInactive.Include);
+        if (_windowShot != null)
+            _windowShot.Triggered += Save;
 
         if (Checkpoint.RestorePending)
         {
@@ -104,6 +109,8 @@ public class CheckpointManager : MonoBehaviour
             _corpse.BarPickedUp -= Save;
         if (_chase != null)
             _chase.ShutOut -= Save;
+        if (_windowShot != null)
+            _windowShot.Triggered -= Save;
     }
 
     void Save()

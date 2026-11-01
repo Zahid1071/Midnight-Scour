@@ -16,8 +16,6 @@ public class JumpscareManager : MonoBehaviour
 
     public CinemachineCamera jumpscareCam;
 
-    [SerializeField] private GameObject wishlistBanner;
-    [SerializeField] private DemoEndScreenUI demoEndScreen;
     [SerializeField] private string reloadSceneName = "Main Scene";
     [SerializeField] private string mainMenuSceneName = "Main Menu";
     [SerializeField] private float endGameDelaySeconds = 4f;
@@ -35,68 +33,17 @@ public class JumpscareManager : MonoBehaviour
 
     Coroutine _endGameRoutine;
     Coroutine _impactPunchRoutine;
-    bool _endsDemo;
     float _impactBaseFov = 60f;
     float _impactBaseDutch;
 
     void Awake()
     {
         Instance = this;
-
-        ResolveWishlistBanner();
-
-        if (wishlistBanner != null)
-            wishlistBanner.SetActive(false);
-
-        if (demoEndScreen == null)
-            demoEndScreen = FindFirstObjectByType<DemoEndScreenUI>(FindObjectsInactive.Include);
     }
 
-    void ResolveWishlistBanner()
-    {
-        if (wishlistBanner != null)
-            return;
-
-        var transforms = FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        foreach (var t in transforms)
-        {
-            if (t == null || t.name != "Wishlist Banner")
-                continue;
-
-            // Wishlist Banner lives under _UI Canvas, not under this manager.
-            if (!t.gameObject.scene.IsValid())
-                continue;
-
-            wishlistBanner = t.gameObject;
-            return;
-        }
-    }
-
-    void ShowWishlistBanner()
-    {
-        ResolveWishlistBanner();
-
-        if (wishlistBanner == null)
-            return;
-
-        wishlistBanner.SetActive(true);
-        SteamStoreLink.EnsureOn(wishlistBanner);
-
-        var anim = wishlistBanner.GetComponent<Animation>();
-        if (anim != null)
-        {
-            anim.enabled = true;
-            anim.playAutomatically = false;
-            if (anim.clip != null)
-                anim.Play(anim.clip.name);
-        }
-    }
-
-    /// <param name="endsDemo">Show the demo end screen afterwards instead of the game over.</param>
-    public void TriggerJumpscare(Transform jumpscarePoint, Transform npcFace, bool endsDemo = false)
+    public void TriggerJumpscare(Transform jumpscarePoint, Transform npcFace)
     {
         BeginCaptureUi();
-        _endsDemo = endsDemo;
 
         if (npcFace != null)
         {
@@ -238,37 +185,17 @@ public class JumpscareManager : MonoBehaviour
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
-        if (demoEndScreen == null)
-            demoEndScreen = FindFirstObjectByType<DemoEndScreenUI>(FindObjectsInactive.Include);
-
-        if ((_endsDemo || DemoEndDirector.IsDemoFinaleActive) && demoEndScreen != null)
+        CaptureReason reason = CaptureContext.Consume();
+        var gameOver = GameOverUI.Instance;
+        if (gameOver == null)
+            gameOver = FindFirstObjectByType<GameOverUI>(FindObjectsInactive.Include);
+        if (gameOver == null)
         {
-            CaptureContext.Clear();
-            ShowWishlistBanner();
-            yield return StartCoroutine(demoEndScreen.WaitForExitRoutine());
-
-            if (DemoEndScreenUI.TryFinishWithApplicationQuit())
-            {
-                _endGameRoutine = null;
-                yield break;
-            }
-
-            LoadMenuScene();
+            var go = new GameObject("GameOverUI");
+            gameOver = go.AddComponent<GameOverUI>();
         }
-        else
-        {
-            CaptureReason reason = CaptureContext.Consume();
-            var gameOver = GameOverUI.Instance;
-            if (gameOver == null)
-                gameOver = FindFirstObjectByType<GameOverUI>(FindObjectsInactive.Include);
-            if (gameOver == null)
-            {
-                var go = new GameObject("GameOverUI");
-                gameOver = go.AddComponent<GameOverUI>();
-            }
 
-            yield return StartCoroutine(gameOver.WaitForChoiceRoutine(reason));
-        }
+        yield return StartCoroutine(gameOver.WaitForChoiceRoutine(reason));
 
         _endGameRoutine = null;
     }

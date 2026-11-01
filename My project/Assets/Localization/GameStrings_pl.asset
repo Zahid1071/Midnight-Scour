@@ -868,6 +868,27 @@ MonoBehaviour:
     m_Localized: UCIEKAJ
     m_Metadata:
       m_Items: []
+  - m_Id: 36908069202821122
+    m_Localized: Ustawienia mikrofonu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 36908069202821123
+    m_Localized: "Je\u015Bli gra wychwytuje za du\u017Co lub za ma\u0142o d\u017Awi\u0119ku,
+      mo\u017Cesz dostosowa\u0107 czu\u0142o\u015B\u0107 mikrofonu w ustawieniach."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913856
+    m_Localized: Mikrofon
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913857
+    m_Localized: "To m\xF3j samoch\xF3d."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 37307819441913858
+    m_Localized: "Gdzie jest cia\u0142o?"
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

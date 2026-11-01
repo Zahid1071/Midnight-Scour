@@ -166,20 +166,13 @@ public class InteractionUIManager : MonoBehaviour
 
         bool show = _crosshairState == CrosshairState.Default
             && !PlayerControlGate.IsInputBlocked
-            && (_cachedPlayerHider == null || (!_cachedPlayerHider.isHidden && !_cachedPlayerHider.IsHidingEngaged))
-            && (DemoEndScreenUI.Instance == null || !DemoEndScreenUI.Instance.IsShowing);
+            && (_cachedPlayerHider == null || (!_cachedPlayerHider.isHidden && !_cachedPlayerHider.IsHidingEngaged));
         SetCrosshairActive(dotCrosshairImage, show);
     }
 
     private void Update()
     {
         if (PlayerControlGate.IsInputBlocked)
-        {
-            ClearDetection(true);
-            return;
-        }
-
-        if (DemoEndScreenUI.Instance != null && DemoEndScreenUI.Instance.IsShowing)
         {
             ClearDetection(true);
             return;
