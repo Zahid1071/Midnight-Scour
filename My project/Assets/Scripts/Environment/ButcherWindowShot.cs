@@ -8,12 +8,9 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Plays once, the moment the player steps through the frame of the basement exit door. From their own view it closes
-/// in on the car the way the hide shot does, a light coming up over it, then turns heavily to a window of the house where the
-/// butcher stands lit from behind, staring out.
-/// It is the real butcher, moved there and held for the stare: he wheels round and sets off on a relentless hunt for
-/// the player, and control returns once the view has blended back, his chase music taking over until the hunt ends.
-/// Installs itself in any scene with Outdoor Fog unless the scene already has one (put it in the scene to assign the
-/// sounds); left empty, the car, window and butcher are found when it plays.
+/// in on the car the way the hide shot does, a light coming up over it, then — if <see cref="includeWindowHunt"/> is
+/// on — turns heavily to a window of the house where the butcher stands lit from behind, staring out, and releases
+/// him into a relentless hunt. With the hunt off (live default), only the car beat plays and control returns.
 /// The object must be named "Butcher Window Camera": the brain's custom blends cut into it and ease out of it by name.
 /// </summary>
 [DisallowMultipleComponent]
@@ -22,6 +19,10 @@ public class ButcherWindowShot : MonoBehaviour
 {
     const string LockReason = "butcher_window_shot";
     const string CameraName = "Butcher Window Camera";
+
+    [Header("Playback")]
+    [Tooltip("Off (live): car zoom + subtitle, then control back. On: full window stare, butcher hunt, chase music.")]
+    [SerializeField] bool includeWindowHunt = false;
 
     [Header("Trigger")]
     [Tooltip("Camera height (world Y) that counts as out of the basement; matches Outdoor Fog's full-fog height.")]
@@ -75,6 +76,15 @@ public class ButcherWindowShot : MonoBehaviour
     [SerializeField] Vector3 standOffset = new Vector3(0f, -1.6f, -0.8f);
     [Tooltip("How far inside a picked window he stands.")]
     [SerializeField] float standDepth = 0.9f;
+    [Tooltip("On release from the window, nudge this far into the room interior before he pathfinds. " +
+             "Do not warp him onto an outside door prepoint — that is what stuck him at the door.")]
+    [SerializeField] float releaseIntoRoomDistance = 2.5f;
+    [Tooltip("Living_Room marker: butcher starts the locked-car scare here (hidden).")]
+    [SerializeField] string cinematicSpawnName = "Cinematic Spawn Position";
+    [Tooltip("Living_Room marker: he walks here for the window stare.")]
+    [SerializeField] string cinematicAmbushName = "Cinematic Ambush Position";
+    [Tooltip("Seconds to walk from the cinematic spawn to the cinematic ambush.")]
+    [SerializeField] float windowApproachTime = 0.85f;
     [Tooltip("Metres of height the window shot takes in; smaller is tighter.")]
     [SerializeField] float windowFrameHeight = 2.4f;
     [Tooltip("Seconds of the head turn from the car to the window; the view lags a little behind and settles after.")]
@@ -156,12 +166,49 @@ public class ButcherWindowShot : MonoBehaviour
     /// <summary>The player is out of the basement and the shot is about to take over; nothing has moved yet.</summary>
     public event Action Triggered;
 
+    /// <summary>
+    /// Dev: fire the leave-basement sequence now (checkpoint, car shot, butcher release) if it has not run yet.
+    /// </summary>
+    public bool TryDebugTrigger()
+    {
+        if (_played || _sequenceBusy)
+            return false;
+        // Claim before Invoke so Update cannot start a second Play the same frame.
+        _played = true;
+        _sequenceBusy = true;
+        Triggered?.Invoke();
+        StartCoroutine(Play());
+        return true;
+    }
+
+    /// <summary>
+    /// After the locked car door: window stare with the butcher teleported there, then he investigates
+    /// <paramref name="investigatePoint"/> (Search / last-known) instead of a relentless chase. Once only.
+    /// </summary>
+    public bool TryPlayWindowCarInvestigate(Vector3 investigatePoint)
+    {
+        if (_windowInvestigatePlayed || _sequenceBusy)
+            return false;
+        _windowInvestigatePlayed = true;
+        _sequenceBusy = true;
+        _releaseInvestigate = true;
+        _investigatePoint = investigatePoint;
+        StartCoroutine(PlayWindowCarInvestigate(investigatePoint));
+        return true;
+    }
+
     CinemachineCamera _cam;
     NPCController[] _npcs;
     bool _played;
+    bool _windowInvestigatePlayed;
+    bool _sequenceBusy;
+    bool _releaseInvestigate;
+    Vector3 _investigatePoint;
     bool _locked;
     NPCController _held;
     bool _heldHearingDisabled;
+    Vector3 _heldWindowOutward;
+    bool _hasHeldWindowOutward;
     NPCController _hunter;
     bool _chaseMusicOn;
     bool _runPromptOn;
@@ -247,7 +294,7 @@ public class ButcherWindowShot : MonoBehaviour
             HideRunPrompt();
         if (_chaseMusicOn && !Hunting())
             EndChaseMusic();
-        if (_played)
+        if (_played || _sequenceBusy)
             return;
         if (_player == null)
             _player = FindFirstObjectByType<CinemachineMouseLook>();
@@ -257,8 +304,11 @@ public class ButcherWindowShot : MonoBehaviour
         // The butcher is spawned in after the scene loads.
         if (_npcs == null || _npcs.Length == 0)
             _npcs = FindObjectsByType<NPCController>(FindObjectsSortMode.None);
-        if (Chased())
+        // Car-only must still play if he's already chasing; the full hunt shot waits him out.
+        if (includeWindowHunt && Chased())
             return;
+        _played = true;
+        _sequenceBusy = true;
         Triggered?.Invoke();
         StartCoroutine(Play());
     }
@@ -281,22 +331,32 @@ public class ButcherWindowShot : MonoBehaviour
 
     IEnumerator Play()
     {
+        // May already be true from TryDebugTrigger / Update; keep it set either way.
         _played = true;
+        _sequenceBusy = true;
         Camera main = Camera.main;
         if (main == null)
+        {
+            _sequenceBusy = false;
             yield break;
+        }
         Vector3 eye = main.transform.position;
 
         NPCController butcher = FindButcher(out bool woken);
-        if (butcher == null && butcherPrefab == null)
+        if (includeWindowHunt && butcher == null && butcherPrefab == null)
         {
             Debug.LogWarning("ButcherWindowShot: no butcher to put in the window.", this);
+            _sequenceBusy = false;
             yield break;
         }
         Begin(main);
         // A butcher just switched on runs his Start next frame, which would kick his routine over the hold.
         if (woken)
             yield return null;
+
+        // Car-only: freeze him where he stands so he can't walk into the player during the beat. Not moved, not hunted.
+        if (!includeWindowHunt && butcher != null)
+            HoldInPlace(butcher);
 
         Vector3 pos = eye;
         Quaternion rot = main.transform.rotation;
@@ -357,6 +417,18 @@ public class ButcherWindowShot : MonoBehaviour
                 yield return new WaitForSeconds(carHold);
         }
 
+        if (!includeWindowHunt)
+        {
+            _cam.Priority = 0;
+            for (float t = 0f; t < blendOut; t += Time.deltaTime)
+            {
+                SetCarLight(1f - SmootherStep(t / blendOut));
+                yield return null;
+            }
+            Stop();
+            yield break;
+        }
+
         // Picked from where the car move ended: the doorway itself can have every window walled off.
         if (!TryAim(pos, true, out Aim aim) && !TryAim(pos, false, out aim))
         {
@@ -375,7 +447,7 @@ public class ButcherWindowShot : MonoBehaviour
             if (butcher != null)
                 yield return null;
         }
-        if (butcher == null || !HoldAtWindow(butcher, feet, facingCamera))
+        if (butcher == null || !HoldAtWindow(butcher, feet, facingCamera, outward))
             Debug.LogWarning("ButcherWindowShot: couldn't put the butcher in the window.", this);
         SpawnBacklight(feet - outward * backlightOffset.x + Vector3.up * backlightOffset.y);
 
@@ -497,6 +569,8 @@ public class ButcherWindowShot : MonoBehaviour
             mouseLook.SetLook(Quaternion.LookRotation(Flat(lastSeen - eye)));
         _cam.Priority = 0;
         StartChaseMusic();
+        // Hand control back as the blend starts so the fade-out doesn't freeze the player.
+        UnlockControl();
         for (float t = 0f; t < blendOut; t += Time.deltaTime)
         {
             OutdoorFog.DensityScale = Mathf.Lerp(windowFog, 1f, SmootherStep(t / blendOut));
@@ -506,23 +580,295 @@ public class ButcherWindowShot : MonoBehaviour
         ShowRunPrompt();
     }
 
+    IEnumerator PlayWindowCarInvestigate(Vector3 investigatePoint)
+    {
+        _sequenceBusy = true;
+        _releaseInvestigate = true;
+        // Exact player spot — existing Search / vision / hearing own the rest.
+        _investigatePoint = investigatePoint;
+
+        Camera main = Camera.main;
+        if (main == null)
+        {
+            _sequenceBusy = false;
+            _releaseInvestigate = false;
+            yield break;
+        }
+
+        Vector3 eye = main.transform.position;
+        Vector3 pos = eye;
+        Quaternion rot = main.transform.rotation;
+        float fov = main.fieldOfView;
+
+        NPCController butcher = FindButcher(out bool woken);
+        if (butcher == null && butcherPrefab == null)
+        {
+            Debug.LogWarning("ButcherWindowShot: no butcher for the locked-car window scare.", this);
+            _sequenceBusy = false;
+            _releaseInvestigate = false;
+            yield break;
+        }
+
+        Begin(main);
+        if (woken)
+            yield return null;
+
+        Pose(pos, rot, fov);
+        _cam.Priority = priority;
+        PlaySfx(startSfx, startVolume);
+
+        bool alreadyOutside = butcher != null && IsButcherOutside(butcher);
+        bool moveToWindow = !alreadyOutside;
+
+        Vector3 lookTarget;
+        Vector3 outward;
+        Vector3 standFeet;
+        Quaternion facingCamera;
+        Vector3 approachFrom = default, approachTo = default;
+        bool approachDone = true;
+
+        if (alreadyOutside)
+        {
+            // Already in the yard: leave him where he is, zoom the camera onto him.
+            standFeet = butcher.transform.position;
+            lookTarget = standFeet + Vector3.up * followHeight;
+            outward = Flat(pos - standFeet);
+            if (outward.sqrMagnitude < 0.01f)
+                outward = Flat(butcher.transform.forward);
+            outward.Normalize();
+            facingCamera = Quaternion.LookRotation(
+                Flat(pos - standFeet).sqrMagnitude > 0.01f ? Flat(pos - standFeet) : outward);
+
+            if (!HoldInPlace(butcher))
+                Debug.LogWarning("ButcherWindowShot: couldn't hold the outdoor butcher for the scare.", this);
+            else
+            {
+                butcher.transform.rotation = facingCamera;
+                butcher.poiLookDirector?.LockLookToPlayer();
+                _heldWindowOutward = outward;
+                _hasHeldWindowOutward = true;
+            }
+
+            Debug.Log("ButcherWindowShot: car-locked scare — butcher already outside, camera only.", this);
+        }
+        else
+        {
+            if (!TryGetCinematicSpawnAndAmbush(out Transform spawn, out Transform ambush))
+            {
+                Debug.LogWarning(
+                    $"ButcherWindowShot: need \"{cinematicSpawnName}\" and \"{cinematicAmbushName}\" in the scene.",
+                    this);
+                _cam.Priority = 0;
+                yield return new WaitForSeconds(blendOut);
+                Stop();
+                yield break;
+            }
+
+            standFeet = ambush.position;
+            if (NavMesh.SamplePosition(standFeet, out NavMeshHit ambushHit, 2f, NavMesh.AllAreas))
+                standFeet = ambushHit.position;
+
+            lookTarget = standFeet + Vector3.up * 1.4f;
+            outward = Flat(pos - standFeet).normalized;
+            if (TryAim(pos, true, out Aim aim) || TryAim(pos, false, out aim))
+            {
+                lookTarget = aim.look;
+                outward = aim.outward;
+            }
+            else if (outward.sqrMagnitude < 0.01f)
+                outward = Flat(ambush.forward).normalized;
+
+            facingCamera = Quaternion.LookRotation(
+                Flat(pos - standFeet).sqrMagnitude > 0.01f ? Flat(pos - standFeet) : outward);
+
+            Vector3 spawnFeet = spawn.position;
+            if (NavMesh.SamplePosition(spawnFeet, out NavMeshHit spawnHit, 2f, NavMesh.AllAreas))
+                spawnFeet = spawnHit.position;
+
+            if (butcher == null)
+            {
+                butcher = SpawnButcher(spawnFeet, facingCamera);
+                if (butcher != null)
+                    yield return null;
+            }
+
+            approachFrom = spawnFeet;
+            approachTo = standFeet;
+            approachDone = false;
+            moveToWindow = true;
+
+            if (butcher == null || !BeginApproachFromSpawn(butcher, spawnFeet, standFeet, facingCamera, outward))
+            {
+                Debug.LogWarning("ButcherWindowShot: couldn't stage the butcher at the cinematic spawn.", this);
+                approachDone = true;
+            }
+
+            Debug.Log(
+                $"ButcherWindowShot: car-locked scare spawn={spawn.name} → ambush={ambush.name}.",
+                this);
+        }
+
+        float windowDistance = Mathf.Max(0.5f, Vector3.Distance(pos, lookTarget));
+        float windowFov = Mathf.Clamp(2f * Mathf.Atan(windowFrameHeight * 0.5f / windowDistance) * Mathf.Rad2Deg, 3f, 60f);
+        {
+            Quaternion fromRot = rot;
+            Quaternion toRot = Quaternion.LookRotation(lookTarget - pos);
+            float side = Mathf.Sign(Vector3.SignedAngle(Flat(fromRot * Vector3.forward), Flat(toRot * Vector3.forward), Vector3.up));
+            float headTime = Mathf.Max(0.05f, lookTime);
+            float omega = 2f * Mathf.PI * Mathf.Max(0.1f, lookFrequency);
+            float peakSpeed = 1.875f / headTime;
+            float zoomStart = zoomDelay * headTime;
+            float zoomLength = Mathf.Max(0.05f, headTime - zoomStart + zoomSettle);
+            float logFrom = Mathf.Log(fov), logTo = Mathf.Log(windowFov), logCreep = Mathf.Log(stareCreep);
+            float x = 0f, v = 0f;
+            bool stung = false;
+            float approachDur = Mathf.Max(0.05f, windowApproachTime);
+            float total = moveToWindow
+                ? Mathf.Max(headTime + stareTime, approachDur + stareTime)
+                : headTime + stareTime;
+
+            PlaySfx(turnSfx, turnVolume);
+
+            for (float t = 0f; t < total; t += Time.deltaTime)
+            {
+                const float step = 1f / 240f;
+                float dt = Time.deltaTime;
+                int steps = Mathf.Max(1, Mathf.CeilToInt(dt / step));
+                float h = dt / steps;
+                for (int i = 0; i < steps; i++)
+                {
+                    float target = SmootherStep((t + h * (i + 1)) / headTime);
+                    v += (omega * omega * (target - x) - 2f * lookDamping * omega * v) * h;
+                    x += v * h;
+                }
+
+                float speed = Mathf.Clamp(v / peakSpeed, -1f, 1f);
+                Quaternion sway = Quaternion.Euler(lookDip * Mathf.Abs(speed), 0f, -side * lookLean * speed);
+                Quaternion look = Quaternion.SlerpUnclamped(fromRot, toRot, x) * sway;
+                float zoom = SmootherStep((t - zoomStart) / zoomLength);
+                float creep = SmootherStep((t - headTime) / Mathf.Max(0.01f, stareTime));
+                fov = Mathf.Exp(Mathf.Lerp(logFrom, logTo, zoom) + logCreep * creep);
+                Pose(pos, look, fov);
+
+                if (moveToWindow && !approachDone && _held != null)
+                {
+                    float a = SmootherStep(t / approachDur);
+                    Vector3 p = Vector3.Lerp(approachFrom, approachTo, a);
+                    if (NavMesh.SamplePosition(p, out NavMeshHit mid, 1.25f, NavMesh.AllAreas))
+                        p = mid.position;
+                    NavMeshAgent heldAgent = _held.GetComponent<NavMeshAgent>();
+                    if (heldAgent != null)
+                        heldAgent.Warp(p);
+                    Quaternion walkFacing = Flat(approachTo - approachFrom).sqrMagnitude > 0.01f
+                        ? Quaternion.LookRotation(Flat(approachTo - approachFrom))
+                        : facingCamera;
+                    _held.transform.SetPositionAndRotation(p, Quaternion.Slerp(walkFacing, facingCamera, a));
+                    if (t >= approachDur)
+                    {
+                        approachDone = true;
+                        FinishApproachAtWindow(_held, approachTo, facingCamera);
+                    }
+                }
+
+                OutdoorFog.DensityScale = Mathf.Lerp(1f, windowFog, Mathf.Clamp01(x));
+                if (!stung && t >= stingAt * headTime)
+                {
+                    stung = true;
+                    PlaySfx(sting, stingVolume);
+                }
+                if (_held != null)
+                    _held.poiLookDirector?.TickLockedPlayerLook();
+                yield return null;
+            }
+
+            if (moveToWindow && !approachDone && _held != null)
+                FinishApproachAtWindow(_held, approachTo, facingCamera);
+
+            rot = toRot;
+            fov = windowFov * stareCreep;
+            Pose(pos, rot, fov);
+            OutdoorFog.DensityScale = windowFog;
+        }
+
+        // Turn toward the car / player while still held — he must not path until the fade starts.
+        Transform runner = _held != null ? _held.transform : null;
+        if (_held != null)
+        {
+            PlaySfx(butcherTurnSfx, butcherTurnVolume);
+            Quaternion facing = runner.rotation;
+            Vector3 towardPlayer = Flat(_investigatePoint - runner.position);
+            if (towardPlayer.sqrMagnitude < 0.01f)
+                towardPlayer = -outward;
+            Quaternion away = Quaternion.LookRotation(RunDirection(_held, runner.position, towardPlayer));
+            for (float t = 0f; t < turnTime && _held != null; t += Time.deltaTime)
+            {
+                runner.rotation = Quaternion.Slerp(facing, away, SmootherStep(t / Mathf.Max(0.01f, turnTime)));
+                yield return null;
+            }
+        }
+
+        Vector3 lastSeen = lookTarget;
+        {
+            float fromFov = fov;
+            float followTotal = runTime + emptyHold;
+            for (float t = 0f; t < followTotal; t += Time.deltaTime)
+            {
+                if (runner != null)
+                    lastSeen = runner.position + Vector3.up * followHeight;
+                Vector3 toTarget = lastSeen - pos;
+                if (toTarget.sqrMagnitude > 0.01f)
+                    rot = Quaternion.Slerp(rot, Quaternion.LookRotation(toTarget), 1f - Mathf.Exp(-followSharpness * Time.deltaTime));
+                fov = Mathf.Lerp(fromFov, Mathf.Min(fromFov * followWiden, 60f), SmootherStep(t / Mathf.Max(0.01f, runTime)));
+                Pose(pos, rot, fov);
+                yield return null;
+            }
+        }
+
+        CinemachineMouseLook mouseLook = FindFirstObjectByType<CinemachineMouseLook>();
+        if (mouseLook != null)
+            mouseLook.SetLook(Quaternion.LookRotation(Flat(lastSeen - eye)));
+
+        // Fade begins: he runs now (no Search stand-still), and control returns so the blend isn't a freeze.
+        _cam.Priority = 0;
+        ReleaseIntoInvestigate(_investigatePoint, urgent: true);
+        UnlockControl();
+        for (float t = 0f; t < blendOut; t += Time.deltaTime)
+        {
+            OutdoorFog.DensityScale = Mathf.Lerp(windowFog, 1f, SmootherStep(t / blendOut));
+            yield return null;
+        }
+        Stop();
+    }
+
     /// <summary>Ends the shot at once and gives control back.</summary>
     public void Stop()
     {
         if (_cam != null)
             _cam.Priority = 0;
         OutdoorFog.DensityScale = 1f;
-        ReleaseIntoHunt();
+        if (_releaseInvestigate)
+            ReleaseIntoInvestigate(_investigatePoint, urgent: true);
+        else if (includeWindowHunt)
+            ReleaseIntoHunt();
+        else
+            ReleaseWithoutHunt();
+        _releaseInvestigate = false;
         if (_backlight != null)
             Destroy(_backlight.gameObject);
         if (_carLight != null)
             Destroy(_carLight.gameObject);
+        UnlockControl();
+        if (_played)
+            HasFinished = true;
+        _sequenceBusy = false;
+    }
+
+    void UnlockControl()
+    {
         foreach (Renderer r in _hiddenViewmodel)
             if (r != null)
                 r.enabled = true;
         _hiddenViewmodel.Clear();
-        if (_played)
-            HasFinished = true;
         if (!_locked)
             return;
         _locked = false;
@@ -657,8 +1003,31 @@ public class ButcherWindowShot : MonoBehaviour
         && npc.currentState != NPCController.AIState.Scripted
         && npc.currentState != NPCController.AIState.Capture;
 
+    // Car-only: keep him Scripted where he is so he can't catch the player mid-beat. No window move, no stare.
+    bool HoldInPlace(NPCController butcher)
+    {
+        NavMeshAgent agent = butcher.GetComponent<NavMeshAgent>();
+        if (agent == null || butcher.fsm == null || !CanHunt(butcher))
+            return false;
+        if (!agent.enabled)
+            agent.enabled = true;
+
+        butcher.fsm.SetState(NPCController.AIState.Scripted);
+        butcher.GetComponent<FS_Atmo.Navigator>()?.ClearRoute();
+        _held = butcher;
+        _heldHearingDisabled = butcher.HearingDisabled;
+        butcher.SetHearingDisabled(true);
+
+        agent.updatePosition = true;
+        agent.updateRotation = true;
+        agent.ResetPath();
+        agent.velocity = Vector3.zero;
+        agent.isStopped = true;
+        return true;
+    }
+
     // Puts him at the window facing the camera, staring at the player, deaf and still until released.
-    bool HoldAtWindow(NPCController butcher, Vector3 feet, Quaternion facing)
+    bool HoldAtWindow(NPCController butcher, Vector3 feet, Quaternion facing, Vector3 outward)
     {
         NavMeshAgent agent = butcher.GetComponent<NavMeshAgent>();
         if (agent == null || butcher.fsm == null || !CanHunt(butcher))
@@ -677,6 +1046,8 @@ public class ButcherWindowShot : MonoBehaviour
         _held = butcher;
         _heldHearingDisabled = butcher.HearingDisabled;
         butcher.SetHearingDisabled(true);
+        _heldWindowOutward = Flat(outward).normalized;
+        _hasHeldWindowOutward = _heldWindowOutward.sqrMagnitude > 0.01f;
 
         agent.updatePosition = true;
         agent.updateRotation = true;
@@ -697,6 +1068,76 @@ public class ButcherWindowShot : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Warp to the cinematic spawn marker (hidden), Scripted + deaf. Camera turn walks him to ambush.
+    /// </summary>
+    bool BeginApproachFromSpawn(
+        NPCController butcher,
+        Vector3 spawnFeet,
+        Vector3 ambushFeet,
+        Quaternion facing,
+        Vector3 outward)
+    {
+        NavMeshAgent agent = butcher.GetComponent<NavMeshAgent>();
+        if (agent == null || butcher.fsm == null || !CanHunt(butcher))
+            return false;
+        if (!agent.enabled)
+            agent.enabled = true;
+
+        if (!NavMesh.SamplePosition(spawnFeet, out NavMeshHit spawnHit, 2f, agent.areaMask))
+        {
+            Debug.LogWarning($"ButcherWindowShot: no navmesh at cinematic spawn {spawnFeet}.", this);
+            return false;
+        }
+        if (!NavMesh.SamplePosition(ambushFeet, out NavMeshHit ambushHit, 2f, agent.areaMask))
+        {
+            Debug.LogWarning($"ButcherWindowShot: no navmesh at ambush {ambushFeet}.", this);
+            return false;
+        }
+
+        butcher.fsm.SetState(NPCController.AIState.Scripted);
+        butcher.GetComponent<FS_Atmo.Navigator>()?.ClearRoute();
+        _held = butcher;
+        _heldHearingDisabled = butcher.HearingDisabled;
+        butcher.SetHearingDisabled(true);
+        _heldWindowOutward = Flat(outward).normalized;
+        _hasHeldWindowOutward = _heldWindowOutward.sqrMagnitude > 0.01f;
+
+        agent.updatePosition = true;
+        agent.updateRotation = true;
+        if (!agent.Warp(spawnHit.position))
+            return false;
+
+        Quaternion startFacing = Flat(ambushHit.position - spawnHit.position).sqrMagnitude > 0.01f
+            ? Quaternion.LookRotation(Flat(ambushHit.position - spawnHit.position))
+            : facing;
+        butcher.transform.SetPositionAndRotation(spawnHit.position, startFacing);
+        agent.ResetPath();
+        agent.velocity = Vector3.zero;
+        agent.isStopped = true;
+
+        Animator animator = butcher.GetComponentInChildren<Animator>();
+        if (animator != null && animator.HasState(0, Animator.StringToHash(locomotionState)))
+            animator.Play(locomotionState, 0, 0f);
+        return true;
+    }
+
+    void FinishApproachAtWindow(NPCController butcher, Vector3 windowFeet, Quaternion facing)
+    {
+        if (butcher == null)
+            return;
+        NavMeshAgent agent = butcher.GetComponent<NavMeshAgent>();
+        if (agent != null)
+        {
+            agent.Warp(windowFeet);
+            agent.ResetPath();
+            agent.velocity = Vector3.zero;
+            agent.isStopped = true;
+        }
+        butcher.transform.SetPositionAndRotation(windowFeet, facing);
+        butcher.poiLookDirector?.LockLookToPlayer();
+    }
+
     // Lets the held butcher go on a hunt that only ends in a capture.
     void ReleaseIntoHunt()
     {
@@ -705,6 +1146,7 @@ public class ButcherWindowShot : MonoBehaviour
         if (butcher == null)
             return;
         butcher.SetHearingDisabled(_heldHearingDisabled);
+        TryWarpIntoRoomInterior(butcher);
         // The hunt refuses a Scripted butcher; this only flips the state, it starts no routine.
         butcher.SetState(NPCController.AIState.Natural);
         butcher.ForceRelentlessHunt(CaptureReason.Spotted);
@@ -716,6 +1158,153 @@ public class ButcherWindowShot : MonoBehaviour
             return;
         }
         _hunter = butcher;
+    }
+
+    // Car-only end: put him back on his normal day. No hunt, no chase music.
+    void ReleaseWithoutHunt()
+    {
+        NPCController butcher = _held;
+        _held = null;
+        if (butcher == null)
+            return;
+        butcher.SetHearingDisabled(_heldHearingDisabled);
+        butcher.poiLookDirector?.UnlockLookFromPlayer();
+        butcher.SetState(NPCController.AIState.Natural);
+        butcher.EnsureNaturalRoutineStarted();
+    }
+
+    // Locked-car scare end: last-known = player, then the normal Search reaction.
+    void ReleaseIntoInvestigate(Vector3 investigatePoint, bool urgent = false)
+    {
+        NPCController butcher = _held;
+        _held = null;
+        _releaseInvestigate = false;
+        if (butcher == null)
+            return;
+        butcher.SetHearingDisabled(_heldHearingDisabled);
+        butcher.poiLookDirector?.UnlockLookFromPlayer();
+        butcher.ForceInvestigateAt(investigatePoint, urgent);
+    }
+
+    static bool IsButcherOutside(NPCController butcher)
+    {
+        if (butcher == null)
+            return false;
+
+        RoomAnchor room = butcher.GetCurrentRoom();
+        if (room != null)
+            return room.name.IndexOf("Outside", StringComparison.OrdinalIgnoreCase) >= 0;
+
+        string home = butcher.interaction != null && butcher.interaction.data != null
+            ? butcher.interaction.data.homeID
+            : string.Empty;
+        if (string.IsNullOrEmpty(home) || NPCAnchorManager.Instance == null)
+            return false;
+
+        Transform voted = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(
+            butcher.transform.position, home, NavMesh.AllAreas, isNpcSelf: true);
+        return voted != null && voted.name.IndexOf("Outside", StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+
+    /// <summary>
+    /// Nudge off the window sill into the room interior / room anchor. Never onto an outside door prepoint.
+    /// </summary>
+    bool TryWarpIntoRoomInterior(NPCController butcher)
+    {
+        if (butcher == null)
+            return false;
+
+        NavMeshAgent agent = butcher.GetComponent<NavMeshAgent>();
+        if (agent == null)
+            return false;
+        if (!agent.enabled)
+            agent.enabled = true;
+
+        Vector3 from = butcher.transform.position;
+        Vector3 inward = _hasHeldWindowOutward ? -_heldWindowOutward : Flat(butcher.transform.forward);
+        if (inward.sqrMagnitude < 0.01f)
+            inward = Vector3.forward;
+        inward.Normalize();
+
+        string home = butcher.interaction != null && butcher.interaction.data != null
+            ? butcher.interaction.data.homeID
+            : string.Empty;
+        int mask = agent.areaMask;
+
+        Vector3 warp = from;
+        bool foundMesh = false;
+        RoomAnchor room = null;
+
+        float baseDist = Mathf.Max(1f, releaseIntoRoomDistance);
+        float[] distances = { baseDist, baseDist * 0.55f, baseDist * 1.4f, 4f };
+        for (int i = 0; i < distances.Length; i++)
+        {
+            Vector3 probe = from + inward * distances[i];
+            if (!NavMesh.SamplePosition(probe, out NavMeshHit hit, 2.5f, mask))
+                continue;
+
+            foundMesh = true;
+            warp = hit.position;
+
+            if (NPCAnchorManager.Instance == null || string.IsNullOrEmpty(home))
+                break;
+
+            Transform roomT = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(
+                hit.position, home, mask, isNpcSelf: true);
+            if (roomT == null)
+                continue;
+
+            room = roomT.GetComponent<RoomAnchor>();
+            if (room != null)
+                break;
+        }
+
+        if (!foundMesh)
+            return false;
+
+        if (room != null
+            && NavMesh.SamplePosition(room.transform.position, out NavMeshHit roomHit, 3f, mask))
+            warp = roomHit.position;
+
+        agent.updatePosition = true;
+        agent.updateRotation = true;
+        if (!agent.Warp(warp))
+            return false;
+
+        butcher.transform.position = warp;
+        agent.ResetPath();
+        agent.velocity = Vector3.zero;
+        agent.isStopped = false;
+        _hasHeldWindowOutward = false;
+        return true;
+    }
+
+    bool TryGetCinematicSpawnAndAmbush(out Transform spawn, out Transform ambush)
+    {
+        spawn = FindNamedMarker(cinematicSpawnName, "Cinematic Spawn Position", "Butcher Cinematic spawn position");
+        ambush = FindNamedMarker(cinematicAmbushName, "Cinematic Ambush Position");
+        return spawn != null && ambush != null;
+    }
+
+    static Transform FindNamedMarker(params string[] names)
+    {
+        if (names == null || names.Length == 0)
+            return null;
+
+        foreach (Transform t in FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (t == null)
+                continue;
+            for (int i = 0; i < names.Length; i++)
+            {
+                if (string.IsNullOrEmpty(names[i]))
+                    continue;
+                if (t.name == names[i])
+                    return t;
+            }
+        }
+
+        return null;
     }
 
     // Capture can drop back into the chase (he breaks off to drag them from a hiding spot), so it still counts.

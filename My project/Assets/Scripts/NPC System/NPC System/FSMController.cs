@@ -23,6 +23,8 @@ public class FSMController
     Coroutine _cageEscapeReactionCo;
     HidingSpot _witnessedHideSpot;
     bool _relentlessViseMissHunt;
+    bool _skipNextSearchStartupDelay;
+    bool _urgentSearchRun;
 
     public bool IsRelentlessViseMissHunt => _relentlessViseMissHunt;
 
@@ -212,6 +214,15 @@ public class FSMController
     }
 
     /// <summary>
+    /// Next Search skips the opening stand-still and uses run speed (window-scare handoff).
+    /// </summary>
+    public void ArmUrgentSearch(bool run = true)
+    {
+        _skipNextSearchStartupDelay = true;
+        _urgentSearchRun = run;
+    }
+
+    /// <summary>
     /// First time he sees the cage after a real escape: pig bark, then (re)start search.
     /// </summary>
     public void BeginCageEscapeReaction()
@@ -272,12 +283,14 @@ public class FSMController
 
         npc.StopCoroutine(_searchRoutineCo);
         _searchRoutineCo = null;
+        _urgentSearchRun = false;
     }
 
     IEnumerator RunSearchRoutine()
     {
         yield return SearchRoutine();
         _searchRoutineCo = null;
+        _urgentSearchRun = false;
     }
 
     void StartAmbushRoutine()
@@ -671,7 +684,9 @@ public class FSMController
                 break;
 
             case NPCController.AIState.Search:
-                agent.speed = walkingSpeed + ((runningSpeed - walkingSpeed) / 3f);
+                agent.speed = _urgentSearchRun
+                    ? runningSpeed
+                    : walkingSpeed + ((runningSpeed - walkingSpeed) / 3f);
                 break;
 
             case NPCController.AIState.Ambush:
@@ -1232,7 +1247,10 @@ public class FSMController
     private IEnumerator SearchRoutine()
     {
         Debug.Log("🔎 State: SEARCH");
-        yield return new WaitForSeconds(2);
+        if (_skipNextSearchStartupDelay)
+            _skipNextSearchStartupDelay = false;
+        else
+            yield return new WaitForSeconds(2);
 
         Transform roomAnchor = npc.perception.searchTarget;
 
@@ -1268,15 +1286,29 @@ public class FSMController
         if (!alreadyAtRoom)
         {
             var room = roomAnchor.GetComponent<RoomAnchor>();
-            // Pass room anchor as final point so same-room GoToRoom actually moves
-            // (without it, same-room + no finalPoint can leave him idle until stuck timeout).
+            // Prefer last-known as the final step (e.g. car in Outside_Room) so door-aware
+            // routing is used instead of a broken direct GoToPoint to an outdoor mesh island.
+            Vector3 lkp = npc.perception != null ? npc.perception.LastKnownPlayerPosition : Vector3.zero;
+            Vector3? finalPoint = null;
+            Vector3 waitPos = roomPos;
+            if (lkp != Vector3.zero && (lkp - roomPos).sqrMagnitude > 1f)
+            {
+                finalPoint = lkp;
+                waitPos = lkp;
+            }
+            else
+            {
+                // Same-room with no LKP: pass room anchor so GoToRoom actually moves.
+                finalPoint = roomPos;
+            }
+
             if (nav != null && room != null)
-                nav.GoToRoom(room, roomPos);
+                nav.GoToRoom(room, finalPoint);
             else if (agent != null)
-                agent.SetDestination(roomPos);
+                agent.SetDestination(waitPos);
 
             yield return WaitForAgentArrivalOrGiveUp(
-                agent, roomPos, SearchArriveDistance, SearchStuckTimeout);
+                agent, waitPos, SearchArriveDistance, SearchStuckTimeout);
         }
 
         var data = npc.interaction?.data;
@@ -1285,6 +1317,21 @@ public class FSMController
         var lookDirector = npc.poiLookDirector;
 
         Debug.Log($"🔎 Searching {searchStops.Count}/{allStops.Length} spot(s) in {roomAnchor.name}");
+
+        // Outside (and any room with no hide spots): poke around last-known instead of bailing.
+        if (searchStops.Count == 0)
+        {
+            yield return PatrolAroundLastKnown();
+            if (npc.currentState != NPCController.AIState.Capture
+                && npc.currentState != NPCController.AIState.Chase)
+            {
+                if (!IsPlayerStealthHidden() && npc.perception != null && npc.perception.CanSeePlayer)
+                    npc.BeginChaseFromPerception();
+                else
+                    TryAmbushOrNaturalAfterSearch();
+            }
+            yield break;
+        }
 
         foreach (var spot in searchStops)
         {
@@ -1386,6 +1433,108 @@ public class FSMController
     const float SearchStuckTimeout = 5f;
     const float WitnessedHideStuckTimeout = 25f;
     const float SearchArriveMaxYDelta = 1.5f;
+
+    const float LastSeenPatrolRadius = 7f;
+    const float LastSeenPatrolMinSeparation = 2.25f;
+    const int LastSeenPatrolMinStops = 2;
+    const int LastSeenPatrolMaxStops = 3;
+
+    /// <summary>
+    /// When a search room has no hiding spots (e.g. Outside): walk 2–3 pathable points
+    /// around last-known, wait 1–2s at each, then resume the normal post-search decision.
+    /// </summary>
+    IEnumerator PatrolAroundLastKnown()
+    {
+        Vector3 center = npc.perception != null
+            ? npc.perception.LastKnownPlayerPosition
+            : npc.transform.position;
+        if (center == Vector3.zero)
+            center = npc.transform.position;
+
+        int mask = agent != null ? agent.areaMask : NavMesh.AllAreas;
+        if (!NavMesh.SamplePosition(center, out NavMeshHit centerHit, 4f, mask))
+            yield break;
+        center = centerHit.position;
+
+        int want = Random.Range(LastSeenPatrolMinStops, LastSeenPatrolMaxStops + 1);
+        var points = new List<Vector3>(want);
+        Vector3 pathFrom = agent != null ? agent.transform.position : center;
+
+        for (int attempt = 0; attempt < 28 && points.Count < want; attempt++)
+        {
+            Vector2 disk = Random.insideUnitCircle * LastSeenPatrolRadius;
+            if (disk.sqrMagnitude < 2.25f)
+                continue;
+
+            Vector3 probe = center + new Vector3(disk.x, 0f, disk.y);
+            if (!NavMesh.SamplePosition(probe, out NavMeshHit hit, 2.5f, mask))
+                continue;
+
+            var path = new NavMeshPath();
+            if (!NavMesh.CalculatePath(pathFrom, hit.position, mask, path)
+                || path.corners == null
+                || path.corners.Length == 0)
+                continue;
+
+            Vector3 dest = hit.position;
+            if (path.status == NavMeshPathStatus.PathPartial)
+                dest = path.corners[path.corners.Length - 1];
+            else if (path.status != NavMeshPathStatus.PathComplete)
+                continue;
+
+            if ((dest - center).sqrMagnitude < 1.5f * 1.5f)
+                continue;
+
+            bool tooClose = false;
+            for (int i = 0; i < points.Count; i++)
+            {
+                if ((points[i] - dest).sqrMagnitude < LastSeenPatrolMinSeparation * LastSeenPatrolMinSeparation)
+                {
+                    tooClose = true;
+                    break;
+                }
+            }
+            if (tooClose)
+                continue;
+
+            points.Add(dest);
+        }
+
+        if (points.Count == 0)
+            yield break;
+
+        Debug.Log($"🔎 Last-known patrol: {points.Count} stop(s) around {center}");
+
+        for (int i = 0; i < points.Count; i++)
+        {
+            if (TryBreakSearchForChase())
+                yield break;
+
+            Vector3 dest = points[i];
+            if (nav != null)
+                nav.GoToPoint(dest);
+            else if (agent != null)
+                agent.SetDestination(dest);
+
+            yield return WaitForAgentArrivalOrGiveUp(
+                agent, dest, SearchArriveDistance, SearchStuckTimeout);
+
+            if (TryBreakSearchForChase())
+                yield break;
+
+            float wait = Random.Range(1f, 2f);
+            float elapsed = 0f;
+            while (elapsed < wait)
+            {
+                if (TryBreakSearchForChase())
+                    yield break;
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+
+            pathFrom = agent != null ? agent.transform.position : dest;
+        }
+    }
 
     /// <summary>
     /// Waits until the agent is within <paramref name="arriveDistance"/> of <paramref name="dest"/>

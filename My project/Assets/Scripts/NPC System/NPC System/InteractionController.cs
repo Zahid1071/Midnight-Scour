@@ -179,6 +179,18 @@ public class InteractionController : MonoBehaviour
         s_basementRoutineUnlockTime = Time.time + s_basementGraceDurationSeconds;
     }
 
+    /// <summary>
+    /// Dev skip: treat the player as already through the basement exit (Natural may leave the basement
+    /// again once any post-cage grace ends). Clears Continue-intro hold so a teleport out of the cage works.
+    /// </summary>
+    public static void ForcePlayerLeftBasement()
+    {
+        s_playerLeftBasement = true;
+        s_basementGraceHoldForManualStart = false;
+        if (s_basementGracePendingCageExit)
+            NotifyPlayerLeftCage();
+    }
+
     static void TryStartBasementGraceCountdownIfPlayerOutsideCage()
     {
         if (s_basementGraceHoldForManualStart)

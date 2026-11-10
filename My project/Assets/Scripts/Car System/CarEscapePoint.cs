@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class CarEscapePoint : MonoBehaviour, IInteractable
@@ -9,9 +10,14 @@ public class CarEscapePoint : MonoBehaviour, IInteractable
     [SerializeField, Range(0f, 1f)] float lockedVolume = 1f;
     [SerializeField] float lockedFeedbackCooldown = 1f;
 
+    [Header("Locked → window scare")]
+    [Tooltip("After the first locked feedback (once the leave-basement car shot has finished), wait this long then play the butcher-in-the-window beat.")]
+    [SerializeField] float lockedWindowScareDelay = 2f;
+
     public bool RepairDisabledForDemo => repairDisabledForDemo;
 
     float _nextLockedTime;
+    bool _windowScareStarted;
 
     public bool Interact()
     {
@@ -65,6 +71,33 @@ public class CarEscapePoint : MonoBehaviour, IInteractable
         hud?.ShowSubtitle(Loc.Get("gameplay.locked"), 2.5f, hud.WarningColor);
         if (lockedSfx != null && SoundManager.Instance != null)
             SoundManager.Instance.PlaySFXAt(lockedSfx, transform.position, lockedVolume, 1f, -1f, transform);
+
+        // Once out of the basement (car shot done): first locked click arms the window stare → car investigate.
+        if (!_windowScareStarted && ButcherWindowShot.HasFinished)
+        {
+            _windowScareStarted = true;
+            StartCoroutine(DelayedWindowScare());
+        }
+
         return false;
+    }
+
+    IEnumerator DelayedWindowScare()
+    {
+        if (lockedWindowScareDelay > 0f)
+            yield return new WaitForSeconds(lockedWindowScareDelay);
+
+        ButcherWindowShot shot = FindFirstObjectByType<ButcherWindowShot>(FindObjectsInactive.Include);
+        if (shot == null)
+        {
+            Debug.LogWarning("[CarEscapePoint] Locked window scare: no ButcherWindowShot in the scene.", this);
+            yield break;
+        }
+
+        // Investigate where the player actually stood when they tried the door — not the Outside_Room anchor.
+        GameObject player = GameObject.FindWithTag("Player");
+        Vector3 investigateAt = player != null ? player.transform.position : transform.position;
+        if (!shot.TryPlayWindowCarInvestigate(investigateAt))
+            Debug.LogWarning("[CarEscapePoint] Locked window scare could not start (already playing or finished).", this);
     }
 }

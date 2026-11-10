@@ -428,6 +428,97 @@ public class NPCController : MonoBehaviour
         fsm?.BeginRelentlessHunt(reason);
     }
 
+    /// <summary>
+    /// Story beat: mark <paramref name="worldPosition"/> as last-known and kick the normal Search
+    /// reaction (same path as cage-escape / noise investigate). Vision/sound can still escalate to Chase.
+    /// <paramref name="urgent"/> skips the Search stand-still and runs toward the mark (window scare).
+    /// </summary>
+    public void ForceInvestigateAt(Vector3 worldPosition, bool urgent = false)
+    {
+        if (currentState == AIState.Dead || currentState == AIState.Capture)
+            return;
+
+        GetComponent<FS_Atmo.Navigator>()?.ClearRoute();
+        perception?.RedirectLastKnownPosition(worldPosition);
+        EnsureSearchTargetForLastKnown(worldPosition);
+
+        if (agent != null)
+        {
+            if (!agent.enabled)
+                agent.enabled = true;
+            agent.updatePosition = true;
+            agent.updateRotation = true;
+            agent.isStopped = false;
+            agent.velocity = Vector3.zero;
+        }
+
+        // Leave cinematic Scripted holds so the normal Search kick can take over.
+        if (currentState == AIState.Scripted)
+            SetState(AIState.Natural);
+
+        if (urgent)
+            fsm?.ArmUrgentSearch(run: true);
+
+        if (fsm != null)
+            fsm.BeginCageEscapeReaction();
+        else if (interaction != null)
+            interaction.StandUpFromHotspotThenSetState(AIState.Search);
+        else
+            SetState(AIState.Search);
+    }
+
+    /// <summary>
+    /// Search needs a room anchor. Outdoor LKPs often fail door-voting — if so, use Outside in his
+    /// zone so the door graph can walk toward the LKP. The LKP itself stays the player point.
+    /// </summary>
+    void EnsureSearchTargetForLastKnown(Vector3 worldPosition)
+    {
+        if (perception == null || perception.searchTarget != null)
+            return;
+
+        string home = interaction != null && interaction.data != null
+            ? interaction.data.homeID
+            : string.Empty;
+
+        if (!string.IsNullOrEmpty(home) && NPCAnchorManager.Instance != null)
+        {
+            Transform voted = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(
+                worldPosition, home, NavMesh.AllAreas, isNpcSelf: false);
+            if (voted != null)
+            {
+                perception.searchTarget = voted;
+                return;
+            }
+        }
+
+        RoomAnchor current = GetCurrentRoom();
+        if (current != null
+            && current.name.IndexOf("Outside", System.StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            perception.searchTarget = current.transform;
+            return;
+        }
+
+        if (string.IsNullOrEmpty(home))
+            return;
+
+#if UNITY_2023_1_OR_NEWER
+        var rooms = Object.FindObjectsByType<RoomAnchor>(FindObjectsSortMode.None);
+#else
+        var rooms = Object.FindObjectsOfType<RoomAnchor>();
+#endif
+        for (int i = 0; i < rooms.Length; i++)
+        {
+            RoomAnchor room = rooms[i];
+            if (room == null || room.zoneID != home)
+                continue;
+            if (room.name.IndexOf("Outside", System.StringComparison.OrdinalIgnoreCase) < 0)
+                continue;
+            perception.searchTarget = room.transform;
+            return;
+        }
+    }
+
     private void HandleSuspicionReached()
     {
         if (HearingDisabled) return;
