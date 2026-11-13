@@ -274,20 +274,8 @@ public class CorridorTension : MonoBehaviour
         p.y = _player.position.y + Random.Range(0.2f, 2f);
         p = bounds.ClosestPoint(p);
 
-        var go = new GameObject(clip.name + " (Corridor Dark)");
-        go.transform.SetParent(transform, false);
-        go.transform.position = p;
-        var src = go.AddComponent<AudioSource>();
-        src.playOnAwake = false;
-        src.outputAudioMixerGroup = mixerGroup;
-        src.spatialBlend = 1f;
-        src.rolloffMode = AudioRolloffMode.Logarithmic;
-        src.minDistance = darkMinDistance;
-        src.maxDistance = 20f;
-        src.dopplerLevel = 0f;
-        src.pitch = Random.Range(0.9f, 1.05f);
-        src.PlayOneShot(clip, Random.Range(darkVolume.x, darkVolume.y));
-        Destroy(go, clip.length / src.pitch + 0.25f);
+        SpatialAudio.PlayAt(clip, p, Random.Range(darkVolume.x, darkVolume.y), darkMinDistance, 20f, mixerGroup, transform,
+            Random.Range(0.9f, 1.05f));
     }
 
     void Leave()

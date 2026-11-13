@@ -863,6 +863,30 @@ MonoBehaviour:
     m_Key: gameplay.where_is_the_body
     m_Metadata:
       m_Items: []
+  - m_Id: 46856168847310848
+    m_Key: map.small_house
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831744
+    m_Key: map.farmhouse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831745
+    m_Key: map.basement
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831746
+    m_Key: map.truck
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831747
+    m_Key: map.dog_pen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831748
+    m_Key: map.pickup
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

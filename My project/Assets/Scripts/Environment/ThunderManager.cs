@@ -24,6 +24,8 @@ public class ThunderManager : MonoBehaviour
     [Header("Audio")]
     [SerializeField] AudioClip thunderSfx;
     [SerializeField] float thunderVolume = 1f;
+    [Tooltip("Thunder volume multiplier while the player is indoors.")]
+    [SerializeField, Range(0f, 1f)] float indoorThunderVolume = 0.5f;
     [SerializeField] Vector2 thunderPitchRange = new Vector2(0.95f, 1.05f);
 
     [Header("Camera Shake")]
@@ -837,7 +839,8 @@ public class ThunderManager : MonoBehaviour
             return;
 
         float pitch = Random.Range(thunderPitchRange.x, thunderPitchRange.y);
-        SoundManager.Instance.PlaySFX(thunderSfx, thunderVolume, pitch);
+        float indoorScale = Mathf.Lerp(indoorThunderVolume, 1f, SoundManager.Instance.OutdoorAmount);
+        SoundManager.Instance.PlaySFX(thunderSfx, thunderVolume * indoorScale, pitch);
     }
 
     void ImpulseSwings()

@@ -892,6 +892,31 @@ MonoBehaviour:
     m_Localized: Ceset nereye gitti?
     m_Metadata:
       m_Items: []
+  - m_Id: 46856168847310848
+    m_Localized: "K\xFC\xE7\xFCk ev"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831744
+    m_Localized: "\xC7iftlik evi"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831745
+    m_Localized: Bodrum
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831746
+    m_Localized: Kamyonet
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831747
+    m_Localized: "K\xF6pek a\u011F\u0131l\u0131"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831748
+    m_Localized: "\xC7iftli\u011Fin elle \xE7izilmi\u015F bir haritas\u0131. Tekrar
+      bakmak i\xE7in M'ye bas."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

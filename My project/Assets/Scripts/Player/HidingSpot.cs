@@ -63,6 +63,9 @@ public class HidingSpot : MonoBehaviour, IInteractable
     [Header("NPC Search")]
     [Tooltip("NPC pauses here during room search but the player cannot hide. Uses the same pivot/POI as a normal hiding spot.")]
     public bool searchCheckpointOnly;
+    [Tooltip("A chasing NPC that saw the player within this many seconds before they started hiding knows this spot was used and comes to check it.")]
+    [Min(0f)]
+    [SerializeField] float chaseWitnessSeconds = 3.5f;
 
     public float GetSearchPickWeight()
     {
@@ -186,6 +189,36 @@ public class HidingSpot : MonoBehaviour, IInteractable
         return false;
     }
 
+    /// <summary>Nearest NPC that is chasing (or screaming before a chase) and saw the player within <see cref="chaseWitnessSeconds"/>.</summary>
+    private NPCController FindChasingWitness()
+    {
+#if UNITY_2023_1_OR_NEWER
+        var npcs = Object.FindObjectsByType<NPCController>(FindObjectsSortMode.None);
+#else
+        var npcs = Object.FindObjectsOfType<NPCController>();
+#endif
+        NPCController best = null;
+        float bestDist = float.MaxValue;
+        foreach (var npc in npcs)
+        {
+            if (npc == null || npc.perception == null)
+                continue;
+            if (npc.currentState != NPCController.AIState.Chase && !npc.IsReactingToSpotted)
+                continue;
+            if (Time.time - npc.perception.LastSawPlayerTime > chaseWitnessSeconds)
+                continue;
+
+            float dist = Vector3.Distance(npc.transform.position, transform.position);
+            if (dist < bestDist)
+            {
+                best = npc;
+                bestDist = dist;
+            }
+        }
+
+        return best;
+    }
+
     /// <summary>Stealth is granted once at hide entry; it is not stripped when NPCs approach later.</summary>
     private bool CanGrantStealthAtEntry(GameObject player)
     {
@@ -199,7 +232,7 @@ public class HidingSpot : MonoBehaviour, IInteractable
     /// Player finished entering while an NPC could see it — send that NPC to this spot to capture
     /// (guaranteed, like a successful search hide-spot roll), instead of ejecting the player.
     /// </summary>
-    private void AlertNpcsOfWitnessedHide(GameObject player)
+    private void AlertNpcsOfWitnessedHide(GameObject player, NPCController preferred)
     {
 #if UNITY_2023_1_OR_NEWER
         var npcs = Object.FindObjectsByType<NPCController>(FindObjectsSortMode.None);
@@ -210,6 +243,15 @@ public class HidingSpot : MonoBehaviour, IInteractable
         NPCController best = null;
         float bestScore = float.MaxValue;
         Vector3 spotPos = GetSearchPivot() != null ? GetSearchPivot().position : transform.position;
+
+        if (preferred != null
+            && preferred.currentState != NPCController.AIState.Capture
+            && preferred.currentState != NPCController.AIState.Dead
+            && preferred.currentState != NPCController.AIState.Scripted)
+        {
+            SendWitnessToSpot(preferred, spotPos);
+            return;
+        }
 
         foreach (var npc in npcs)
         {
@@ -265,14 +307,17 @@ public class HidingSpot : MonoBehaviour, IInteractable
             }
         }
 
-        if (best == null)
-            return;
+        if (best != null)
+            SendWitnessToSpot(best, spotPos);
+    }
 
-        if (best.perception != null)
-            best.perception.RedirectLastKnownPosition(spotPos);
+    void SendWitnessToSpot(NPCController npc, Vector3 spotPos)
+    {
+        if (npc.perception != null)
+            npc.perception.RedirectLastKnownPosition(spotPos);
 
         CaptureContext.Set(CaptureReason.WitnessedHide);
-        best.BeginWitnessedHideCapture(this);
+        npc.BeginWitnessedHideCapture(this);
     }
 
     public bool Interact()
@@ -391,6 +436,11 @@ public class HidingSpot : MonoBehaviour, IInteractable
         originalLayerIndex = player.layer;
         playerRef = player;
 
+        // Sight checks raycast against the player's and this spot's colliders, which are
+        // switched off below, so they must run now rather than after the stealth delay.
+        NPCController chaseWitness = FindChasingWitness();
+        bool witnessed = chaseWitness != null || !CanGrantStealthAtEntry(player);
+
         hider.SetHidingEngaged(true);
 
         HidingCameraSystem.Instance.AttachToPivot(activePivot);
@@ -413,12 +463,11 @@ public class HidingSpot : MonoBehaviour, IInteractable
         if (stealthLayerDelay > 0f)
             yield return new WaitForSeconds(stealthLayerDelay);
 
-        if (!CanGrantStealthAtEntry(player))
+        if (witnessed || IsAnyNPCTooCloseForHiddenLayer(player.transform.position))
         {
-            // Alert while the player is still on the visible layer so LOS scoring stays valid,
-            // then finish the hide — do not eject. Butcher paths here and captures like a
+            // Finish the hide — do not eject. Butcher paths here and captures like a
             // successful search hide-spot roll.
-            AlertNpcsOfWitnessedHide(player);
+            AlertNpcsOfWitnessedHide(player, chaseWitness);
 
             player.layer = hiddenLayer;
             hider.SetVisuals(false);

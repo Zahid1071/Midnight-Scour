@@ -889,6 +889,31 @@ MonoBehaviour:
     m_Localized: "Gdzie jest cia\u0142o?"
     m_Metadata:
       m_Items: []
+  - m_Id: 46856168847310848
+    m_Localized: "Ma\u0142y dom"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831744
+    m_Localized: Dom na farmie
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831745
+    m_Localized: Piwnica
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831746
+    m_Localized: Pikap
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831747
+    m_Localized: Kojec psa
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831748
+    m_Localized: "R\u0119cznie narysowana mapa farmy. Naci\u015Bnij M, aby spojrze\u0107
+      na ni\u0105 ponownie."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

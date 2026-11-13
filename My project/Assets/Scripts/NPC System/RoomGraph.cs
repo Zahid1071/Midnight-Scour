@@ -8,6 +8,7 @@ namespace FS_Atmo
     {
         public RoomAnchor roomA;
         public RoomAnchor roomB;
+        [Tooltip("Leave empty for an open doorway with no door: rooms stay separate, nothing to open.")]
         public DoorController door;
         public Transform prePointA;
         public Transform prePointB;
@@ -51,7 +52,7 @@ namespace FS_Atmo
 
             foreach (var e in edges)
             {
-                if (!e?.roomA || !e.roomB || !e.door || !e.prePointA || !e.prePointB)
+                if (!e?.roomA || !e.roomB || !e.prePointA || !e.prePointB)
                     continue;
 
                 if (!_adj.ContainsKey(e.roomA)) _adj[e.roomA] = new List<DoorEdge>();

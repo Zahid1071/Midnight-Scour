@@ -247,6 +247,7 @@ public class CheckpointManager : MonoBehaviour
         d.corridorLeft = corridor != null && corridor.HasLeftCorridor;
         TensionMusicCues music = FindFirstObjectByType<TensionMusicCues>();
         d.returnMusicPlaying = music != null && music.ReturnMusicPlaying;
+        d.mapFound = FarmMapView.Instance != null && FarmMapView.Instance.HasMap;
 
         if (GameplayHintManager.Instance != null)
             d.hintsShown = GameplayHintManager.Instance.GetShownHints();
@@ -334,6 +335,8 @@ public class CheckpointManager : MonoBehaviour
             FindFirstObjectByType<CorridorTension>()?.RestoreLeft();
         if (d.returnMusicPlaying)
             FindFirstObjectByType<TensionMusicCues>()?.RestoreReturnMusic();
+        if (d.mapFound)
+            FarmMapView.Instance?.RestoreCollected();
 
         RestorePlayer(d);
 

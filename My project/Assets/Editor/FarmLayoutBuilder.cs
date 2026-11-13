@@ -20,10 +20,11 @@ public static class FarmLayoutBuilder
     const float YardY = 0.02f;
     const float HousePadY = 0.05f;
 
-    // Farmhouse local frame is turned 180 degrees so its front porch faces the cellar door.
-    static readonly Vector3 HouseOrigin = new Vector3(0f, 0.55f, 56f);
+    // Farmhouse local frame is turned 180 degrees so its front porch faces the cellar door. The rect covers the
+    // 21 x 12 m house plus both porches.
+    static readonly Vector3 HouseOrigin = new Vector3(-2.6f, 0.55f, 85.5f);
     const float HouseYaw = 180f;
-    static readonly Rect HouseRect = Rect.MinMaxRect(-18.5f, 43.5f, 3.5f, 59.5f);
+    static readonly Rect HouseRect = Rect.MinMaxRect(-26f, 69.5f, 0f, 90f);
 
     // Driver side faces the cellar door; nose points out toward the driveway. Offset right so the porch steps stay visible.
     static readonly Vector3 TruckPosition = new Vector3(-3.4f, 0f, 33.2f);
@@ -40,14 +41,17 @@ public static class FarmLayoutBuilder
     const float CountyRoadX = -70f;
     const float CountyRoadHalfWidth = 3.5f;
 
-    // 0: cellar door to the gravel pad, 1: gravel pad to the porch steps, 2: driveway to the county road, 3: field lane.
+    // 0: cellar door to the gravel pad, 1: gravel pad to the porch steps, 2: driveway to the county road,
+    // 3: field lane out to the dog pen gate.
     static readonly Vector2[][] Paths =
     {
         new[] { new Vector2(-7.5f, 24.6f), new Vector2(-7.4f, 27.5f), new Vector2(-7.2f, 30f) },
         new[] { new Vector2(-7.5f, 40f), new Vector2(-7.5f, 44.2f) },
         new[] { new Vector2(-18f, 35f), new Vector2(-36f, 35.5f), new Vector2(-52f, 36.2f), new Vector2(CountyRoadX, 36.5f) },
-        new[] { new Vector2(2f, 35f), new Vector2(22f, 36f), new Vector2(34f, 39f), new Vector2(60f, 39.5f) },
+        new[] { new Vector2(2f, 35f), new Vector2(22f, 36f), new Vector2(34f, 39f), new Vector2(60f, 39.5f), new Vector2(DogPenSetup.Gate.x - 1f, DogPenSetup.Gate.z) },
     };
+    // Grass clearing cut out of the east field around the dog pen footprint.
+    const float PenClearing = 6f;
     static readonly float[] PathWidths = { 1.2f, 1.4f, 4.2f, 2.8f };
 
     struct Field
@@ -97,6 +101,33 @@ public static class FarmLayoutBuilder
         new Vector2(-25f, 57f), new Vector2(-28f, 19f), new Vector2(13f, 66f), new Vector2(19f, 31f), new Vector2(-30f, 70f),
     };
 
+    struct Grove
+    {
+        public Vector2 centre;
+        public float radius;
+        public int count;
+        public Grove(float x, float z, float radius, int count) { centre = new Vector2(x, z); this.radius = radius; this.count = count; }
+    }
+
+    // Clumps around the farmstead: cover that breaks the killer's line of sight outdoors, and a frame for the house
+    // and the dog pen. Undergrowth is planted under each.
+    static readonly Grove[] Groves =
+    {
+        new Grove(22f, 92f, 7f, 10),  // north-east, behind the house
+        new Grove(-34f, 77f, 6f, 8),  // west of the house
+        new Grove(-29f, 12f, 7f, 9),  // south-west, past the cellar
+        new Grove(25f, 15f, 5f, 6),   // south-east
+        new Grove(-24f, 50f, 4f, 5),  // west yard
+        new Grove(24f, 55f, 4f, 5),   // east yard
+        new Grove(14f, 73f, 5f, 6),   // east of the house
+        new Grove(87.5f, 39f, 5f, 5), // behind the dog pen, in its clearing
+    };
+    static readonly Vector2[] LoneYardTrees =
+    {
+        new Vector2(-15f, 56f), new Vector2(8f, 60f), new Vector2(-33f, 28f), new Vector2(16f, 46f), new Vector2(-2f, 98f),
+    };
+    const int GroveSeed = 4242;
+
     [MenuItem("Tools/Environment/Build Farm Layout")]
     static void BuildMenu() => Debug.Log(Build(DefaultSeed));
 
@@ -118,6 +149,7 @@ public static class FarmLayoutBuilder
         Paint(terrain);
         PlantDetails(terrain, rng);
         int trees = PlantTrees(terrain, rng);
+        PlantUndergrowth(terrain, new System.Random(GroveSeed));
         ConfigureTerrain(terrain);
 
         var forestDecor = GameObject.Find(ForestDecorRootName);
@@ -130,11 +162,12 @@ public static class FarmLayoutBuilder
         }
         PlaceTruck(envRoot.transform);
         string house = FarmhouseBuilder.Build(HouseOrigin, HouseYaw);
+        string pen = DogPenSetup.Place();
 
         EditorUtility.SetDirty(terrain.terrainData);
         AssetDatabase.SaveAssets();
         UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(terrainGo.scene);
-        return $"Farm layout built: {trees} trees. {house}";
+        return $"Farm layout built: {trees} trees. {house} {pen}";
     }
 
     // ---------- Shape ----------
@@ -171,6 +204,8 @@ public static class FarmLayoutBuilder
         }
 
         h = Mathf.Lerp(HousePadY, h, Smooth01((RectDistance(HouseRect, p) - 0.5f) / 6f));
+        float penY = BaseHeight(DogPenSetup.FenceCentre.x, DogPenSetup.FenceCentre.z);
+        h = Mathf.Lerp(penY, h, Smooth01((RectDistance(DogPenSetup.Footprint, p) - 0.5f) / 5f));
         h = Mathf.Max(h, YardY - RectDistance(BasementRect, p) * 0.15f);
         if (DoorApronRect.Contains(p))
         {
@@ -293,18 +328,19 @@ public static class FarmLayoutBuilder
         var maps = new float[res, res, 4];
         for (int iz = 0; iz < res; iz++)
         for (int ix = 0; ix < res; ix++)
-        {
-            float x = pos.x + (ix + 0.5f) / res * size.x;
-            float z = pos.z + (iz + 0.5f) / res * size.z;
-            var s = Sample(x, z);
-            float grass = Mathf.Max(0f, s.grass), straw = Mathf.Max(0f, s.straw), soil = Mathf.Max(0f, s.soil), gravel = Mathf.Max(0f, s.gravel);
-            float sum = Mathf.Max(1e-4f, grass + straw + soil + gravel);
-            maps[iz, ix, 0] = grass / sum;
-            maps[iz, ix, 1] = straw / sum;
-            maps[iz, ix, 2] = soil / sum;
-            maps[iz, ix, 3] = gravel / sum;
-        }
+            PaintTexel(maps, iz, ix, pos.x + (ix + 0.5f) / res * size.x, pos.z + (iz + 0.5f) / res * size.z);
         data.SetAlphamaps(0, 0, maps);
+    }
+
+    static void PaintTexel(float[,,] maps, int iz, int ix, float x, float z)
+    {
+        var s = Sample(x, z);
+        float grass = Mathf.Max(0f, s.grass), straw = Mathf.Max(0f, s.straw), soil = Mathf.Max(0f, s.soil), gravel = Mathf.Max(0f, s.gravel);
+        float sum = Mathf.Max(1e-4f, grass + straw + soil + gravel);
+        maps[iz, ix, 0] = grass / sum;
+        maps[iz, ix, 1] = straw / sum;
+        maps[iz, ix, 2] = soil / sum;
+        maps[iz, ix, 3] = gravel / sum;
     }
 
     static void EnsureFarmLayers()
@@ -372,39 +408,119 @@ public static class FarmLayoutBuilder
         var layers = new int[protos.Length][,];
         for (int i = 0; i < layers.Length; i++) layers[i] = new int[res, res];
 
-        var truck = new Vector2(TruckPosition.x, TruckPosition.z);
         for (int iz = 0; iz < res; iz++)
         for (int ix = 0; ix < res; ix++)
         {
-            float x = pos.x + (ix + 0.5f) / res * size.x;
-            float z = pos.z + (iz + 0.5f) / res * size.z;
-            var p = new Vector2(x, z);
-            float core = Vector2.Distance(p, Core);
-            if (core > 150f || StairwellRect.Contains(p) || RectDistance(HouseRect, p) < 0.3f || Vector2.Distance(p, truck) < 3.6f)
-                continue;
-            var s = Sample(x, z);
-            if (s.gravel > 0.3f || s.soil > 0.55f && s.field < 0.5f) continue;
-            double r = rng.NextDouble();
-
-            if (s.field > 0.5f)
-            {
-                if (s.stubbleField && s.ridge > 0.5f && core < 130f && r < 0.8)
-                    layers[StubbleDetail][iz, ix] = 1 + rng.Next(0, 3);
-                continue;
-            }
-
-            bool margin = FieldAt(p, out _).HasValue || Mathf.Abs(x - CountyRoadX) < 9f;
-            float lush = (1f - s.straw * 0.6f) * Mathf.Lerp(0.55f, 1f, Mathf.PerlinNoise(x * 0.15f + 7f, z * 0.15f + 3f));
-            if (margin && r < 0.35)
-                layers[TallGrassDetail][iz, ix] = 1 + rng.Next(0, 2);
-            else if (r < 0.85 * lush)
-                layers[rng.Next(0, 3)][iz, ix] = 1 + (int)(lush * 2.5f * (float)rng.NextDouble());
-            else if (r < 0.92 * lush)
-                layers[3][iz, ix] = 1;
-            else if (margin && r < 0.92 * lush + 0.02)
-                layers[BushDetail][iz, ix] = 1;
+            int layer = DetailAt(pos.x + (ix + 0.5f) / res * size.x, pos.z + (iz + 0.5f) / res * size.z, rng, out int count);
+            if (layer >= 0) layers[layer][iz, ix] = count;
         }
         for (int i = 0; i < layers.Length; i++) data.SetDetailLayer(0, 0, i, layers[i]);
+    }
+
+    /// Detail layer planted in the cell at (x, z) with its instance count, or -1 for bare ground.
+    static int DetailAt(float x, float z, System.Random rng, out int count)
+    {
+        count = 0;
+        var p = new Vector2(x, z);
+        float core = Vector2.Distance(p, Core);
+        if (core > 150f || StairwellRect.Contains(p) || RectDistance(HouseRect, p) < 0.3f ||
+            Vector2.Distance(p, new Vector2(TruckPosition.x, TruckPosition.z)) < 3.6f || RectDistance(DogPenSetup.FenceRect, p) < 0.4f)
+            return -1;
+        var s = Sample(x, z);
+        if (s.gravel > 0.3f || s.soil > 0.55f && s.field < 0.5f) return -1;
+        double r = rng.NextDouble();
+
+        if (s.field > 0.5f)
+        {
+            if (!(s.stubbleField && s.ridge > 0.5f && core < 130f && r < 0.8)) return -1;
+            count = 1 + rng.Next(0, 3);
+            return StubbleDetail;
+        }
+
+        bool margin = FieldAt(p, out _).HasValue || Mathf.Abs(x - CountyRoadX) < 9f;
+        float lush = (1f - s.straw * 0.6f) * Mathf.Lerp(0.55f, 1f, Mathf.PerlinNoise(x * 0.15f + 7f, z * 0.15f + 3f));
+        if (margin && r < 0.35)
+        {
+            count = 1 + rng.Next(0, 2);
+            return TallGrassDetail;
+        }
+        if (r < 0.85 * lush)
+        {
+            int layer = rng.Next(0, 3);
+            count = 1 + (int)(lush * 2.5f * (float)rng.NextDouble());
+            return layer;
+        }
+        count = 1;
+        if (r < 0.92 * lush) return 3;
+        if (margin && r < 0.92 * lush + 0.02) return BushDetail;
+        return -1;
+    }
+
+    /// Rebuilds the ground of one area of the current terrain from the layout rules (shape, paint and grass; trees
+    /// are left alone), e.g. after the dog pen moves. Run PlantGroves afterwards to restore undergrowth in the area.
+    public static string RefreshGround(Rect area, bool sculpt, int seed)
+    {
+        var envRoot = GameObject.Find("_Environment");
+        var terrain = envRoot ? envRoot.transform.Find("Terrain")?.GetComponent<Terrain>() : null;
+        if (!terrain) return "No _Environment/Terrain found.";
+        var data = terrain.terrainData;
+        if (data.detailPrototypes.Length != DetailPrefabPaths.Length || data.alphamapLayers != TerrainLayerPaths.Length)
+            return "Terrain doesn't match the farm layout; run Build Farm Layout instead.";
+
+        Undo.RegisterCompleteObjectUndo(data, "Refresh Farm Ground");
+        var pos = terrain.transform.position;
+        var size = data.size;
+        _terrainOrigin = pos;
+
+        if (sculpt)
+        {
+            int res = data.heightmapResolution;
+            var c = Cells(area, pos, size, res - 1, res);
+            var heights = new float[c.height, c.width];
+            for (int iz = 0; iz < c.height; iz++)
+            for (int ix = 0; ix < c.width; ix++)
+            {
+                float x = pos.x + (c.x + ix) / (res - 1f) * size.x;
+                float z = pos.z + (c.y + iz) / (res - 1f) * size.z;
+                heights[iz, ix] = Mathf.Clamp01((GroundHeight(x, z) - pos.y) / size.y);
+            }
+            data.SetHeights(c.x, c.y, heights);
+        }
+
+        int ares = data.alphamapResolution;
+        var a = Cells(area, pos, size, ares, ares);
+        var maps = new float[a.height, a.width, 4];
+        for (int iz = 0; iz < a.height; iz++)
+        for (int ix = 0; ix < a.width; ix++)
+            PaintTexel(maps, iz, ix, pos.x + (a.x + ix + 0.5f) / ares * size.x, pos.z + (a.y + iz + 0.5f) / ares * size.z);
+        data.SetAlphamaps(a.x, a.y, maps);
+
+        int dres = data.detailResolution;
+        var d = Cells(area, pos, size, dres, dres);
+        var rng = new System.Random(seed);
+        var layers = new int[DetailPrefabPaths.Length][,];
+        for (int i = 0; i < layers.Length; i++) layers[i] = new int[d.height, d.width];
+        for (int iz = 0; iz < d.height; iz++)
+        for (int ix = 0; ix < d.width; ix++)
+        {
+            int layer = DetailAt(pos.x + (d.x + ix + 0.5f) / dres * size.x, pos.z + (d.y + iz + 0.5f) / dres * size.z, rng, out int count);
+            if (layer >= 0) layers[layer][iz, ix] = count;
+        }
+        for (int i = 0; i < layers.Length; i++) data.SetDetailLayer(d.x, d.y, i, layers[i]);
+
+        EditorUtility.SetDirty(data);
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(terrain.gameObject.scene);
+        return $"Refreshed ground over {area} (sculpt: {sculpt}).";
+    }
+
+    /// Grid cells (clamped to the map) covering a world rect, for a grid of `cells` steps across the terrain.
+    static RectInt Cells(Rect area, Vector3 pos, Vector3 size, int cells, int limit)
+    {
+        int x0 = Mathf.Clamp(Mathf.FloorToInt((area.xMin - pos.x) / size.x * cells), 0, limit);
+        int x1 = Mathf.Clamp(Mathf.CeilToInt((area.xMax - pos.x) / size.x * cells) + 1, 0, limit);
+        int z0 = Mathf.Clamp(Mathf.FloorToInt((area.yMin - pos.z) / size.z * cells), 0, limit);
+        int z1 = Mathf.Clamp(Mathf.CeilToInt((area.yMax - pos.z) / size.z * cells) + 1, 0, limit);
+        return new RectInt(x0, z0, x1 - x0, z1 - z0);
     }
 
     // ---------- Trees ----------
@@ -428,6 +544,8 @@ public static class FarmLayoutBuilder
         void Add(float x, float z, float deadChance, float sizeBias)
         {
             if (x < pos.x + 2f || z < pos.z + 2f || x > pos.x + size.x - 2f || z > pos.z + size.z - 2f) return;
+            var p = new Vector2(x, z);
+            if (RectDistance(HouseRect, p) < 1.5f || RectDistance(DogPenSetup.Footprint, p) < 1f) return;
             bool isDead = rng.NextDouble() < deadChance;
             int index = isDead ? rng.Next(0, dead.Count) : dead.Count + rng.Next(0, birch.Count);
             float scale = (isDead ? Mathf.Lerp(0.6f, 0.9f, (float)rng.NextDouble()) : Mathf.Lerp(0.45f, 0.7f, (float)rng.NextDouble())) * sizeBias;
@@ -457,6 +575,7 @@ public static class FarmLayoutBuilder
         }
 
         foreach (var t in YardTrees) Add(t.x, t.y, 0.7f, 1.15f);
+        foreach (var p in GrovePoints(new System.Random(GroveSeed), false)) Add(p.x, p.y, 0.55f, 1.05f);
 
         // Distant tree lines along creeks and field edges, so the horizon is not empty.
         void Line(Vector2 a, Vector2 b, float spacing, float gapChance)
@@ -497,6 +616,134 @@ public static class FarmLayoutBuilder
         return prefab;
     }
 
+    /// Trunk spots for the groves and lone yard trees, at least 2.5 m apart and clear of the house, pen, paths,
+    /// truck and cellar. With checkScene, spots touching a scene collider (other than the terrain) are dropped too.
+    static List<Vector2> GrovePoints(System.Random rng, bool checkScene)
+    {
+        var points = new List<Vector2>();
+        bool Free(Vector2 p)
+        {
+            if (RectDistance(HouseRect, p) < 3f || RectDistance(DogPenSetup.Footprint, p) < 1.5f) return false;
+            if (RectDistance(GravelPadRect, p) < 2.5f || RectDistance(BasementRect, p) < 1f) return false;
+            if (Vector2.Distance(p, new Vector2(TruckPosition.x, TruckPosition.z)) < 6f) return false;
+            for (int i = 0; i < Paths.Length; i++)
+                if (PathDistance(p, i) < PathWidths[i] * 0.5f + 2.5f) return false;
+            if (FieldAt(p, out _).HasValue) return false;
+            foreach (var q in points)
+                if (Vector2.Distance(p, q) < 2.5f) return false;
+            if (checkScene)
+                foreach (var c in Physics.OverlapCapsule(new Vector3(p.x, 0.5f, p.y), new Vector3(p.x, 4f, p.y), 1.2f))
+                    if (!(c is TerrainCollider)) return false;
+            return true;
+        }
+        foreach (var g in Groves)
+            for (int i = 0; i < g.count * 3 && i < 200; i++)
+            {
+                if (CountNear(points, g.centre, g.radius + 0.1f) >= g.count) break;
+                float a = (float)rng.NextDouble() * Mathf.PI * 2f, r = Mathf.Sqrt((float)rng.NextDouble()) * g.radius;
+                var p = g.centre + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * r;
+                if (Free(p)) points.Add(p);
+            }
+        foreach (var t in LoneYardTrees)
+            if (Free(t)) points.Add(t);
+        return points;
+    }
+
+    static int CountNear(List<Vector2> points, Vector2 c, float r)
+    {
+        int n = 0;
+        foreach (var p in points)
+            if (Vector2.Distance(p, c) <= r) n++;
+        return n;
+    }
+
+    /// Dry bushes and tall grass under the groves.
+    static void PlantUndergrowth(Terrain terrain, System.Random rng)
+    {
+        var data = terrain.terrainData;
+        if (data.detailPrototypes.Length <= BushDetail) return;
+        var pos = terrain.transform.position;
+        var size = data.size;
+        int res = data.detailResolution;
+        foreach (var g in Groves)
+        {
+            float reach = g.radius + 2f;
+            int x0 = Mathf.FloorToInt((g.centre.x - reach - pos.x) / size.x * res), x1 = Mathf.CeilToInt((g.centre.x + reach - pos.x) / size.x * res);
+            int z0 = Mathf.FloorToInt((g.centre.y - reach - pos.z) / size.z * res), z1 = Mathf.CeilToInt((g.centre.y + reach - pos.z) / size.z * res);
+            var bush = data.GetDetailLayer(x0, z0, x1 - x0, z1 - z0, BushDetail);
+            var tall = data.GetDetailLayer(x0, z0, x1 - x0, z1 - z0, TallGrassDetail);
+            for (int iz = 0; iz < z1 - z0; iz++)
+            for (int ix = 0; ix < x1 - x0; ix++)
+            {
+                var p = new Vector2(pos.x + (ix + x0 + 0.5f) / res * size.x, pos.z + (iz + z0 + 0.5f) / res * size.z);
+                float d = Vector2.Distance(p, g.centre) / reach;
+                if (d > 1f || RectDistance(HouseRect, p) < 1f || RectDistance(DogPenSetup.Footprint, p) < 0.5f) continue;
+                for (int i = 0; i < Paths.Length; i++)
+                    if (PathDistance(p, i) < PathWidths[i] * 0.5f + 0.5f) { d = 2f; break; }
+                if (d > 1f) continue;
+                double r = rng.NextDouble();
+                if (r < 0.07 * (1f - d * 0.6f)) bush[iz, ix] = 1;
+                else if (r < 0.3 * (1f - d)) tall[iz, ix] = 1 + rng.Next(0, 2);
+            }
+            data.SetDetailLayer(x0, z0, BushDetail, bush);
+            data.SetDetailLayer(x0, z0, TallGrassDetail, tall);
+        }
+    }
+
+    /// Adds the groves, lone yard trees and their undergrowth to the current terrain without rebuilding the farm.
+    [MenuItem("Tools/Environment/Plant Farm Groves")]
+    static void PlantGrovesMenu() => Debug.Log(PlantGroves());
+
+    public static string PlantGroves()
+    {
+        var envRoot = GameObject.Find("_Environment");
+        var terrain = envRoot ? envRoot.transform.Find("Terrain")?.GetComponent<Terrain>() : null;
+        if (!terrain) return "No _Environment/Terrain found.";
+        var data = terrain.terrainData;
+        int deadCount = DeadTreeNames.Length;
+        if (data.treePrototypes.Length != deadCount + BirchNumbers.Length) return "Terrain trees don't match the farm layout; run Build Farm Layout instead.";
+
+        Undo.RegisterCompleteObjectUndo(data, "Plant Farm Groves");
+        var rng = new System.Random(GroveSeed);
+        var pos = terrain.transform.position;
+        var size = data.size;
+        var existing = new List<Vector2>();
+        foreach (var t in data.treeInstances)
+        {
+            var w = Vector3.Scale(t.position, size) + pos;
+            existing.Add(new Vector2(w.x, w.z));
+        }
+        var instances = new List<TreeInstance>(data.treeInstances);
+        int added = 0;
+        foreach (var p in GrovePoints(rng, true))
+        {
+            bool crowded = false;
+            foreach (var q in existing)
+                if (Vector2.Distance(p, q) < 2.5f) { crowded = true; break; }
+            if (crowded) continue;
+            bool isDead = rng.NextDouble() < 0.55;
+            int index = isDead ? rng.Next(0, deadCount) : deadCount + rng.Next(0, BirchNumbers.Length);
+            float scale = (isDead ? Mathf.Lerp(0.6f, 0.9f, (float)rng.NextDouble()) : Mathf.Lerp(0.45f, 0.7f, (float)rng.NextDouble())) * 1.05f;
+            instances.Add(new TreeInstance
+            {
+                prototypeIndex = index,
+                position = new Vector3((p.x - pos.x) / size.x, 0f, (p.y - pos.z) / size.z),
+                heightScale = scale,
+                widthScale = scale * Mathf.Lerp(0.9f, 1.1f, (float)rng.NextDouble()),
+                rotation = (float)rng.NextDouble() * Mathf.PI * 2f,
+                color = Color.white,
+                lightmapColor = Color.white,
+            });
+            existing.Add(p);
+            added++;
+        }
+        data.SetTreeInstances(instances.ToArray(), true);
+        PlantUndergrowth(terrain, rng);
+        EditorUtility.SetDirty(data);
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(terrain.gameObject.scene);
+        return $"Planted {added} grove and yard trees ({instances.Count} total) with undergrowth.";
+    }
+
     // ---------- Scene objects ----------
 
     static void PlaceTruck(Transform envRoot)
@@ -527,10 +774,12 @@ public static class FarmLayoutBuilder
 
     static Field? FieldAt(Vector2 p, out float edgeDistance)
     {
+        float clearing = RectDistance(DogPenSetup.Footprint, p) - PenClearing;
         foreach (var f in Fields)
         {
-            if (!f.rect.Contains(p)) continue;
+            if (!f.rect.Contains(p) || clearing <= 0f) continue;
             edgeDistance = Mathf.Min(p.x - f.rect.xMin, f.rect.xMax - p.x, p.y - f.rect.yMin, f.rect.yMax - p.y);
+            edgeDistance = Mathf.Min(edgeDistance, clearing);
             return f;
         }
         edgeDistance = 0f;

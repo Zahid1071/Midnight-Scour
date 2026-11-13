@@ -293,6 +293,7 @@ public class Cage : MonoBehaviour
             return;
 
         GameObject root = player.transform.root != null ? player.transform.root.gameObject : player;
+        int playerLayer = PlayerLayer >= 0 ? PlayerLayer : LayerMask.NameToLayer("Player");
 
         // Drop stale "still inside" from before the teleport.
         isOccupied = false;
@@ -303,13 +304,22 @@ public class Cage : MonoBehaviour
 
         Collider triggerCol = GetComponent<Collider>();
         if (triggerCol == null || !triggerCol.isTrigger)
+        {
+            // Still strip Captive/HiddenPlayer if we teleported out without a usable trigger.
+            if (playerLayer >= 0)
+                root.layer = playerLayer;
             return;
+        }
 
         if (!IsPlayerInsideTrigger(triggerCol, root))
+        {
+            // Outside the cage after teleport — never keep Captive/HiddenPlayer on the player.
+            if (playerLayer >= 0)
+                root.layer = playerLayer;
             return;
+        }
 
         // Landed in the cage (normal Continue spawn) — treat as held, original = Player.
-        int playerLayer = PlayerLayer >= 0 ? PlayerLayer : LayerMask.NameToLayer("Player");
         originalLayerIndex = SanitizeOriginalLayer(playerLayer >= 0 ? playerLayer : root.layer);
         playerRef = root;
         isOccupied = true;

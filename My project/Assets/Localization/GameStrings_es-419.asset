@@ -878,6 +878,30 @@ MonoBehaviour:
     m_Localized: "\xBFD\xF3nde est\xE1 el cuerpo?"
     m_Metadata:
       m_Items: []
+  - m_Id: 46856168847310848
+    m_Localized: "Casa peque\xF1a"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831744
+    m_Localized: Casa de la granja
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831745
+    m_Localized: "S\xF3tano"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831746
+    m_Localized: Camioneta
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831747
+    m_Localized: Corral del perro
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831748
+    m_Localized: Un mapa de la granja dibujado a mano. Presiona M para volver a mirarlo.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

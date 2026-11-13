@@ -4,9 +4,6 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerFootstepRhythm : MonoBehaviour
 {
-    [Header("References")]
-    public FootstepController footstepController;
-
     [Header("Step Distances (meters)")]
     public float walkStepDistance = 2.0f;
     public float runStepDistance = 1.29f;
@@ -26,6 +23,9 @@ public class PlayerFootstepRhythm : MonoBehaviour
     private float distanceAccumulator = 0f;
     private float lastStepDistance = -1f;
     private int stepsTaken;
+
+    /// <summary>Raised on every footstep with the flat speed at that moment.</summary>
+    public event System.Action<float> Stepped;
 
     /// <summary>Footsteps played plus progress toward the next one; whole numbers land on a footstep.</summary>
     public float StepProgress => stepsTaken + (lastStepDistance > 0f ? distanceAccumulator / lastStepDistance : 0f);
@@ -59,8 +59,6 @@ public class PlayerFootstepRhythm : MonoBehaviour
         if (lastStepDistance > 0f && !Mathf.Approximately(stepDistance, lastStepDistance))
             distanceAccumulator *= stepDistance / lastStepDistance;
         lastStepDistance = stepDistance;
-        float volume = GetVolumeForSpeed(speed);
-        bool useRunClips = speed > runThreshold;
 
         // Accumulate true distance traveled, not net displacement
         float delta = Vector3.Distance(transform.position, lastFramePosition);
@@ -68,7 +66,7 @@ public class PlayerFootstepRhythm : MonoBehaviour
         lastFramePosition = transform.position;
         while (distanceAccumulator >= stepDistance)
         {
-            footstepController.PlayFootstep(volume, useRunClips);
+            Stepped?.Invoke(speed);
 
             float suspicionValue = 0f;
             if (speed > runThreshold) suspicionValue = 50;
@@ -89,14 +87,6 @@ public class PlayerFootstepRhythm : MonoBehaviour
         if (speed > walkThreshold) return walkStepDistance;
         if (speed > sneakThreshold) return sneakStepDistance;
         return walkStepDistance; // fallback
-    }
-
-    float GetVolumeForSpeed(float speed)
-    {
-        if (speed > runThreshold) return footstepController.runVolume;
-        if (speed > walkThreshold) return footstepController.walkVolume;
-        if (speed > sneakThreshold) return footstepController.sneakVolume;
-        return footstepController.walkVolume; // fallback
     }
 
 

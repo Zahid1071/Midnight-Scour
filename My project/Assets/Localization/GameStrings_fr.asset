@@ -884,6 +884,31 @@ MonoBehaviour:
     m_Localized: "O\xF9 est pass\xE9 le corps ?"
     m_Metadata:
       m_Items: []
+  - m_Id: 46856168847310848
+    m_Localized: Petite maison
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831744
+    m_Localized: Ferme
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831745
+    m_Localized: Sous-sol
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831746
+    m_Localized: Pick-up
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831747
+    m_Localized: Enclos du chien
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831748
+    m_Localized: "Une carte de la ferme dessin\xE9e \xE0 la main. Appuyez sur M pour
+      la consulter \xE0 nouveau."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

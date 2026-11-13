@@ -23,6 +23,8 @@ public class PerceptionController : MonoBehaviour
 
     // Runtime state
     public bool CanSeePlayer { get; private set; }
+    /// <summary>Time.time of the last frame the player was in sight.</summary>
+    public float LastSawPlayerTime { get; private set; } = float.NegativeInfinity;
     public Vector3 LastKnownPlayerPosition { get; private set; }
     public float visionMeter { get; private set; } = 0f; // read-only (debug)
 
@@ -240,6 +242,7 @@ public class PerceptionController : MonoBehaviour
                 if (!Cage.ContainsWorldPoint(aim))
                     LastKnownPlayerPosition = aim;
                 CanSeePlayer = true;
+                LastSawPlayerTime = Time.time;
                 return;
             }
         }
@@ -251,6 +254,15 @@ public class PerceptionController : MonoBehaviour
 
     private void UpdateVisionMeters()
     {
+        // Scripted cinematic holds ignore OnVisionConfirmed — never arm a streak that
+        // would block the next real sighting after release.
+        if (npc != null && npc.currentState == NPCController.AIState.Scripted)
+        {
+            visionMeter = 0f;
+            confirmedThisStreak = false;
+            return;
+        }
+
         if (CanSeePlayer && ShouldInstantConfirmVision())
         {
             visionMeter = confirmSeconds;
@@ -277,6 +289,13 @@ public class PerceptionController : MonoBehaviour
 
         if (!CanSeePlayer && visionMeter <= 0f)
             confirmedThisStreak = false;
+    }
+
+    /// <summary>Clears a pending vision confirm so the next LoS can start a chase again.</summary>
+    public void ResetVisionConfirmation()
+    {
+        visionMeter = 0f;
+        confirmedThisStreak = false;
     }
 
     /// <summary>
@@ -460,6 +479,7 @@ public class PerceptionController : MonoBehaviour
     public void ClearVisionState()
     {
         CanSeePlayer = false;
+        LastSawPlayerTime = float.NegativeInfinity;
         visionMeter = 0f;
         confirmedThisStreak = false;
         lostSightTimer = 0f;

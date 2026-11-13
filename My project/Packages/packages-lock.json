@@ -153,7 +153,7 @@
     },
     "com.unity.formats.alembic": {
       "version": "2.4.1",
-      "depth": 1,
+      "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.timeline": "1.8.7",

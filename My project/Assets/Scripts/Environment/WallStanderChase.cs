@@ -430,19 +430,11 @@ public class WallStanderChase : MonoBehaviour
 
         if (roarClip != null)
         {
-            var go = new GameObject("Wall Stander Roar Audio");
-            go.transform.SetParent(_head, false);
-            var src = go.AddComponent<AudioSource>();
-            src.playOnAwake = false;
-            src.outputAudioMixerGroup = mixerGroup;
-            src.spatialBlend = 1f;
-            src.rolloffMode = AudioRolloffMode.Logarithmic;
-            src.minDistance = roarMinDistance;
-            src.maxDistance = 30f;
-            src.dopplerLevel = 0f;
-            SpatialAudioCues.Ignore(src);
+            Transform mouth = _head != null ? _head : transform;
+            AudioSource src = SpatialAudio.Create("Wall Stander Roar Audio", mouth, mouth.position, mixerGroup,
+                roarMinDistance, 30f);
             src.PlayOneShot(roarClip, roarVolume * roarBoost);
-            Destroy(go, roarClip.length + 0.25f);
+            Destroy(src.gameObject, roarClip.length + 0.25f);
         }
         StartMusic();
 
@@ -1070,20 +1062,7 @@ public class WallStanderChase : MonoBehaviour
         AudioClip clip = bangClips[index % bangClips.Length];
         if (clip == null)
             return;
-        var go = new GameObject("Door Bang Audio");
-        go.transform.position = bangPoint;
-        var src = go.AddComponent<AudioSource>();
-        src.playOnAwake = false;
-        src.outputAudioMixerGroup = mixerGroup;
-        src.spatialBlend = 1f;
-        src.rolloffMode = AudioRolloffMode.Logarithmic;
-        src.minDistance = bangMinDistance;
-        src.maxDistance = 25f;
-        src.dopplerLevel = 0f;
-        src.pitch = Random.Range(0.94f, 1.02f);
-        SpatialAudioCues.Ignore(src);
-        src.PlayOneShot(clip, bangVolume);
-        Destroy(go, clip.length / src.pitch + 0.25f);
+        SpatialAudio.PlayAt(clip, bangPoint, bangVolume, bangMinDistance, 25f, mixerGroup, null, Random.Range(0.94f, 1.02f));
         BangShake(bangPoint, shakeDegrees);
     }
 

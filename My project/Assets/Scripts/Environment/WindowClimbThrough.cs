@@ -45,8 +45,11 @@ public class WindowClimbThrough : MonoBehaviour, IInteractable
     [SerializeField] float climbDuration = 2.6f;
     [Tooltip("Share of the climb (0-1) at which the player body/colliders teleport to the far side.")]
     [SerializeField, Range(0.15f, 0.9f)] float teleportAt = 0.5f;
-    [Tooltip("Seconds of the blend back to the player head (brain custom blend); control returns after it.")]
+    [Tooltip("Seconds of the blend back to the player head (brain custom blend).")]
     [SerializeField] float blendOut = 0.8f;
+    [Tooltip("Control and the HUD come back this many seconds before the climb + blend-out would end; " +
+             "the camera finishes blending back while the player already moves.")]
+    [SerializeField, Min(0f)] float releaseControlEarly = 1f;
     [Tooltip("Degrees the view dips while heaving over the sill.")]
     [SerializeField] float heaveDip = 8f;
     [Tooltip("Degrees the view rolls into the climb at peak effort.")]
@@ -237,7 +240,9 @@ public class WindowClimbThrough : MonoBehaviour, IInteractable
             capsule.enabled = false;
 
         float duration = Mathf.Max(0.2f, climbDuration);
-        for (float t = 0f; t < duration; t += Time.deltaTime)
+        float releaseAt = Mathf.Max(duration * teleportAt, duration + Mathf.Max(0f, blendOut) - releaseControlEarly);
+        float cameraEnd = Mathf.Min(duration, releaseAt);
+        for (float t = 0f; t < cameraEnd; t += Time.deltaTime)
         {
             float linear = Mathf.Clamp01(t / duration);
             float u = WeightedClimb(linear);
@@ -284,7 +289,7 @@ public class WindowClimbThrough : MonoBehaviour, IInteractable
             mouseLook.SetLook(faceThrough);
 
         climbCamera.Priority = 0;
-        for (float t = 0f; t < blendOut; t += Time.deltaTime)
+        for (float t = cameraEnd; t < releaseAt; t += Time.deltaTime)
         {
             if (collisionRestored)
                 TickLockedGravity(body, ref fallVelocity);

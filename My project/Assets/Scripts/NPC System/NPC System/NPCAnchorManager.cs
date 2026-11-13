@@ -132,7 +132,7 @@ public class NPCAnchorManager : MonoBehaviour
 
         foreach (var edge in RoomGraph.Instance.edges)
         {
-            if (!edge.prePointA || !edge.prePointB || !edge.door) continue;
+            if (!edge.prePointA || !edge.prePointB) continue;
 
             // PrePointA → roomA
             if (edge.roomA != null && edge.roomA.zoneID == ownerZoneID

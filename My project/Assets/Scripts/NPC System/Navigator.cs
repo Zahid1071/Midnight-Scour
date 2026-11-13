@@ -237,19 +237,22 @@ namespace FS_Atmo
                             }
                         }
 
+                        bool doorless = edge.door == null || !edge.door.HasLeaf;
+
                         // Stand still at the entry prepoint so opening the carve can't slide him through.
-                        if (agent != null)
+                        if (agent != null && !doorless)
                         {
                             agent.ResetPath();
                             agent.isStopped = true;
                             agent.velocity = Vector3.zero;
                         }
 
-                        yield return EnsureDoorOpenForCrossing(edge.door, enteringBasement);
+                        if (!doorless)
+                            yield return EnsureDoorOpenForCrossing(edge.door, enteringBasement);
 
                         // Linger at the basement doorway before crossing (other doors skip this).
                         // Abort early if the player is actually visible — chase-from-noise still waits.
-                        if (enteringBasement && basementDoorPostOpenHold > 0f)
+                        if (enteringBasement && !doorless && basementDoorPostOpenHold > 0f)
                             yield return BasementDoorPostOpenHoldRoutine();
 
                         if (agent != null)
@@ -262,7 +265,7 @@ namespace FS_Atmo
 
                         // 4) Only seal the door if we actually reached the far side.
                         //    Closing after a failed cross is what locks the A↔B loop.
-                        if (crossed && edge.door != null && edge.door.AICloseAfterPassing)
+                        if (crossed && !doorless && edge.door.AICloseAfterPassing)
                             edge.door.RequestClose(bypassLock: true);
 
                         if (!crossed)

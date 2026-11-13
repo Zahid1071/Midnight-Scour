@@ -141,6 +141,7 @@ public class CheckpointData
     public bool wallStanderShutOut;
     public bool corridorLeft;
     public bool returnMusicPlaying;
+    public bool mapFound;
 
     [Header("Hints")]
     public List<string> hintsShown = new List<string>();

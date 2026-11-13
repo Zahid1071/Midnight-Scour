@@ -182,8 +182,8 @@ public class ButcherWindowShot : MonoBehaviour
     }
 
     /// <summary>
-    /// After the locked car door: window stare with the butcher teleported there, then he investigates
-    /// <paramref name="investigatePoint"/> (Search / last-known) instead of a relentless chase. Once only.
+    /// After the locked car door: zoom to the butcher, eye contact, then he runs immediately toward
+    /// <paramref name="investigatePoint"/> while the camera follows for a beat and blends out. Once only.
     /// </summary>
     public bool TryPlayWindowCarInvestigate(Vector3 investigatePoint)
     {
@@ -668,13 +668,11 @@ public class ButcherWindowShot : MonoBehaviour
             if (NavMesh.SamplePosition(standFeet, out NavMeshHit ambushHit, 2f, NavMesh.AllAreas))
                 standFeet = ambushHit.position;
 
-            lookTarget = standFeet + Vector3.up * 1.4f;
+            // Stay locked on the butcher — never a second frame target (window glass / yard / car).
+            lookTarget = standFeet + Vector3.up * followHeight;
             outward = Flat(pos - standFeet).normalized;
             if (TryAim(pos, true, out Aim aim) || TryAim(pos, false, out aim))
-            {
-                lookTarget = aim.look;
                 outward = aim.outward;
-            }
             else if (outward.sqrMagnitude < 0.01f)
                 outward = Flat(ambush.forward).normalized;
 
@@ -790,7 +788,7 @@ public class ButcherWindowShot : MonoBehaviour
             OutdoorFog.DensityScale = windowFog;
         }
 
-        // Turn toward the car / player while still held — he must not path until the fade starts.
+        // After eye contact: wheel toward the player, then he runs immediately — camera stays on him only.
         Transform runner = _held != null ? _held.transform : null;
         if (_held != null)
         {
@@ -803,34 +801,39 @@ public class ButcherWindowShot : MonoBehaviour
             for (float t = 0f; t < turnTime && _held != null; t += Time.deltaTime)
             {
                 runner.rotation = Quaternion.Slerp(facing, away, SmootherStep(t / Mathf.Max(0.01f, turnTime)));
+                Vector3 turnLook = runner.position + Vector3.up * followHeight - pos;
+                if (turnLook.sqrMagnitude > 0.01f)
+                    rot = Quaternion.LookRotation(turnLook);
+                Pose(pos, rot, fov);
                 yield return null;
             }
         }
 
         Vector3 lastSeen = lookTarget;
+        if (runner != null)
+            lastSeen = runner.position + Vector3.up * followHeight;
+
+        // Run now — no second look target, no widen-to-yard beat while he stands still.
+        ReleaseIntoInvestigate(_investigatePoint, urgent: true);
+
+        const float investigateFollow = 1f;
+        for (float t = 0f; t < investigateFollow; t += Time.deltaTime)
         {
-            float fromFov = fov;
-            float followTotal = runTime + emptyHold;
-            for (float t = 0f; t < followTotal; t += Time.deltaTime)
-            {
-                if (runner != null)
-                    lastSeen = runner.position + Vector3.up * followHeight;
-                Vector3 toTarget = lastSeen - pos;
-                if (toTarget.sqrMagnitude > 0.01f)
-                    rot = Quaternion.Slerp(rot, Quaternion.LookRotation(toTarget), 1f - Mathf.Exp(-followSharpness * Time.deltaTime));
-                fov = Mathf.Lerp(fromFov, Mathf.Min(fromFov * followWiden, 60f), SmootherStep(t / Mathf.Max(0.01f, runTime)));
-                Pose(pos, rot, fov);
-                yield return null;
-            }
+            if (runner != null)
+                lastSeen = runner.position + Vector3.up * followHeight;
+            Vector3 toTarget = lastSeen - pos;
+            if (toTarget.sqrMagnitude > 0.01f)
+                rot = Quaternion.Slerp(rot, Quaternion.LookRotation(toTarget), 1f - Mathf.Exp(-followSharpness * Time.deltaTime));
+            Pose(pos, rot, fov);
+            yield return null;
         }
 
         CinemachineMouseLook mouseLook = FindFirstObjectByType<CinemachineMouseLook>();
         if (mouseLook != null)
             mouseLook.SetLook(Quaternion.LookRotation(Flat(lastSeen - eye)));
 
-        // Fade begins: he runs now (no Search stand-still), and control returns so the blend isn't a freeze.
+        // Zoom away / blend back; control returns as the fade starts.
         _cam.Priority = 0;
-        ReleaseIntoInvestigate(_investigatePoint, urgent: true);
         UnlockControl();
         for (float t = 0f; t < blendOut; t += Time.deltaTime)
         {
@@ -1145,7 +1148,7 @@ public class ButcherWindowShot : MonoBehaviour
         _held = null;
         if (butcher == null)
             return;
-        butcher.SetHearingDisabled(_heldHearingDisabled);
+        butcher.RestorePerceptionAfterScriptedHold();
         TryWarpIntoRoomInterior(butcher);
         // The hunt refuses a Scripted butcher; this only flips the state, it starts no routine.
         butcher.SetState(NPCController.AIState.Natural);
@@ -1153,7 +1156,6 @@ public class ButcherWindowShot : MonoBehaviour
         if (butcher.currentState != NPCController.AIState.Chase)
         {
             Debug.LogWarning($"ButcherWindowShot: {butcher.name} didn't start the hunt (state {butcher.currentState}).", this);
-            butcher.poiLookDirector?.UnlockLookFromPlayer();
             butcher.EnsureNaturalRoutineStarted();
             return;
         }
@@ -1167,10 +1169,14 @@ public class ButcherWindowShot : MonoBehaviour
         _held = null;
         if (butcher == null)
             return;
-        butcher.SetHearingDisabled(_heldHearingDisabled);
-        butcher.poiLookDirector?.UnlockLookFromPlayer();
-        butcher.SetState(NPCController.AIState.Natural);
-        butcher.EnsureNaturalRoutineStarted();
+        butcher.RestorePerceptionAfterScriptedHold();
+        if (butcher.fsm != null)
+            butcher.fsm.SetState(NPCController.AIState.Natural);
+        else
+        {
+            butcher.SetState(NPCController.AIState.Natural);
+            butcher.EnsureNaturalRoutineStarted();
+        }
     }
 
     // Locked-car scare end: last-known = player, then the normal Search reaction.
@@ -1181,8 +1187,7 @@ public class ButcherWindowShot : MonoBehaviour
         _releaseInvestigate = false;
         if (butcher == null)
             return;
-        butcher.SetHearingDisabled(_heldHearingDisabled);
-        butcher.poiLookDirector?.UnlockLookFromPlayer();
+        butcher.RestorePerceptionAfterScriptedHold();
         butcher.ForceInvestigateAt(investigatePoint, urgent);
     }
 

@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 3090453657295839001}
   - component: {fileID: 72859471452438870}
   - component: {fileID: 1394322090321949160}
-  - component: {fileID: 1007146295468474448}
   - component: {fileID: 4786904321958068962}
   - component: {fileID: 4134655764735739326}
   - component: {fileID: 5458437940652445483}
@@ -238,46 +237,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f663f69b97e40ad4590254ab9ed9f41f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1007146295468474448
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4884186263421869}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f000ae88209b16e4382cfd12c1a70ae0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  footAnchor: {fileID: 0}
-  leftFootClips:
-  - {fileID: 8300000, guid: 2b63309ffc6088b4abf9ac4d102f7fd1, type: 3}
-  - {fileID: 8300000, guid: 13f16a5ae7de3974095246a559b4f038, type: 3}
-  rightFootClips:
-  - {fileID: 8300000, guid: ca7069d5342f23e4aa25885500314b33, type: 3}
-  - {fileID: 8300000, guid: 38ec14ae48ccc884f8c0c2a8e7aecd68, type: 3}
-  runLeftFootClips:
-  - {fileID: 8300000, guid: ece139d247d01d04b88b65e37bbb580a, type: 3}
-  - {fileID: 8300000, guid: b5531ad995210f548b5b2775bbb330f7, type: 3}
-  - {fileID: 8300000, guid: b5531ad995210f548b5b2775bbb330f7, type: 3}
-  runRightFootClips:
-  - {fileID: 8300000, guid: 598a469419ee51c449c28e6cb3b5f210, type: 3}
-  - {fileID: 8300000, guid: fc1a5417388406f429b35815222fdfa5, type: 3}
-  - {fileID: 8300000, guid: 81c2595457881634f9bd941b5b8c5e95, type: 3}
-  chaseSweetenerClips:
-  - {fileID: 8300000, guid: 06dfd2aeff582994ab720aa5debc9bd4, type: 3}
-  - {fileID: 8300000, guid: ea945d9bc35a6d54cba29305b11d51bc, type: 3}
-  chaseSweetenerChance: 0.35
-  chaseSweetenerVolume: 0.55
-  mixerGroup: {fileID: 5656172210110584295, guid: d0494497af355c44f913d2de9798dce5, type: 2}
-  walkReverbZoneMix: 0
-  runReverbZoneMix: 0.85
-  walkVolume: 1
-  runVolume: 2
-  sneakVolume: 0.4
-  walkPitchRange: {x: 0.97, y: 1.03}
-  runPitchRange: {x: 0.6, y: 0.8}
 --- !u!114 &4786904321958068962
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11628,7 +11587,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10212d676176f554986e4ce26767b19a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  footstepController: {fileID: 1007146295468474448}
   runSpeedThreshold: 3.25
   forceRunClipsDuringChase: 1
 --- !u!114 &8822441100112233446

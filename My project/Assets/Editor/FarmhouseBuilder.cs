@@ -1,28 +1,36 @@
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
 /// <summary>
 /// Assembles a two-story farmhouse from the Atmospheric House modular kit (furnished by FarmhouseDecorator).
-/// Local frame: 15 m wide (x) by 9 m deep (z), front facade on +z, ground floor at y 0, 3 m stories.
-/// Plan: centre hall (x 6..9) with the stairs in its back-right corner climbing toward the front door;
-/// living room on the left; dining and kitchen on the right; upstairs a large bedroom on the left,
-/// a bedroom with an en-suite bathroom on the right.
+/// Local frame: 21 m wide (x) by 12 m deep (z), front facade on +z, ground floor at y 0, 3 m stories.
+/// Ground floor: a 6 m hall (x 6..12) with the stairs along its back-left (x 6..9, z 0..6) climbing toward
+/// the front door. The flight hugs the x = 6 wall and its bottom steps face the open hall, so there is no
+/// wall between the stairs and the hall and no corridor to squeeze through.
+/// Living room and study on the left; dining room and kitchen on the right. Hall, dining
+/// room and kitchen form a loop through doorless arches, so the butcher can be circled.
+/// Upstairs: landing over the front of the hall; main bedroom and sewing room on the left; bathroom behind
+/// the stairwell; storage room and child's room on the right, looped through the bathroom.
+/// Doors with leaves are only used where a closable room helps hiding; through-routes use open arches.
+/// The "Gameplay" child (hiding spots, interactable props) survives rebuilds untouched.
 /// </summary>
 public static class FarmhouseBuilder
 {
     public const string RootName = "Farmhouse";
+    public const string GameplayName = "Gameplay";
     const string Kit = "Assets/AtmosphericHouse/Prefabs/Building/";
     const string DoorKit = "Assets/AtmosphericHouse/Prefabs/Doors/";
-    const float Story = 3f;
-    const float Width = 15f;
-    const float Depth = 9f;
-    // Stairs_main_L is built for a corner: its own wall panels cover the ground-floor back wall and the
-    // x = 9 partition up to z = 4 on both stories, so those faces are left out below.
-    static readonly Vector3 StairsPivot = new Vector3(9f, 0f, 0f);
-    const float StairsYaw = 270f;
+    public const float Story = 3f;
+    public const float Width = 21f;
+    public const float Depth = 12f;
+    // Stairs_main_R is built for a corner: its own wall panels cover the ground-floor back wall and the
+    // x = 6 wall up to z = 4 on the stair side of both stories, so those faces are left out below.
+    static readonly Vector3 StairsPivot = new Vector3(6f, 0f, 0f);
+    const float StairsYaw = 90f;
     const int StairsBackModule = 2;
-    const float HallX = 6f;
+    const float StairX = 6f, StairDepth = 6f;
 
     const string DoorOpenSound = "Assets/Audio/SFX/dragon-studio-open-door-stock-sfx-454246.mp3";
     const string DoorCloseSound = "Assets/Audio/SFX/garage_door_mp3/zapsplat_household_garage_door_wooden_closed_impact_rattle_001_53573.mp3";
@@ -31,23 +39,23 @@ public static class FarmhouseBuilder
     // Exterior modules per side, index 0 = ground floor. Modules run in the wall's +x / +z order.
     static readonly string[][] Front =
     {
-        new[] { "window", "window", "frontdoor", "window", "window" },
-        new[] { "window", "window", "windowsmall", "window", "window" },
+        new[] { "window", "window", "window", "frontdoor", "window", "window", "window" },
+        new[] { "window", "window", "windowsmall", "window", "window", "window", "window" },
     };
     static readonly string[][] Back =
     {
-        new[] { "window", "window", "plain", "door", "window" },
-        new[] { "window", "window", "plain", "windowsmall", "plain" },
+        new[] { "window", "window", "plain", "window", "plain", "door", "window" },
+        new[] { "window", "window", "plain", "windowsmall", "window", "plain", "window" },
     };
     static readonly string[][] Left =
     {
-        new[] { "window", "plain", "window" },
-        new[] { "window", "plain", "window" },
+        new[] { "window", "plain", "plain", "window" },
+        new[] { "window", "plain", "plain", "plain" },
     };
     static readonly string[][] Right =
     {
-        new[] { "window", "plain", "window" },
-        new[] { "window", "plain", "window" },
+        new[] { "plain", "plain", "window", "plain" },
+        new[] { "plain", "plain", "window", "plain" },
     };
 
     struct Partition
@@ -65,28 +73,48 @@ public static class FarmhouseBuilder
         }
     }
 
+    // Kinds: "plain" wall, "door" single door with a leaf, "open" double-width arch without leaves.
     static readonly Partition[] Partitions =
     {
-        // Ground floor: hall | living room on x = 6, hall | kitchen + dining on x = 9, kitchen | dining on z = 3.
-        new Partition(0, true, 6f, 0f, "plain"),
-        new Partition(0, true, 6f, 3f, "doordouble"),
-        new Partition(0, true, 6f, 6f, "plain"),
-        new Partition(0, true, 9f, 0f, "plain", negFace: false),
-        new Partition(0, true, 9f, 3f, "plain", negFace: false),
-        new Partition(0, true, 9f, 4f, "plain", posFace: false, length: 2f),
-        new Partition(0, true, 9f, 6f, "doordouble"),
-        new Partition(0, false, 3f, 9f, "plain"),
-        new Partition(0, false, 3f, 12f, "doordouble"),
-        // Upstairs: hall | bedroom on x = 6, hall | bedroom on x = 9, bathroom | bedroom on z = 3.
-        new Partition(1, true, 6f, 0f, "plain"),
-        new Partition(1, true, 6f, 3f, "plain"),
+        // Ground floor. x = 6: study + living room | stairs + hall (stair side lined by Stairs_main_R up to z = 4).
+        new Partition(0, true, 6f, 0f, "plain", posFace: false),
+        new Partition(0, true, 6f, 3f, "plain", posFace: false),
+        new Partition(0, true, 6f, 4f, "plain", negFace: false, length: 2f),
+        new Partition(0, true, 6f, 6f, "open"),
+        new Partition(0, true, 6f, 9f, "plain"),
+        // x = 12: hall | kitchen + dining room.
+        new Partition(0, true, 12f, 0f, "door"),
+        new Partition(0, true, 12f, 3f, "plain"),
+        new Partition(0, true, 12f, 6f, "open"),
+        new Partition(0, true, 12f, 9f, "plain"),
+        // z = 6: study | living room, kitchen | dining room.
+        new Partition(0, false, 6f, 0f, "door"),
+        new Partition(0, false, 6f, 3f, "plain"),
+        new Partition(0, false, 6f, 12f, "plain"),
+        new Partition(0, false, 6f, 15f, "open"),
+        new Partition(0, false, 6f, 18f, "plain"),
+
+        // Upstairs. x = 6: sewing room + main bedroom | stairwell + landing.
+        new Partition(1, true, 6f, 0f, "plain", posFace: false),
+        new Partition(1, true, 6f, 3f, "plain", posFace: false),
+        new Partition(1, true, 6f, 4f, "plain", negFace: false, length: 2f),
         new Partition(1, true, 6f, 6f, "door"),
-        new Partition(1, true, 9f, 0f, "plain", negFace: false),
-        new Partition(1, true, 9f, 3f, "plain", negFace: false),
-        new Partition(1, true, 9f, 4f, "plain", posFace: false, length: 2f),
-        new Partition(1, true, 9f, 6f, "door"),
-        new Partition(1, false, 3f, 9f, "door"),
-        new Partition(1, false, 3f, 12f, "plain"),
+        new Partition(1, true, 6f, 9f, "plain"),
+        // x = 9: stairwell | bathroom.
+        new Partition(1, true, 9f, 0f, "plain"),
+        new Partition(1, true, 9f, 3f, "plain"),
+        // x = 12: bathroom + landing | storage room + child's room.
+        new Partition(1, true, 12f, 0f, "door"),
+        new Partition(1, true, 12f, 3f, "plain"),
+        new Partition(1, true, 12f, 6f, "door"),
+        new Partition(1, true, 12f, 9f, "plain"),
+        // z = 6: sewing room | main bedroom, bathroom | landing, storage room | child's room.
+        new Partition(1, false, 6f, 0f, "door"),
+        new Partition(1, false, 6f, 3f, "plain"),
+        new Partition(1, false, 6f, 9f, "door"),
+        new Partition(1, false, 6f, 12f, "plain"),
+        new Partition(1, false, 6f, 15f, "open"),
+        new Partition(1, false, 6f, 18f, "plain"),
     };
 
     [MenuItem("Tools/Environment/Build Farmhouse")]
@@ -102,12 +130,20 @@ public static class FarmhouseBuilder
         var env = GameObject.Find("_Environment");
         if (!env) return "No _Environment root found.";
         var old = env.transform.Find(RootName);
+        var gameplay = old ? old.Find(GameplayName) : null;
+        if (gameplay) Undo.SetTransformParent(gameplay, env.transform, "Build Farmhouse");
         if (old) Undo.DestroyObjectImmediate(old.gameObject);
 
         var root = new GameObject(RootName).transform;
         Undo.RegisterCreatedObjectUndo(root.gameObject, "Build Farmhouse");
         root.SetParent(env.transform, false);
         root.SetPositionAndRotation(position, Quaternion.Euler(0f, yaw, 0f));
+        if (gameplay)
+        {
+            Undo.SetTransformParent(gameplay, root, "Build Farmhouse");
+            gameplay.localPosition = Vector3.zero;
+            gameplay.localRotation = Quaternion.identity;
+        }
 
         int count = 0;
         count += BuildExterior(Group(root, "Exterior Walls"), Group(root, "Foundation"));
@@ -119,9 +155,10 @@ public static class FarmhouseBuilder
         BuildReflectionProbes(Group(root, "Reflection Probes"));
         int props = FarmhouseDecorator.Decorate(root);
         int doors = FinishOpenablesAndStatics(root.gameObject);
+        string wiring = FarmhouseGameplay.Wire(root);
 
         UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(env.scene);
-        return $"Farmhouse built with {count} kit parts, {props} decor props, {doors} interactable doors/windows/drawers.";
+        return $"Farmhouse built with {count} kit parts, {props} decor props, {doors} interactable doors/windows/drawers. {wiring}";
     }
 
     public static int FinishOpenablesAndStatics(GameObject root)
@@ -131,6 +168,18 @@ public static class FarmhouseBuilder
         MarkStatic(root);
         HideKitHelpers(root);
         return doors;
+    }
+
+    /// Interior doorways in the farmhouse frame: centre, wall orientation, story, and whether it has a leaf.
+    public static IEnumerable<(Vector3 centre, bool alongZ, bool hasLeaf)> InteriorDoorways()
+    {
+        foreach (var p in Partitions)
+        {
+            if (p.kind != "door" && p.kind != "open") continue;
+            float mid = p.start + p.length * 0.5f;
+            var c = p.alongZ ? new Vector3(p.c, p.story * Story, mid) : new Vector3(mid, p.story * Story, p.c);
+            yield return (c, p.alongZ, p.kind == "door");
+        }
     }
 
     /// The kit's ceiling pieces carry red emissive editing markers that would bake red light into the rooms.
@@ -207,7 +256,7 @@ public static class FarmhouseBuilder
             float y = p.story * Story;
             string set = InteriorSet(p.story);
             string len = Mathf.RoundToInt(p.length) + "x";
-            string piece = p.kind == "door" ? len + "_door" : p.kind == "doordouble" ? len + "_doordouble" : len;
+            string piece = p.kind == "door" ? len + "_door" : p.kind == "open" ? len + "_doordouble" : len;
             string part = $"WallIn_{set}_{piece}";
             Vector3 posPivot, negPivot;
             float posYaw, negYaw;
@@ -224,20 +273,22 @@ public static class FarmhouseBuilder
             GameObject doorWall = null;
             if (p.posFace) { doorWall = Place(parent, part, posPivot, posYaw); n++; }
             if (p.negFace) { var w = Place(parent, part, negPivot, negYaw); doorWall = doorWall ? doorWall : w; n++; }
-            if (doorWall && (p.kind == "door" || p.kind == "doordouble"))
-                n += AddKitDoor(doorWall.transform, p.kind == "doordouble");
+            if (doorWall && (p.kind == "door" || p.kind == "open"))
+                n += AddKitDoor(doorWall.transform, p.kind == "open", leaf: p.kind == "door");
         }
-        return n;
+        // Upstairs, the x = 9 stairwell wall ends at z = 6 where the hall opens up; cap the bare panel edge.
+        Place(parent, "WallIn_B_corner_outSmall", new Vector3(9f, Story, 6f), 270f);
+        return n + 1;
     }
 
     /// Same parts and offsets as the kit's "Spawn additional" buttons on WallIn_*_door / _doordouble.
-    static int AddKitDoor(Transform wall, bool isDouble)
+    static int AddKitDoor(Transform wall, bool isDouble, bool leaf)
     {
         var offset = new Vector3(-1.5f, 0f, 0f);
         PlaceChild(wall, Kit + (isDouble ? "Doorframe_in_double" : "Doorframe_in_single"), offset);
-        PlaceChild(wall, DoorKit + (isDouble ? "Door_parent_A_double" : "Door_parent_A_L"), offset);
+        if (leaf) PlaceChild(wall, DoorKit + (isDouble ? "Door_parent_A_double" : "Door_parent_A_L"), offset);
         PlaceChild(wall, Kit + (isDouble ? "Floor_trim_doordouble" : "Floor_trim_door"), offset);
-        return 3;
+        return leaf ? 3 : 2;
     }
 
     static void PlaceChild(Transform parent, string assetPathNoExt, Vector3 localPos)
@@ -266,28 +317,24 @@ public static class FarmhouseBuilder
         for (float x = 0f; x < Width; x += 3f)
         for (float z = 0f; z < Depth; z += 3f)
         {
-            bool hall = x == HallX;
             Fill(floors, "Floor_3x3", x, z, x + 3f, z + 3f, 0f);
             Fill(ceilings, "Ceiling_3x3", x, z, x + 3f, z + 3f, Story * 2f);
             n += 2;
-            if (hall) continue;
+            if (x == StairX && z < StairDepth) continue;
             Fill(floors, "Floor_3x3", x, z, x + 3f, z + 3f, Story);
             Fill(ceilings, "Ceiling_3x3", x, z, x + 3f, z + 3f, Story);
             n += 2;
         }
 
-        // Centre hall: stair opening over z 0..6, plain tile over the front 3 m.
-        float x0 = HallX, x1 = HallX + 3f;
-        Place(floors, "Floor_6x3_stairs_L", StairsPivot + Vector3.up * Story, StairsYaw);
-        Place(ceilings, "Ceiling_6x3_stairs_L", StairsPivot + Vector3.up * Story, StairsYaw);
-        Fill(floors, "Floor_3x3", x0, 6f, x1, Depth, Story);
-        Fill(ceilings, "Ceiling_3x3", x0, 6f, x1, Depth, Story);
-        return n + 4;
+        // Stair opening over x 6..9, z 0..6.
+        Place(floors, "Floor_6x3_stairs_R", StairsPivot + Vector3.up * Story, StairsYaw);
+        Place(ceilings, "Ceiling_6x3_stairs_R", StairsPivot + Vector3.up * Story, StairsYaw);
+        return n + 2;
     }
 
     static int BuildStairs(Transform parent)
     {
-        Place(parent, "Stairs_main_L", StairsPivot, StairsYaw);
+        Place(parent, "Stairs_main_R", StairsPivot, StairsYaw);
         return 1;
     }
 
@@ -296,25 +343,28 @@ public static class FarmhouseBuilder
     static int BuildRoof(Transform parent)
     {
         float y = Story * 2f;
-        for (float x = 3f; x <= Width; x += 3f)
-            Place(parent, "Roof_A_9x", new Vector3(x, y, Depth), 0f);
-        Place(parent, "Roof_A_9x_gable", new Vector3(Width, y, Depth), 0f);
-        Place(parent, "Roof_A_9x_gable", new Vector3(0f, y, 0f), 180f);
-        return 7;
+        int n = 0;
+        for (float x = 3f; x <= Width; x += 3f, n++)
+            Place(parent, "Roof_A_12x", new Vector3(x, y, Depth), 0f);
+        Place(parent, "Roof_A_12x_gable", new Vector3(Width, y, Depth), 0f);
+        Place(parent, "Roof_A_12x_gable", new Vector3(0f, y, 0f), 180f);
+        return n + 2;
     }
 
     static int BuildPorches(Transform parent)
     {
-        // Full-width front porch, steps in front of the door. The end pieces close the porch flush with the
-        // side walls; Porch_A_3x_corner is only for porches that wrap around onto a side wall.
-        Place(parent, "Porch_A_3x_end_R", new Vector3(3f, 0f, Depth), 0f);
-        Place(parent, "Porch_A_3x", new Vector3(6f, 0f, Depth), 0f);
-        Place(parent, "Porch_A_3x_entrance", new Vector3(9f, 0f, Depth), 0f);
-        Place(parent, "Porch_A_3x", new Vector3(12f, 0f, Depth), 0f);
-        Place(parent, "Porch_A_3x_end_L", new Vector3(Width, 0f, Depth), 0f);
+        // Full-width front porch, steps in front of the door (module x 9..12). The end pieces close the porch
+        // flush with the side walls; Porch_A_3x_corner is only for porches that wrap around onto a side wall.
+        int n = 0;
+        for (int m = 0; m < Front[0].Length; m++, n++)
+        {
+            string part = m == 0 ? "Porch_A_3x_end_R" : m == Front[0].Length - 1 ? "Porch_A_3x_end_L"
+                : Front[0][m] == "frontdoor" ? "Porch_A_3x_entrance" : "Porch_A_3x";
+            Place(parent, part, new Vector3(m * 3f + 3f, 0f, Depth), 0f);
+        }
         // Back porch: the self-contained 6 m piece (posts and railings on both ends), steps centred on the kitchen door.
-        Place(parent, "Porch_A_6x_entrance_separate", new Vector3(10.5f, 0f, 0f), 180f);
-        return 6;
+        Place(parent, "Porch_A_6x_entrance_separate", new Vector3(16.5f, 0f, 0f), 180f);
+        return n + 1;
     }
 
     // ---------- Helpers ----------
@@ -405,10 +455,12 @@ public static class FarmhouseBuilder
         const StaticEditorFlags flags = StaticEditorFlags.ContributeGI | StaticEditorFlags.OccluderStatic |
                                         StaticEditorFlags.OccludeeStatic | StaticEditorFlags.ReflectionProbeStatic;
         var decor = root.transform.Find(FarmhouseDecorator.DecorName);
+        var gameplay = root.transform.Find(GameplayName);
         foreach (var t in root.GetComponentsInChildren<Transform>(true))
         {
             // Openable doors and windows animate, so they stay dynamic.
             if (t.GetComponentInParent<Animator>(true)) continue;
+            if (gameplay && t.IsChildOf(gameplay)) continue;
             GameObjectUtility.SetStaticEditorFlags(t.gameObject, flags);
             // Props are lit by the probe volume: the Poly Haven models have no lightmap UVs, and small props
             // would only waste lightmap space.
@@ -420,8 +472,10 @@ public static class FarmhouseBuilder
 
     static readonly (string name, int story, float x0, float z0, float x1, float z1)[] ProbeRooms =
     {
-        ("Living Room", 0, 0f, 0f, 6f, 9f), ("Hall", 0, 6f, 0f, 9f, 9f), ("Dining Room", 0, 9f, 3f, 15f, 9f), ("Kitchen", 0, 9f, 0f, 15f, 3f),
-        ("Main Bedroom", 1, 0f, 0f, 6f, 9f), ("Landing", 1, 6f, 0f, 9f, 9f), ("Bedroom", 1, 9f, 3f, 15f, 9f), ("Bathroom", 1, 9f, 0f, 15f, 3f),
+        ("Living Room", 0, 0f, 6f, 6f, 12f), ("Study", 0, 0f, 0f, 6f, 6f), ("Hall", 0, 6f, 0f, 12f, 12f),
+        ("Dining Room", 0, 12f, 6f, 21f, 12f), ("Kitchen", 0, 12f, 0f, 21f, 6f),
+        ("Main Bedroom", 1, 0f, 6f, 6f, 12f), ("Sewing Room", 1, 0f, 0f, 6f, 6f), ("Landing", 1, 6f, 6f, 12f, 12f),
+        ("Bathroom", 1, 9f, 0f, 12f, 6f), ("Child Room", 1, 12f, 6f, 21f, 12f), ("Storage Room", 1, 12f, 0f, 21f, 6f),
     };
 
     /// One baked box-projected probe per room, plus a low-importance probe for the porches and yard.

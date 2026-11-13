@@ -879,6 +879,31 @@ MonoBehaviour:
     m_Localized: "Cad\xEA o corpo?"
     m_Metadata:
       m_Items: []
+  - m_Id: 46856168847310848
+    m_Localized: Casa pequena
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831744
+    m_Localized: Casa da fazenda
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831745
+    m_Localized: "Por\xE3o"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831746
+    m_Localized: Caminhonete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831747
+    m_Localized: Canil
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831748
+    m_Localized: "Um mapa da fazenda desenhado \xE0 m\xE3o. Pressione M para olhar
+      de novo."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

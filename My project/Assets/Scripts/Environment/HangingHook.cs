@@ -170,17 +170,11 @@ public class HangingHook : MonoBehaviour
         if (swingLoopSfx == null)
             return;
 
-        var go = new GameObject("HookChainLoop");
-        go.transform.SetParent(transform, false);
-        _loopSource = go.AddComponent<AudioSource>();
+        // Many hooks hang in the basement and they're silent most of the time, so they don't take reflection slots.
+        _loopSource = SpatialAudio.Create("HookChainLoop", transform, transform.position, output, swingLoopMinDistance,
+            swingLoopMaxDistance, AudioRolloffMode.Linear, false);
         _loopSource.clip = swingLoopSfx;
         _loopSource.loop = true;
-        _loopSource.playOnAwake = false;
-        _loopSource.spatialBlend = 1f;
-        _loopSource.rolloffMode = AudioRolloffMode.Linear;
-        _loopSource.minDistance = swingLoopMinDistance;
-        _loopSource.maxDistance = swingLoopMaxDistance;
-        _loopSource.outputAudioMixerGroup = output;
         _loopSource.pitch = Random.Range(swingLoopPitch.x, swingLoopPitch.y);
         _loopSource.volume = 0f;
         // Hooks start at different points of the loop so several swinging together don't phase.

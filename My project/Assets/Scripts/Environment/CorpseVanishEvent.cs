@@ -9,7 +9,8 @@ using UnityEngine.Events;
 /// <summary>
 /// Cage room corpse scare (scripted):
 /// 1. The first padlock pin the player sets: a faint scratch from the body, quiet enough to doubt.
-/// 2. The player walks out of the open cage (this arms the door); a second faint sound follows a moment later.
+/// 2. The player walks out of the open cage (this arms the door); a second sound follows a moment later, as the body
+///    starts sitting up under its sheet.
 /// 3. The player steps out through the cage room doorway (then, if set, walks up to the next door): the body is gone, the lighter (and any
 ///    lit candles near the body or the player) go out in a gust, the tool the player needs starts to glint, and running
 ///    footsteps tear away from where he lay, kicking a tin can halfway. The lighter then only sparks for a few
@@ -58,6 +59,13 @@ public class CorpseVanishEvent : MonoBehaviour
     [SerializeField, Range(0f, 1f)] float exitFollowUpVolume = 1f;
     [Tooltip("Seconds after leaving the cage before the second sound.")]
     [SerializeField] float exitFollowUpDelay = 2f;
+    [Tooltip("Starts sitting up under the sheet. Empty = the body stays down.")]
+    [SerializeField] CorpseSitUp sitUp;
+    [Tooltip("Seconds after leaving the cage before the sit-up starts.")]
+    [SerializeField] float sitUpDelay = 0f;
+    [Tooltip("Played from the body as he sits up. Empty = nothing (assign when you have the clip).")]
+    [SerializeField] AudioClip sitUpClip;
+    [SerializeField, Range(0f, 1f)] float sitUpVolume = 1f;
 
     [Header("3. Leaving through the cage room doorway, then the next door")]
     [Tooltip("The cage room's doorframe; the side the body is on counts as inside the room.")]
@@ -349,8 +357,7 @@ public class CorpseVanishEvent : MonoBehaviour
         _wallRevealPlayed = true;
         if (wallStingClip != null)
         {
-            AudioSource sting = CreateSource("Wall Sting Audio", cam.transform.position);
-            sting.spatialBlend = 0f;
+            AudioSource sting = CreateFlatSource("Wall Sting Audio");
             sting.PlayOneShot(wallStingClip, wallStingVolume);
             Destroy(sting.gameObject, wallStingClip.length + 0.25f);
         }
@@ -538,6 +545,23 @@ public class CorpseVanishEvent : MonoBehaviour
         // Delay counts from the moment the player stepped out, not from the confirmation.
         StartCoroutine(PlayClue(exitClue, exitClueVolume, exitClueDelay - exitConfirmTime));
         StartCoroutine(PlayClue(exitFollowUpClip, exitFollowUpVolume, exitFollowUpDelay - exitConfirmTime));
+        if (sitUp != null)
+            StartCoroutine(SitUpRoutine(sitUpDelay - exitConfirmTime));
+    }
+
+    IEnumerator SitUpRoutine(float delay)
+    {
+        if (delay > 0f)
+            yield return new WaitForSeconds(delay);
+        if (_stage == Stage.Done)
+            yield break;
+        if (sitUpClip != null)
+        {
+            AudioSource src = CreateSource("Corpse Sit Up Audio", _lookPoint, pinClueMinDistance);
+            src.PlayOneShot(sitUpClip, sitUpVolume);
+            Destroy(src.gameObject, sitUpClip.length + 0.25f);
+        }
+        sitUp.Play();
     }
 
     void TickExitDoor()
@@ -579,12 +603,8 @@ public class CorpseVanishEvent : MonoBehaviour
     {
         if (doorwayClip == null)
             return;
-        Camera cam = Camera.main;
-        Vector3 at = doorwayClipPoint != null ? doorwayClipPoint.position
-            : cam != null ? cam.transform.position : exitDoorway.position;
-        AudioSource src = CreateSource("Doorway Audio", at);
-        if (doorwayClipPoint == null)
-            src.spatialBlend = 0f;
+        AudioSource src = doorwayClipPoint != null ? CreateSource("Doorway Audio", doorwayClipPoint.position)
+            : CreateFlatSource("Doorway Audio");
         src.PlayOneShot(doorwayClip, doorwayClipVolume);
         Destroy(src.gameObject, doorwayClip.length + 0.25f);
     }
@@ -649,8 +669,7 @@ public class CorpseVanishEvent : MonoBehaviour
         SpawnReturnLight(look + Flat(start - look).normalized * 0.8f + Vector3.up * 1.2f);
         if (returnClip != null)
         {
-            AudioSource src = CreateSource("Return Shot Audio", start);
-            src.spatialBlend = 0f;
+            AudioSource src = CreateFlatSource("Return Shot Audio");
             src.PlayOneShot(returnClip, returnClipVolume);
             Destroy(src.gameObject, returnClip.length + 0.25f);
         }
@@ -779,8 +798,7 @@ public class CorpseVanishEvent : MonoBehaviour
         Camera cam = Camera.main;
         if (blowOutClip != null && cam != null)
         {
-            AudioSource gust = CreateSource("Lights Out Gust Audio", cam.transform.TransformPoint(blowOutOffset));
-            gust.minDistance = blowOutMinDistance;
+            AudioSource gust = CreateSource("Lights Out Gust Audio", cam.transform.TransformPoint(blowOutOffset), blowOutMinDistance);
             gust.PlayOneShot(blowOutClip, blowOutVolume);
             Destroy(gust.gameObject, blowOutClip.length + 0.25f);
             if (blowOutLead > 0f)
@@ -856,8 +874,7 @@ public class CorpseVanishEvent : MonoBehaviour
             AudioClip step = runUpSteps[i % runUpSteps.Length];
             if (step != null)
             {
-                AudioSource src = CreateSource("Corpse Run Up Audio", PointOnPath(u));
-                src.minDistance = runMinDistance;
+                AudioSource src = CreateSource("Corpse Run Up Audio", PointOnPath(u), runMinDistance);
                 src.pitch = UnityEngine.Random.Range(0.9f, 0.98f);
                 src.PlayOneShot(step, runUpVolume);
                 Destroy(src.gameObject, step.length / src.pitch + 0.25f);
@@ -868,10 +885,9 @@ public class CorpseVanishEvent : MonoBehaviour
 
     IEnumerator RunClipRoutine()
     {
-        AudioSource steps = CreateSource("Corpse Run Audio", _lookPoint);
+        AudioSource steps = CreateSource("Corpse Run Audio", _lookPoint, runMinDistance);
         steps.clip = runClip;
         steps.volume = runVolume;
-        steps.minDistance = runMinDistance;
         steps.Play();
 
         float duration = runClip.length;
@@ -884,8 +900,7 @@ public class CorpseVanishEvent : MonoBehaviour
             if (!midPlayed && u >= midRunTime)
             {
                 midPlayed = true;
-                AudioSource can = CreateSource("Corpse Mid Run Audio", steps.transform.position);
-                can.minDistance = runMinDistance;
+                AudioSource can = CreateSource("Corpse Mid Run Audio", steps.transform.position, runMinDistance);
                 can.PlayOneShot(midRunClip, midRunVolume);
                 Destroy(can.gameObject, midRunClip.length + 0.25f);
             }
@@ -902,8 +917,7 @@ public class CorpseVanishEvent : MonoBehaviour
             yield return new WaitForSeconds(delay);
         if (_stage == Stage.Done)
             yield break;
-        AudioSource clue = CreateSource("Corpse Clue Audio", _lookPoint);
-        clue.minDistance = pinClueMinDistance;
+        AudioSource clue = CreateSource("Corpse Clue Audio", _lookPoint, pinClueMinDistance);
         clue.PlayOneShot(clip, volume);
         Destroy(clue.gameObject, clip.length + 0.25f);
     }
@@ -951,19 +965,19 @@ public class CorpseVanishEvent : MonoBehaviour
         return any ? b.center + Vector3.up * 0.05f : transform.position;
     }
 
-    AudioSource CreateSource(string sourceName, Vector3 position)
+    AudioSource CreateSource(string sourceName, Vector3 position, float minDistance = 1.2f)
+    {
+        return SpatialAudio.Create(sourceName, transform, position, mixerGroup, minDistance, 20f);
+    }
+
+    AudioSource CreateFlatSource(string sourceName)
     {
         var go = new GameObject(sourceName);
         go.transform.SetParent(transform, false);
-        go.transform.position = position;
         var src = go.AddComponent<AudioSource>();
         src.playOnAwake = false;
         src.outputAudioMixerGroup = mixerGroup;
-        src.spatialBlend = 1f;
-        src.rolloffMode = AudioRolloffMode.Logarithmic;
-        src.minDistance = 1.2f;
-        src.maxDistance = 20f;
-        src.dopplerLevel = 0f;
+        src.spatialBlend = 0f;
         return src;
     }
 }

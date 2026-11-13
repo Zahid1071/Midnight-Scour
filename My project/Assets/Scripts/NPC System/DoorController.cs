@@ -62,6 +62,12 @@ namespace FS_Atmo
         public bool IsPlayerCloseBlocked =>
             playerCloseLockoutAfterAiOpen > 0f && Time.time < _playerCloseBlockedUntil;
 
+        /// <summary>
+        /// False when the door leaf was removed or disabled. The frame then acts as an always-open
+        /// doorway: no carve, nothing to open or close, but it still separates the two rooms.
+        /// </summary>
+        public bool HasLeaf => simpleOpenClose != null && simpleOpenClose.gameObject.activeInHierarchy;
+
         void MarkOpenedByAi()
         {
             if (playerCloseLockoutAfterAiOpen <= 0f)
@@ -85,18 +91,17 @@ namespace FS_Atmo
             }
 
             if (simpleOpenClose != null)
-            {
-                lastOpenFlag = simpleOpenClose.objectOpen;
-                IsOpen = lastOpenFlag;
-                state = IsOpen ? DoorState.Open : DoorState.Closed;
                 simpleOpenClose.OnOpenSoundPlayed += HandleOpenSoundPlayed;
-            }
-            else
+
+            if (!HasLeaf)
             {
-                lastOpenFlag = false;
-                IsOpen = false;
-                state = DoorState.Closed;
+                SetDoorwayOpen();
+                return;
             }
+
+            lastOpenFlag = simpleOpenClose.objectOpen;
+            IsOpen = lastOpenFlag;
+            state = IsOpen ? DoorState.Open : DoorState.Closed;
 
             ApplyCarveImmediate(IsOpen);
         }
@@ -112,6 +117,12 @@ namespace FS_Atmo
         private void Update()
         {
             if (simpleOpenClose == null) return;
+
+            if (!HasLeaf)
+            {
+                if (state != DoorState.Open) SetDoorwayOpen();
+                return;
+            }
 
             if (simpleOpenClose.objectOpen != lastOpenFlag)
             {
@@ -148,6 +159,7 @@ namespace FS_Atmo
         // AI/NPC can bypass lock so door still plays Open/Close (not Locked)
         public void RequestOpen(bool bypassLock, Action<bool> onDone = null)
         {
+            if (!HasLeaf) { SetDoorwayOpen(); onDone?.Invoke(true); return; }
             if (isLocked && !bypassLock) { onDone?.Invoke(false); return; }
             if (state == DoorState.Open || state == DoorState.Opening) { onDone?.Invoke(true); return; }
 
@@ -161,6 +173,7 @@ namespace FS_Atmo
 
         public void RequestClose(bool bypassLock, Action onDone = null)
         {
+            if (!HasLeaf) { onDone?.Invoke(); return; }
             if (state == DoorState.Closed || state == DoorState.Closing) { onDone?.Invoke(); return; }
 
             _requestInProgress = false;
@@ -170,6 +183,8 @@ namespace FS_Atmo
 
         public void ForceOpenInstant()
         {
+            if (!HasLeaf) { SetDoorwayOpen(); return; }
+
             _requestInProgress = false;
             StopAllCoroutines();
 
@@ -187,6 +202,8 @@ namespace FS_Atmo
 
         public void ForceCloseInstant()
         {
+            if (!HasLeaf) { SetDoorwayOpen(); return; }
+
             _requestInProgress = false;
             StopAllCoroutines();
 
@@ -202,6 +219,25 @@ namespace FS_Atmo
         }
 
         // ========= Internals =========
+
+        private void SetDoorwayOpen()
+        {
+            _requestInProgress = false;
+            StopAllCoroutines();
+
+            // A leaf re-enabled later reads closed against this and re-carves normally.
+            lastOpenFlag = true;
+            if (carveObstacle)
+            {
+                carveObstacle.carving = false;
+                carveObstacle.enabled = false;
+            }
+
+            bool wasOpen = IsOpen;
+            IsOpen = true;
+            state = DoorState.Open;
+            if (!wasOpen) OnOpened?.Invoke();
+        }
 
         private IEnumerator OpenRoutine(Action<bool> onDone, bool triggerAnim, bool bypassLock)
         {

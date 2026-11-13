@@ -312,13 +312,13 @@ GameObject:
   - component: {fileID: 1978471637655604388}
   - component: {fileID: 5420857361349278248}
   - component: {fileID: 4385367944622275737}
-  - component: {fileID: 4452460983465209085}
   - component: {fileID: 8782256225151303304}
   - component: {fileID: 6319191353915927965}
   - component: {fileID: 7829341056284017392}
   - component: {fileID: 750681375347046963}
   - component: {fileID: 8847291056384729103}
   - component: {fileID: 5193847261059384721}
+  - component: {fileID: 7622276074100566991}
   m_Layer: 12
   m_Name: PlayerCapsule
   m_TagString: Player
@@ -682,40 +682,6 @@ MonoBehaviour:
     m_Bits: 180800
   cameraTransform: {fileID: 0}
   outOfReachMessage: It is too far
---- !u!114 &4452460983465209085
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8616685848737228372}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f000ae88209b16e4382cfd12c1a70ae0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  footAnchor: {fileID: 0}
-  leftFootClips:
-  - {fileID: 8300000, guid: f5dc1aebb3da41d46a8bece3122fd117, type: 3}
-  - {fileID: 8300000, guid: 658c4a2923a799f42985303dec4a06bf, type: 3}
-  - {fileID: 8300000, guid: 60af8a75ea76ad44187be3f274d5e1b3, type: 3}
-  rightFootClips:
-  - {fileID: 8300000, guid: 8d3ac292e5809ff4fa4bcce1b53d7804, type: 3}
-  - {fileID: 8300000, guid: 3b9479bee7ed87147b2eed1ac259dbe5, type: 3}
-  - {fileID: 8300000, guid: f5dc1aebb3da41d46a8bece3122fd117, type: 3}
-  runLeftFootClips: []
-  runRightFootClips: []
-  chaseSweetenerClips: []
-  chaseSweetenerChance: 0.35
-  chaseSweetenerVolume: 0.55
-  mixerGroup: {fileID: 5656172210110584295, guid: d0494497af355c44f913d2de9798dce5, type: 2}
-  walkReverbZoneMix: 0
-  runReverbZoneMix: 0.85
-  walkVolume: 1
-  runVolume: 1.3
-  sneakVolume: 0.4
-  walkPitchRange: {x: 0.97, y: 1.03}
-  runPitchRange: {x: 0.9, y: 0.98}
 --- !u!114 &8782256225151303304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -728,7 +694,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2487ac4a1dba60c4da8413f905603a61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  footstepController: {fileID: 4452460983465209085}
   walkStepDistance: 2
   runStepDistance: 1.29
   sneakStepDistance: 1.2
@@ -861,3 +826,21 @@ MonoBehaviour:
   maxAmplitudeMultiplier: 2
   maxFrequencyMultiplier: 7
   noiseFadeSeconds: 1.5
+--- !u!114 &7622276074100566991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8616685848737228372}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e558ced964b061344b7a0883d67127c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bank: {fileID: 11400000, guid: 80cf5462839c34a49aea4d2d76789ede, type: 2}
+  output: {fileID: 5656172210110584295, guid: d0494497af355c44f913d2de9798dce5, type: 2}
+  sneakVolume: 0.12
+  walkVolume: 0.3
+  runVolume: 0.5
+  pitch: {x: 0.97, y: 1.06}

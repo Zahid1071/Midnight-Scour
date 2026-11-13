@@ -885,6 +885,30 @@ MonoBehaviour:
     m_Localized: Where is the body?
     m_Metadata:
       m_Items: []
+  - m_Id: 46856168847310848
+    m_Localized: Small House
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831744
+    m_Localized: Farmhouse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831745
+    m_Localized: Basement
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831746
+    m_Localized: Truck
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831747
+    m_Localized: Dog Pen
+    m_Metadata:
+      m_Items: []
+  - m_Id: 46856169052831748
+    m_Localized: A hand-drawn map of the farm. Press M to look at it again.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []

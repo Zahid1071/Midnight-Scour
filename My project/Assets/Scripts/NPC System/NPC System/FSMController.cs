@@ -25,6 +25,7 @@ public class FSMController
     bool _relentlessViseMissHunt;
     bool _skipNextSearchStartupDelay;
     bool _urgentSearchRun;
+    float _chaseLostStillTimer;
 
     public bool IsRelentlessViseMissHunt => _relentlessViseMissHunt;
 
@@ -152,6 +153,7 @@ public class FSMController
             case NPCController.AIState.Chase:
                 StopSearchRoutine();
                 StopAmbushRoutine();
+                _chaseLostStillTimer = 0f;
                 // Witnessed-hide capture owns chase movement when active — don't clear it here.
                 if (_witnessedHideSpot == null)
                     nav?.ClearRoute();
@@ -194,7 +196,8 @@ public class FSMController
         SoundManager.Instance.PlaySFXFollowing(
             npc.ChaseEnterSfx,
             npc.transform,
-            npc.ChaseEnterVolume);
+            npc.ChaseEnterVolume,
+            offset: NPCController.SfxEmitOffset);
     }
 
     float _lastInvestigateSfxTime = -999f;
@@ -206,11 +209,27 @@ public class FSMController
     /// </summary>
     public void TryPlayInvestigateSfx()
     {
-        if (Time.time - _lastInvestigateSfxTime < InvestigateSfxCooldown)
+        float clipLength = npc.ChaseEnterSfx != null ? npc.ChaseEnterSfx.length : 0f;
+        if (Time.time - _lastInvestigateSfxTime < Mathf.Max(InvestigateSfxCooldown, clipLength))
             return;
 
+        PlaySpottedScream();
+    }
+
+    /// <summary>Plays the pig scream regardless of cooldown and returns its length in seconds.</summary>
+    public float PlaySpottedScream()
+    {
         _lastInvestigateSfxTime = Time.time;
         PlayChaseEnterSfx();
+        return npc.ChaseEnterSfx != null ? npc.ChaseEnterSfx.length : 0f;
+    }
+
+    /// <summary>Stop search/ambush routines and movement without changing state (spotted scream).</summary>
+    public void HaltForSpottedReaction()
+    {
+        StopSearchRoutine();
+        StopAmbushRoutine();
+        StopAgentMovement();
     }
 
     /// <summary>
@@ -810,6 +829,14 @@ public class FSMController
     /// </summary>
     public void BeginRelentlessViseMissHunt() => BeginRelentlessHunt(CaptureReason.HammerTimingFail);
 
+    /// <summary>Dev: drop any hunt (relentless included) and send him back to his normal day.</summary>
+    public void CallOffHunt()
+    {
+        _relentlessViseMissHunt = false;
+        CaptureContext.ClearIf(CaptureReason.Spotted);
+        SetState(NPCController.AIState.Natural);
+    }
+
     public void BeginRelentlessHunt(CaptureReason reason)
     {
         if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured))
@@ -917,8 +944,8 @@ public class FSMController
         if (SoundManager.Instance != null && SoundManager.Instance.tensionSFXBank != null)
         {
             var bank = SoundManager.Instance.tensionSFXBank;
-            if (bank.Length > 0) SoundManager.Instance.PlaySFXAt(bank[0], npc.transform.position);
-            if (bank.Length > 1) SoundManager.Instance.PlaySFXAt(bank[1], npc.transform.position);
+            if (bank.Length > 0) SoundManager.Instance.PlaySFXAt(bank[0], npc.SfxEmitPosition);
+            if (bank.Length > 1) SoundManager.Instance.PlaySFXAt(bank[1], npc.SfxEmitPosition);
         }
 
         // BeginCaptureUi already holds this for hide-exit; open-world capture acquires here.
@@ -1046,7 +1073,7 @@ public class FSMController
                 if (npc.perception.CanInstantConfirmVisiblePlayer())
                 {
                     EndAmbushPresentation();
-                    npc.BeginChaseFromPerception();
+                    npc.BeginSpottedChase();
                     yield break;
                 }
 
@@ -1054,7 +1081,7 @@ public class FSMController
                 if (seenTimer >= confirm)
                 {
                     EndAmbushPresentation();
-                    npc.BeginChaseFromPerception();
+                    npc.BeginSpottedChase();
                     yield break;
                 }
             }
@@ -1119,7 +1146,7 @@ public class FSMController
             return;
 
         if (SoundManager.Instance != null)
-            SoundManager.Instance.PlaySFXAt(npc.AmbushMetalRustleSfx, npc.transform.position, npc.AmbushRustleVolume);
+            SoundManager.Instance.PlaySFXAt(npc.AmbushMetalRustleSfx, npc.SfxEmitPosition, npc.AmbushRustleVolume);
 
         _ambushRustlePlayed = true;
     }
@@ -1326,7 +1353,7 @@ public class FSMController
                 && npc.currentState != NPCController.AIState.Chase)
             {
                 if (!IsPlayerStealthHidden() && npc.perception != null && npc.perception.CanSeePlayer)
-                    npc.BeginChaseFromPerception();
+                    npc.BeginSpottedChase();
                 else
                     TryAmbushOrNaturalAfterSearch();
             }
@@ -1418,7 +1445,7 @@ public class FSMController
         if (npc.currentState != NPCController.AIState.Capture)
         {
             if (!IsPlayerStealthHidden() && npc.perception != null && npc.perception.CanSeePlayer)
-                npc.BeginChaseFromPerception();
+                npc.BeginSpottedChase();
             else
                 TryAmbushOrNaturalAfterSearch();
         }
@@ -1431,8 +1458,14 @@ public class FSMController
     // (the agent can drift slightly while decelerating). Never used to arrive early.
     const float ArriveRecheckSlack = 0.35f;
     const float SearchStuckTimeout = 5f;
-    const float WitnessedHideStuckTimeout = 25f;
+    // Above the worst door wait (open timeout + SFX wait + basement hold ≈ 5.5s).
+    const float WitnessedHideStuckTimeout = 8f;
     const float SearchArriveMaxYDelta = 1.5f;
+    // Progress slower than this counts toward the stuck timeout (frame-rate independent).
+    const float StuckProgressSpeed = 0.25f;
+
+    const float ChaseLostStillSpeed = 0.2f;
+    const float ChaseLostStillSeconds = 1f;
 
     const float LastSeenPatrolRadius = 7f;
     const float LastSeenPatrolMinSeparation = 2.25f;
@@ -1582,7 +1615,7 @@ public class FSMController
                 yield break;
             }
 
-            if (Mathf.Abs(dist - lastDist) < 0.05f)
+            if (Mathf.Abs(dist - lastDist) < StuckProgressSpeed * Time.deltaTime)
                 stuckTimer += Time.deltaTime;
             else
                 stuckTimer = 0f;
@@ -1603,7 +1636,7 @@ public class FSMController
     {
         if (!IsPlayerStealthHidden() && npc.perception != null && npc.perception.CanSeePlayer)
         {
-            SetState(NPCController.AIState.Chase);
+            npc.BeginSpottedChase();
             return true;
         }
 
@@ -1796,6 +1829,7 @@ public class FSMController
         {
             // Görüyorum: Direkt üzerine koş (Canlı Takip)
             targetPosition = npc.perception.PlayerTransform.position;
+            _chaseLostStillTimer = 0f;
         }
         else
         {
@@ -1817,7 +1851,9 @@ public class FSMController
             // Closed cage / locker: agent often cannot reach the LSP/player point.
             // Standing at the bars counts as "arrived" so Chase does not softlock.
             float blockedArriveDist = Mathf.Max(2.5f, npc.captureDistance + 1.25f);
-            bool arrived = distToLSP < 1.5f || (isHidden && distToPlayer < blockedArriveDist);
+            bool arrived = distToLSP < 1.5f
+                || (isHidden && distToPlayer < blockedArriveDist)
+                || TickChaseLostStall(agent);
 
             if (arrived)
             {
@@ -1837,6 +1873,21 @@ public class FSMController
 
         // 4. Hareket — door-aware routing (wait at gate, open, cross). Skip replans mid-door.
         ReplanChasePath(targetPosition);
+    }
+
+    /// <summary>
+    /// Last-known is the player's collider center, often off the NavMesh (behind furniture, at a
+    /// locker door) so the agent parks short of the 1.5m arrive radius and replans forever.
+    /// Standing still outside a door transit for a moment counts as arrived.
+    /// </summary>
+    bool TickChaseLostStall(NavMeshAgent agent)
+    {
+        bool still = agent.velocity.sqrMagnitude < ChaseLostStillSpeed * ChaseLostStillSpeed
+            && !agent.pathPending
+            && !nav.IsInDoorTransit;
+
+        _chaseLostStillTimer = still ? _chaseLostStillTimer + Time.deltaTime : 0f;
+        return _chaseLostStillTimer >= ChaseLostStillSeconds;
     }
 
     void TickRelentlessViseMissChase(NavMeshAgent agent)

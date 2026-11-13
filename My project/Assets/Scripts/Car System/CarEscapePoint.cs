@@ -12,7 +12,7 @@ public class CarEscapePoint : MonoBehaviour, IInteractable
 
     [Header("Locked → window scare")]
     [Tooltip("After the first locked feedback (once the leave-basement car shot has finished), wait this long then play the butcher-in-the-window beat.")]
-    [SerializeField] float lockedWindowScareDelay = 2f;
+    [SerializeField] float lockedWindowScareDelay = 1f;
 
     public bool RepairDisabledForDemo => repairDisabledForDemo;
 
@@ -70,7 +70,7 @@ public class CarEscapePoint : MonoBehaviour, IInteractable
         var hud = HudManager.Instance;
         hud?.ShowSubtitle(Loc.Get("gameplay.locked"), 2.5f, hud.WarningColor);
         if (lockedSfx != null && SoundManager.Instance != null)
-            SoundManager.Instance.PlaySFXAt(lockedSfx, transform.position, lockedVolume, 1f, -1f, transform);
+            SoundManager.Instance.PlaySFXAt(lockedSfx, transform.position, lockedVolume);
 
         // Once out of the basement (car shot done): first locked click arms the window stare → car investigate.
         if (!_windowScareStarted && ButcherWindowShot.HasFinished)

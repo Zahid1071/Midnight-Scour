@@ -92,6 +92,8 @@ public class JumpscareManager : MonoBehaviour
 
         if (ReadPanelUI.Instance != null && ReadPanelUI.Instance.IsOpen)
             ReadPanelUI.Instance.Close();
+        if (FarmMapView.Instance != null && FarmMapView.Instance.IsOpen)
+            FarmMapView.Instance.Close();
 
         Object.FindFirstObjectByType<PauseManager>(FindObjectsInactive.Include)?.DismissForGameOver();
     }

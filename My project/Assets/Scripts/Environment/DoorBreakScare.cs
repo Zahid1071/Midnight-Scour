@@ -57,12 +57,14 @@ public class DoorBreakScare : MonoBehaviour
     [SerializeField] AudioClip approachClip;
     [Tooltip("Above 1 boosts the sound past the clip's own level.")]
     [SerializeField, Range(0f, 2f)] float approachVolume = 2f;
-    [Tooltip("Full volume within this distance, so the lock's own noise doesn't bury it.")]
-    [SerializeField] float approachMinDistance = 4f;
+    [Tooltip("Full volume within this distance. Keep it under the start distance so it swells as it closes in.")]
+    [SerializeField] float approachMinDistance = 2f;
     [Tooltip("The sound starts at most this far behind the player.")]
     [SerializeField] float approachStartDistance = 4.5f;
     [Tooltip("The sound stops this far behind the player.")]
     [SerializeField] float approachStopDistance = 1.8f;
+    [Tooltip("Metres below the behind point (eye height) the sound travels at: about 0.2 for a voice, 1.4 for footsteps.")]
+    [SerializeField] float approachDropBelowEye = 0.2f;
     [Tooltip("Seconds after the sound starts before the head turns.")]
     [SerializeField] float lookBackDelay = 1f;
 
@@ -176,11 +178,12 @@ public class DoorBreakScare : MonoBehaviour
         toPlayer.y = 0f;
         Vector3 dir = toPlayer.normalized;
         float startDistance = Mathf.Min(toPlayer.magnitude, approachStartDistance);
-        float floorY = behindPoint.position.y - 1.4f;
+        // Head height: the approach clip is a scream, and with HRTF a source at the floor is heard from below.
+        float mouthY = behindPoint.position.y - approachDropBelowEye;
         Vector3 from = listener - dir * startDistance;
         Vector3 to = listener - dir * Mathf.Min(startDistance, approachStopDistance);
-        from.y = floorY;
-        to.y = floorY;
+        from.y = mouthY;
+        to.y = mouthY;
         AudioSource approach = PlayAt(approachClip, from, approachVolume, approachMinDistance);
         if (approach != null)
             StartCoroutine(Glide(approach.transform, from, to, approachClip.length));
@@ -310,22 +313,6 @@ public class DoorBreakScare : MonoBehaviour
 
     AudioSource PlayAt(AudioClip clip, Vector3 position, float volume, float minDistance, float pitch = 1f)
     {
-        if (clip == null)
-            return null;
-        var go = new GameObject(clip.name + " (Door Scare)");
-        go.transform.SetParent(transform, false);
-        go.transform.position = position;
-        var src = go.AddComponent<AudioSource>();
-        src.playOnAwake = false;
-        src.outputAudioMixerGroup = mixerGroup;
-        src.spatialBlend = 1f;
-        src.rolloffMode = AudioRolloffMode.Logarithmic;
-        src.minDistance = minDistance;
-        src.maxDistance = 20f;
-        src.dopplerLevel = 0f;
-        src.pitch = pitch;
-        src.PlayOneShot(clip, volume);
-        Destroy(go, clip.length / Mathf.Max(0.1f, pitch) + 0.25f);
-        return src;
+        return SpatialAudio.PlayAt(clip, position, volume, minDistance, 20f, mixerGroup, transform, pitch);
     }
 }

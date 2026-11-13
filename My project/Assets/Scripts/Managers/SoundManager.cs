@@ -41,6 +41,13 @@ public class SoundManager : MonoBehaviour
 
     [Header("Ambience")]
     public AudioClip defaultAmbience;
+    [Tooltip("Outdoor ambience volume while there is a roof or ceiling above the camera.")]
+    [SerializeField, Range(0f, 1f)] private float indoorAmbienceVolume = 0.12f;
+    [Tooltip("Outdoor ambience low-pass cutoff (Hz) while indoors — heard through the walls.")]
+    [SerializeField] private float indoorAmbienceCutoff = 800f;
+    [SerializeField, Min(0.01f)] private float indoorAmbienceFade = 0.6f;
+    [Tooltip("A roof within this height (m) above the camera counts as indoors.")]
+    [SerializeField] private float roofCheckDistance = 15f;
 
     [Header("UI Clips")]
     public AudioClip uiClickClip;
@@ -68,13 +75,6 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private float sfxMinDistance = 1f;
     [SerializeField] private float sfxMaxDistance = 18f;
 
-    [Header("3D World SFX Occlusion")]
-    [SerializeField] private LayerMask occlusionLayers = ~0;
-    [Range(0f, 1f)]
-    [SerializeField] private float occludedVolumeMultiplier = 0.4f;
-    [SerializeField] private float occludedLowpassCutoff = 1400f;
-    [SerializeField] private float clearLowpassCutoff = 22000f;
-
     private readonly Queue<AudioSource> threeDPool = new();
     AudioSource _searchTensionSource;
 
@@ -82,6 +82,16 @@ public class SoundManager : MonoBehaviour
 
     private Coroutine musicFadeRoutine;
     private bool usingA = true;
+
+    AudioLowPassFilter _ambienceLowPass;
+    float _outdoorAmount = 1f;
+    bool _underRoof;
+    float _nextRoofCheck;
+
+    const float OpenAirCutoff = 22000f;
+
+    /// <summary>1 outdoors, 0 indoors (smoothed). Scale outdoor-only sounds such as thunder by it.</summary>
+    public float OutdoorAmount => _outdoorAmount;
 
     Transform _player;
     int _lastPlayerLayer = -1;
@@ -115,6 +125,8 @@ public class SoundManager : MonoBehaviour
 
     void Update()
     {
+        UpdateIndoorAmbience();
+
         if (!_inGameplayScene || !_gameplayMusicReady || _chaseMusicActive)
             return;
 
@@ -139,6 +151,28 @@ public class SoundManager : MonoBehaviour
         musicSourceB.volume = 1f;
         ambienceSource.volume = 1f;
         sfxSource.volume = 1f;
+
+        _ambienceLowPass = ambienceSource.GetComponent<AudioLowPassFilter>();
+        if (!_ambienceLowPass) _ambienceLowPass = ambienceSource.gameObject.AddComponent<AudioLowPassFilter>();
+        _ambienceLowPass.cutoffFrequency = OpenAirCutoff;
+    }
+
+    // Muffles the outdoor ambience while a roof or ceiling is above the camera.
+    void UpdateIndoorAmbience()
+    {
+        Camera cam = Camera.main;
+        if (cam != null && Time.unscaledTime >= _nextRoofCheck)
+        {
+            _nextRoofCheck = Time.unscaledTime + 0.25f;
+            // Starts above the camera so the player's own capsule (which it starts inside) is skipped.
+            _underRoof = Physics.Raycast(cam.transform.position + Vector3.up * 0.3f, Vector3.up, roofCheckDistance,
+                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+        }
+
+        _outdoorAmount = Mathf.MoveTowards(_outdoorAmount, _underRoof ? 0f : 1f, Time.unscaledDeltaTime / indoorAmbienceFade);
+        ambienceSource.volume = Mathf.Lerp(indoorAmbienceVolume, 1f, _outdoorAmount);
+        // Cutoff is blended on a log scale so the muffling fades evenly to the ear.
+        _ambienceLowPass.cutoffFrequency = Mathf.Exp(Mathf.Lerp(Mathf.Log(indoorAmbienceCutoff), Mathf.Log(OpenAirCutoff), _outdoorAmount));
     }
 
     void SilenceMusicSources()
@@ -176,20 +210,14 @@ public class SoundManager : MonoBehaviour
         for (int i = 0; i < poolSize; i++)
         {
             var go = new GameObject($"SFX3D_{i:D2}");
+            go.SetActive(false);
             go.transform.SetParent(transform);
             var src = go.AddComponent<AudioSource>();
             src.playOnAwake = false;
             src.loop = false;
             src.outputAudioMixerGroup = sfxGroup;
+            SpatialAudio.Configure(src, sfxMinDistance, sfxMaxDistance, AudioRolloffMode.Linear, false);
             src.spatialBlend = threeDSpatialBlend;
-            src.rolloffMode = AudioRolloffMode.Linear;
-            src.minDistance = sfxMinDistance;
-            src.maxDistance = sfxMaxDistance;
-
-            if (src.GetComponent<AudioLowPassFilter>() == null)
-                src.gameObject.AddComponent<AudioLowPassFilter>();
-
-            go.SetActive(false);
             threeDPool.Enqueue(src);
         }
     }
@@ -352,31 +380,16 @@ public class SoundManager : MonoBehaviour
 
     public void PlaySFXAt(AudioClip clip, Vector3 position, float volume = 1f, float pitch = 1f)
     {
-        PlaySFXAt(clip, position, volume, pitch, reverbZoneMix: -1f, ignoreOcclusionRoot: null);
-    }
-
-    public void PlaySFXAt(
-        AudioClip clip,
-        Vector3 position,
-        float volume,
-        float pitch,
-        float reverbZoneMix,
-        Transform ignoreOcclusionRoot)
-    {
         if (!clip || threeDPool.Count == 0) return;
-
-        WorldSfxOcclusion.Result occlusion = EvaluateOcclusion(position, ignoreOcclusionRoot);
 
         var src = threeDPool.Dequeue();
         var go = src.gameObject;
         go.transform.position = position;
         go.SetActive(true);
 
-        ApplyOcclusionToSource(src, occlusion, reverbZoneMix);
-
         src.pitch = pitch;
         src.clip = clip;
-        src.volume = Mathf.Clamp01(volume * occlusion.VolumeMultiplier);
+        src.volume = Mathf.Clamp01(volume);
         src.Play();
         StartCoroutine(Return3DWhenDone(src, clip.length / Mathf.Abs(pitch)));
     }
@@ -385,24 +398,20 @@ public class SoundManager : MonoBehaviour
     /// 3D one-shot that sticks to a moving transform (e.g. a bark that follows an NPC)
     /// instead of being left behind at the spawn position.
     /// </summary>
-    public void PlaySFXFollowing(AudioClip clip, Transform follow, float volume = 1f, float pitch = 1f)
+    public void PlaySFXFollowing(AudioClip clip, Transform follow, float volume = 1f, float pitch = 1f, Vector3 offset = default)
     {
         if (!clip || follow == null || threeDPool.Count == 0) return;
 
-        WorldSfxOcclusion.Result occlusion = EvaluateOcclusion(follow.position, follow);
-
         var src = threeDPool.Dequeue();
         var go = src.gameObject;
-        go.transform.position = follow.position;
+        go.transform.position = follow.position + offset;
         go.SetActive(true);
-
-        ApplyOcclusionToSource(src, occlusion, reverbZoneMix: -1f);
 
         src.pitch = pitch;
         src.clip = clip;
-        src.volume = Mathf.Clamp01(volume * occlusion.VolumeMultiplier);
+        src.volume = Mathf.Clamp01(volume);
         src.Play();
-        StartCoroutine(FollowAndReturn3DWhenDone(src, follow, clip.length / Mathf.Abs(pitch)));
+        StartCoroutine(FollowAndReturn3DWhenDone(src, follow, offset, clip.length / Mathf.Abs(pitch)));
     }
 
     public void PlaySFXSafe(AudioClip clip, Vector3 position, float volume = 1f, float pitch = 1f)
@@ -413,43 +422,8 @@ public class SoundManager : MonoBehaviour
             PlaySFXAt(clip, position, volume, pitch);
     }
 
-    // SpatialAudioCues muffles every 3D source continuously (including these) while it's active.
-    WorldSfxOcclusion.Result EvaluateOcclusion(Vector3 position, Transform ignoreRoot)
-    {
-        if (SpatialAudioCues.Active)
-            return new WorldSfxOcclusion.Result { IsOccluded = false, VolumeMultiplier = 1f, LowpassCutoff = clearLowpassCutoff };
-        return WorldSfxOcclusion.Evaluate(
-            position,
-            occlusionLayers,
-            occludedVolumeMultiplier,
-            occludedLowpassCutoff,
-            clearLowpassCutoff,
-            ignoreRoot);
-    }
-
-    void ApplyOcclusionToSource(AudioSource src, WorldSfxOcclusion.Result occlusion, float reverbZoneMix)
-    {
-        if (reverbZoneMix >= 0f)
-            src.reverbZoneMix = reverbZoneMix;
-
-        var lowPass = src.GetComponent<AudioLowPassFilter>();
-        if (lowPass == null)
-            return;
-
-        lowPass.enabled = occlusion.IsOccluded;
-        lowPass.cutoffFrequency = occlusion.LowpassCutoff;
-    }
-
     void ResetPooledSource(AudioSource src)
     {
-        var lowPass = src.GetComponent<AudioLowPassFilter>();
-        if (lowPass != null)
-        {
-            lowPass.enabled = false;
-            lowPass.cutoffFrequency = clearLowpassCutoff;
-        }
-
-        src.reverbZoneMix = 1f;
         src.pitch = 1f;
     }
 
@@ -508,13 +482,13 @@ public class SoundManager : MonoBehaviour
 
     // ---------- INTERNALS ----------
 
-    private IEnumerator FollowAndReturn3DWhenDone(AudioSource src, Transform follow, float seconds)
+    private IEnumerator FollowAndReturn3DWhenDone(AudioSource src, Transform follow, Vector3 offset, float seconds)
     {
         float end = Time.time + seconds;
         while (Time.time < end)
         {
             if (follow != null)
-                src.transform.position = follow.position;
+                src.transform.position = follow.position + offset;
             yield return null;
         }
 

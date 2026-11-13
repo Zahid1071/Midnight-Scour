@@ -97,6 +97,7 @@ public class POILookDirector : MonoBehaviour
     public void UnlockLookFromPlayer()
     {
         _lockedToPlayer = false;
+        CancelHoldAndClearLook();
     }
 
     /// <summary>Call while locked so the POI tracks a moving player.</summary>

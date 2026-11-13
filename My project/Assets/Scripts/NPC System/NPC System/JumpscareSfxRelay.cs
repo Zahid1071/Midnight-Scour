@@ -47,6 +47,6 @@ public class JumpscareSfxRelay : MonoBehaviour
         if (clip == null || SoundManager.Instance == null)
             return;
 
-        SoundManager.Instance.PlaySFXFollowing(clip, followRoot, volume);
+        SoundManager.Instance.PlaySFXFollowing(clip, followRoot, volume, offset: NPCController.SfxEmitOffset);
     }
 }

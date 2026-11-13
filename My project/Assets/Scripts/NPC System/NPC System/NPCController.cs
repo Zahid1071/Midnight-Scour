@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
+using Unity.Cinemachine;
 
 public class NPCController : MonoBehaviour
 {
@@ -45,6 +46,26 @@ public class NPCController : MonoBehaviour
     public AudioClip ChaseEnterSfx => chaseEnterSfx;
     public float ChaseEnterVolume => chaseEnterVolume;
 
+    [Header("Spotted")]
+    [Tooltip("When he sees the player he stops, faces them and plays the Chase SFX; the chase starts once it has finished.")]
+    [SerializeField] float spottedTurnSpeed = 360f;
+    [Tooltip("Player camera shake when spotted (peak degrees / Hz / seconds).")]
+    [SerializeField] float spottedShakeDegrees = 1.5f;
+    [SerializeField] float spottedShakeFrequency = 10f;
+    [SerializeField] float spottedShakeDuration = 1.2f;
+
+    Coroutine _spottedRoutine;
+
+    /// <summary>True while he is screaming at the player before the chase starts.</summary>
+    public bool IsReactingToSpotted => _spottedRoutine != null;
+
+    /// <summary>
+    /// Body/voice one-shots play this high above the root. The root sits on the floor mesh, where
+    /// Steam Audio occlusion rays start inside acoustic geometry and the sound comes out muffled.
+    /// </summary>
+    public static readonly Vector3 SfxEmitOffset = new Vector3(0f, 1.5f, 0f);
+    public Vector3 SfxEmitPosition => transform.position + SfxEmitOffset;
+
     Vector3 _runStartPos;
     Quaternion _runStartRot;
     bool _haveRunStart;
@@ -68,6 +89,31 @@ public class NPCController : MonoBehaviour
 
         _ignorePlayerFootstepsUntil = Time.time + duration;
         suspicion?.ClearFootstepSuspicion();
+    }
+
+    /// <summary>End any active post-door footstep deafness (cinematic / scare release).</summary>
+    public void ClearIgnorePlayerFootsteps()
+    {
+        _ignorePlayerFootstepsUntil = -1f;
+    }
+
+    /// <summary>
+    /// After a Scripted cinematic hold: hearing on, vision streak clear, look unlocked, agent runnable.
+    /// </summary>
+    public void RestorePerceptionAfterScriptedHold()
+    {
+        SetHearingDisabled(false);
+        ClearIgnorePlayerFootsteps();
+        perception?.ResetVisionConfirmation();
+        poiLookDirector?.UnlockLookFromPlayer();
+        if (agent != null)
+        {
+            if (!agent.enabled)
+                agent.enabled = true;
+            agent.isStopped = false;
+            agent.updatePosition = true;
+            agent.updateRotation = true;
+        }
     }
 
     [Header("Chase Replan")]
@@ -112,6 +158,8 @@ public class NPCController : MonoBehaviour
     /// </summary>
     public void ResetAfterCaptureContinue()
     {
+        StopSpottedReaction();
+
         if (_captureRoutine != null)
         {
             StopCoroutine(_captureRoutine);
@@ -236,6 +284,7 @@ public class NPCController : MonoBehaviour
         float interval = GetNaturalPoiIntervalSeconds();
         bool shouldRun =
             currentState == AIState.Natural &&
+            _spottedRoutine == null &&
             poiLookDirector != null &&
             interval > 0f;
 
@@ -324,6 +373,101 @@ public class NPCController : MonoBehaviour
     }
 
     /// <summary>
+    /// He sees the player: stop, face them and scream (player camera shakes), then chase only once
+    /// the scream has finished so the player gets a head start. A relentless hunt skips the scream.
+    /// </summary>
+    public void BeginSpottedChase()
+    {
+        if (!CanReactToSpotted() || _spottedRoutine != null)
+            return;
+
+        if (fsm.IsRelentlessViseMissHunt)
+        {
+            BeginChaseFromPerception();
+            return;
+        }
+
+        _spottedRoutine = StartCoroutine(SpottedRoutine());
+    }
+
+    public void StopSpottedReaction()
+    {
+        if (_spottedRoutine == null)
+            return;
+
+        StopCoroutine(_spottedRoutine);
+        _spottedRoutine = null;
+        poiLookDirector?.UnlockLookFromPlayer();
+    }
+
+    bool CanReactToSpotted() =>
+        currentState != AIState.Chase && currentState != AIState.Capture
+        && currentState != AIState.Dead && currentState != AIState.Scripted
+        && !PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCinematic);
+
+    IEnumerator SpottedRoutine()
+    {
+        // Callers can be the search/ambush coroutines themselves — let them exit before halting them.
+        yield return null;
+
+        if (!CanReactToSpotted())
+        {
+            _spottedRoutine = null;
+            yield break;
+        }
+
+        fsm.HaltForSpottedReaction();
+        // Ends the natural routine (standing up first if seated) without leaving the current state.
+        interaction?.StandUpFromHotspotThenSetState(currentState);
+        poiLookDirector?.LockLookToPlayer();
+
+        float end = Time.time + fsm.PlaySpottedScream();
+        ShakePlayerCamera();
+
+        while (Time.time < end && CanReactToSpotted())
+        {
+            poiLookDirector?.TickLockedPlayerLook();
+            if (interaction == null || !interaction.IsStandingUpFromHotspot)
+                TurnTowardsPlayer();
+            yield return null;
+        }
+
+        _spottedRoutine = null;
+        poiLookDirector?.UnlockLookFromPlayer();
+        if (CanReactToSpotted())
+            BeginChaseFromPerception();
+    }
+
+    void TurnTowardsPlayer()
+    {
+        Transform player = perception != null ? perception.PlayerTransform : null;
+        if (player == null)
+            return;
+
+        Vector3 toPlayer = player.position - transform.position;
+        toPlayer.y = 0f;
+        if (toPlayer.sqrMagnitude < 0.01f)
+            return;
+
+        transform.rotation = Quaternion.RotateTowards(
+            transform.rotation, Quaternion.LookRotation(toPlayer), spottedTurnSpeed * Time.deltaTime);
+    }
+
+    void ShakePlayerCamera()
+    {
+        CinemachineBrain brain = Camera.main != null ? Camera.main.GetComponent<CinemachineBrain>() : null;
+        if (brain == null)
+            brain = FindFirstObjectByType<CinemachineBrain>();
+        if (brain == null || !(brain.ActiveVirtualCamera is CinemachineVirtualCameraBase vcam))
+            return;
+
+        var kick = vcam.GetComponent<CameraKick>();
+        if (kick == null)
+            kick = vcam.gameObject.AddComponent<CameraKick>();
+        kick.Kick(spottedShakeDegrees, spottedShakeFrequency, spottedShakeDuration);
+    }
+
+    /// <summary>
     /// Drop routine, door routes, and POI — run straight at the player.
     /// Stands up from a hotspot first so he doesn't float-sit toward the player.
     /// </summary>
@@ -377,6 +521,8 @@ public class NPCController : MonoBehaviour
             return;
         if (currentState == AIState.Capture || currentState == AIState.Dead || currentState == AIState.Scripted)
             return;
+
+        StopSpottedReaction();
 
         // Mistimed hammer hunt paths to the hide itself — don't arm the softlock-prone coroutine.
         if (fsm != null && fsm.IsRelentlessViseMissHunt)
@@ -542,7 +688,7 @@ public class NPCController : MonoBehaviour
         if (currentState == AIState.Natural)
             CaptureContext.Set(CaptureReason.Spotted);
 
-        BeginChaseFromPerception();
+        BeginSpottedChase();
     }
 
 

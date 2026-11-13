@@ -47,11 +47,13 @@ public static class FarmhouseDecorator
 
     static readonly Room[] Rooms =
     {
-        new Room(0, 0f, 0f, 6f, 9f, "Wall_wallpaper_sage_worn", null),       // living room
-        new Room(0, 9f, 3f, 15f, 9f, "Wall_wallpaper_beige_worn", null),     // dining room
-        new Room(0, 9f, 0f, 15f, 3f, null, "Floor_tiles_A_worn"),            // kitchen
-        new Room(1, 0f, 0f, 6f, 9f, "Wall_B_wallpaper_A_worn", null),        // main bedroom
-        new Room(1, 9f, 0f, 15f, 3f, "Wall_tiles_worn", "Floor_tiles_B_worn"), // bathroom
+        new Room(0, 0f, 6f, 6f, 12f, "Wall_wallpaper_sage_worn", null),       // living room
+        new Room(0, 0f, 0f, 6f, 6f, "Wall_wallpaper_beige_worn", null),       // study
+        new Room(0, 12f, 6f, 21f, 12f, "Wall_wallpaper_beige_worn", null),    // dining room
+        new Room(0, 12f, 0f, 21f, 6f, null, "Floor_tiles_A_worn"),            // kitchen
+        new Room(1, 0f, 6f, 6f, 12f, "Wall_B_wallpaper_A_worn", null),        // main bedroom
+        new Room(1, 0f, 0f, 6f, 6f, "Wall_wallpaper_sage_worn", null),        // sewing room
+        new Room(1, 9f, 0f, 12f, 6f, "Wall_tiles_worn", "Floor_tiles_B_worn"), // bathroom
     };
 
     static Transform _house, _decor, _group;
@@ -87,11 +89,14 @@ public static class FarmhouseDecorator
         Physics.SyncTransforms();
 
         Group("Living Room"); LivingRoom();
+        Group("Study"); Study();
         Group("Hall"); Hall();
         Group("Dining Room"); DiningRoom();
         Group("Kitchen"); Kitchen();
         Group("Main Bedroom"); MainBedroom();
-        Group("Bedroom"); Bedroom();
+        Group("Sewing Room"); SewingRoom();
+        Group("Child Room"); ChildRoom();
+        Group("Storage Room"); StorageRoom();
         Group("Bathroom"); Bathroom();
         Group("Porches and Yard"); Exterior();
         Group("Door Grime"); DoorGrime();
@@ -109,175 +114,236 @@ public static class FarmhouseDecorator
 
     // ---------- Rooms ----------
 
+    // Doorways to keep clear (centre of each 3 m module): ground x = 6 at z 7.5 (arch), x = 12 at z 1.5 (door)
+    // and 7.5 (arch), z = 6 at x 1.5 (door) and 16.5 (arch); upstairs x = 6 at z 7.5, x = 12 at z 1.5 and 7.5,
+    // z = 6 at x 1.5, 10.5 and 16.5 (arch). Front door x 9..12, back door x 15..18.
+
     static void LivingRoom()
     {
-        K("Furniture/Fireplace", 0f, 0f, 4.5f, 90f);
-        K("Carpets/Carpet_persian_A", 2.75f, 0f, 4.5f, 0f);
-        K("Furniture/Sofa_3seat", 3.75f, 0f, 4.5f, 270f);
-        K("Furniture/Table_coffee", 2.45f, 0f, 4.5f, 90f);
-        K("Small_table_props/Magazine_A", 2.35f, 0.42f, 4.3f, 70f);
-        K("Kitchen_supplies/Coffee_mug", 2.55f, 0.42f, 4.85f, 0f);
-        K("Furniture/Sofa_1seat", 2.0f, 0f, 2.55f, 330f);
-        H("Rockingchair_01", 2.0f, 0f, 6.5f, 215f);
-        K("Furniture/Side_table_E", 0.6f, 0f, 2.6f, 90f);
-        K("Lamps/Lamp_table_shade", 0.6f, 0.57f, 2.6f, 0f);
-        K("Lamps/Lamp_standing", 4.45f, 0f, 6.2f, 0f);
-        K("Furniture/Bookcase_B", 3f, 0f, 9f - Surface - 0.15f, 180f);
-        K("Small_table_props/China_vase", 3.5f, 1.49f, 8.75f, 180f);
-        K("Small_table_props/Painting_table_A", 2.5f, 1.49f, 8.78f, 180f);
-        K("Electronics/TV_off", 3f, 0f, Surface + 0.17f, 0f);
-        H("wall_clock", 3f, 1.95f, Surface + 0.03f, 0f, snap: false);
-        H("vintage_grandfather_clock_01", 6f - Surface - 0.23f, 0f, 7.6f, 270f);
-        K("Paintings/Painting_B", 6f - Surface - 0.02f, 1.6f, 1.5f, 270f);
-        K("Lamps/CeilingFan", 3f, 2.8f, 4.5f, 0f);
-        Curtains(0, 'N', 9f, 1.5f, true); Curtains(0, 'N', 9f, 4.5f, true);
+        // Fireplace on the side wall, sofa group facing it; the arch to the hall stays clear behind the sofa.
+        K("Furniture/Fireplace", 0f, 0f, 7.5f, 90f);
+        K("Carpets/Carpet_persian_A", 2.75f, 0f, 7.9f, 0f);
+        K("Furniture/Sofa_3seat", 3.75f, 0f, 7.9f, 270f);
+        K("Furniture/Table_coffee", 2.45f, 0f, 7.9f, 90f);
+        K("Small_table_props/Magazine_A", 2.35f, 0.42f, 7.7f, 70f);
+        K("Kitchen_supplies/Coffee_mug", 2.55f, 0.42f, 8.25f, 0f);
+        // The locker hiding spot (under the Living_Room anchor) stands on the hall wall at z 11.3.
+        K("Furniture/Sofa_1seat", 1.6f, 0f, 9.9f, 210f);
+        H("Rockingchair_01", 3.5f, 0f, 11.1f, 190f);
+        K("Furniture/Side_table_E", 0.6f, 0f, 11.2f, 90f);
+        K("Lamps/Lamp_table_shade", 0.6f, 0.57f, 11.2f, 0f);
+        H("vintage_grandfather_clock_01", 6f - Surface - 0.23f, 0f, 9.75f, 270f);
+        K("Lamps/CeilingFan", 3f, 2.8f, 9f, 0f);
+        Curtains(0, 'N', 12f, 1.5f, true); Curtains(0, 'N', 12f, 4.5f, true);
+        Curtains(0, 'W', 0f, 10.5f, true);
+        D("Decal_plaster_floor_B", 1.4f, 0.003f, 11.2f, 30f);
+        D("Decal_papers_C", 4.6f, 0.003f, 9.9f, 200f);
+        WallDecal("Decal_leaking_A", 'N', 12f, 0.6f, 2.75f);
+        WallDecal("Decal_damage_crack_B", 'E', 6f, 11.4f, 2.3f);
+    }
+
+    static void Study()
+    {
+        // Farmer's office: desk under the back windows, bookcase on the hall wall.
+        K("Furniture/Bookcase_B", 6f - Surface - 0.15f, 0f, 3f, 270f);
+        K("Books/Book_set_A", 5.7f, 0.81f, 3f, 270f);
+        K("Furniture/Table_B", 3f, 0f, 1.05f, 0f);
+        K("Furniture/Chair_wooden", 3f, 0f, 1.85f, 175f);
+        K("Small_table_props/Magazine_A", 2.75f, 0.78f, 1.0f, 20f);
+        H("vintage_oil_lamp", 3.45f, 0.78f, 0.9f, 0f);
+        K("Furniture/Side_table_E", 0.6f, 0f, 4.5f, 90f);
+        K("Lamps/Lamp_table_shade", 0.6f, 0.57f, 4.5f, 0f);
+        K("Furniture/Dresser_C", 4.45f, 0f, 6f - Surface - 0.27f, 180f);
+        K("Small_table_props/Painting_table_A", 4.1f, 0.86f, 5.6f, 180f);
+        K("Paintings/Painting_H", 4.45f, 1.75f, 6f - Surface - 0.02f, 180f);
+        K("Storage_props/Storage_box_wicker", 1.0f, 0f, 2.9f, 15f);
+        K("Lamps/Lamp_ceiling_round", 3f, 2.8f, 3f, 0f);
         Curtains(0, 'S', 0f, 1.5f, true); Curtains(0, 'S', 0f, 4.5f, true);
-        Curtains(0, 'W', 0f, 1.5f, true); Curtains(0, 'W', 0f, 7.5f, true);
-        D("Decal_plaster_floor_B", 1.6f, 0.003f, 7.6f, 30f);
-        D("Decal_papers_C", 4.6f, 0.003f, 7.7f, 200f);
-        WallDecal("Decal_leaking_A", 'N', 9f, 0.6f, 2.75f);
-        WallDecal("Decal_damage_crack_B", 'E', 6f, 1.2f, 2.3f);
+        Curtains(0, 'W', 0f, 1.5f, true);
+        D("Decal_papers_E", 2.2f, 0.003f, 3.6f, 300f);
+        WallDecal("Decal_leaking_B", 'W', 0f, 4.4f, 2.75f);
     }
 
     static void Hall()
     {
-        K("Carpets/Carpet_A", 7.5f, 0f, 6.7f, 0f);
-        K("Furniture/Side_table_D", 9f - Surface - 0.19f, 0f, 5.15f, 270f);
-        K("Small_table_props/China_vase", 8.75f, 0.87f, 4.85f, 270f);
-        H("mantel_clock_01", 8.72f, 0.87f, 5.4f, 270f);
-        K("Paintings/Painting_E", 9f - Surface - 0.02f, 1.65f, 5.15f, 270f);
-        K("Lamps/Lamp_ceiling_round", 7.5f, 2.8f, 7f, 0f);
-        K("Lamps/Lamp_ceiling_ball", 7.5f, Up + 2.8f, 7.5f, 0f);
-        D("Decal_papers_A", 7.3f, 0.003f, 8.1f, 15f);
+        K("Carpets/Carpet_A", 10.5f, 0f, 9.6f, 0f);
+        K("Furniture/Side_table_D", 12f - Surface - 0.19f, 0f, 10.6f, 270f);
+        H("mantel_clock_01", 11.72f, 0.87f, 10.85f, 270f);
+        K("Paintings/Painting_E", 12f - Surface - 0.02f, 1.65f, 10.6f, 270f);
+        // Back of the hall, toward the kitchen door. The bottom stair steps face +x at z 0..1.2, so keep
+        // x 8.3..9.6 there clear.
+        K("Furniture/Cabinet_B", 12f - Surface - 0.31f, 0f, 4.5f, 270f);
+        K("Storage_props/Storage_box_wicker", 8.75f, 0f, 3.2f, 10f);
+        K("Lamps/Lamp_ceiling_round", 9f, 2.8f, 9f, 0f);
+        K("Lamps/Lamp_ceiling_round", 10.5f, 2.8f, 3f, 0f);
+        K("Lamps/Lamp_ceiling_ball", 9f, Up + 2.8f, 9f, 0f);
+        Curtains(0, 'S', 0f, 10.5f, false);
+        D("Decal_papers_A", 9.8f, 0.003f, 10.9f, 15f);
+        D("Decal_plaster_floor_D", 10.6f, 0.003f, 4.2f, 80f);
     }
 
     static void DiningRoom()
     {
-        K("Carpets/Carpet_persian_B", 12f, 0f, 6f, 90f);
-        K("Furniture/Table_A_tablecloth", 12f, 0f, 6f, 0f);
-        K("Furniture/Chair_wooden", 11.4f, 0f, 5.1f, 0f);
-        K("Furniture/Chair_wooden", 12.6f, 0f, 5.1f, 0f);
-        K("Furniture/Chair_wooden", 11.4f, 0f, 6.9f, 180f);
-        K("Furniture/Chair_wooden", 12.75f, 0f, 7.25f, 160f);
-        K("Furniture/Chair_wooden", 10.55f, 0f, 6f, 90f);
-        K("Furniture/Chair_wooden", 13.45f, 0f, 6f, 270f);
-        K("Small_table_props/China_set_B", 11.9f, 0.79f, 6f, 0f);
-        K("Small_table_props/Candelabra", 12.6f, 0.79f, 5.95f, 0f);
-        K("Lamps/Lamp_chandelier", 12f, 2.8f, 6f, 0f);
-        K("Furniture/Cabinet_B", 15f - Surface - 0.31f, 0f, 4.5f, 270f);
-        K("Furniture/Dresser_C", 10.55f, 0f, 3f + Surface + 0.27f, 0f);
-        K("Small_table_props/Candelabra", 9.95f, 0.86f, 3.35f, 0f);
-        K("Small_table_props/China_set_A", 11.1f, 0.86f, 3.35f, 0f);
-        K("Paintings/Painting_H", 10.55f, 1.75f, 3f + Surface + 0.02f, 0f);
-        Curtains(0, 'N', 9f, 10.5f, true); Curtains(0, 'N', 9f, 13.5f, true);
-        Curtains(0, 'E', 15f, 7.5f, true);
-        WallDecal("Decal_leaking_B", 'E', 15f, 5.6f, 2.75f);
-        D("Decal_plaster_floor_D", 14f, 0.003f, 8.2f, 120f);
+        // Table centred at (16.5, 9); the arches to the hall (x = 12) and kitchen (z = 6, x 15..18) stay clear.
+        const float tx = 16.5f, tz = 9f;
+        K("Carpets/Carpet_persian_B", tx, 0f, tz, 90f);
+        K("Furniture/Table_A_tablecloth", tx, 0f, tz, 0f);
+        K("Furniture/Chair_wooden", tx - 0.6f, 0f, tz - 0.9f, 0f);
+        K("Furniture/Chair_wooden", tx + 0.6f, 0f, tz - 0.9f, 0f);
+        K("Furniture/Chair_wooden", tx - 0.6f, 0f, tz + 0.9f, 180f);
+        K("Furniture/Chair_wooden", tx + 0.75f, 0f, tz + 1.25f, 160f);
+        K("Furniture/Chair_wooden", tx - 1.45f, 0f, tz, 90f);
+        K("Furniture/Chair_wooden", tx + 1.45f, 0f, tz, 270f);
+        K("Small_table_props/China_set_B", tx - 0.1f, 0.79f, tz, 0f);
+        K("Small_table_props/Candelabra", tx + 0.6f, 0.79f, tz - 0.05f, 0f);
+        K("Lamps/Lamp_chandelier", tx, 2.8f, tz, 0f);
+        K("Furniture/Cabinet_B", 21f - Surface - 0.31f, 0f, 10.5f, 270f);
+        K("Furniture/Dresser_C", 13.6f, 0f, 6f + Surface + 0.27f, 0f);
+        K("Small_table_props/Candelabra", 13.0f, 0.86f, 6.35f, 0f);
+        K("Small_table_props/China_set_A", 14.15f, 0.86f, 6.35f, 0f);
+        K("Paintings/Painting_H", 13.6f, 1.75f, 6f + Surface + 0.02f, 0f);
+        K("Furniture/Side_table_D", 19.6f, 0f, 6f + Surface + 0.19f, 0f);
+        Curtains(0, 'N', 12f, 13.5f, true); Curtains(0, 'N', 12f, 16.5f, true); Curtains(0, 'N', 12f, 19.5f, true);
+        Curtains(0, 'E', 21f, 7.5f, true);
+        WallDecal("Decal_leaking_B", 'E', 21f, 11.1f, 2.75f);
+        D("Decal_plaster_floor_D", 19.8f, 0.003f, 11.2f, 120f);
     }
 
     static void Kitchen()
     {
-        // Counter run on the dining-room partition (z = 3), facing -z; modules span +1 m in x from their pivot.
-        K("Kitchen_cabinets/Kitchen_counter_A", 9.1f, 0f, 3f, 180f);
-        K("Kitchen_cabinets/Kitchen_counter_sink", 10.1f, 0f, 3f, 180f);
-        K("Kitchen_cabinets/Kitchen_counter_B", 11.1f, 0f, 3f, 180f);
-        K("Kitchen_cabinets/Kitchen_cabinet_A", 9.1f, 0f, 3f, 180f);
-        K("Kitchen_cabinets/Kitchen_cabinet_C", 10.1f, 0f, 3f, 180f);
-        K("Kitchen_cabinets/Kitchen_cabinet_B", 11.1f, 0f, 3f, 180f);
-        K("Electronics/Stove", 9f, 0f, 1.2f, 90f);
-        K("Kitchen_supplies/Pot", 9.5f, Top(9.5f, 0.95f, 1.2f), 0.95f, 0f);
-        K("Kitchen_supplies/Frying_pan", 9.5f, Top(9.5f, 1.45f, 1.2f), 1.45f, 300f);
-        K("Electronics/Fridge", 12.35f, 0f, 0f, 0f);
-        K("Furniture/Table_B", 13.6f, 0f, 1.55f, 0f);
-        K("Furniture/Chair_kitchen", 13.6f, 0f, 0.75f, 0f);
-        K("Furniture/Chair_kitchen", 12.8f, 0f, 1.6f, 80f);
-        K("Kitchen_supplies/Plate_dirty", 13.5f, 0.78f, 1.35f, 0f);
-        K("Kitchen_supplies/Coffee_mug", 13.85f, 0.78f, 1.7f, 0f);
-        K("Kitchen_supplies/Trashcan_large", 11.5f, 0f, 0.4f, 0f);
-        K("Kitchen_supplies/Cutting_board", 9.55f, 0.95f, 2.6f, 180f);
-        K("Kitchen_supplies/Jar_A", 11.55f, 0.95f, 2.75f, 0f);
-        K("Kitchen_supplies/Jar_C", 11.75f, 0.95f, 2.72f, 0f);
-        K("Kitchen_supplies/Cutlery_holder", 11.3f, 0.95f, 2.75f, 0f);
-        K("Storage_props/Dish_soap", 10.95f, 0.95f, 2.78f, 0f);
-        K("Lamps/Lamp_ceiling_round", 12f, 2.8f, 1.5f, 0f);
-        Curtains(0, 'S', 0f, 13.5f, false);
-        Curtains(0, 'E', 15f, 1.5f, false);
-        D("Decal_damage_tiles", 12.4f, 0.003f, 1.9f, 0f);
+        // Counter run on the dining-room partition (z = 6) east of the arch, facing -z; modules span +1 m in x
+        // from their pivot. Stove on the east wall, fridge on the back wall, table in the middle.
+        K("Kitchen_cabinets/Kitchen_counter_A", 17.9f, 0f, 6f, 180f);
+        K("Kitchen_cabinets/Kitchen_counter_sink", 18.9f, 0f, 6f, 180f);
+        K("Kitchen_cabinets/Kitchen_counter_B", 19.9f, 0f, 6f, 180f);
+        K("Kitchen_cabinets/Kitchen_cabinet_A", 17.9f, 0f, 6f, 180f);
+        K("Kitchen_cabinets/Kitchen_cabinet_C", 18.9f, 0f, 6f, 180f);
+        K("Kitchen_cabinets/Kitchen_cabinet_B", 19.9f, 0f, 6f, 180f);
+        K("Electronics/Stove", 21f, 0f, 1.5f, 270f);
+        K("Kitchen_supplies/Pot", 20.5f, Top(20.5f, 1.75f, 1.2f), 1.75f, 0f);
+        K("Kitchen_supplies/Frying_pan", 20.5f, Top(20.5f, 1.25f, 1.2f), 1.25f, 120f);
+        K("Electronics/Fridge", 13.4f, 0f, 0f, 0f);
+        K("Furniture/Table_B", 16.4f, 0f, 3.1f, 0f);
+        K("Furniture/Chair_kitchen", 16.4f, 0f, 2.3f, 0f);
+        K("Furniture/Chair_kitchen", 15.6f, 0f, 3.15f, 80f);
+        K("Furniture/Chair_kitchen", 17.3f, 0f, 3.6f, 230f);
+        K("Kitchen_supplies/Plate_dirty", 16.3f, 0.78f, 2.9f, 0f);
+        K("Kitchen_supplies/Coffee_mug", 16.65f, 0.78f, 3.25f, 0f);
+        K("Kitchen_supplies/Trashcan_large", 12.45f, 0f, 4.4f, 0f);
+        K("Kitchen_supplies/Cutting_board", 18.35f, 0.95f, 5.6f, 180f);
+        K("Kitchen_supplies/Jar_A", 20.35f, 0.95f, 5.75f, 0f);
+        K("Kitchen_supplies/Jar_C", 20.55f, 0.95f, 5.72f, 0f);
+        K("Kitchen_supplies/Cutlery_holder", 20.1f, 0.95f, 5.75f, 0f);
+        K("Storage_props/Dish_soap", 19.75f, 0.95f, 5.78f, 0f);
+        K("Lamps/Lamp_ceiling_round", 16.5f, 2.8f, 3f, 0f);
+        Curtains(0, 'S', 0f, 19.5f, false);
+        D("Decal_damage_tiles", 14.4f, 0.003f, 2.3f, 0f);
+        D("Decal_damage_tiles", 19.2f, 0.003f, 3.9f, 90f);
     }
 
     static void MainBedroom()
     {
-        K("Furniture/Bed_king", 1.17f, Up, 4.5f, 90f);
-        K("Furniture/Side_table_C", 0.36f, Up, 2.95f, 90f);
-        K("Furniture/Side_table_C", 0.36f, Up, 6.05f, 90f);
-        H("vintage_oil_lamp", 0.36f, Up + 0.69f, 2.95f, 0f);
-        K("Lamps/Lamp_table_shade", 0.36f, Up + 0.69f, 6.05f, 0f);
-        K("Paintings/Painting_K", Surface + 0.02f, Up + 1.85f, 4.5f, 90f);
-        K("Furniture/Wardrobe", 6f - Surface - 0.34f, Up, 2f, 270f);
-        K("Furniture/Dresser_B", 3f, Up, 9f - Surface - 0.27f, 180f);
-        K("Small_table_props/Hair_brush", 2.7f, Up + 0.86f, 8.65f, 200f);
-        K("Small_table_props/Lotion_set_A", 3.3f, Up + 0.86f, 8.7f, 180f);
-        K("Small_table_props/Painting_table_B", 3.05f, Up + 0.86f, 8.75f, 180f);
-        K("Bathroom_props/Bathroom_mirror", 3f, Up + 1.6f, 9f - Surface, 180f);
-        K("Carpets/Carpet_persian_B", 3.2f, Up, 4.5f, 90f);
-        K("Storage_props/Storage_box_wicker", 2.55f, Up, 4.5f, 90f);
-        K("Furniture/Chair_wooden", 4.9f, Up, 8.1f, 200f);
-        K("Lamps/CeilingFan", 3f, Up + 2.8f, 4.5f, 0f);
-        Curtains(1, 'N', 9f, 1.5f, true); Curtains(1, 'N', 9f, 4.5f, true);
-        Curtains(1, 'S', 0f, 1.5f, true); Curtains(1, 'S', 0f, 4.5f, true);
-        Curtains(1, 'W', 0f, 1.5f, true); Curtains(1, 'W', 0f, 7.5f, true);
-        WallDecal("Decal_leaking_A", 'S', 0f, 3f, Up + 2.75f);
-        D("Decal_plaster_floor_F", 4.3f, Up + 0.003f, 6.2f, 60f);
+        // Bed on the side wall; the king bed itself is the player's hiding spot under the Main_Bedroom_Room anchor.
+        if (!HasGameplay("Bed_king")) K("Furniture/Bed_king", 1.17f, Up, 9f, 90f);
+        K("Furniture/Side_table_C", 0.36f, Up, 7.45f, 90f);
+        K("Furniture/Side_table_C", 0.36f, Up, 10.55f, 90f);
+        H("vintage_oil_lamp", 0.36f, Up + 0.69f, 7.45f, 0f);
+        K("Lamps/Lamp_table_shade", 0.36f, Up + 0.69f, 10.55f, 0f);
+        K("Paintings/Painting_K", Surface + 0.02f, Up + 1.85f, 9f, 90f);
+        K("Furniture/Dresser_B", 4.3f, Up, 6f + Surface + 0.27f, 0f);
+        K("Small_table_props/Hair_brush", 4.0f, Up + 0.86f, 6.35f, 20f);
+        K("Small_table_props/Lotion_set_A", 4.6f, Up + 0.86f, 6.3f, 0f);
+        K("Bathroom_props/Bathroom_mirror", 4.3f, Up + 1.6f, 6f + Surface, 0f);
+        K("Carpets/Carpet_persian_B", 3.2f, Up, 9f, 90f);
+        K("Furniture/Chair_wooden", 2.7f, Up, 11.35f, 200f);
+        K("Lamps/CeilingFan", 3f, Up + 2.8f, 9f, 0f);
+        Curtains(1, 'N', 12f, 1.5f, true); Curtains(1, 'N', 12f, 4.5f, true);
+        WallDecal("Decal_leaking_A", 'N', 12f, 3f, Up + 2.75f);
+        D("Decal_plaster_floor_F", 4.3f, Up + 0.003f, 8.6f, 60f);
     }
 
-    static void Bedroom()
+    static void SewingRoom()
     {
-        K("Furniture/Bed_twin", 15f - Surface - 1.04f, Up, 4.5f, 270f);
-        K("Furniture/Side_table_E", 14.6f, Up, 5.6f, 270f);
-        K("Lamps/Lamp_table_shade", 14.6f, Up + 0.57f, 5.6f, 0f);
-        K("Paintings/Painting_N", 15f - Surface - 0.02f, Up + 1.85f, 4.5f, 270f);
-        K("Furniture/Dresser_A", 12.25f, Up, 3f + Surface + 0.17f, 0f);
-        K("Furniture/Bookcase_A", 12f, Up, 9f - Surface - 0.15f, 180f);
-        K("Books/Book_set_A", 12f, Up + 0.81f, 8.75f, 180f);
-        K("Furniture/Chair_wooden", 13.9f, Up, 8.3f, 210f);
-        K("Storage_props/Laundry_basket_A", 11.9f, Up, 3.9f, 20f);
-        K("Carpets/Carpet_C", 11.8f, Up, 6f, 90f);
-        K("Lamps/Lamp_ceiling_round", 12f, Up + 2.8f, 6f, 0f);
-        Curtains(1, 'N', 9f, 10.5f, false); Curtains(1, 'N', 9f, 13.5f, false);
-        Curtains(1, 'E', 15f, 7.5f, false);
-        D("Decal_papers_E", 11.2f, Up + 0.003f, 7.4f, 300f);
+        K("Furniture/Wardrobe", 6f - Surface - 0.34f, Up, 4.4f, 270f);
+        K("Furniture/Table_B", 1.2f, Up, 3.9f, 90f);
+        K("Furniture/Chair_wooden", 2.0f, Up, 3.9f, 270f);
+        K("Storage_props/Laundry_basket_A", 0.6f, Up, 2.4f, 20f);
+        K("Storage_props/Storage_box_wicker", 4.9f, Up, 0.5f, 350f);
+        K("Furniture/Side_table_C", 0.36f, Up, 0.5f, 90f);
+        K("Lamps/Lamp_ceiling_round", 3f, Up + 2.8f, 3f, 0f);
+        Curtains(1, 'S', 0f, 1.5f, true); Curtains(1, 'S', 0f, 4.5f, true);
+        Curtains(1, 'W', 0f, 1.5f, true);
+        WallDecal("Decal_leaking_A", 'S', 0f, 3f, Up + 2.75f);
+        D("Decal_papers_C", 3.2f, Up + 0.003f, 4.6f, 40f);
+    }
+
+    static void ChildRoom()
+    {
+        // The bed is a hiding spot entered from its west side (FarmhouseGameplay), so the night stand goes east.
+        if (!HasGameplay("Bed_twin")) K("Furniture/Bed_twin", 19.5f, Up, 6f + Surface + 1.04f, 0f);
+        K("Furniture/Side_table_E", 20.55f, Up, 6.4f, 0f);
+        K("Lamps/Lamp_table_shade", 20.55f, Up + 0.57f, 6.4f, 0f);
+        K("Paintings/Painting_N", 19.5f, Up + 1.85f, 6f + Surface + 0.02f, 0f);
+        K("Furniture/Dresser_A", 14.4f, Up, 6f + Surface + 0.17f, 0f);
+        K("Furniture/Bookcase_A", 12f + Surface + 0.15f, Up, 10.5f, 90f);
+        K("Books/Book_set_A", 12.35f, Up + 0.81f, 10.5f, 90f);
+        K("Furniture/Chair_wooden", 17.6f, Up, 11.2f, 210f);
+        K("Carpets/Carpet_C", 16.5f, Up, 9f, 90f);
+        K("Lamps/Lamp_ceiling_round", 16.5f, Up + 2.8f, 9f, 0f);
+        Curtains(1, 'N', 12f, 13.5f, false); Curtains(1, 'N', 12f, 16.5f, false); Curtains(1, 'N', 12f, 19.5f, false);
+        Curtains(1, 'E', 21f, 7.5f, false);
+        D("Decal_papers_E", 15.2f, Up + 0.003f, 8.4f, 300f);
+    }
+
+    static void StorageRoom()
+    {
+        // Junk room: crates and furniture break line of sight between the bathroom door and the arch.
+        K("Furniture/Wardrobe", 21f - Surface - 0.34f, Up, 1.6f, 270f);
+        K("Furniture/Bookcase_B", 16.5f, Up, Surface + 0.15f, 0f);
+        H("wooden_crate_02", 14.4f, Up, 0.8f, 10f);
+        H("wooden_crate_02", 14.5f, Up, 1.75f, 95f);
+        H("barrel_03", 20.3f, Up, 4.9f, 0f);
+        H("wooden_ladder", 19.2f, Up, 0.45f, 0f);
+        K("Furniture/Chair_wooden", 18.6f, Up, 3.4f, 40f);
+        K("Furniture/Sofa_1seat", 13.4f, Up, 4.6f, 120f);
+        K("Storage_props/Storage_box_wicker", 17.8f, Up, 4.9f, 15f);
+        K("Storage_props/Laundry_basket_A", 15.0f, Up, 3.5f, 60f);
+        K("Lamps/Lamp_ceiling_round", 16.5f, Up + 2.8f, 3f, 0f);
+        Curtains(1, 'S', 0f, 13.5f, false); Curtains(1, 'S', 0f, 19.5f, false);
+        D("Decal_plaster_floor_H", 16.9f, Up + 0.003f, 2.2f, 0f);
+        WallDecal("Decal_leaking_B", 'E', 21f, 4.4f, Up + 2.75f);
     }
 
     static void Bathroom()
     {
         // Tub and curtain rail need a wall at both ends: they fill the 2.8 m between the back wall and the
-        // partition, along the outer wall (tub local x -2.9..-0.1 runs along -z, local z -0.4 sits on the wall).
-        K("Bathroom_props/Bathtub", 15f - Surface - 0.4f, Up, 3f, 270f);
-        K("Bathroom_props/Shower_curtain", 15f - Surface - 0.4f, Up, 3f, 270f);
-        K("Bathroom_props/Toilet", 11.2f, Up, Surface + 0.37f, 0f);
-        K("Bathroom_props/Toiletpaper_set", 11.75f, Up, 0.35f, 0f);
-        K("Bathroom_props/Bathroom_sink", 9f + Surface, Up, 1.5f, 90f);
-        K("Bathroom_props/Bathroom_mirror", 9f + Surface, Up + 1.6f, 1.5f, 90f);
-        K("Lamps/Lamp_bathroom_wall", 9f + Surface, Up + 2.2f, 1.5f, 90f);
-        K("Bathroom_props/Trashcan", 9.4f, Up, 2.5f, 0f);
-        D("Decal_plaster_floor_H", 13f, Up + 0.003f, 2.2f, 0f);
+        // stairwell partition along the x = 9 wall (tub local x -2.9..-0.1 runs along +z, local z -0.4 on the wall).
+        K("Bathroom_props/Bathtub", 9f + Surface + 0.4f, Up, 0f, 90f);
+        K("Bathroom_props/Shower_curtain", 9f + Surface + 0.4f, Up, 0f, 90f);
+        if (!HasGameplay("Toilet")) K("Bathroom_props/Toilet", 12f - Surface - 0.37f, Up, 3.7f, 270f);
+        K("Bathroom_props/Toiletpaper_set", 11.75f, Up, 3.05f, 270f);
+        K("Bathroom_props/Bathroom_sink", 9f + Surface, Up, 3.7f, 90f);
+        K("Bathroom_props/Bathroom_mirror", 9f + Surface, Up + 1.6f, 3.7f, 90f);
+        K("Lamps/Lamp_bathroom_wall", 9f + Surface, Up + 2.2f, 3.7f, 90f);
+        K("Bathroom_props/Trashcan", 9.35f, Up, 4.6f, 0f);
+        D("Decal_plaster_floor_H", 10.6f, Up + 0.003f, 2.2f, 0f);
     }
 
     static void Exterior()
     {
-        // Front porch (deck z 9..11.9) and back porch (x 7.4..13.6, z -3..0, steps around x 10.5).
-        H("Rockingchair_01", 3.2f, Ground(3.2f, 10.4f), 10.4f, 15f);
-        H("wooden_stool_01", 4.1f, Ground(4.1f, 10.1f), 10.1f, 30f);
-        H("wicker_basket_01", 4.1f, Ground(4.1f, 10.1f) + 0.44f, 10.1f, 10f);
-        H("painted_wooden_bench", 12.5f, Ground(12.5f, 9.5f), 9.5f, 0f);
-        H("watering_can_metal_01", 5.6f, Ground(5.6f, 11.4f), 11.4f, 120f);
-        H("wooden_bucket_01", 14.2f, Ground(14.2f, 11.3f), 11.3f, 0f);
+        // Front porch (deck z 12..14.9, steps at x 9..12) and back porch (x 13.4..19.6, z -3..0, steps around x 16.5).
+        H("Rockingchair_01", 3.2f, Ground(3.2f, 13.4f), 13.4f, 15f);
+        H("wooden_stool_01", 4.1f, Ground(4.1f, 13.1f), 13.1f, 30f);
+        H("wicker_basket_01", 4.1f, Ground(4.1f, 13.1f) + 0.44f, 13.1f, 10f);
+        H("painted_wooden_bench", 15.5f, Ground(15.5f, 12.5f), 12.5f, 0f);
+        H("watering_can_metal_01", 6.6f, Ground(6.6f, 14.4f), 14.4f, 120f);
+        H("wooden_bucket_01", 19.2f, Ground(19.2f, 14.3f), 14.3f, 0f);
 
-        K("Lamps/Lamp_exterior_wall", 11.6f, 1.95f, -0.1f, 180f);
-        H("garden_hose_wall_mounted_01", 12.9f, 0.9f, -0.1f - 0.13f, 180f, snap: false);
-        H("wooden_stool_01", 11.5f, Ground(11.5f, -0.6f), -0.6f, 200f);
-        H("metal_jerrycan", 12.9f, Ground(12.9f, -2.4f), -2.4f, 160f);
-        H("barrel_03", 15.45f, Ground(15.45f, -0.45f), -0.45f, 0f);
+        K("Lamps/Lamp_exterior_wall", 17.6f, 1.95f, -0.1f, 180f);
+        H("garden_hose_wall_mounted_01", 18.9f, 0.9f, -0.1f - 0.13f, 180f, snap: false);
+        H("wooden_stool_01", 17.5f, Ground(17.5f, -0.6f), -0.6f, 200f);
+        H("metal_jerrycan", 18.9f, Ground(18.9f, -2.4f), -2.4f, 160f);
+        H("barrel_03", 21.45f, Ground(21.45f, -0.45f), -0.45f, 0f);
         H("wooden_crate_02", 6.5f, Ground(6.5f, -0.6f), -0.6f, 180f);
         H("rusted_spade_01", 8.25f, Ground(8.25f, -0.25f), -0.25f, 180f, pitch: -12f);
         H("sledgehammer_01", 8.0f, Ground(8.0f, -0.22f), -0.22f, 170f, pitch: -10f);
@@ -406,6 +472,17 @@ public static class FarmhouseDecorator
     {
         _group = new GameObject(name).transform;
         _group.SetParent(_decor, false);
+    }
+
+    /// True when the Gameplay group or a farmhouse room anchor already holds an object whose name starts with
+    /// prefix (e.g. the bed hiding spot).
+    static bool HasGameplay(string prefix)
+    {
+        var gameplay = _house.Find(FarmhouseBuilder.GameplayName);
+        if (gameplay)
+            foreach (var t in gameplay.GetComponentsInChildren<Transform>(true))
+                if (t != gameplay && t.name.StartsWith(prefix)) return true;
+        return FarmhouseGameplay.RoomsHold(prefix);
     }
 
     static GameObject Instantiate(string assetPath)
