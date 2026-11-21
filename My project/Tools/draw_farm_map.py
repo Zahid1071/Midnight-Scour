@@ -165,26 +165,25 @@ def rect_distance(r, x, z):
     return math.hypot(dx, dz)
 
 
-# ---------- layout (mirrors FarmLayoutBuilder / DogPenSetup) ----------
+# ---------- layout (mirrors FarmLayoutBuilder; dog pen removed) ----------
 
 ROAD_X, ROAD_HALF = -70.0, 3.5
 DRIVEWAY = [(-19.0, 35.0), (-36.0, 35.5), (-52.0, 36.2), (-66.5, 36.5)]
 PAD = (-19.0, 29.5, 3.0, 40.5)
 CELLAR_PATH = [(-7.5, 24.6), (-7.4, 27.5), (-7.2, 29.5)]
 PORCH_PATH = [(-7.5, 40.5), (-7.5, 44.2)]
-GATE = (72.37, 39.55)
-LANE = [(3.0, 35.2), (22.0, 36.0), (34.0, 39.0), (60.0, 39.5), (GATE[0] - 1.0, GATE[1])]
+# Short field track east of the yard (no longer leads to a dog pen).
+LANE = [(3.0, 35.2), (22.0, 36.0), (34.0, 39.0), (48.0, 39.5)]
 BASEMENT = (-12.0, 6.0, 15.0, 25.0)
 STAIRWELL = (-9.05, 19.25, -5.95, 24.35)
 HOUSE = (-23.6, 73.5, -2.6, 85.5)
 FRONT_PORCH = (-23.7, 70.6, -2.5, 73.5)
 PORCH_STEPS = (-15.0, 70.5, -11.6, 73.5)
 BACK_PORCH = (-22.2, 85.5, -16.0, 88.5)
-SMALL_HOUSE = (-95.1, 128.2, -83.2, 143.0)
-PEN_FENCE = (72.3, 34.8, 79.7, 43.2)
-PEN_FOOTPRINT = (68.9, 29.3, 84.4, 48.6)
-PEN_CLEARING = 6.0
-TRUCK_CENTRE, TRUCK_HEADING = (1.85, 49.1), (-0.970, 0.242)  # hood direction on the ground
+# Relocated small house (former dog-pen clearing).
+SMALL_HOUSE = (69.0, 31.8, 81.0, 46.6)
+# GMC Typhoon on the county road, nose roughly south-southwest (yaw 194°).
+TRUCK_CENTRE, TRUCK_HEADING = (-65.29, 44.56), (-0.242, -0.970)
 
 FIELD_MARGIN = 3.5
 FIELDS = [
@@ -193,10 +192,6 @@ FIELDS = [
     ((-64.0, 102.0, 30.0, 260.0), False),
     ((-260.0, -260.0, -78.0, 260.0), True),
 ]
-
-
-def in_clearing(x, z):
-    return rect_distance(PEN_FOOTPRINT, x, z) < PEN_CLEARING + FIELD_MARGIN
 
 
 def near_small_house(x, z):
@@ -226,7 +221,7 @@ def draw_fields():
                 t = s
                 while t <= e:
                     x, z = (c, t) if along_z else (t, c)
-                    if in_clearing(x, z) or near_small_house(x, z):
+                    if near_small_house(x, z):
                         if len(pts) > 1:
                             stroke(faint, pts, 0.12, 0.12, 1.0)
                         pts = []
@@ -284,11 +279,11 @@ def draw_small_house():
     x0, z0, x1, z1 = SMALL_HOUSE
     for _ in range(2):
         hand_poly(ink, rect(x0 + 0.6, z0 + 0.6, x1 - 0.6, z1 - 0.6), 0.36, 0.8, 0.1)
-    ridge_x = (x0 + x1) / 2
-    stroke(ink, [(ridge_x, z0 + 0.6), (ridge_x, z1 - 0.6)], 0.28, 0.08)
-    hatch(ink, rect(ridge_x + 0.3, z0 + 1.0, x1 - 1.0, z1 - 1.0), 0.7, -30.0, 0.13)
-    # Door step facing the road.
-    hand_poly(ink, rect(x1 - 0.6, 133.6, x1 + 1.2, 136.0), 0.2, 0.3, 0.05)
+    ridge_z = (z0 + z1) / 2
+    stroke(ink, [(x0 + 0.6, ridge_z), (x1 - 0.6, ridge_z)], 0.28, 0.08)
+    hatch(ink, rect(x0 + 1.0, ridge_z + 0.3, x1 - 1.0, z1 - 1.0), 0.7, 55.0, 0.13)
+    # Door step on the west side, toward the farm.
+    hand_poly(ink, rect(x0 - 1.2, ridge_z - 1.2, x0 + 0.6, ridge_z + 1.2), 0.2, 0.3, 0.05)
 
 
 def draw_basement():
@@ -307,42 +302,6 @@ def draw_basement():
     stroke(ink, [(-8.5, 25.4), (-7.5, 26.8), (-6.5, 25.4)], 0.24, 0.05)
 
 
-def draw_pen():
-    x0, z0, x1, z1 = PEN_FENCE
-    gz0, gz1 = GATE[1] - 0.8, GATE[1] + 0.8
-    sides = [
-        [(x0, z0), (x1, z0)], [(x1, z0), (x1, z1)], [(x1, z1), (x0, z1)],
-        [(x0, z1), (x0, gz1)], [(x0, gz0), (x0, z0)],
-    ]
-    for a, b in sides:
-        stroke(ink, [a, b], 0.26, 0.08, 0.6)
-        n = max(2, int(math.dist(a, b) / 0.9))
-        for i in range(n + 1):
-            t = i / n
-            x, z = a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t
-            dx, dz = b[0] - a[0], b[1] - a[1]
-            length = math.hypot(dx, dz)
-            nx, nz = -dz / length * 0.35, dx / length * 0.35
-            stroke(ink, [(x - nx, z - nz), (x + nx, z + nz)], 0.14, 0.02, 0.3)
-    # Gate swung open, outward.
-    stroke(ink, [(x0, gz1), (x0 - 1.5, gz1 + 0.4)], 0.22, 0.03, 0.3)
-    # Kennel against the back fence.
-    kx0, kz0, kx1, kz1 = x1 - 2.6, 39.0, x1 - 0.6, 41.6
-    hand_poly(ink, rect(kx0, kz0, kx1, kz1), 0.24, 0.3, 0.05)
-    stroke(ink, [(kx0, (kz0 + kz1) / 2), (kx1, (kz0 + kz1) / 2)], 0.2, 0.04)
-    hatch(ink, rect(kx0 + 0.15, (kz0 + kz1) / 2 + 0.1, kx1 - 0.15, kz1 - 0.15), 0.3, 50.0, 0.1)
-    # Paw prints heading out of the gate.
-    for i, (px, pz) in enumerate([(70.6, 39.1), (69.2, 40.0), (67.6, 39.3), (66.1, 40.2)]):
-        cx, cy = P(px, pz)
-        r = 0.32 * S
-        ink.d.ellipse([cx - r, cy - r * 0.8, cx + r, cy + r * 0.8], fill=255)
-        for ang in (-60, -20, 20, 60):
-            a = math.radians(ang - 90)
-            tx, ty = cx + math.cos(a) * r * 1.6, cy + math.sin(a) * r * 1.6
-            tr = r * 0.32
-            ink.d.ellipse([tx - tr, ty - tr, tx + tr, ty + tr], fill=255)
-
-
 def draw_truck():
     (cx, cz), (hx, hz) = TRUCK_CENTRE, TRUCK_HEADING
     sx, sz = -hz, hx
@@ -350,20 +309,21 @@ def draw_truck():
     def at(f, s):
         return (cx + hx * f + sx * s, cz + hz * f + sz * s)
 
-    half_len, half_w = 2.65, 1.0
+    # Slightly larger sketch for the upscaled Typhoon.
+    half_len, half_w = 3.2, 1.2
     for _ in range(2):
         hand_poly(ink, [at(half_len, -half_w), at(half_len, half_w), at(-half_len, half_w), at(-half_len, -half_w)], 0.28, 0.3, 0.05)
-    stroke(ink, [at(1.3, -half_w), at(1.3, half_w)], 0.22, 0.03)
-    stroke(ink, [at(-0.1, -half_w), at(-0.1, half_w)], 0.22, 0.03)
-    hatch(ink, [at(1.3, -half_w), at(1.3, half_w), at(-0.1, half_w), at(-0.1, -half_w)], 0.3, 30.0, 0.1)
-    for f in (1.8, -1.6):
-        for s in (-1.15, 1.15):
-            hand_poly(ink, [at(f + 0.4, s - 0.15), at(f + 0.4, s + 0.15), at(f - 0.4, s + 0.15), at(f - 0.4, s - 0.15)], 0.18, 0.1, 0.02)
+    stroke(ink, [at(1.5, -half_w), at(1.5, half_w)], 0.22, 0.03)
+    stroke(ink, [at(-0.2, -half_w), at(-0.2, half_w)], 0.22, 0.03)
+    hatch(ink, [at(1.5, -half_w), at(1.5, half_w), at(-0.2, half_w), at(-0.2, -half_w)], 0.3, 30.0, 0.1)
+    for f in (2.2, -2.0):
+        for s in (-1.35, 1.35):
+            hand_poly(ink, [at(f + 0.45, s - 0.18), at(f + 0.45, s + 0.18), at(f - 0.45, s + 0.18), at(f - 0.45, s - 0.18)], 0.18, 0.1, 0.02)
     # Loose loop around it in red pencil.
     loop = []
     for i in range(30):
         a = i / 26 * math.tau
-        loop.append((cx + math.cos(a) * 5.0 * (1 + 0.04 * math.sin(a * 3)), cz + math.sin(a) * 3.6))
+        loop.append((cx + math.cos(a) * 5.5 * (1 + 0.04 * math.sin(a * 3)), cz + math.sin(a) * 4.0))
     stroke(red, loop, 0.3, 0.35, 0.7)
 
 
@@ -473,7 +433,6 @@ def main():
     draw_basement()
     draw_house()
     draw_small_house()
-    draw_pen()
     draw_truck()
     for x, z, scale, dead in trees:
         if rect_distance(HOUSE, x, z) < 1.0 or rect_distance(SMALL_HOUSE, x, z) < 1.0:

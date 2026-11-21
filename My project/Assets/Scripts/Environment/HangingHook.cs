@@ -39,18 +39,24 @@ public class HangingHook : MonoBehaviour
     [Header("Chain loop SFX")]
     [SerializeField] AudioClip swingLoopSfx;
     [SerializeField] AudioMixerGroup output;
-    [SerializeField, Range(0f, 1f)] float swingLoopMaxVolume = 0.6f;
-    [Tooltip("Volume kept while the hook is still swinging after the burst has died down.")]
-    [SerializeField, Range(0f, 1f)] float swingLoopTailVolume = 0.02f;
+    [SerializeField, Range(0f, 1f)] float swingLoopMaxVolume = 0.45f;
+    [Tooltip("Volume kept while the hook is still swinging after the burst has died down. Keep 0 — a quiet tail reads as a hum that cuts.")]
+    [SerializeField, Range(0f, 1f)] float swingLoopTailVolume = 0f;
     [Tooltip("Hook speed (m/s) of a push or knock that gives the full burst.")]
     [Min(0.01f)]
     [SerializeField] float swingSpeedForMaxVolume = 1.4f;
-    [Tooltip("Exponential decay rate of the burst (1/s). 2.5 = about 8% left after one second, even if the hook keeps swinging.")]
+    [Tooltip("How fast the burst dies (1/s). Higher = shorter chain rattle.")]
     [Min(0f)]
-    [SerializeField] float swingLoopDecay = 2.5f;
+    [SerializeField] float swingLoopDecay = 1.6f;
     [Tooltip("How fast the volume rises to a new burst (1/s).")]
     [Min(1f)]
     [SerializeField] float swingLoopAttack = 20f;
+    [Tooltip("How fast the audible volume eases down when the burst ends (1/s). Keep low so Pause isn't a hard cut.")]
+    [Min(0.05f)]
+    [SerializeField] float swingLoopRelease = 0.55f;
+    [Tooltip("Seconds to ease volume to silence after the target hits zero (prevents Pause clicks).")]
+    [Min(0.05f)]
+    [SerializeField] float swingLoopFadeOutSeconds = 1.25f;
     [Tooltip("Hook speed (m/s) below which the hook counts as still and the loop fades out.")]
     [Min(0.01f)]
     [SerializeField] float swingQuietSpeed = 0.12f;
@@ -64,6 +70,9 @@ public class HangingHook : MonoBehaviour
     float _burst;
     float _loopVolumeSmoothed;
     bool _loopStarted;
+    float _passVolumeScale = 1f;
+
+    float EffectiveLoopMaxVolume => swingLoopMaxVolume * _passVolumeScale;
 
     void Awake()
     {
@@ -93,7 +102,10 @@ public class HangingHook : MonoBehaviour
     void OnDisable()
     {
         if (_loopSource != null)
+        {
+            _loopSource.volume = 0f;
             _loopSource.Pause();
+        }
         _burst = 0f;
         _loopVolumeSmoothed = 0f;
     }
@@ -103,18 +115,103 @@ public class HangingHook : MonoBehaviour
         Excite(collision.relativeVelocity.magnitude);
     }
 
+    public AudioClip ChainLoopClip => swingLoopSfx;
+    public float ChainLoopMaxVolume => swingLoopMaxVolume;
+
     /// <summary>Swing the hook as if something brushed past it, at this velocity (m/s).</summary>
     public void Knock(Vector3 velocity)
     {
-        _rb.WakeUp();
-        _rb.AddForce(velocity, ForceMode.VelocityChange);
-        Excite(velocity.magnitude);
+        if (_rb == null)
+            _rb = GetComponent<Rigidbody>();
+        EnsureLoopSource();
+        if (_rb != null)
+        {
+            _rb.WakeUp();
+            // Match a player shove: set horizontal velocity so UpdateLoopVolume hears real motion.
+            Vector3 v = velocity;
+            v.y = 0f;
+            if (v.sqrMagnitude < 0.01f)
+                v = transform.right * swingSpeedForMaxVolume;
+            _rb.linearVelocity = new Vector3(v.x, _rb.linearVelocity.y, v.z);
+            _rb.AddForce(v, ForceMode.VelocityChange);
+        }
+        float speed = Mathf.Max(velocity.magnitude, swingSpeedForMaxVolume);
+        Excite(speed);
+        KickLoopAudible(speed);
+    }
+
+    /// <summary>
+    /// Scripted pass: keep exciting the chain loop like the player walking through (velocity-driven volume).
+    /// </summary>
+    public System.Collections.IEnumerator KnockPassRoutine(Vector3 direction, float speed, float duration = 0.4f,
+        float volumeScale = 1f)
+    {
+        if (_rb == null)
+            _rb = GetComponent<Rigidbody>();
+        EnsureLoopSource();
+        direction.y = 0f;
+        if (direction.sqrMagnitude < 1e-4f)
+            direction = Vector3.right;
+        direction.Normalize();
+        float spd = Mathf.Max(speed, swingSpeedForMaxVolume);
+        float end = Time.time + Mathf.Max(0.15f, duration);
+        _passVolumeScale = Mathf.Max(1f, volumeScale);
+        try
+        {
+            while (Time.time < end)
+            {
+                if (_rb != null)
+                {
+                    _rb.WakeUp();
+                    Vector3 v = direction * spd;
+                    _rb.linearVelocity = new Vector3(v.x, _rb.linearVelocity.y, v.z);
+                }
+                Excite(spd);
+                KickLoopAudible(spd);
+                yield return new WaitForFixedUpdate();
+            }
+        }
+        finally
+        {
+            _passVolumeScale = 1f;
+        }
     }
 
     /// <summary>Restart the chain burst (a push or a knock). Stronger hits give a louder burst.</summary>
     void Excite(float speed)
     {
-        _burst = Mathf.Max(_burst, Mathf.Clamp01(speed / swingSpeedForMaxVolume));
+        _burst = Mathf.Max(_burst, Mathf.Clamp01(speed / Mathf.Max(0.01f, swingSpeedForMaxVolume)));
+    }
+
+    void EnsureLoopSource()
+    {
+        if (_loopSource != null || swingLoopSfx == null)
+            return;
+        CreateLoopSource();
+    }
+
+    /// <summary>Force the same chain loop the player hears when walking through — full burst, playing now.</summary>
+    void KickLoopAudible(float speed)
+    {
+        EnsureLoopSource();
+        if (_loopSource == null)
+            return;
+        float level = Mathf.Clamp01(speed / Mathf.Max(0.01f, swingSpeedForMaxVolume));
+        _burst = Mathf.Max(_burst, level);
+        float cap = EffectiveLoopMaxVolume;
+        float vol = Mathf.Max(cap * Mathf.Max(0.55f, level), cap * 0.55f);
+        _loopVolumeSmoothed = Mathf.Max(_loopVolumeSmoothed, vol);
+        _loopSource.volume = _loopVolumeSmoothed;
+        if (!_loopSource.isPlaying)
+        {
+            if (_loopStarted)
+                _loopSource.UnPause();
+            else
+            {
+                _loopSource.Play();
+                _loopStarted = true;
+            }
+        }
     }
 
     void FixedUpdate()
@@ -167,18 +264,21 @@ public class HangingHook : MonoBehaviour
 
     void CreateLoopSource()
     {
-        if (swingLoopSfx == null)
+        if (swingLoopSfx == null || _loopSource != null)
             return;
 
         // Many hooks hang in the basement and they're silent most of the time, so they don't take reflection slots.
         _loopSource = SpatialAudio.Create("HookChainLoop", transform, transform.position, output, swingLoopMinDistance,
             swingLoopMaxDistance, AudioRolloffMode.Linear, false);
+        if (_loopSource == null)
+            return;
         _loopSource.clip = swingLoopSfx;
         _loopSource.loop = true;
         _loopSource.pitch = Random.Range(swingLoopPitch.x, swingLoopPitch.y);
         _loopSource.volume = 0f;
         // Hooks start at different points of the loop so several swinging together don't phase.
-        _loopSource.time = Random.Range(0f, swingLoopSfx.length);
+        if (swingLoopSfx.length > 0.05f)
+            _loopSource.time = Random.Range(0f, swingLoopSfx.length);
     }
 
     void UpdateLoopVolume()
@@ -186,28 +286,37 @@ public class HangingHook : MonoBehaviour
         if (_loopSource == null)
             return;
 
-        // With time frozen (tutorial popup) the burst can't decay, so the loop would drone on at a fixed volume.
+        // With time frozen, ease out instead of Pause (Pause mid-loop clicks / cuts the chain).
+        float dt = Time.timeScale <= 0f ? Time.unscaledDeltaTime : Time.deltaTime;
         if (Time.timeScale <= 0f)
-        {
-            if (_loopSource.isPlaying)
-                _loopSource.Pause();
-            return;
-        }
+            _burst = 0f;
 
-        float dt = Time.deltaTime;
-        float speed = _rb.IsSleeping() ? 0f : _rb.GetPointVelocity(_rb.worldCenterOfMass).magnitude;
+        float speed = _rb != null && !_rb.IsSleeping()
+            ? _rb.GetPointVelocity(_rb.worldCenterOfMass).magnitude
+            : 0f;
         _burst *= Mathf.Exp(-swingLoopDecay * dt);
 
-        // Loud right after a push/knock, then dies off exponentially; a slow tail while it keeps swinging.
-        float moving = Mathf.Clamp01(speed / swingQuietSpeed);
-        float target = Mathf.Max(_burst * swingLoopMaxVolume, swingLoopTailVolume) * moving;
+        // Soft motion gate: never zero the target instantly when the hook slows / sleeps.
+        float moving = Time.timeScale <= 0f ? 0f : Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(speed / swingQuietSpeed));
+        if (_burst > 0.02f)
+            moving = Mathf.Max(moving, 0.35f);
+        float target = Mathf.Max(_burst * EffectiveLoopMaxVolume, swingLoopTailVolume) * moving;
+
         if (target > _loopVolumeSmoothed)
-            _loopVolumeSmoothed = Mathf.Lerp(_loopVolumeSmoothed, target, 1f - Mathf.Exp(-swingLoopAttack * dt));
+        {
+            _loopVolumeSmoothed = Mathf.MoveTowards(
+                _loopVolumeSmoothed, target, swingLoopAttack * dt * Mathf.Max(target, 0.05f));
+        }
         else
-            _loopVolumeSmoothed = target;
+        {
+            // Linear release into silence — avoids Pause cutting mid-rattle.
+            float fadeStep = EffectiveLoopMaxVolume / Mathf.Max(0.05f, swingLoopFadeOutSeconds);
+            float releaseStep = Mathf.Max(swingLoopRelease * Mathf.Max(_loopVolumeSmoothed, 0.02f), fadeStep);
+            _loopVolumeSmoothed = Mathf.MoveTowards(_loopVolumeSmoothed, target, releaseStep * dt);
+        }
+
         _loopSource.volume = _loopVolumeSmoothed;
 
-        // Keep the voice free while the hook hangs still.
         bool audible = _loopVolumeSmoothed > 0.002f;
         if (audible && !_loopSource.isPlaying)
         {
@@ -217,8 +326,12 @@ public class HangingHook : MonoBehaviour
                 _loopSource.Play();
             _loopStarted = true;
         }
-        else if (!audible && _loopSource.isPlaying && target <= 0.002f)
+        else if (!audible && _loopSource.isPlaying)
+        {
+            _loopSource.volume = 0f;
             _loopSource.Pause();
+            _loopVolumeSmoothed = 0f;
+        }
     }
 
 #if UNITY_EDITOR

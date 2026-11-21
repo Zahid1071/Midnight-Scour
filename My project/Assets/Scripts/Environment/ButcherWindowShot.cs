@@ -166,6 +166,9 @@ public class ButcherWindowShot : MonoBehaviour
     /// <summary>The player is out of the basement and the shot is about to take over; nothing has moved yet.</summary>
     public event Action Triggered;
 
+    /// <summary>Fired once the car / window shot has finished and control is back with the player.</summary>
+    public event Action Finished;
+
     /// <summary>
     /// Dev: fire the leave-basement sequence now (checkpoint, car shot, butcher release) if it has not run yet.
     /// </summary>
@@ -277,6 +280,9 @@ public class ButcherWindowShot : MonoBehaviour
         _hasExit = true;
     }
 
+    /// <summary>Same rule as the leave-basement trigger: eye height and past the exit door frame.</summary>
+    public bool IsOutOfBasement(Vector3 eye) => OutOfBasement(eye);
+
     bool OutOfBasement(Vector3 eye) =>
         eye.y >= outdoorEyeY && (!_hasExit || Vector3.Dot(Flat(eye - _exitPoint), _exitOut) >= exitClearance);
 
@@ -337,15 +343,25 @@ public class ButcherWindowShot : MonoBehaviour
         Camera main = Camera.main;
         if (main == null)
         {
+            // Mark finished so debug skips waiting on HasFinished do not hang for the full timeout.
+            HasFinished = true;
             _sequenceBusy = false;
             yield break;
         }
-        Vector3 eye = main.transform.position;
+
+        // Seed from the player's eye — not Camera.main. After a checkpoint restore the brain can still sit on the
+        // cage intro pose while the body is already outside, which made the car push-in start from the cage.
+        if (_player == null)
+            _player = FindFirstObjectByType<CinemachineMouseLook>();
+        Vector3 eye = _player != null ? _player.transform.position : main.transform.position;
+        Quaternion startRot = _player != null ? _player.transform.rotation : main.transform.rotation;
+        float startFov = main.fieldOfView;
 
         NPCController butcher = FindButcher(out bool woken);
         if (includeWindowHunt && butcher == null && butcherPrefab == null)
         {
             Debug.LogWarning("ButcherWindowShot: no butcher to put in the window.", this);
+            HasFinished = true;
             _sequenceBusy = false;
             yield break;
         }
@@ -358,9 +374,16 @@ public class ButcherWindowShot : MonoBehaviour
         if (!includeWindowHunt && butcher != null)
             HoldInPlace(butcher);
 
+        // Re-read after the wake frame so a restore teleport has settled before we cut in.
+        if (_player != null)
+        {
+            eye = _player.transform.position;
+            startRot = _player.transform.rotation;
+        }
+
         Vector3 pos = eye;
-        Quaternion rot = main.transform.rotation;
-        float fov = main.fieldOfView;
+        Quaternion rot = startRot;
+        float fov = startFov;
         Pose(pos, rot, fov);
         _cam.Priority = priority;
         PlaySfx(startSfx, startVolume);
@@ -498,6 +521,7 @@ public class ButcherWindowShot : MonoBehaviour
                 {
                     stung = true;
                     PlaySfx(sting, stingVolume);
+                    CameraKick.KickPlayer(1.45f, 14f, 0.4f);
                 }
                 if (_held != null)
                     _held.poiLookDirector?.TickLockedPlayerLook();
@@ -773,6 +797,7 @@ public class ButcherWindowShot : MonoBehaviour
                 {
                     stung = true;
                     PlaySfx(sting, stingVolume);
+                    CameraKick.KickPlayer(1.45f, 14f, 0.4f);
                 }
                 if (_held != null)
                     _held.poiLookDirector?.TickLockedPlayerLook();
@@ -843,6 +868,16 @@ public class ButcherWindowShot : MonoBehaviour
         Stop();
     }
 
+    /// <summary>
+    /// Checkpoint restore / continue: treat the leave-basement car shot as already done so it does not replay.
+    /// </summary>
+    public void MarkPlayed()
+    {
+        _played = true;
+        HasFinished = true;
+        _sequenceBusy = false;
+    }
+
     /// <summary>Ends the shot at once and gives control back.</summary>
     public void Stop()
     {
@@ -861,9 +896,12 @@ public class ButcherWindowShot : MonoBehaviour
         if (_carLight != null)
             Destroy(_carLight.gameObject);
         UnlockControl();
+        bool justFinished = _played && !HasFinished;
         if (_played)
             HasFinished = true;
         _sequenceBusy = false;
+        if (justFinished)
+            Finished?.Invoke();
     }
 
     void UnlockControl()
@@ -1337,18 +1375,13 @@ public class ButcherWindowShot : MonoBehaviour
 
     void ShowRunPrompt()
     {
-        if (!Hunting())
-            return;
-        _runPromptOn = true;
-        RunPromptUI.Show();
+        // RUN overlay removed from the game.
+        _runPromptOn = false;
     }
 
     void HideRunPrompt()
     {
-        if (!_runPromptOn)
-            return;
         _runPromptOn = false;
-        RunPromptUI.Hide();
     }
 
     static void PlaySfx(AudioClip clip, float volume)

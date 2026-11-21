@@ -767,8 +767,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296751
-    m_Localized: "Bas\u0131n\xE7 uygulamak i\xE7in sa\u011F t\u0131k bas\u0131l\u0131
-      tut"
+    m_Localized: "Bas\u0131n\xE7 uygulamak i\xE7in sa\u011F t\u0131kla"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296752
@@ -817,7 +816,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 34365368158781440
     m_Localized: "Do\u011Fru y\xF6n\xFC bul ve daha sonra kilit k\u0131r\u0131lana
-      dek tornaviday\u0131 o y\xF6ne do\u011Fru \xE7ek."
+      dek tornaviday\u0131 o y\xF6ne do\u011Fru yava\u015F\xE7a it."
     m_Metadata:
       m_Items: []
   - m_Id: 34392063293128704
@@ -915,6 +914,14 @@ MonoBehaviour:
   - m_Id: 46856169052831748
     m_Localized: "\xC7iftli\u011Fin elle \xE7izilmi\u015F bir haritas\u0131. Tekrar
       bakmak i\xE7in M'ye bas."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 49832862310858752
+    m_Localized: "Pencerelerden Ge\xE7"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 49832862424104960
+    m_Localized: "A\xE7\u0131k pencerelerden \xE7iftlik evine girebilirsin."
     m_Metadata:
       m_Items: []
   references:

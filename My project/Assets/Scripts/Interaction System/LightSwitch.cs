@@ -68,6 +68,21 @@ public class LightSwitch : MonoBehaviour, IInteractable
         return true;
     }
 
+    /// <summary>
+    /// Temporary on/off for scare flickers without flipping the rocker or changing <see cref="IsOn"/>.
+    /// Finish with <see cref="SetOnInstant"/> / <see cref="StopFlicker"/> so logical state matches.
+    /// </summary>
+    public void PulseLit(bool lit)
+    {
+        if (_flicker != null)
+        {
+            StopCoroutine(_flicker);
+            _flicker = null;
+        }
+        // Scare pulses only toggle emitters — material swaps hitch when many lamps flash.
+        SetLightsEnabled(lit);
+    }
+
     /// <summary>Sets the lights with no sound or flicker (checkpoint load).</summary>
     public void SetOnInstant(bool on)
     {
@@ -80,6 +95,35 @@ public class LightSwitch : MonoBehaviour, IInteractable
             rocker.Rotate(0f, 0f, 180f, Space.Self);
         IsOn = on;
         Apply(on);
+    }
+
+    /// <summary>Brief on/off stutter while already on (return scare). Does nothing if currently off.</summary>
+    public void PlayFlicker()
+    {
+        if (!IsOn)
+            return;
+        if (_flicker != null)
+            StopCoroutine(_flicker);
+        _flicker = StartCoroutine(FlickerPulse());
+    }
+
+    /// <summary>Turns the lights on with the switch-on flicker pattern (no rocker flip if already on).</summary>
+    public void TurnOnWithFlicker()
+    {
+        if (IsOn)
+        {
+            PlayFlicker();
+            return;
+        }
+        if (rocker != null)
+            rocker.Rotate(0f, 0f, 180f, Space.Self);
+        IsOn = true;
+        if (_flicker != null)
+            StopCoroutine(_flicker);
+        if (flickerPattern != null && flickerPattern.Length > 0)
+            _flicker = StartCoroutine(FlickerOn());
+        else
+            Apply(true);
     }
 
     IEnumerator FlickerOn()
@@ -95,11 +139,68 @@ public class LightSwitch : MonoBehaviour, IInteractable
         _flicker = null;
     }
 
+    IEnumerator FlickerPulse()
+    {
+        float[] pulse = flickerPattern != null && flickerPattern.Length > 0
+            ? flickerPattern
+            : new[] { 0.05f, 0.1f, 0.04f, 0.18f, 0.06f };
+        bool lit = false;
+        foreach (float duration in pulse)
+        {
+            Apply(lit);
+            yield return new WaitForSeconds(duration);
+            lit = !lit;
+        }
+        Apply(true);
+        _flicker = null;
+    }
+
+    /// <summary>Keeps stuttering on/off until <see cref="StopFlicker"/> (chase panic lights).</summary>
+    public void StartConstantFlicker(float minOn = 0.04f, float maxOn = 0.14f, float minOff = 0.03f, float maxOff = 0.11f)
+    {
+        if (_flicker != null)
+            StopCoroutine(_flicker);
+        if (!IsOn)
+        {
+            if (rocker != null)
+                rocker.Rotate(0f, 0f, 180f, Space.Self);
+            IsOn = true;
+        }
+        _flicker = StartCoroutine(ConstantFlicker(minOn, maxOn, minOff, maxOff));
+    }
+
+    public void StopFlicker(bool leaveOn = true)
+    {
+        if (_flicker != null)
+        {
+            StopCoroutine(_flicker);
+            _flicker = null;
+        }
+        Apply(leaveOn && IsOn);
+    }
+
+    IEnumerator ConstantFlicker(float minOn, float maxOn, float minOff, float maxOff)
+    {
+        while (true)
+        {
+            // Lights only — skip bulb material swaps so chase flicker doesn't allocate every tick.
+            SetLightsEnabled(true);
+            yield return new WaitForSeconds(Random.Range(minOn, maxOn));
+            SetLightsEnabled(false);
+            yield return new WaitForSeconds(Random.Range(minOff, maxOff));
+        }
+    }
+
+    void SetLightsEnabled(bool lit)
+    {
+        for (int i = 0; i < _lights.Count; i++)
+            if (_lights[i] != null)
+                _lights[i].enabled = lit;
+    }
+
     void Apply(bool lit)
     {
-        foreach (Light l in _lights)
-            if (l != null)
-                l.enabled = lit;
+        SetLightsEnabled(lit);
 
         Material target = lit ? onMaterial : offMaterial;
         if (target == null)

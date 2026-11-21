@@ -7,16 +7,11 @@ public class KnockScareEvent : MonoBehaviour
 
     private void OnDestroy()
     {
-        // Prevents the sound from triggering when the scene unloads or the game quits
-        if (!gameObject.scene.isLoaded) return;
+        // Scene unload / quit / checkpoint rebuilds destroy world pickups — never replay the knock then.
+        if (!gameObject.scene.isLoaded || Checkpoint.IsRestoring)
+            return;
 
-        if (knockClip != null && soundLocation != null)
-        {
-            // Replace 'SoundManager.Instance' and 'PlaySound' with your actual Singleton and method names
-            if (SoundManager.Instance != null)
-            {
-                SoundManager.Instance.PlaySFXAt(knockClip, soundLocation.position);
-            }
-        }
+        if (knockClip != null && soundLocation != null && SoundManager.Instance != null)
+            SoundManager.Instance.PlaySFXAt(knockClip, soundLocation.position);
     }
 }

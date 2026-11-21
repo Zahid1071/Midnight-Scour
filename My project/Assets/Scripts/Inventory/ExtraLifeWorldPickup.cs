@@ -39,9 +39,9 @@ public class ExtraLifeWorldPickup : MonoBehaviour, IInteractable
             pos = col.bounds.center;
 
         if (pickUpSfx != null && SoundManager.Instance != null)
-            SoundManager.Instance.PlaySFXAt(pickUpSfx, pos);
+            SoundManager.Instance.PlaySFX(pickUpSfx, 0.28f);
         else if (lockpickItem.pickUpSFX != null && SoundManager.Instance != null)
-            SoundManager.Instance.PlaySFXAt(lockpickItem.pickUpSFX, pos);
+            SoundManager.Instance.PlaySFX(lockpickItem.pickUpSFX, 0.28f);
 
         string msg = Loc.Get(pickupSubtitleKey);
         if (string.IsNullOrEmpty(msg) || msg == pickupSubtitleKey)

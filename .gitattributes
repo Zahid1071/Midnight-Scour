@@ -48,3 +48,5 @@
 *.mov binary
 *.avi binary
 My[[:space:]]project/Assets/Prefabs/Characters/Zombie[[:space:]]Hitman/Zombie[[:space:]]Hitman.fbx filter=lfs diff=lfs merge=lfs -text
+My[[:space:]]project/Assets/Models/Corpse/Crawl[[:space:]]Scare/Crawl_Scare.fbx filter=lfs diff=lfs merge=lfs -text
+My[[:space:]]project/Assets/Models/Corpse/Crawl[[:space:]]Scare/Crawl_Sheet.abc filter=lfs diff=lfs merge=lfs -text

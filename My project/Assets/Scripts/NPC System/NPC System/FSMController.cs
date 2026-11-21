@@ -29,6 +29,38 @@ public class FSMController
 
     public bool IsRelentlessViseMissHunt => _relentlessViseMissHunt;
 
+    /// <summary>
+    /// Chase/Search bed stays on while ANY NPC is hunting — avoids cutting music when one
+    /// butcher drops chase while another is still on you.
+    /// </summary>
+    public static void RefreshChaseMusicFromAllNpcs()
+    {
+        if (SoundManager.Instance == null)
+            return;
+
+        bool tension = false;
+#if UNITY_2023_1_OR_NEWER
+        var npcs = Object.FindObjectsByType<NPCController>(FindObjectsSortMode.None);
+#else
+        var npcs = Object.FindObjectsOfType<NPCController>();
+#endif
+        for (int i = 0; i < npcs.Length; i++)
+        {
+            var n = npcs[i];
+            if (n == null)
+                continue;
+            var s = n.currentState;
+            if (s == NPCController.AIState.Chase || s == NPCController.AIState.Search)
+            {
+                tension = true;
+                break;
+            }
+        }
+
+        SoundManager.EnsureClipReady(SoundManager.Instance.chaseMusic);
+        SoundManager.Instance.SetChaseMusicActive(tension);
+    }
+
     Transform _lastAmbushSpot;
     int _consecutiveSameAmbushCount;
 
@@ -105,13 +137,7 @@ public class FSMController
         var prev = npc.currentState;
         npc.currentState = newState;
 
-        if (SoundManager.Instance != null)
-        {
-            bool tensionMusic =
-                newState == NPCController.AIState.Chase ||
-                newState == NPCController.AIState.Search;
-            //SoundManager.Instance.SetChaseMusicActive(tensionMusic);
-        }
+        RefreshChaseMusicFromAllNpcs();
 
         switch (newState)
         {
@@ -766,6 +792,9 @@ public class FSMController
         // Hide HUD/cursor immediately — hide-exit wait happens before DoCaptureNow/jumpscare,
         // and exiting the locker would otherwise flash crosshair UI.
         JumpscareManager.BeginCaptureUi();
+
+        // Mid window-climb: drop climb cam/gate instantly so jumpscare takes over with no blend delay.
+        WindowClimbThrough.AbortForCapture();
 
         var playerT = npc.perception != null ? npc.perception.PlayerTransform : null;
         if (playerT != null)
@@ -1808,9 +1837,11 @@ public class FSMController
         // 1. Durum Tespiti — locker hide stays valid even if NPC walks up later
         bool isHidden = IsPlayerStealthHidden();
         bool canSee   = !isHidden && npc.perception.CanSeePlayer;
+        // First half of window climb: body still in the start-side room (colliders off, so LOS may fail).
+        bool climbCatchable = !isHidden && WindowClimbThrough.IsCatchablePhase;
 
-        // 2. Yakalama Kontrolü (Sadece Görüyor ve Yakınsa — never while player is hidden)
-        if (canSee && npc.perception.PlayerTransform != null)
+        // 2. Yakalama Kontrolü (visible + close, or mid climb-through first half — never while hidden)
+        if ((canSee || climbCatchable) && npc.perception.PlayerTransform != null)
         {
             float dist = Vector3.Distance(npc.transform.position, npc.perception.PlayerTransform.position);
             if (dist <= npc.captureDistance)
@@ -1825,9 +1856,9 @@ public class FSMController
         // 3. Hedef Belirleme
         Vector3 targetPosition;
 
-        if (canSee)
+        if (canSee || climbCatchable)
         {
-            // Görüyorum: Direkt üzerine koş (Canlı Takip)
+            // Visible, or mid climb first-half: live-track the body (still in the start-side room).
             targetPosition = npc.perception.PlayerTransform.position;
             _chaseLostStillTimer = 0f;
         }

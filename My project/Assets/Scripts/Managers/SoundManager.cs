@@ -28,9 +28,9 @@ public class SoundManager : MonoBehaviour
     public AudioClip menuMusic;
 
     [Header("Music - Gameplay")]
-    [Tooltip("Default exploration music for all non-captive layers.")]
+    [Tooltip("Basement music. Plays after leaving the cage while still underground; silent outdoors.")]
     public AudioClip gameMusic;
-    [Tooltip("Played while the player is on the captive layer (12). Falls back to gameMusic if unset.")]
+    [Tooltip("Optional track while locked in the cage (captive layer 12). Leave empty for silence until escape.")]
     public AudioClip captiveLayerMusic;
     [Tooltip("Played while any NPC is chasing or searching. Overrides layer music until hunt ends.")]
     public AudioClip chaseMusic;
@@ -38,9 +38,15 @@ public class SoundManager : MonoBehaviour
     [Tooltip("Stealth hiding layer — layer swaps here never change music.")]
     [SerializeField] private int hiddenLayerIndex = 7;
     [SerializeField] private float gameplayMusicFade = 0.5f;
+    [Tooltip("NPC zone used for room votes (basement vs outside). Matches RoomAnchor parents.")]
+    [SerializeField] string basementRoomZoneId = "Demo_Environment";
 
     [Header("Ambience")]
     public AudioClip defaultAmbience;
+    [Tooltip("Extra outdoor layer (e.g. night crickets) played with the main outside bed.")]
+    public AudioClip cricketAmbience;
+    [Tooltip("Cricket layer volume relative to full outdoors (0.6 = 60%).")]
+    [SerializeField, Range(0f, 1f)] private float cricketAmbienceVolume = 0.6f;
     [Tooltip("Outdoor ambience volume while there is a roof or ceiling above the camera.")]
     [SerializeField, Range(0f, 1f)] private float indoorAmbienceVolume = 0.12f;
     [Tooltip("Outdoor ambience low-pass cutoff (Hz) while indoors — heard through the walls.")]
@@ -48,6 +54,8 @@ public class SoundManager : MonoBehaviour
     [SerializeField, Min(0.01f)] private float indoorAmbienceFade = 0.6f;
     [Tooltip("A roof within this height (m) above the camera counts as indoors.")]
     [SerializeField] private float roofCheckDistance = 15f;
+    [Tooltip("Seconds to fade out basement bed when the return-scare audio lock engages.")]
+    [SerializeField] private float returnScareMusicFadeOut = 2.5f;
 
     [Header("UI Clips")]
     public AudioClip uiClickClip;
@@ -67,10 +75,11 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioSource musicSourceA;
     [SerializeField] private AudioSource musicSourceB; // for crossfades
     [SerializeField] private AudioSource ambienceSource;
+    [SerializeField] private AudioSource cricketAmbienceSource;
     [SerializeField] private AudioSource sfxSource;    // 2D one-shots
 
     [Header("3D SFX Pool")]
-    [SerializeField] private int poolSize = 12;
+    [SerializeField] private int poolSize = 20;
     [SerializeField] private float threeDSpatialBlend = 1f;
     [SerializeField] private float sfxMinDistance = 1f;
     [SerializeField] private float sfxMaxDistance = 18f;
@@ -84,6 +93,7 @@ public class SoundManager : MonoBehaviour
     private bool usingA = true;
 
     AudioLowPassFilter _ambienceLowPass;
+    AudioLowPassFilter _cricketAmbienceLowPass;
     float _outdoorAmount = 1f;
     bool _underRoof;
     float _nextRoofCheck;
@@ -98,10 +108,17 @@ public class SoundManager : MonoBehaviour
     bool _playerOnCaptiveLayer;
     bool _chaseMusicActive;
     AudioClip _chaseMusicOverride;
+    bool _zoneMusicActive;
+    AudioClip _zoneMusicOverride;
+    float _zoneMusicVolume = 1f;
+    float _musicTargetVolume = 1f;
+    bool _playerInBasement = true;
+    bool _returnScareAudioLock;
     bool _wasPlayerHiddenForMusic;
     bool _inGameplayScene;
     bool _gameplayMusicReady;
     Coroutine _gameplayMusicRoutine;
+    float _ambienceVolumeMul = 1f;
 
     void Awake()
     {
@@ -127,10 +144,15 @@ public class SoundManager : MonoBehaviour
     {
         UpdateIndoorAmbience();
 
-        if (!_inGameplayScene || !_gameplayMusicReady || _chaseMusicActive)
+        if (!_inGameplayScene || !_gameplayMusicReady)
             return;
 
-        RefreshPlayerLayerMusic();
+        // Basement exit / re-entry can change the bed without a layer swap.
+        if (!_chaseMusicActive && !_zoneMusicActive)
+        {
+            RefreshBasementMusicState();
+            RefreshPlayerLayerMusic();
+        }
     }
 
     void OnDestroy()
@@ -144,17 +166,23 @@ public class SoundManager : MonoBehaviour
         if (!musicSourceA) musicSourceA = CreateChildSource("Music A", musicGroup, loop: true);
         if (!musicSourceB) musicSourceB = CreateChildSource("Music B", musicGroup, loop: true);
         if (!ambienceSource) ambienceSource = CreateChildSource("Ambience", ambienceGroup, loop: true);
+        if (!cricketAmbienceSource) cricketAmbienceSource = CreateChildSource("Cricket Ambience", ambienceGroup, loop: true);
         if (!sfxSource) sfxSource = CreateChildSource("SFX 2D", sfxGroup, loop: false);
 
         // start with full volumes (actual loudness controlled by Mixer)
         musicSourceA.volume = 1f;
         musicSourceB.volume = 1f;
         ambienceSource.volume = 1f;
+        cricketAmbienceSource.volume = 0f;
         sfxSource.volume = 1f;
 
         _ambienceLowPass = ambienceSource.GetComponent<AudioLowPassFilter>();
         if (!_ambienceLowPass) _ambienceLowPass = ambienceSource.gameObject.AddComponent<AudioLowPassFilter>();
         _ambienceLowPass.cutoffFrequency = OpenAirCutoff;
+
+        _cricketAmbienceLowPass = cricketAmbienceSource.GetComponent<AudioLowPassFilter>();
+        if (!_cricketAmbienceLowPass) _cricketAmbienceLowPass = cricketAmbienceSource.gameObject.AddComponent<AudioLowPassFilter>();
+        _cricketAmbienceLowPass.cutoffFrequency = OpenAirCutoff;
     }
 
     // Muffles the outdoor ambience while a roof or ceiling is above the camera.
@@ -170,9 +198,60 @@ public class SoundManager : MonoBehaviour
         }
 
         _outdoorAmount = Mathf.MoveTowards(_outdoorAmount, _underRoof ? 0f : 1f, Time.unscaledDeltaTime / indoorAmbienceFade);
-        ambienceSource.volume = Mathf.Lerp(indoorAmbienceVolume, 1f, _outdoorAmount);
+        float ambientTarget = Mathf.Lerp(indoorAmbienceVolume, 1f, _outdoorAmount) * _ambienceVolumeMul;
+        ambienceSource.volume = Mathf.MoveTowards(ambienceSource.volume, ambientTarget, Time.unscaledDeltaTime * 1.5f);
         // Cutoff is blended on a log scale so the muffling fades evenly to the ear.
-        _ambienceLowPass.cutoffFrequency = Mathf.Exp(Mathf.Lerp(Mathf.Log(indoorAmbienceCutoff), Mathf.Log(OpenAirCutoff), _outdoorAmount));
+        float cutoff = Mathf.Exp(Mathf.Lerp(Mathf.Log(indoorAmbienceCutoff), Mathf.Log(OpenAirCutoff), _outdoorAmount));
+        _ambienceLowPass.cutoffFrequency = cutoff;
+
+        if (cricketAmbience != null)
+        {
+            if (cricketAmbienceSource == null || !cricketAmbienceSource.isPlaying)
+                PlayCricketAmbience(true);
+
+            if (cricketAmbienceSource != null)
+            {
+                float cricketTarget = ambientTarget * cricketAmbienceVolume;
+                cricketAmbienceSource.volume = Mathf.MoveTowards(
+                    cricketAmbienceSource.volume, cricketTarget, Time.unscaledDeltaTime * 1.5f);
+                if (_cricketAmbienceLowPass != null)
+                    _cricketAmbienceLowPass.cutoffFrequency = cutoff;
+            }
+        }
+
+        TickReturnScareAudioLock();
+    }
+
+    /// <summary>
+    /// Return trip (corridor / cage): mute insects ambience + basement bed until the player
+    /// is above ground and chase music has ended.
+    /// </summary>
+    public void SetReturnScareAudioLock(bool locked)
+    {
+        if (_returnScareAudioLock == locked)
+            return;
+        _returnScareAudioLock = locked;
+        _ambienceVolumeMul = locked ? 0f : 1f;
+        if (locked)
+        {
+            // Fade basement bed out; chase/zone still win if active.
+            if (!_chaseMusicActive && !_zoneMusicActive)
+                StopMusic(returnScareMusicFadeOut);
+        }
+        else if (!_chaseMusicActive && !_zoneMusicActive)
+            ApplyGameplayMusic();
+    }
+
+    public bool IsReturnScareAudioLocked => _returnScareAudioLock;
+
+    void TickReturnScareAudioLock()
+    {
+        if (!_returnScareAudioLock || !_inGameplayScene)
+            return;
+        // Stay locked while still underground or while chase/search music is up.
+        if (_playerInBasement || _chaseMusicActive)
+            return;
+        SetReturnScareAudioLock(false);
     }
 
     void SilenceMusicSources()
@@ -216,7 +295,9 @@ public class SoundManager : MonoBehaviour
             src.playOnAwake = false;
             src.loop = false;
             src.outputAudioMixerGroup = sfxGroup;
-            SpatialAudio.Configure(src, sfxMinDistance, sfxMaxDistance, AudioRolloffMode.Linear, false);
+            // Interactive: HRTF + distance only. Reflections/occlusion on the pool made doors hum then hard-cut,
+            // and nearby basement SFX sound choked.
+            SpatialAudio.ConfigureInteractive(src, sfxMinDistance, sfxMaxDistance, AudioRolloffMode.Linear);
             src.spatialBlend = threeDSpatialBlend;
             threeDPool.Enqueue(src);
         }
@@ -225,6 +306,7 @@ public class SoundManager : MonoBehaviour
     // ---------- PUBLIC API ----------
 
     public bool IsChaseMusicActive => _chaseMusicActive;
+    public bool IsZoneMusicActive => _zoneMusicActive;
 
     /// <summary>NPC chase/search started — tension music overrides layer music until cleared.</summary>
     public void SetChaseMusicActive(bool active) => SetChaseMusicActive(active, null);
@@ -242,6 +324,9 @@ public class SoundManager : MonoBehaviour
         if (!_inGameplayScene)
             return;
 
+        if (active)
+            EnsureClipReady(overrideClip != null ? overrideClip : chaseMusic);
+
         // While hidden, never fade out tension — resume layer music only after leaving the spot.
         if (!active && IsPlayerHiddenForMusic())
             return;
@@ -252,10 +337,66 @@ public class SoundManager : MonoBehaviour
         ApplyGameplayMusic();
     }
 
+    /// <summary>
+    /// Location bed (e.g. small-house tension) that replaces exploration music until cleared.
+    /// Chase music still wins while active. Pass restoreGameplay=false to cut to silence
+    /// (jumpscare) and hold that silence until zone music is cleared with restore.
+    /// </summary>
+    public void SetZoneMusicActive(bool active, AudioClip clip = null, bool restoreGameplay = true, float volume = 1f)
+    {
+        if (!active && !restoreGameplay)
+        {
+            // Hold silence: stay in zone-music mode with a null clip so layer music can't restart.
+            _zoneMusicActive = true;
+            _zoneMusicOverride = null;
+            _zoneMusicVolume = 1f;
+            if (_inGameplayScene)
+                StopMusic(0.12f);
+            return;
+        }
+
+        AudioClip overrideClip = active ? clip : null;
+        float targetVol = active ? Mathf.Clamp01(volume) : 1f;
+        if (_zoneMusicActive == active && _zoneMusicOverride == overrideClip
+            && (!active || Mathf.Approximately(_zoneMusicVolume, targetVol)))
+            return;
+
+        _zoneMusicActive = active;
+        _zoneMusicOverride = overrideClip;
+        _zoneMusicVolume = targetVol;
+
+        if (!_inGameplayScene)
+            return;
+
+        if (!active)
+        {
+            _musicTargetVolume = 1f;
+            if (!_chaseMusicActive)
+                RefreshPlayerLayerMusic(force: true);
+            else
+                ApplyGameplayMusic();
+            return;
+        }
+
+        EnsureClipReady(clip);
+        ApplyGameplayMusic();
+    }
+
+    /// <summary>Warm a clip on a background load so the first Play does not hitch the main thread.</summary>
+    public static void EnsureClipReady(AudioClip clip)
+    {
+        if (clip == null)
+            return;
+        if (clip.loadState == AudioDataLoadState.Loaded)
+            return;
+        clip.LoadAudioData();
+    }
+
     public void PlayMusic(AudioClip clip, float fade = 0.5f)
     {
         SyncMixerVolumeFromSettings();
         if (clip == null) { StopMusic(fade); return; }
+        EnsureClipReady(clip);
         CrossfadeTo(clip, fade);
     }
 
@@ -273,9 +414,39 @@ public class SoundManager : MonoBehaviour
             ambienceSource.clip = clip;
         }
         if (!ambienceSource.isPlaying) ambienceSource.Play();
+        PlayCricketAmbience(loop);
     }
 
-    public void StopAmbience() => ambienceSource.Stop();
+    void PlayCricketAmbience(bool loop = true)
+    {
+        if (cricketAmbienceSource == null)
+            cricketAmbienceSource = CreateChildSource("Cricket Ambience", ambienceGroup, loop: true);
+        if (cricketAmbience == null)
+        {
+            cricketAmbienceSource.Stop();
+            cricketAmbienceSource.clip = null;
+            return;
+        }
+
+        EnsureClipReady(cricketAmbience);
+        cricketAmbienceSource.loop = loop;
+        cricketAmbienceSource.spatialBlend = 0f;
+        cricketAmbienceSource.outputAudioMixerGroup = ambienceGroup;
+        if (cricketAmbienceSource.clip != cricketAmbience)
+        {
+            cricketAmbienceSource.Stop();
+            cricketAmbienceSource.clip = cricketAmbience;
+        }
+        if (!cricketAmbienceSource.isPlaying)
+            cricketAmbienceSource.Play();
+    }
+
+    public void StopAmbience()
+    {
+        ambienceSource.Stop();
+        if (cricketAmbienceSource != null)
+            cricketAmbienceSource.Stop();
+    }
 
     AudioClip GetSearchTensionClip()
     {
@@ -391,7 +562,8 @@ public class SoundManager : MonoBehaviour
         src.clip = clip;
         src.volume = Mathf.Clamp01(volume);
         src.Play();
-        StartCoroutine(Return3DWhenDone(src, clip.length / Mathf.Abs(pitch)));
+        // Extra tail so Steam Audio reflections aren't hard-stopped with the dry clip (audible cutoff).
+        StartCoroutine(Return3DWhenDone(src, clip.length / Mathf.Max(0.1f, Mathf.Abs(pitch)) + 0.5f));
     }
 
     /// <summary>
@@ -411,7 +583,8 @@ public class SoundManager : MonoBehaviour
         src.clip = clip;
         src.volume = Mathf.Clamp01(volume);
         src.Play();
-        StartCoroutine(FollowAndReturn3DWhenDone(src, follow, offset, clip.length / Mathf.Abs(pitch)));
+        StartCoroutine(FollowAndReturn3DWhenDone(src, follow, offset,
+            clip.length / Mathf.Max(0.1f, Mathf.Abs(pitch)) + 0.5f));
     }
 
     public void PlaySFXSafe(AudioClip clip, Vector3 position, float volume = 1f, float pitch = 1f)
@@ -484,25 +657,36 @@ public class SoundManager : MonoBehaviour
 
     private IEnumerator FollowAndReturn3DWhenDone(AudioSource src, Transform follow, Vector3 offset, float seconds)
     {
-        float end = Time.time + seconds;
-        while (Time.time < end)
+        float deadline = Time.time + Mathf.Max(0.05f, seconds);
+        while (src != null && Time.time < deadline)
         {
             if (follow != null)
                 src.transform.position = follow.position + offset;
+            if (!src.isPlaying)
+                break;
             yield return null;
         }
-
-        src.Stop();
-        src.clip = null;
-        ResetPooledSource(src);
-        src.gameObject.SetActive(false);
-        threeDPool.Enqueue(src);
+        yield return Return3DWhenDone(src, 0f);
     }
 
     private IEnumerator Return3DWhenDone(AudioSource src, float seconds)
     {
-        yield return new WaitForSeconds(seconds);
+        float deadline = Time.time + Mathf.Max(0.05f, seconds);
+        while (src != null && src.isPlaying && Time.time < deadline)
+            yield return null;
+        if (src == null)
+            yield break;
+        // Short fade instead of a hard Stop (avoids click / cut-off on door opens).
+        float startVol = src.volume;
+        for (float t = 0f; t < 0.08f && src != null; t += Time.unscaledDeltaTime)
+        {
+            src.volume = Mathf.Lerp(startVol, 0f, t / 0.08f);
+            yield return null;
+        }
+        if (src == null)
+            yield break;
         src.Stop();
+        src.volume = startVol;
         src.clip = null;
         ResetPooledSource(src);
         src.gameObject.SetActive(false);
@@ -522,8 +706,20 @@ public class SoundManager : MonoBehaviour
         usingA = !usingA;
 
         // prepare target
+        float targetVol = _musicTargetVolume;
         if (newClip != null)
         {
+            EnsureClipReady(newClip);
+            // Never assign+Play a still-loading / not-yet-loaded clip — that freezes the game
+            // (Streaming first buffer and DecompressOnLoad decode both hitch on the main thread).
+            float wait = 0f;
+            while (newClip.loadState != AudioDataLoadState.Loaded && wait < 2f)
+            {
+                if (newClip.loadState == AudioDataLoadState.Unloaded)
+                    EnsureClipReady(newClip);
+                wait += Time.unscaledDeltaTime;
+                yield return null;
+            }
             to.clip = newClip;
             to.volume = 0f;
             if (!to.isPlaying) to.Play();
@@ -536,7 +732,7 @@ public class SoundManager : MonoBehaviour
             t += Time.unscaledDeltaTime;
             float k = duration > 0f ? t / duration : 1f;
             from.volume = Mathf.Lerp(fromStart, 0f, k);
-            if (newClip != null) to.volume = Mathf.Lerp(0f, 1f, k);
+            if (newClip != null) to.volume = Mathf.Lerp(0f, targetVol, k);
             yield return null;
         }
 
@@ -549,7 +745,7 @@ public class SoundManager : MonoBehaviour
         }
         else
         {
-            to.volume = 1f;
+            to.volume = targetVol;
         }
     }
 
@@ -578,6 +774,13 @@ public class SoundManager : MonoBehaviour
         _playerOnCaptiveLayer = false;
         _chaseMusicActive = false;
         _chaseMusicOverride = null;
+        _zoneMusicActive = false;
+        _zoneMusicOverride = null;
+        _zoneMusicVolume = 1f;
+        _musicTargetVolume = 1f;
+        _playerInBasement = true;
+        _returnScareAudioLock = false;
+        _ambienceVolumeMul = 1f;
         _wasPlayerHiddenForMusic = false;
 
         SilenceMusicSources();
@@ -594,6 +797,14 @@ public class SoundManager : MonoBehaviour
 
     IEnumerator BeginGameplayAudioDeferred()
     {
+        // Kick loads before the first Play so large beds never decompress mid-frame.
+        EnsureClipReady(defaultAmbience);
+        EnsureClipReady(cricketAmbience);
+        EnsureClipReady(gameMusic);
+        EnsureClipReady(chaseMusic);
+        EnsureClipReady(captiveLayerMusic);
+        EnsureClipReady(menuMusic);
+
         PlayAmbience(defaultAmbience, true);
 
         const float findPlayerTimeout = 3f;
@@ -612,6 +823,7 @@ public class SoundManager : MonoBehaviour
         yield return null;
         yield return null;
 
+        RefreshBasementMusicState(force: true);
         RefreshPlayerLayerMusic(force: true);
         _gameplayMusicReady = true;
         _gameplayMusicRoutine = null;
@@ -661,22 +873,56 @@ public class SoundManager : MonoBehaviour
             return;
 
         AudioClip clip = ResolveGameplayMusicClip();
+        _musicTargetVolume = _zoneMusicActive ? _zoneMusicVolume : 1f;
+
         if (clip == null)
         {
             // No exploration track: let chase music fade out instead of looping on after the hunt.
             if (CurrentMusicClip != null && !(IsPlayerHiddenForMusic() && _chaseMusicActive))
-                StopMusic(gameplayMusicFade);
+            {
+                float fade = _returnScareAudioLock ? returnScareMusicFadeOut : gameplayMusicFade;
+                StopMusic(fade);
+            }
             return;
         }
 
         if (CurrentMusicClip == clip)
+        {
+            // Same bed, maybe a volume change (e.g. zone volume).
+            var active = usingA ? musicSourceA : musicSourceB;
+            if (active != null && active.isPlaying
+                && !Mathf.Approximately(active.volume, _musicTargetVolume)
+                && musicFadeRoutine == null)
+                active.volume = _musicTargetVolume;
             return;
+        }
 
         // Hidden: only allow tension music to start — never fade to exploration/captive mid-hide.
         if (IsPlayerHiddenForMusic() && !_chaseMusicActive)
             return;
 
         PlayMusic(clip, gameplayMusicFade);
+    }
+
+    void RefreshBasementMusicState(bool force = false)
+    {
+        if (_player == null)
+        {
+            var playerGo = GameObject.FindWithTag("Player");
+            if (playerGo != null)
+                _player = playerGo.transform;
+        }
+        if (_player == null)
+            return;
+
+        // Room vote — not world Y. The yard / car sit near basement height and used to keep the bed on.
+        bool inBasement = InteractionController.IsPlayerInBasementRoom(_player.position, basementRoomZoneId);
+        if (!force && inBasement == _playerInBasement)
+            return;
+        _playerInBasement = inBasement;
+        if (force)
+            return;
+        ApplyGameplayMusic();
     }
 
     bool IsPlayerHiddenForMusic()
@@ -691,8 +937,21 @@ public class SoundManager : MonoBehaviour
         if (_chaseMusicActive && chaseMusic != null)
             return chaseMusic;
 
+        // Active zone with a null clip = intentional silence (post-scare hold).
+        if (_zoneMusicActive)
+            return _zoneMusicOverride;
+
+        // Cage: only play an explicit captive track — never fall through to basement music.
         if (_playerOnCaptiveLayer)
-            return captiveLayerMusic != null ? captiveLayerMusic : gameMusic;
+            return captiveLayerMusic;
+
+        // Return scare: no basement bed in corridor/cage until lock clears.
+        if (_returnScareAudioLock)
+            return null;
+
+        // Outdoors / above-ground: no bed. Basement only.
+        if (!_playerInBasement)
+            return null;
 
         return gameMusic;
     }

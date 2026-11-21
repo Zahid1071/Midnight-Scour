@@ -119,7 +119,7 @@ MonoBehaviour:
   patrolDuration: 10
   ambushChance: 0.2
   ambushWaitRange: {x: 10, y: 13}
-  footstepVolume: 1
+  footstepVolume: 1.5
   vision:
     maxViewDistance: 10
     maxViewAngle: 75
@@ -138,8 +138,8 @@ MonoBehaviour:
     footstepThreshold: 100
     footstepDecayPerSecond: 10
   locomotion:
-    walkingSpeed: 2.5
-    runningSpeed: 5
+    walkingSpeed: 2
+    runningSpeed: 3
   chaseRetention:
     gracePeriod: 3
     keepChasingDistance: 5

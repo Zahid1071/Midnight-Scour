@@ -10,9 +10,11 @@ public class ButcherProximityThreat : MonoBehaviour
 {
     [Header("Distance")]
     [Tooltip("Full intensity at this distance or closer.")]
-    [SerializeField] float minDistance = 2f;
+    [SerializeField] float minDistance = 4f;
     [Tooltip("Effect starts at this distance.")]
-    [SerializeField] float maxDistance = 5f;
+    [SerializeField] float maxDistance = 10f;
+    [Tooltip("If |playerY - butcherY| exceeds this, treat as different floors and skip the effect.")]
+    [SerializeField] float maxFloorYDelta = 1f;
 
     [Header("When")]
     [Tooltip("Only while this butcher is Natural / Chase / Search / Suspicious / Capture.")]
@@ -111,6 +113,10 @@ public class ButcherProximityThreat : MonoBehaviour
             return false;
 
         Vector3 playerPos = GetProximityPosition(playerT);
+        // Different floors (stairs, upper story) — no proximity glitch/whisper.
+        if (Mathf.Abs(playerPos.y - transform.position.y) > maxFloorYDelta)
+            return false;
+
         float dist = Vector3.Distance(playerPos, transform.position);
         intensity01 = 1f - Mathf.InverseLerp(minDistance, maxDistance, dist);
         return intensity01 > 0f;

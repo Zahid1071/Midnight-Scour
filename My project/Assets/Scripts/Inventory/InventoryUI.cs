@@ -44,6 +44,18 @@ public class InventoryUI : MonoBehaviour
     private PlacementPreview _placePreview;
     TextMeshProUGUI[] _stackLabels;
 
+    // Hold-to-interact (e.g. car part install / hold pickups)
+    IHoldInteractable _holdTarget;
+    InventoryItem _holdItem;
+    Collider _holdCollider;
+    float _holdElapsed;
+    float _holdDuration;
+    bool _holdWithMouse;
+    bool _holdWithKey;
+
+    /// <summary>True while the circular hold-to-interact ring is active.</summary>
+    public bool IsHoldInteractActive => _holdTarget != null;
+
     private void Awake()
     {
         Instance = this;
@@ -64,6 +76,7 @@ public class InventoryUI : MonoBehaviour
     {
         if (Instance == this)
             Instance = null;
+        CancelHoldInteract();
         _placePreview?.Dispose();
     }
 
@@ -75,13 +88,20 @@ public class InventoryUI : MonoBehaviour
             || (GameOverUI.Instance != null && GameOverUI.Instance.IsShowing))
         {
             CancelDropHold();
+            CancelHoldInteract();
             return;
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha1)) SelectSlot(0);
-        if (Input.GetKeyDown(KeyCode.Alpha2)) SelectSlot(1);
-        if (Input.GetKeyDown(KeyCode.Alpha3)) SelectSlot(2);
-        if (Input.GetKeyDown(KeyCode.Alpha4)) SelectSlot(3);
+        // Skip while Ctrl is held so DebugBasementSkip Ctrl+1/2/3 is not also a hotbar press.
+        bool ctrlHeld = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)
+                        || (Keyboard.current != null && Keyboard.current.ctrlKey.isPressed);
+        if (!ctrlHeld)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1)) SelectSlot(0);
+            if (Input.GetKeyDown(KeyCode.Alpha2)) SelectSlot(1);
+            if (Input.GetKeyDown(KeyCode.Alpha3)) SelectSlot(2);
+            if (Input.GetKeyDown(KeyCode.Alpha4)) SelectSlot(3);
+        }
 
         if (Mouse.current != null)
         {
@@ -92,13 +112,21 @@ public class InventoryUI : MonoBehaviour
                 CycleSelectedSlot(1);
         }
 
+        TickHoldInteract();
+
         bool clickPlacedItem = TickDropKey();
 
         if (!clickPlacedItem && WasUseItemPressedThisFrame())
-            HandleInteractPress(isPrimaryClick: true);
+        {
+            if (!TryBeginHoldInteract(withMouse: true, withKey: false))
+                HandleInteractPress(isPrimaryClick: true);
+        }
 
         if (WasUseItemOnInteractKeyThisFrame())
-            HandleInteractPress(isPrimaryClick: false);
+        {
+            if (!TryBeginHoldInteract(withMouse: false, withKey: true))
+                HandleInteractPress(isPrimaryClick: false);
+        }
     }
 
     /// <summary>True while G is held for a drop (and on the frame a left-click placed from it); left-click then places the item instead of using it.</summary>
@@ -166,6 +194,148 @@ public class InventoryUI : MonoBehaviour
         _dropHeldTime = -1f;
         _dropHeldItem = null;
         _placePreview?.Hide();
+    }
+
+bool TryBeginHoldInteract(bool withMouse, bool withKey)
+    {
+        if (_holdTarget != null)
+            return true;
+
+        var hider = PlayerInteractor.Instance != null
+            ? PlayerInteractor.Instance.GetComponent<PlayerHider>()
+            : null;
+        if (hider != null && hider.isHidden)
+            return false;
+
+        InventoryItem selected = GetSelectedItem();
+
+        // Items with their own LMB action still use E for world holds.
+        if (withMouse && selected != null && selected.hasPrimaryAction)
+            return false;
+
+        var interactor = PlayerInteractor.Instance;
+        if (interactor == null)
+            return false;
+
+        if (!interactor.TryRaycastForHint(out RaycastHit hit, out IInteractable target))
+            return false;
+
+        float actionRange = selected != null
+            ? interactor.GetActionRangeForHeldItem()
+            : interactor.GetWorldInteractRange();
+        if (!interactor.IsWithinActionRange(hit, actionRange))
+            return false;
+
+        IHoldInteractable hold = target as IHoldInteractable;
+        if (hold == null)
+            hold = hit.collider.GetComponent<IHoldInteractable>();
+        if (hold == null)
+            hold = hit.collider.GetComponentInParent<IHoldInteractable>();
+        if (hold == null || !hold.CanBeginHoldInteract(selected))
+            return false;
+
+        _holdTarget = hold;
+        _holdItem = selected;
+        _holdCollider = hit.collider;
+        _holdElapsed = 0f;
+        _holdDuration = Mathf.Max(0.05f, hold.HoldDurationSeconds);
+        _holdWithMouse = withMouse;
+        _holdWithKey = withKey;
+
+        var ui = HoldInteractProgressUI.Ensure();
+        ui?.SetProgress(0f);
+        ui?.SetVisible(true);
+        return true;
+    }
+
+void TickHoldInteract()
+    {
+        if (_holdTarget == null)
+            return;
+
+        bool mouseHeld = _holdWithMouse && Mouse.current != null && Mouse.current.leftButton.isPressed;
+        bool keyHeld = _holdWithKey && Keyboard.current != null && Keyboard.current.eKey.isPressed;
+        if (!mouseHeld && !keyHeld)
+        {
+            CancelHoldInteract();
+            return;
+        }
+
+        if (GetSelectedItem() != _holdItem)
+        {
+            CancelHoldInteract();
+            return;
+        }
+
+        var interactor = PlayerInteractor.Instance;
+        if (interactor == null)
+        {
+            CancelHoldInteract();
+            return;
+        }
+
+        // Stay locked on the collider that started the hold. Requiring a fresh raycast
+        // every frame cancels progress on tiny aim jitter (common with floor pickups).
+        if (_holdCollider == null || !_holdTarget.CanBeginHoldInteract(_holdItem))
+        {
+            CancelHoldInteract();
+            return;
+        }
+
+        float actionRange = _holdItem != null
+            ? interactor.GetActionRangeForHeldItem()
+            : interactor.GetWorldInteractRange();
+        Vector3 holdPoint = _holdCollider.bounds.center;
+        float camDist = interactor.CameraTransform != null
+            ? Vector3.Distance(interactor.CameraTransform.position, holdPoint)
+            : float.MaxValue;
+        var rangeHit = new RaycastHit { point = holdPoint, distance = camDist };
+        if (!interactor.IsWithinRange(rangeHit, actionRange))
+        {
+            CancelHoldInteract();
+            return;
+        }
+
+        _holdElapsed += Time.unscaledDeltaTime;
+        float t = Mathf.Clamp01(_holdElapsed / _holdDuration);
+        var ui = HoldInteractProgressUI.Ensure();
+        ui?.SetProgress(t);
+        ui?.SetVisible(true);
+
+        if (t < 1f)
+            return;
+
+        IHoldInteractable completed = _holdTarget;
+        InventoryItem item = _holdItem;
+        Collider col = _holdCollider;
+        CancelHoldInteract();
+
+        if (completed == null)
+            return;
+
+        if (interactor.IsDuplicateInteractThisFrame(col))
+            return;
+
+        interactor.RegisterInteractForFrame(col);
+        if (completed.CompleteHoldInteract(item))
+            InteractionUIManager.Instance?.PlaySuccessShake();
+    }
+
+    void CancelHoldInteract()
+    {
+        if (_holdTarget != null)
+            _holdTarget.CancelHoldInteract();
+
+        _holdTarget = null;
+        _holdItem = null;
+        _holdCollider = null;
+        _holdElapsed = 0f;
+        _holdDuration = 0f;
+        _holdWithMouse = false;
+        _holdWithKey = false;
+
+        if (HoldInteractProgressUI.Instance != null)
+            HoldInteractProgressUI.Instance.SetVisible(false);
     }
 
     void UpdatePlacePreview()

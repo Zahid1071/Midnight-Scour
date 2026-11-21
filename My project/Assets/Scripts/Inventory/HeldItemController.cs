@@ -4,8 +4,8 @@ using UnityEngine;
 
 /// <summary>
 /// Lives under the gameplay camera. Shows the HeldItemView (placed in the scene under this object)
-/// of the selected inventory item and draws it on equip. Sprinting puts the item away; it is drawn
-/// again once the player stops running.
+/// of the selected inventory item and draws it on equip. Optional sprint holster keeps items in hand
+/// while running when disabled (lighter stays out).
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class HeldItemController : MonoBehaviour
@@ -13,7 +13,7 @@ public sealed class HeldItemController : MonoBehaviour
     public static HeldItemController Instance { get; private set; }
 
     [Header("Sprint holster")]
-    [SerializeField] private bool holsterWhileSprinting = true;
+    [SerializeField] private bool holsterWhileSprinting = false;
 
     [Tooltip("Horizontal speed (m/s) a sprint has to reach before the item is put away. Keep in line with the " +
              "footsteps' run threshold so it goes away as the running steps start.")]

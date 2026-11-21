@@ -9,11 +9,10 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Padlock lockpick — binding-pin style:
-/// RMB — tension (cylinder binds; full turn only when all pins are set).
+/// RMB — toggle tension (cylinder binds; full turn only when all pins are set).
 /// Mouse — travel 0–1; pick snaps to 4 stages (0–25% / 25–50% / 50–75% / 75–100%).
 /// LMB — lift to set the binding pin; while held, the pick stays at its current stage.
 /// Release LMB to move freely again. Binding order is shuffled each attempt.
-/// Releasing RMB drops set pins but keeps the same binding order.
 /// </summary>
 [DisallowMultipleComponent]
 public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiver
@@ -211,7 +210,7 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
     /// <summary>Smoothed visual depth 0-1 toward the current stage snap.</summary>
     float _visualStageDepth01;
     bool _pinsComplete;
-    bool _tensionWasHeld;
+    bool _tensionActive;
 
     Vector3 _pickBaseLocalPos;
     Quaternion _pickBaseLocalRot;
@@ -439,7 +438,7 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
         _pinSlot = 0;
         _visualStageDepth01 = GetSnappedStageDepth01();
         _pinsComplete = false;
-        _tensionWasHeld = false;
+        _tensionActive = false;
         _guide = Guide.None;
         _guideResumeTime = 0f;
         ResetPins();
@@ -490,7 +489,9 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
     {
         var mouse = Mouse.current;
         Vector2 delta = mouse != null ? mouse.delta.ReadValue() : Vector2.zero;
-        bool tensionHeld = mouse != null && mouse.rightButton.isPressed;
+        if (mouse != null && mouse.rightButton.wasPressedThisFrame)
+            _tensionActive = !_tensionActive;
+        bool tensionHeld = _tensionActive;
         bool lifting = mouse != null && mouse.leftButton.isPressed;
 
         // Continuous travel input, then snap into one of 4 stage zones. While lifting (LMB) the pick is
@@ -514,11 +515,6 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
         TickPickStageVisual();
         TickCylinderTwist(tensionHeld);
         ApplyPickVisual();
-
-        // Lose tension → set pins drop; binding order stays (no reshuffle).
-        if (_tensionWasHeld && !tensionHeld)
-            ResetPinsAfterTensionLost();
-        _tensionWasHeld = tensionHeld;
 
         TickGuide(tensionHeld);
 
@@ -867,7 +863,7 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
             return;
 
         string message = guide == Guide.Pressure
-            ? LocOrFallback("gameplay.lockpick_guide_pressure", "Hold right mouse click to apply pressure")
+            ? LocOrFallback("gameplay.lockpick_guide_pressure", "Right-click to apply pressure")
             : LocOrFallback(
                 "gameplay.lockpick_guide_find_pins",
                 "Use your mouse to move the lockpick and press left mouse button to pick pins");
@@ -1537,8 +1533,9 @@ public class PadlockLockpickMinigame : MonoBehaviour, IInteractable, IItemReceiv
             }
         }
 
+        // Flat — player is on the lock; 3D+Steam was a short muffled spike that cut off.
         if (chainFallSfx != null && !silent)
-            SoundManager.Instance?.PlaySFXAt(chainFallSfx, transform.position, sfxVolume);
+            SoundManager.Instance?.PlaySFX(chainFallSfx, Mathf.Clamp01(sfxVolume));
 
         // Silent — padlock already showed unlock feedback.
         if (doorToUnlockSilently == null)

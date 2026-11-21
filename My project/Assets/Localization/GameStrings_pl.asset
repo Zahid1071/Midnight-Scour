@@ -763,7 +763,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296751
-    m_Localized: "Przytrzymaj prawy przycisk myszy, aby nacisn\u0105\u0107"
+    m_Localized: "Kliknij prawy przycisk myszy, aby nacisn\u0105\u0107"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296752
@@ -813,7 +813,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 34365368158781440
-    m_Localized: "Znajd\u017A w\u0142a\u015Bciwy kierunek, a potem ci\u0105gnij \u015Brubokr\u0119t
+    m_Localized: "Znajd\u017A w\u0142a\u015Bciwy kierunek, a potem powoli pchaj \u015Brubokr\u0119t
       w t\u0119 stron\u0119, a\u017C zamek p\u0119knie."
     m_Metadata:
       m_Items: []
@@ -912,6 +912,14 @@ MonoBehaviour:
   - m_Id: 46856169052831748
     m_Localized: "R\u0119cznie narysowana mapa farmy. Naci\u015Bnij M, aby spojrze\u0107
       na ni\u0105 ponownie."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 49832862310858752
+    m_Localized: "Wchod\u017A przez okna"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 49832862424104960
+    m_Localized: "Mo\u017Cesz wej\u015B\u0107 do domu przez otwarte okna."
     m_Metadata:
       m_Items: []
   references:

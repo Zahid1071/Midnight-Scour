@@ -159,6 +159,28 @@ public class NPCAnchorManager : MonoBehaviour
             }
         }
 
+        // Isolated outdoor rooms (e.g. Dog Pen) have no door edges — vote by nearest room in zone.
+        if (bestRoom == null
+            && roomAnchorsByZone.TryGetValue(ownerZoneID, out var zoneRooms)
+            && zoneRooms != null && zoneRooms.Count > 0)
+        {
+            float bestDist = float.PositiveInfinity;
+            for (int i = 0; i < zoneRooms.Count; i++)
+            {
+                var room = zoneRooms[i];
+                if (room == null) continue;
+                if (clampToPlayerFloor && !IsSameFloor(room.transform.position.y, playerFloorY))
+                    continue;
+
+                float d = (room.transform.position - fromPosition).sqrMagnitude;
+                if (d < bestDist)
+                {
+                    bestDist = d;
+                    bestRoom = room;
+                }
+            }
+        }
+
         // A failed target vote falls back to the last result, which any caller may have written
         // (search spots, ambush points). Never hand back a room from another floor — over the
         // basement that sent the chase down the basement stairs.

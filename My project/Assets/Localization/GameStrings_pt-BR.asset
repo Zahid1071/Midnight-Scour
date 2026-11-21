@@ -756,7 +756,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296751
-    m_Localized: "Segure o bot\xE3o direito do mouse para aplicar press\xE3o"
+    m_Localized: "Clique com o bot\xE3o direito do mouse para aplicar press\xE3o"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296752
@@ -804,8 +804,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 34365368158781440
-    m_Localized: "Encontre a dire\xE7\xE3o certa e depois puxe a chave de fenda para
-      esse lado at\xE9 a fechadura quebrar."
+    m_Localized: "Encontre a dire\xE7\xE3o certa e depois empurre a chave de fenda
+      lentamente para esse lado at\xE9 a fechadura quebrar."
     m_Metadata:
       m_Items: []
   - m_Id: 34392063293128704
@@ -902,6 +902,14 @@ MonoBehaviour:
   - m_Id: 46856169052831748
     m_Localized: "Um mapa da fazenda desenhado \xE0 m\xE3o. Pressione M para olhar
       de novo."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 49832862310858752
+    m_Localized: Passe pelas janelas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 49832862424104960
+    m_Localized: "Voc\xEA pode entrar na casa da fazenda por janelas abertas."
     m_Metadata:
       m_Items: []
   references:

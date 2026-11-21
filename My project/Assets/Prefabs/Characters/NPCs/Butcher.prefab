@@ -209,6 +209,10 @@ MonoBehaviour:
   ambushTurnAngleThreshold: 45
   chaseEnterSfx: {fileID: 8300000, guid: c1c6021de7aa4ac41956662c3435aaa1, type: 3}
   chaseEnterVolume: 1
+  spottedTurnSpeed: 360
+  spottedShakeDegrees: 1.5
+  spottedShakeFrequency: 10
+  spottedShakeDuration: 1.2
   ignorePlayerFootstepsDuration: 2.5
   chaseReplanCooldown: 0.25
   chaseReplanDist: 0.75
@@ -239,6 +243,9 @@ MonoBehaviour:
   currentMovementState: 0
   IsPerformingHotspotAction: 0
   visualRoot: {fileID: 485029986416727497}
+  animIdleThreshold: 0
+  animWalkThreshold: 2.5
+  animRunThreshold: 3
   interpolationCurveEnter:
     serializedVersion: 2
     m_Curve:
@@ -379,8 +386,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8e4f2a91c7d4e5f8a0b1c2d3e4f5a6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minDistance: 2
-  maxDistance: 5
+  minDistance: 4
+  maxDistance: 10
+  maxFloorYDelta: 1
   requireThreatState: 1
   requireSameRoom: 1
   maxScanLineJitter: 0.05

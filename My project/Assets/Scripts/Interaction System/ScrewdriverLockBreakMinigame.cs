@@ -181,7 +181,7 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
     [SerializeField] AudioClip stuckLoopSfx;
     [Tooltip("Parts cracking when a shove gets stuck (random pick each time).")]
     [SerializeField] AudioClip[] stuckCrackSfx;
-    [SerializeField, Range(0f, 1f)] float stuckCrackVolume = 0.8f;
+    [SerializeField, Range(0f, 1f)] float stuckCrackVolume = 1f;
     [SerializeField] Vector2 stuckCrackPitchRange = new Vector2(0.9f, 1.1f);
     [Tooltip("Played when a jam is forced through (random pick). Falls back to Stuck Crack Sfx.")]
     [SerializeField] AudioClip[] jamBreakSfx;
@@ -189,7 +189,7 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
     [Tooltip("Played when the lock finally breaks.")]
     [SerializeField] AudioClip breakSfx;
     [SerializeField] AudioClip cancelSfx;
-    [SerializeField] float sfxVolume = 1f;
+    [SerializeField, Range(0f, 1f)] float sfxVolume = 1f;
     [SerializeField, Range(0f, 1f)] float holdLoopMinVolume = 0.08f;
     [SerializeField, Range(0f, 1f)] float holdLoopMaxVolume = 1f;
     [Tooltip("Mouse travel (pixels/frame, smoothed) that reaches max hold-loop volume.")]
@@ -263,14 +263,27 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
 
     /// <summary>A jam (not the last one) was forced through; the argument counts them on this lock, starting at 1.</summary>
     public event Action<int> JamBroken;
+    /// <summary>The jam that was just broken leaves only the final breakthrough ahead.</summary>
+    public event Action PenultimateJamBroken;
+    /// <summary>The lock bar filled and the success callback is about to run.</summary>
+    public event Action BreakSucceeded;
+    /// <summary>
+    /// When set and returns true, a final-jam breakthrough is treated as a normal jam break instead of finishing
+    /// the lock (used so the escape look-back can fire on the 2nd breakthrough before the door opens).
+    /// </summary>
+    public Func<bool> ShouldDeferFinalBreak;
 
     int _jamsBroken;
 
     public Stage CurrentStage => _stage;
     public bool IsRunning => _stage == Stage.Playing;
     public int JamsBroken => _jamsBroken;
+    public bool IsFinalJam => _finalJam;
     public bool IsHoldingBreak => IsRunning && Mouse.current != null && Mouse.current.leftButton.isPressed;
     public float BreakNormalized => Mathf.Clamp01(_breakFill);
+    /// <summary>After the latest non-final breakthrough, the next jam will finish the lock.</summary>
+    public bool IsReadyForFinalJam =>
+        _breakFill < 0.999f && _breakFill + stuckBreakFill + maxFillPerPush >= 0.999f;
 
     void Awake()
     {
@@ -758,14 +771,21 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
                 _jammed = false;
                 _jamForce = 0f;
                 _sessionFillLeft = Mathf.Max(0.01f, maxFillPerPush);
-                if (_finalJam)
+                if (_finalJam && (ShouldDeferFinalBreak == null || !ShouldDeferFinalBreak()))
                     _breakFill = 1f;
                 else
                 {
+                    // Deferred final jam counts as a breakthrough so look-back / jam events still fire.
+                    if (_finalJam)
+                        _finalJam = false;
                     AddBreakFill(stuckBreakFill);
+                    if (_breakFill >= 0.999f)
+                        _breakFill = 0.92f;
                     PlayJamBreak();
                     _jamsBroken++;
                     JamBroken?.Invoke(_jamsBroken);
+                    if (IsReadyForFinalJam)
+                        PenultimateJamBroken?.Invoke();
                 }
                 _release = 1f;
                 _tension = 0f;
@@ -856,7 +876,7 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
             RefreshProgressUi();
             StopHoldLoop();
             if (breakSfx != null)
-                SoundManager.Instance?.PlaySFXAt(breakSfx, keyhole.position, sfxVolume);
+                PlayLockSfx(breakSfx, sfxVolume);
             StartCoroutine(FinishSuccessRoutine());
             return;
         }
@@ -869,14 +889,22 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
 
     void PlayStuckCrack()
     {
-        if (stuckCrackSfx == null || stuckCrackSfx.Length == 0 || SoundManager.Instance == null)
+        if (stuckCrackSfx == null || stuckCrackSfx.Length == 0)
             return;
         AudioClip clip = stuckCrackSfx[UnityEngine.Random.Range(0, stuckCrackSfx.Length)];
         if (clip == null)
             return;
         float pitch = UnityEngine.Random.Range(stuckCrackPitchRange.x, stuckCrackPitchRange.y);
         float volume = _finalJam ? stuckCrackVolume * finalJamCrackVolumeScale : stuckCrackVolume;
-        SoundManager.Instance.PlaySFXAt(clip, keyhole.position, volume, pitch);
+        PlayLockSfx(clip, volume, pitch);
+    }
+
+    void PlayLockSfx(AudioClip clip, float volume, float pitch = 1f)
+    {
+        if (clip == null)
+            return;
+        // Lock cam is in the player's face — 2D keeps it clear and stays off the 3D SFX pool.
+        SoundManager.Instance?.PlaySFX(clip, Mathf.Clamp01(volume), pitch);
     }
 
     /// <summary>1 inside the steady push range, fading to 0 at twice the max speed; 0 below the min.</summary>
@@ -930,13 +958,13 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
     void PlayJamBreak()
     {
         AudioClip[] pool = jamBreakSfx != null && jamBreakSfx.Length > 0 ? jamBreakSfx : stuckCrackSfx;
-        if (pool == null || pool.Length == 0 || SoundManager.Instance == null)
+        if (pool == null || pool.Length == 0)
             return;
         AudioClip clip = pool[UnityEngine.Random.Range(0, pool.Length)];
         if (clip == null)
             return;
         float pitch = UnityEngine.Random.Range(stuckCrackPitchRange.x, stuckCrackPitchRange.y);
-        SoundManager.Instance.PlaySFXAt(clip, keyhole.position, jamBreakVolume, pitch);
+        PlayLockSfx(clip, jamBreakVolume, pitch);
     }
 
     void AddBreakFill(float amount)
@@ -1177,7 +1205,7 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
 
         StopHoldLoop();
         if (playCancelSfx && cancelSfx != null)
-            SoundManager.Instance?.PlaySFXAt(cancelSfx, keyhole.position, sfxVolume);
+            SoundManager.Instance?.PlaySFX(cancelSfx, Mathf.Clamp01(sfxVolume));
 
         var cancel = _onCancel;
         StartCoroutine(FinishExitRoutine(success: false, cancel));
@@ -1196,9 +1224,38 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         _onCancel = null;
 
         // Unlock SFX / subtitle / consume happen immediately — don't wait for cam blend.
+        BreakSucceeded?.Invoke();
         success?.Invoke(tool);
 
         yield return FinishExitRoutine(success: true, null);
+    }
+
+    /// <summary>Clears bar / jam state so a re-locked door needs a fresh break.</summary>
+    public void ResetProgress()
+    {
+        _breakFill = 0f;
+        _sessionFillLeft = Mathf.Max(0.01f, maxFillPerPush);
+        _jammed = false;
+        _finalJam = false;
+        _jamForce = 0f;
+        _jamForceRequired = 0f;
+        _jamBaseRequired = 0f;
+        _jamDirection = Vector2.zero;
+        _jamDirectionProbe = Vector2.zero;
+        _jamsBroken = 0;
+        _sessionArmed = false;
+        _pulledOutSinceSeat = false;
+        RefreshProgressUi();
+    }
+
+    /// <summary>Finishes the lock immediately (deadline / scripted escape). No-op if already idle with an empty bar.</summary>
+    public void ForceComplete()
+    {
+        if (_stage != Stage.Playing)
+            return;
+        _breakFill = 1f;
+        _jammed = false;
+        StartCoroutine(FinishSuccessRoutine());
     }
 
     IEnumerator FinishExitRoutine(bool success, Action cancelCallback)
@@ -1318,7 +1375,7 @@ public class ScrewdriverLockBreakMinigame : MonoBehaviour
         if (stuck)
         {
             key = stuckHintKey;
-            fallback = "Find the right direction, then pull the screwdriver that way until the lock breaks.";
+            fallback = "Find the right direction, then push slowly that way until the lock breaks.";
         }
         else if (seated && holding)
         {

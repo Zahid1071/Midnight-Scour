@@ -34,6 +34,7 @@ Transform:
   - {fileID: 7414570379026273094}
   - {fileID: 2618972828143743058}
   - {fileID: 6891903601943576210}
+  - {fileID: 1646562371559014474}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6895426862770261785
@@ -65,7 +66,15 @@ MonoBehaviour:
   captiveLayerIndex: 12
   hiddenLayerIndex: 7
   gameplayMusicFade: 0.5
-  defaultAmbience: {fileID: 8300000, guid: f6217049e48b14f49a471ebd1b0fccb5, type: 3}
+  basementRoomZoneId: Demo_Environment
+  defaultAmbience: {fileID: 8300000, guid: 346676a978355044dbf73badb212b4de, type: 3}
+  cricketAmbience: {fileID: 8300000, guid: 81064de054329394a9e6e0c952d31629, type: 3}
+  cricketAmbienceVolume: 0.6
+  indoorAmbienceVolume: 0.12
+  indoorAmbienceCutoff: 800
+  indoorAmbienceFade: 0.6
+  roofCheckDistance: 15
+  returnScareMusicFadeOut: 2.5
   uiClickClip: {fileID: 8300000, guid: 29c9b7f66b2ae3f47882d7d526ecd150, type: 3}
   uiHoverClip: {fileID: 8300000, guid: 438f6a52fe6be9641b074b55236b9ef6, type: 3}
   actionFailClip: {fileID: 8300000, guid: 72ae4b80546a8b74d966135c77d4a680, type: 3}
@@ -82,17 +91,12 @@ MonoBehaviour:
   musicSourceA: {fileID: 228075428072045804}
   musicSourceB: {fileID: 7535631578845724816}
   ambienceSource: {fileID: 8021086284184574946}
+  cricketAmbienceSource: {fileID: 6775318533827254210}
   sfxSource: {fileID: 4528937523506965284}
   poolSize: 8
   threeDSpatialBlend: 1
   sfxMinDistance: 1
   sfxMaxDistance: 18
-  occlusionLayers:
-    serializedVersion: 2
-    m_Bits: 17207
-  occludedVolumeMultiplier: 1
-  occludedLowpassCutoff: 10000
-  clearLowpassCutoff: 22000
 --- !u!1 &4504894872282728294
 GameObject:
   m_ObjectHideFlags: 0
@@ -393,8 +397,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 1301280918907549777, guid: d0494497af355c44f913d2de9798dce5, type: 2}
-  m_audioClip: {fileID: 8300000, guid: f6217049e48b14f49a471ebd1b0fccb5, type: 3}
-  m_Resource: {fileID: 8300000, guid: f6217049e48b14f49a471ebd1b0fccb5, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 346676a978355044dbf73badb212b4de, type: 3}
+  m_Resource: {fileID: 8300000, guid: 346676a978355044dbf73badb212b4de, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -471,6 +475,161 @@ AudioSource:
     - serializedVersion: 3
       time: 0
       value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!1 &7376368890532482121
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1646562371559014474}
+  - component: {fileID: 6775318533827254210}
+  - component: {fileID: 7564875145456260632}
+  m_Layer: 0
+  m_Name: Cricket Ambience
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1646562371559014474
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7376368890532482121}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1351119778044966336}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &6775318533827254210
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7376368890532482121}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 1301280918907549777, guid: d0494497af355c44f913d2de9798dce5, type: 2}
+  m_audioClip: {fileID: 8300000, guid: 81064de054329394a9e6e0c952d31629, type: 3}
+  m_Resource: {fileID: 8300000, guid: 81064de054329394a9e6e0c952d31629, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 0.6
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!169 &7564875145456260632
+AudioLowPassFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7376368890532482121}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_LowpassResonanceQ: 1
+  lowpassLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0

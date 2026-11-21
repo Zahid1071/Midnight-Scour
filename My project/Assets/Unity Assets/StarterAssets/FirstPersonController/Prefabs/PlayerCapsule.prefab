@@ -45,7 +45,7 @@ AudioSource:
   m_audioClip: {fileID: 8300000, guid: e1b4c5c7432797245ab30987ad17e5ea, type: 3}
   m_Resource: {fileID: 8300000, guid: e1b4c5c7432797245ab30987ad17e5ea, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.532
+  m_Volume: 0.1064
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -602,6 +602,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveSpeed: 2.6
   SprintSpeed: 4
+  TensionWalkSpeed: 1.3
   RotationSpeed: 1
   SpeedChangeRate: 2
   SneakSpeed: 1
@@ -752,7 +753,7 @@ MonoBehaviour:
   walkBobAmountX: 0.025
   runBobAmountX: 0.024
   sneakSpeed: 1
-  walkSpeed: 2.6
+  walkSpeed: 1.3
   runSpeed: 4
   impactSharpness: 1.5
   blendIn: 6
@@ -840,7 +841,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bank: {fileID: 11400000, guid: 80cf5462839c34a49aea4d2d76789ede, type: 2}
   output: {fileID: 5656172210110584295, guid: d0494497af355c44f913d2de9798dce5, type: 2}
-  sneakVolume: 0.12
-  walkVolume: 0.3
   runVolume: 0.5
   pitch: {x: 0.97, y: 1.06}

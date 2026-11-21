@@ -887,6 +887,14 @@ MonoBehaviour:
     m_Key: map.pickup
     m_Metadata:
       m_Items: []
+  - m_Id: 49832862310858752
+    m_Key: tutorial.window_climb.title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 49832862424104960
+    m_Key: tutorial.window_climb.body
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

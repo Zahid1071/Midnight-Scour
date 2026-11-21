@@ -12,17 +12,19 @@ namespace StarterAssets
 	public class FirstPersonController : MonoBehaviour
 	{
 		[Header("Player")]
-		[Tooltip("Move speed of the character in m/s")]
-		public float MoveSpeed = 4.0f;
+		[Tooltip("Normal walk speed of the character in m/s")]
+		public float MoveSpeed = 2.6f;
 		[Tooltip("Sprint speed of the character in m/s")]
-		public float SprintSpeed = 6.0f;
+		public float SprintSpeed = 4.0f;
+		[Tooltip("Slower walk used in scare / tension beats (m/s)")]
+		public float TensionWalkSpeed = 1.3f;
 		[Tooltip("Rotation speed of the character")]
 		public float RotationSpeed = 1.0f;
 		[Tooltip("Acceleration and deceleration")]
 		public float SpeedChangeRate = 10.0f;
 
 		[Tooltip("Sneak speed of the character in m/s")]
-		public float SneakSpeed = 1.5f;
+		public float SneakSpeed = 1.0f;
 
 		[Header("Directional Sprint")]
 		[Tooltip("Sprint speed multiplier when running diagonally or sideways (any left/right key held).")]
@@ -53,6 +55,9 @@ namespace StarterAssets
 
 		/// <summary>While true, holding sprint only walks (e.g. out of breath).</summary>
 		public bool SprintLocked { get; set; }
+
+		/// <summary>While true, unscoped walk uses <see cref="TensionWalkSpeed"/> instead of <see cref="MoveSpeed"/>.</summary>
+		public bool TensionWalk { get; set; }
 
 		/// <summary>Top movement speed in m/s, whatever the stance (e.g. out of breath).</summary>
 		public float SpeedLimit { get; set; } = float.PositiveInfinity;
@@ -251,15 +256,17 @@ namespace StarterAssets
 			_isSneaking = Input.GetKey(KeyCode.LeftControl) && (SprintLocked || !Input.GetKey(KeyCode.LeftShift));
 #endif
 
-			// set target speed based on move speed, sprint speed and if sprint is pressed
+			// Walk / tension walk / sneak / sprint. SpeedLimit only caps normal or tension walk.
 			float targetSpeed;
 			if (_isSneaking)
 				targetSpeed = SneakSpeed;
 			else if (_input.sprint && !SprintLocked)
 				targetSpeed = Mathf.Max(MoveSpeed, SprintSpeed * SprintDirectionMultiplier(_input.move));
 			else
-				targetSpeed = MoveSpeed;
-			targetSpeed = Mathf.Min(targetSpeed, SpeedLimit);
+			{
+				float walk = TensionWalk ? TensionWalkSpeed : MoveSpeed;
+				targetSpeed = Mathf.Min(walk, SpeedLimit);
+			}
 
 			TrackDirectionChange();
 			targetSpeed *= _speedCap;

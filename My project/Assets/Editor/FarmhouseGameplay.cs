@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using FS_Atmo;
 using UnityEditor;
+using UnityEditor.Localization;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -112,10 +113,89 @@ public static class FarmhouseGameplay
     {
         int push = AddSoftPush(house);
         int gaps = AddClimbGaps(house);
+        string tutorial = EnsureWindowClimbTutorial(house);
+        string strings = EnsureWindowClimbStrings();
         var anchors = EnsureAnchors(house);
         int edges = anchors != null ? RebuildEdges(house, anchors) : 0;
         int hides = anchors != null ? AdoptHidingSpots(house, anchors) + EnsureHidingSpots(house, anchors) : 0;
-        return $"Gameplay: {push} soft-push doors, {gaps} climb-through windows, {edges} room graph edges, {hides} hiding spots.";
+        return $"Gameplay: {push} soft-push doors, {gaps} climb-through windows, {tutorial}, {strings}, {edges} room graph edges, {hides} hiding spots.";
+    }
+
+    const string WindowClimbTutorialName = "Window Climb Tutorial";
+    static readonly string[] WindowClimbLocales = { "en", "zh-Hans", "fr", "ja", "pl", "pt-BR", "ru", "tr", "es-419", "th" };
+    static readonly Dictionary<string, string[]> WindowClimbStrings = new Dictionary<string, string[]>
+    {
+        {
+            "tutorial.window_climb.title",
+            new[]
+            {
+                "Climb Through Windows", "从窗户爬进去", "Passe par les fenêtres", "窓から入れる", "Wchodź przez okna",
+                "Passe pelas janelas", "Пролезай в окна", "Pencerelerden Geç", "Entra por las ventanas", "ปีนผ่านหน้าต่าง",
+            }
+        },
+        {
+            "tutorial.window_climb.body",
+            new[]
+            {
+                "You can climb through open windows to get into the farmhouse.",
+                "你可以从开着的窗户爬进农舍。",
+                "Tu peux passer par les fenêtres ouvertes pour entrer dans la ferme.",
+                "開いた窓から農家に入れる。",
+                "Możesz wejść do domu przez otwarte okna.",
+                "Você pode entrar na casa da fazenda por janelas abertas.",
+                "Через открытые окна можно пролезть в фермерский дом.",
+                "Açık pencerelerden çiftlik evine girebilirsin.",
+                "Puedes entrar a la casa de la granja por las ventanas abiertas.",
+                "คุณสามารถปีนผ่านหน้าต่างที่เปิดอยู่เพื่อเข้าบ้านไร่ได้",
+            }
+        },
+    };
+
+    static string EnsureWindowClimbTutorial(Transform house)
+    {
+        var existing = house.Find(WindowClimbTutorialName);
+        GameObject go = existing != null ? existing.gameObject : null;
+        if (go == null)
+        {
+            go = new GameObject(WindowClimbTutorialName);
+            Undo.RegisterCreatedObjectUndo(go, "Window Climb Tutorial");
+            go.transform.SetParent(house, false);
+            go.transform.localPosition = Vector3.zero;
+        }
+
+        if (go.GetComponent<FarmhouseWindowClimbTutorial>() == null)
+            Undo.AddComponent<FarmhouseWindowClimbTutorial>(go);
+
+        var so = new SerializedObject(go.GetComponent<FarmhouseWindowClimbTutorial>());
+        so.FindProperty("center").objectReferenceValue = house;
+        so.FindProperty("radius").floatValue = 30f;
+        so.ApplyModifiedPropertiesWithoutUndo();
+        EditorUtility.SetDirty(go);
+        return "window-climb tutorial ready";
+    }
+
+    static string EnsureWindowClimbStrings()
+    {
+        var collection = LocalizationEditorSettings.GetStringTableCollection(Loc.Table);
+        if (collection == null)
+            return "no GameStrings table";
+
+        var shared = collection.SharedData;
+        foreach (var kv in WindowClimbStrings)
+        {
+            var entry = shared.GetEntry(kv.Key) ?? shared.AddKey(kv.Key);
+            foreach (var table in collection.StringTables)
+            {
+                int i = System.Array.IndexOf(WindowClimbLocales, table.LocaleIdentifier.Code);
+                if (i < 0)
+                    continue;
+                table.AddEntry(entry.Id, kv.Value[i]);
+                EditorUtility.SetDirty(table);
+            }
+        }
+        EditorUtility.SetDirty(shared);
+        AssetDatabase.SaveAssets();
+        return "window-climb strings";
     }
 
     /// True when a farmhouse room anchor holds a child whose name starts with prefix (e.g. a bed hiding spot).
@@ -198,6 +278,18 @@ public static class FarmhouseGameplay
         foreach (var t in walls.GetComponentsInChildren<Transform>(true))
         {
             if (t.name != "Window_single_vinyl") continue;
+            // Climb-through is ground floor only (local Y vs farmhouse root; story height 3m).
+            float localY = house.InverseTransformPoint(t.position).y;
+            if (localY > FarmhouseBuilder.Story * 0.5f)
+            {
+                var existing = t.Find("Climb Gap");
+                if (existing)
+                {
+                    var col = existing.GetComponent<Collider>();
+                    if (col) col.enabled = false;
+                }
+                continue;
+            }
             var openable = t.Find("Window_single_vinyl_openable");
             var window = openable ? openable.GetComponent<SimpleOpenClose>() : null;
             if (!window) continue;

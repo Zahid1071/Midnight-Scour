@@ -26,6 +26,24 @@ public class CameraKick : CinemachineExtension
         _startTime = Time.time;
     }
 
+    /// <summary>Sting / scare bump on the live player Cinemachine camera.</summary>
+    public static void KickPlayer(float degrees = 1.35f, float frequency = 14f, float duration = 0.4f)
+    {
+        if (degrees <= 0f || duration <= 0f)
+            return;
+
+        CinemachineBrain brain = Camera.main != null ? Camera.main.GetComponent<CinemachineBrain>() : null;
+        if (brain == null)
+            brain = Object.FindFirstObjectByType<CinemachineBrain>();
+        if (brain == null || !(brain.ActiveVirtualCamera is CinemachineVirtualCameraBase vcam))
+            return;
+
+        CameraKick kick = vcam.GetComponent<CameraKick>();
+        if (kick == null)
+            kick = vcam.gameObject.AddComponent<CameraKick>();
+        kick.Kick(degrees, frequency, duration);
+    }
+
     protected override void PostPipelineStageCallback(
         CinemachineVirtualCameraBase vcam, CinemachineCore.Stage stage, ref CameraState state, float deltaTime)
     {

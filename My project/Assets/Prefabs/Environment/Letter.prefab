@@ -71,11 +71,15 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 56720f4883419cc46bdfaf0e1cd58438, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 2100000, guid: 3f8ac6bbd7982ef4d8b81b66e807341b, type: 2}
+      objectReference: {fileID: 2100000, guid: 29f972cfb3531e6468f6c4fab374b056, type: 2}
     - target: {fileID: -7511558181221131132, guid: 56720f4883419cc46bdfaf0e1cd58438, type: 3}
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
       objectReference: {fileID: 2100000, guid: e768ca64c06a4b368c60a627b0e25fd1, type: 2}
+    - target: {fileID: -5754084199372789682, guid: 56720f4883419cc46bdfaf0e1cd58438, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 8879863021826941025, guid: cd7f8f2ef277e45418202d55e2f3097a, type: 3}
     - target: {fileID: 919132149155446097, guid: 56720f4883419cc46bdfaf0e1cd58438, type: 3}
       propertyPath: m_Name
       value: Letter
@@ -116,6 +120,9 @@ MonoBehaviour:
   letterText: 'The toilet is clogged, I can''t find the plunger. It was inside that
     bucket but I can''t remember where it was '
   interactSFX: {fileID: 8300000, guid: 4bbfe9a2c80cd454b86384a1b1c579ef, type: 3}
+  onClosed:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &880010002
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -135,5 +142,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2.6, y: 1.98, z: 0.31}
-  m_Center: {x: 0, y: -1, z: 0}
+  m_Size: {x: 2.7816, y: 2.0132, z: 0.15}
+  m_Center: {x: 0, y: -1.0066, z: 0.031000001}

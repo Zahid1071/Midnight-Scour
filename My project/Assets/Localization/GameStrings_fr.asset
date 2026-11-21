@@ -760,7 +760,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296751
-    m_Localized: Maintiens le clic droit pour appliquer de la pression
+    m_Localized: Clic droit pour appliquer de la pression
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296752
@@ -809,8 +809,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 34365368158781440
-    m_Localized: "Trouve la bonne direction, puis tire le tournevis dans ce sens
-      jusqu'\xE0 ce que la serrure c\xE8de."
+    m_Localized: "Trouve la bonne direction, puis pousse lentement le tournevis dans
+      ce sens jusqu'\xE0 ce que la serrure c\xE8de."
     m_Metadata:
       m_Items: []
   - m_Id: 34392063293128704
@@ -907,6 +907,15 @@ MonoBehaviour:
   - m_Id: 46856169052831748
     m_Localized: "Une carte de la ferme dessin\xE9e \xE0 la main. Appuyez sur M pour
       la consulter \xE0 nouveau."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 49832862310858752
+    m_Localized: "Passe par les fen\xEAtres"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 49832862424104960
+    m_Localized: "Tu peux passer par les fen\xEAtres ouvertes pour entrer dans la
+      ferme."
     m_Metadata:
       m_Items: []
   references:

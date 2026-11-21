@@ -197,14 +197,52 @@ namespace FS_Atmo
         /// <summary>Off = the player can open this but not close it (scripted sequences). AI and scripts still can.</summary>
         public bool PlayerCanClose { get; set; } = true;
 
+        /// <summary>Off = the player can close this but not open it (scripted "stuck" door). AI and scripts still can.</summary>
+        public bool PlayerCanOpen { get; set; } = true;
+
+        [Tooltip("Loc key shown when PlayerCanOpen/Close blocks the door. Empty = gameplay.stuck.")]
+        [SerializeField] string stuckMessageKey = "gameplay.stuck";
+
         public bool Interact()
         {
             if (objectOpen && !PlayerCanClose)
             {
-                InteractionFeedback.Fail(Loc.Get("gameplay.stuck"), 2f);
+                InteractionFeedback.Fail(StuckMessage(), 2f);
+                return false;
+            }
+            if (!objectOpen && !PlayerCanOpen)
+            {
+                InteractionFeedback.Fail(StuckMessage(), 2f);
                 return false;
             }
             return ObjectClicked(bypassLock: false);
+        }
+
+        string StuckMessage()
+        {
+            string key = string.IsNullOrWhiteSpace(stuckMessageKey) ? "gameplay.stuck" : stuckMessageKey;
+            return Loc.Get(key);
+        }
+
+        /// <summary>Slam shut, re-lock for screwdriver, and clear break progress. E says stuck; item use still breaks.</summary>
+        public void StickShutForScrewdriver(string messageKey = "gameplay.screwdriver_stuck")
+        {
+            if (objectOpen)
+                ForceClose();
+            isLocked = true;
+            _chainedAfterContinue = false;
+            PlayerCanOpen = false;
+            if (!string.IsNullOrWhiteSpace(messageKey))
+                stuckMessageKey = messageKey;
+            if (lockBreakMinigame != null)
+                lockBreakMinigame.ResetProgress();
+        }
+
+        void ClearStuckOpenBlock()
+        {
+            PlayerCanOpen = true;
+            PlayerCanClose = true;
+            stuckMessageKey = "gameplay.stuck";
         }
 
         public bool ObjectClicked() => ObjectClicked(bypassLock: false);
@@ -351,6 +389,7 @@ namespace FS_Atmo
 
             // ✅ KİLİT AÇILDI
             isLocked = false;
+            ClearStuckOpenBlock();
             HudManager.Instance?.ShowSubtitle(
                 Loc.Format("gameplay.item_unlocked", item.GetLocalizedName()),
                 2.5f, HudManager.Instance.SuccessColor);
@@ -375,6 +414,7 @@ namespace FS_Atmo
                 return;
 
             isLocked = false;
+            ClearStuckOpenBlock();
             HudManager.Instance?.ShowSubtitle(
                 Loc.Format("gameplay.item_unlocked", item.GetLocalizedName()),
                 2.5f, HudManager.Instance.SuccessColor);
@@ -387,6 +427,25 @@ namespace FS_Atmo
 
             if (openAfterLockBreak)
                 ForceOpenAfterUnlock();
+        }
+
+        /// <summary>Scripted unlock during a chase deadline — no subtitle / consume.</summary>
+        public void ForceUnlockOpenSilent()
+        {
+            isLocked = false;
+            ClearStuckOpenBlock();
+            ForceOpenAfterUnlock();
+        }
+
+        /// <summary>Re-opens the screwdriver break with the required key still in inventory (escape look-back resume).</summary>
+        public bool TryResumeScrewdriverBreak()
+        {
+            if (!isLocked || requiredKey == null || lockBreakMinigame == null)
+                return false;
+            var inventory = InventoryManager.Instance?.GetInventory();
+            if (inventory == null || !inventory.Contains(requiredKey))
+                return false;
+            return ReceiveItem(requiredKey);
         }
 
         /// <summary>Opens if closed, skipping obstruction / interact cooldowns used by normal clicks.</summary>
@@ -445,6 +504,22 @@ namespace FS_Atmo
 
         /// <summary>Snap shut immediately — used after lockpick Continue day-reset.</summary>
         public void ForceCloseInstant() => SnapOpenState(false);
+
+        /// <summary>Closes with the normal close animation and SFX if currently open.</summary>
+        public void ForceClose()
+        {
+            if (!objectOpen)
+                return;
+            float openAmount = GetOpenAmount(myAnimator);
+            if (!hasAdditional)
+            {
+                ToggleSelf(openAmount);
+                return;
+            }
+            float openAmountAdd = GetOpenAmount(additionalAnimator);
+            ToggleSelf(openAmount);
+            ToggleAdditional(openAmountAdd);
+        }
 
         /// <summary>Snap fully open or shut with no sound (checkpoint load, Continue reset).</summary>
         public void SnapOpenState(bool open)
@@ -596,7 +671,7 @@ namespace FS_Atmo
                 if (handleOpenSound != null)
                     yield return new WaitForSeconds(openSoundDelayAfterHandle);
 
-                SoundManager.Instance.PlaySFXSafe(openSound, primaryPosition,5);
+                SoundManager.Instance.PlaySFXAt(openSound, primaryPosition, 1f);
 
                 if (additionalPosition.HasValue)
                     SoundManager.Instance.PlaySFXSafe(openSound, additionalPosition.Value);

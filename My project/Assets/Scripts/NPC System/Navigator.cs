@@ -89,6 +89,16 @@ namespace FS_Atmo
                     route.Clear();
                     route.Add(CreateTempPoint(finalPoint.Value, destinationName, parentName));
                     StartFollowing();
+                    return;
+                }
+
+                // Isolated zones / missing door graph: still walk the destination on NavMesh.
+                if (finalPoint.HasValue)
+                {
+                    if (followCo != null) StopCoroutine(followCo);
+                    isDoorTransit = false;
+                    following = true;
+                    followCo = StartCoroutine(MoveToReached(finalPoint.Value, -1f, _ => following = false));
                 }
                 return;
             }

@@ -2,33 +2,14 @@ using UnityEngine;
 using UnityEngine.Audio;
 
 /// <summary>
-/// Scripted music for two beats (there's no exploration music, so these carry the scenes):
-/// - Forcing the corridor door: a suspense bed while the lock minigame runs. It keeps climbing (with time on the lock
-///   and with every jam broken) until the running steps come, then cuts dead and never plays again.
-/// - Going back for the bar: once the guy is placed (the note was read), the moment the player steps into the
-///   corridor the ambient track starts; it keeps climbing the closer they get to him and stops dead, leaving silence,
-///   the moment the bar behind him is picked up.
+/// Return-trip music for the bar: once the guy is placed (the note was read), stepping into the corridor starts an
+/// ambient bed that climbs the closer the player gets to him and cuts when the bar is picked up.
+/// (Lock-break tension music was removed.)
 /// </summary>
 [DisallowMultipleComponent]
 public class TensionMusicCues : MonoBehaviour
 {
     [SerializeField] AudioMixerGroup musicGroup;
-
-    [Header("Forcing the door")]
-    [SerializeField] ScrewdriverLockBreakMinigame lockMinigame;
-    [SerializeField] DoorBreakScare doorScare;
-    [SerializeField] AudioClip doorMusic;
-    [SerializeField, Range(0f, 1f)] float doorStartVolume = 0.4f;
-    [SerializeField, Range(0f, 1f)] float doorVolume = 1f;
-    [Tooltip("Seconds on the lock to climb from the start volume to full.")]
-    [SerializeField] float doorBuildTime = 45f;
-    [Tooltip("Jams broken before the steps come; each one pushes the build that much further.")]
-    [SerializeField] int doorBuildJams = 3;
-    [SerializeField] float doorFadeIn = 1.5f;
-    [Tooltip("Seconds to fade while the player is off the lock (it comes back where it left off).")]
-    [SerializeField] float doorFadeOut = 1.5f;
-    [Tooltip("Seconds to cut to silence when the steps are about to come.")]
-    [SerializeField] float doorCutTime = 0.3f;
 
     [Header("Going back for the bar")]
     [SerializeField] CorpseVanishEvent wallStanderEvent;
@@ -49,11 +30,8 @@ public class TensionMusicCues : MonoBehaviour
 
     enum Cue { Waiting, Playing, Done }
 
-    AudioSource _door;
     AudioSource _return;
-    Cue _doorState;
     Cue _returnState;
-    float _doorTime;
     Transform _player;
 
     public bool ReturnMusicPlaying => _returnState == Cue.Playing;
@@ -71,64 +49,22 @@ public class TensionMusicCues : MonoBehaviour
         _return = CreateSource("Return Music", returnMusic);
     }
 
-    void OnEnable()
+    void Awake()
     {
-        if (doorScare != null)
-            doorScare.ApproachStarted += OnApproachStarted;
+        // Bar-return bed removed — keep component for checkpoint restore hooks, but never start music.
+        returnMusic = null;
+        if (_return != null)
+        {
+            Destroy(_return.gameObject);
+            _return = null;
+        }
+        _returnState = Cue.Done;
     }
-
-    void OnDisable()
-    {
-        if (doorScare != null)
-            doorScare.ApproachStarted -= OnApproachStarted;
-    }
-
-    void OnApproachStarted() => _doorState = Cue.Done;
 
     void Update()
     {
         bool chase = SoundManager.Instance != null && SoundManager.Instance.IsChaseMusicActive;
-        TickDoor(chase);
         TickReturn(chase);
-    }
-
-    void TickDoor(bool chase)
-    {
-        if (doorMusic == null || lockMinigame == null)
-            return;
-
-        if (_doorState == Cue.Done)
-        {
-            if (_door == null)
-                return;
-            Fade(_door, 0f, doorVolume / Mathf.Max(0.01f, doorCutTime));
-            if (_door.volume <= 0f)
-            {
-                Destroy(_door.gameObject);
-                _door = null;
-            }
-            return;
-        }
-
-        bool onLock = lockMinigame.IsRunning && !chase;
-        if (onLock && _door == null)
-        {
-            _door = CreateSource("Door Tension Music", doorMusic);
-            _doorState = Cue.Playing;
-        }
-        if (_door == null)
-            return;
-
-        if (!onLock)
-        {
-            Fade(_door, 0f, doorVolume / Mathf.Max(0.01f, doorFadeOut));
-            return;
-        }
-        _doorTime += Time.deltaTime;
-        float build = Mathf.Max(_doorTime / Mathf.Max(0.01f, doorBuildTime),
-                                lockMinigame.JamsBroken / (float)Mathf.Max(1, doorBuildJams));
-        float target = Mathf.Lerp(doorStartVolume, doorVolume, Mathf.Clamp01(build));
-        Fade(_door, target, doorVolume / Mathf.Max(0.01f, doorFadeIn));
     }
 
     void TickReturn(bool chase)

@@ -8,25 +8,28 @@ using UnityEngine.Events;
 
 /// <summary>
 /// Cage room corpse scare (scripted):
-/// 1. The first padlock pin the player sets: a faint scratch from the body, quiet enough to doubt.
-/// 2. The player walks out of the open cage (this arms the door); a second sound follows a moment later, as the body
-///    starts sitting up under its sheet.
-/// 3. The player steps out through the cage room doorway (then, if set, walks up to the next door): the body is gone, the lighter (and any
-///    lit candles near the body or the player) go out in a gust, the tool the player needs starts to glint, and running
-///    footsteps tear away from where he lay, kicking a tin can halfway. The lighter then only sparks for a few
-///    strikes before it catches again. When the steps end (or later, once something calls ShowWallStander) he's
-///    standing, face to the wall, across the room.
-/// 4. The first time the lit lighter shows him (WallStanderSeenEvent), then a step closer (or right up close, lit or
-///    not, before the bar can be reached): a sting and a quick dolly zoom on him, then the shot hands back to the
-///    player's view as it tilts down onto the bar left behind him.
-/// 5. Taking the bar sets BarTaken (the corridor music goes silent on it; WallStanderChase arms on it).
-/// 6. Once the note has called ShowWallStander, the first step back into the cage room through the doorway turns the
-///    view onto the empty spot where the body lay, drifting in as the lens tightens, under "Where is the body?".
+/// 1. First padlock pin: a faint scratch from the body.
+/// 2. Leave the cage: cloth rustle only — the body stays lying there. The bar is visible but not pickable yet.
+/// 3. First leave through the cage-room doorway: no lights-out. Unlock the corridor door (no look-back scream),
+///    walk out; room lights come on via CorridorTension.
+/// 4. Read the note (calls ShowWallStander) → go back. Corridor door trap / stuck is handled separately.
+/// 5. Re-enter the cage room: lights flicker. Step into the cage: he sits up, then lights snap out with the gust /
+///    run-away beat. Body is gone; wall stander appears (if the note already called). Bar becomes pickable.
+/// 6. Lit lighter reveal / bar look cinematic still runs when the player finds him at the wall.
 /// </summary>
 [DisallowMultipleComponent]
 public class CorpseVanishEvent : MonoBehaviour
 {
-    public enum Stage { WaitingForPin, WaitingForExit, WaitingForDoor, WaitingForNextDoor, WaitingForLightsOut, Done }
+    public enum Stage
+    {
+        WaitingForPin,
+        WaitingForExit,
+        WaitingForDoor,
+        WaitingForNextDoor,
+        WaitingForReturn,
+        WaitingForLightsOut,
+        Done
+    }
 
     const string CinematicLockReason = "corpse_wall_reveal";
 
@@ -49,23 +52,34 @@ public class CorpseVanishEvent : MonoBehaviour
     [SerializeField] SimpleOpenClose cageDoor;
     [Tooltip("Seconds the player has to be out of the cage before it counts (trigger edges flicker).")]
     [SerializeField] float exitConfirmTime = 0.3f;
-    [Tooltip("Played from the body after the player is out of the cage; uses the pin clue's min distance.")]
+    [Tooltip("Cloth rustle from the body once the player has walked past it toward the door with their back turned.")]
     [SerializeField] AudioClip exitClue;
     [SerializeField, Range(0f, 1f)] float exitClueVolume = 0.4f;
-    [Tooltip("Seconds after leaving the cage before the clue.")]
-    [SerializeField] float exitClueDelay = 1f;
-    [Tooltip("A second sound from the body after leaving the cage. Empty = nothing.")]
+    [Tooltip("Optional second rustle/shift after the first. Empty = nothing.")]
     [SerializeField] AudioClip exitFollowUpClip;
     [SerializeField, Range(0f, 1f)] float exitFollowUpVolume = 1f;
-    [Tooltip("Seconds after leaving the cage before the second sound.")]
-    [SerializeField] float exitFollowUpDelay = 2f;
-    [Tooltip("Starts sitting up under the sheet. Empty = the body stays down.")]
+    [Tooltip("Seconds after the first rustle before the follow-up.")]
+    [SerializeField] float exitFollowUpDelay = 0.8f;
+    [Tooltip("How far past the body (m, toward the door) before the rustle can play.")]
+    [SerializeField] float rustlePastBodyDistance = 1.2f;
+    [Tooltip("Player view must be at least this many degrees away from the body for the rustle.")]
+    [SerializeField] float rustleLookAwayAngle = 100f;
+    [Tooltip("Starts sitting up under the sheet when the player re-enters the cage room on the return scare.")]
     [SerializeField] CorpseSitUp sitUp;
-    [Tooltip("Seconds after leaving the cage before the sit-up starts.")]
-    [SerializeField] float sitUpDelay = 0f;
-    [Tooltip("Played from the body as he sits up. Empty = nothing (assign when you have the clip).")]
+    [Tooltip("Played from the body as he sits up (Steam Audio). Empty = nothing.")]
     [SerializeField] AudioClip sitUpClip;
     [SerializeField, Range(0f, 1f)] float sitUpVolume = 1f;
+    [Tooltip("Flat horror sting the moment sit-up starts (not spatial).")]
+    [SerializeField] AudioClip sitUpStingClip;
+    [SerializeField, Range(0f, 1f)] float sitUpStingVolume = 0.9f;
+    [Tooltip("Lights snap out when sit-up reaches this fraction (0-1). 0 = use Sit Up Hold Before Lights Out.")]
+    [SerializeField, Range(0f, 1f)] float lightsOutAtSitUpNormalized = 0.75f;
+    [Tooltip("Absolute seconds before lights out if Lights Out At Sit Up Normalized is 0. 0 = end of sit-up.")]
+    [SerializeField] float sitUpHoldBeforeLightsOut = 0f;
+    [Tooltip("Pull the sit-up lights-out earlier by this many seconds.")]
+    [SerializeField] float sitUpLightsOutEarlyBy = 1f;
+    [Tooltip("On/off pulse durations for the sit-up kill flicker (must end off — last state is dark).")]
+    [SerializeField] float[] sitUpKillFlickerPattern = { 0.05f, 0.08f, 0.04f, 0.12f, 0.05f, 0.09f, 0.04f, 0.15f };
 
     [Header("3. Leaving through the cage room doorway, then the next door")]
     [Tooltip("The cage room's doorframe; the side the body is on counts as inside the room.")]
@@ -169,10 +183,16 @@ public class CorpseVanishEvent : MonoBehaviour
     [Tooltip("Seconds the lens takes to ease back before control returns.")]
     [SerializeField] float wallBarReturnTime = 0.8f;
 
-    [Header("6. Coming back for the body")]
+    [Header("5. Return scare (after the note)")]
+    [Tooltip("Electric lights that flicker when the player steps back into the cage room, then snap off with the scare.")]
+    [SerializeField] LightSwitch[] lightsToFlickerAndKill;
+    [Tooltip("Extra lamp roots toggled with the light switches (cage / corridor wall lamps not on a switch).")]
+    [SerializeField] GameObject[] extraLampsToKill;
+
+    [Header("6. Coming back for the body (legacy cinematic — keep off)")]
     [Tooltip("After the note calls ShowWallStander, stepping back into the cage room through the doorway plays a shot on " +
              "where the body lay (on the wall zoom camera).")]
-    [SerializeField] bool returnShot = true;
+    [SerializeField] bool returnShot = false;
     [SerializeField] string returnSubtitleKey = "gameplay.where_is_the_body";
     [SerializeField] float returnSubtitleSeconds = 3f;
     [Tooltip("Share of the turn (0-1) at which the subtitle shows.")]
@@ -202,6 +222,13 @@ public class CorpseVanishEvent : MonoBehaviour
     public UnityEvent onLightsOut;
 
     public Stage CurrentStage => _stage;
+    /// <summary>Player has left the cage room once (corridor unlock / leave path is open).</summary>
+    public bool LeftCageRoomFirstPass =>
+        _stage == Stage.WaitingForReturn || _stage == Stage.WaitingForLightsOut || _stage == Stage.Done;
+    /// <summary>Note has armed the return scare / wall stander.</summary>
+    public bool ReturnArmed => _wallStanderCalled;
+    /// <summary>Bar is in the world and may be picked up (after the return lights-out).</summary>
+    public bool BarPickupAllowed => _runFinished;
     public bool WallStanderShown => wallStander != null && wallStander.activeInHierarchy;
     public bool WallStanderSeen => _wallSeen;
     /// <summary>True once the bar behind him has been picked up.</summary>
@@ -235,7 +262,38 @@ public class CorpseVanishEvent : MonoBehaviour
     bool _barShown;
     bool _wasOutsideRoom;
     bool _returnShotPlayed;
+    bool _returnRoomFlickered;
+    bool _returnScareStarted;
+    bool _exitRustlePlayed;
     Light _returnLight;
+
+    /// <summary>Corridor return trap: lights flicker once the player has stepped back in.</summary>
+    public void NotifyReturnFlicker()
+    {
+        if (_returnRoomFlickered)
+            return;
+        _returnRoomFlickered = true;
+        FlickerReturnLights();
+    }
+
+    public bool ReturnFlickerDone => _returnRoomFlickered;
+
+    /// <summary>True when the player is on the cage-room side of <see cref="exitDoorway"/> (or no doorway is set).</summary>
+    public bool IsPlayerInCageRoom(Vector3 worldPos) => IsInsideCageRoom(worldPos);
+
+
+    /// <summary>
+    /// Legacy hook. Tension walk is owned by <see cref="BasementTenseWalkZones"/> (return-for-bar + crawl house).
+    /// Callers clear the flag when a beat ends.
+    /// </summary>
+    public void SetReturnWalkSlow(bool slow)
+    {
+        var fpc = FindFirstObjectByType<StarterAssets.FirstPersonController>(FindObjectsInactive.Include);
+        if (fpc == null)
+            return;
+        if (!slow)
+            fpc.TensionWalk = false;
+    }
 
     void Awake()
     {
@@ -244,14 +302,19 @@ public class CorpseVanishEvent : MonoBehaviour
         if (wallZoomCamera != null)
             wallZoomCamera.Priority = 0;
         SetWallStanderActive(false);
+        // Bar sits in the room from the start, but pickup stays blocked until the return scare finishes.
+        if (barBehindHim != null)
+            barBehindHim.SetActive(true);
     }
 
-    /// <summary>Lets him show up at the wall; if the steps haven't ended yet he appears when they do.</summary>
+    /// <summary>
+    /// Arms him for after the return lights-out. Never enables him early — a lit lighter must not reveal him
+    /// while the room lights are still on.
+    /// </summary>
     public void ShowWallStander()
     {
         _wallStanderCalled = true;
-        if (_runFinished)
-            SetWallStanderActive(true);
+        // Appearance happens only in AppearWallStanderAfterLightsOut (end of return lights-out / run).
     }
 
     void SetWallStanderActive(bool active)
@@ -260,10 +323,16 @@ public class CorpseVanishEvent : MonoBehaviour
             wallStander.SetActive(active);
         if (appearWithWallStander != null)
             foreach (GameObject go in appearWithWallStander)
-                if (go != null)
-                    go.SetActive(active);
+            {
+                if (go == null || go == barBehindHim)
+                    continue;
+                go.SetActive(active);
+            }
         if (active && barBehindHim != null)
+        {
+            barBehindHim.SetActive(true);
             _barShown = true;
+        }
     }
 
     void OnEnable() => PadlockLockpickMinigame.PinSet += OnPinSet;
@@ -290,6 +359,8 @@ public class CorpseVanishEvent : MonoBehaviour
             TickExitDoor();
         else if (_stage == Stage.WaitingForNextDoor)
             TickNextDoor();
+        else if (_stage == Stage.WaitingForReturn)
+            TickReturnScare();
         else if (_stage == Stage.Done)
         {
             TickBarTaken();
@@ -360,6 +431,7 @@ public class CorpseVanishEvent : MonoBehaviour
             AudioSource sting = CreateFlatSource("Wall Sting Audio");
             sting.PlayOneShot(wallStingClip, wallStingVolume);
             Destroy(sting.gameObject, wallStingClip.length + 0.25f);
+            CameraKick.KickPlayer(1.55f, 15f, 0.45f);
         }
         if (wallZoomCamera != null && !PlayerControlGate.IsInputBlocked)
             StartCoroutine(WallRevealRoutine(cam, point));
@@ -487,15 +559,22 @@ public class CorpseVanishEvent : MonoBehaviour
         EndCinematic();
         _stage = Stage.Done;
         _runFinished = true;
+        SetReturnWalkSlow(false);
         _wallStanderCalled = true;
         _wallSeen = true;
         _wallRevealPlayed = true;
         _wallRevealOver = true;
         _returnShotPlayed = true;
+        _returnScareStarted = true;
+        _returnRoomFlickered = true;
+        // Mid-return checkpoint: keep insects/basement bed muted until exit + chase end.
+        if (!barTaken)
+            SoundManager.Instance?.SetReturnScareAudioLock(true);
         foreach (Renderer r in bodyRenderers)
             if (r != null)
                 r.enabled = false;
         AddHighlights();
+        KillReturnLights();
         SetWallStanderActive(true);
     }
 
@@ -540,36 +619,20 @@ public class CorpseVanishEvent : MonoBehaviour
         _outsideTimer += Time.deltaTime;
         if (_outsideTimer < exitConfirmTime)
             return;
-        _wasInsideRoom = false;
+        _wasInsideRoom = true;
         _stage = Stage.WaitingForDoor;
-        // Delay counts from the moment the player stepped out, not from the confirmation.
-        StartCoroutine(PlayClue(exitClue, exitClueVolume, exitClueDelay - exitConfirmTime));
-        StartCoroutine(PlayClue(exitFollowUpClip, exitFollowUpVolume, exitFollowUpDelay - exitConfirmTime));
-        if (sitUp != null)
-            StartCoroutine(SitUpRoutine(sitUpDelay - exitConfirmTime));
-    }
-
-    IEnumerator SitUpRoutine(float delay)
-    {
-        if (delay > 0f)
-            yield return new WaitForSeconds(delay);
-        if (_stage == Stage.Done)
-            yield break;
-        if (sitUpClip != null)
-        {
-            AudioSource src = CreateSource("Corpse Sit Up Audio", _lookPoint, pinClueMinDistance);
-            src.PlayOneShot(sitUpClip, sitUpVolume);
-            Destroy(src.gameObject, sitUpClip.length + 0.25f);
-        }
-        sitUp.Play();
+        // Rustle waits until they walk past the body toward the door with their back turned.
     }
 
     void TickExitDoor()
     {
-        if (exitDoorway == null)
-            return;
         GameObject player = GameObject.FindWithTag("Player");
         if (player == null)
+            return;
+
+        TickExitRustle(player.transform);
+
+        if (exitDoorway == null)
             return;
 
         Vector3 normal = DoorwayInward();
@@ -590,13 +653,233 @@ public class CorpseVanishEvent : MonoBehaviour
         if (!_wasInsideRoom || depth > -doorwayCrossDepth || across > doorwayHalfWidth)
             return;
 
+        // First pass: leave the body where it is and open the corridor unlock path. Scare waits for the return.
+        _wasOutsideRoom = true;
         if (nextDoor != null)
             _stage = Stage.WaitingForNextDoor;
         else
+            _stage = Stage.WaitingForReturn;
+    }
+
+    void TickExitRustle(Transform player)
+    {
+        if (_exitRustlePlayed || exitClue == null && exitFollowUpClip == null)
+            return;
+        if (PlayerControlGate.IsInputBlocked)
+            return;
+
+        Vector3 body = _lookPoint;
+        Vector3 toDoor = exitDoorway != null ? Flat(exitDoorway.position - body) : Flat(player.position - body);
+        if (toDoor.sqrMagnitude < 1e-4f)
+            return;
+        toDoor.Normalize();
+
+        Vector3 toPlayer = Flat(player.position - body);
+        float along = Vector3.Dot(toPlayer, toDoor);
+        if (along < rustlePastBodyDistance)
+            return;
+
+        Camera cam = Camera.main;
+        if (cam == null)
+            return;
+        Vector3 toBody = body + Vector3.up * 0.6f - cam.transform.position;
+        if (toBody.sqrMagnitude > 1e-4f
+            && Vector3.Angle(cam.transform.forward, toBody) < rustleLookAwayAngle)
+            return;
+
+        _exitRustlePlayed = true;
+        StartCoroutine(PlayClue(exitClue, exitClueVolume, 0f));
+        if (exitFollowUpClip != null)
+            StartCoroutine(PlayClue(exitFollowUpClip, exitFollowUpVolume, exitFollowUpDelay));
+    }
+
+    void TickReturnScare()
+    {
+        if (!_wallStanderCalled || _returnScareStarted)
+            return;
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player == null)
+            return;
+
+        bool inRoom = IsInsideCageRoom(player.transform.position);
+        if (!inRoom)
         {
-            _stage = Stage.WaitingForLightsOut;
-            StartCoroutine(LightsOutRoutine());
+            _wasOutsideRoom = true;
+            return;
         }
+
+        // Sit-up when they step back into the cage room (after the corridor flicker / door bang).
+        if (!_wasOutsideRoom)
+            return;
+
+        _returnScareStarted = true;
+        StartCoroutine(SitUpThenLightsOut());
+    }
+
+    bool IsInsideCageRoom(Vector3 worldPos)
+    {
+        if (exitDoorway == null)
+            return true;
+        Vector3 normal = DoorwayInward();
+        Vector3 offset = worldPos - exitDoorway.position;
+        offset.y = 0f;
+        return Vector3.Dot(offset, normal) >= -doorwayCrossDepth;
+    }
+
+    void FlickerReturnLights()
+    {
+        if (lightsToFlickerAndKill != null)
+        {
+            foreach (LightSwitch sw in lightsToFlickerAndKill)
+                if (sw != null)
+                    sw.PlayFlicker();
+        }
+        // Corridor / cage wall lamps aren't on the switch — pulse them too.
+        if (extraLampsToKill != null && extraLampsToKill.Length > 0)
+            StartCoroutine(FlickerExtraLampsRoutine());
+    }
+
+    IEnumerator FlickerExtraLampsRoutine()
+    {
+        float[] pulse = { 0.05f, 0.1f, 0.04f, 0.18f, 0.06f, 0.12f, 0.05f };
+        bool lit = false;
+        foreach (float duration in pulse)
+        {
+            SetExtraLampsLit(lit);
+            yield return new WaitForSeconds(duration);
+            lit = !lit;
+        }
+        SetExtraLampsLit(true);
+    }
+
+    void SetExtraLampsLit(bool lit)
+    {
+        if (extraLampsToKill == null)
+            return;
+        foreach (GameObject lamp in extraLampsToKill)
+        {
+            if (lamp == null)
+                continue;
+            foreach (Light l in lamp.GetComponentsInChildren<Light>(true))
+            {
+                if (l == null)
+                    continue;
+                if (l.GetComponentInParent<Unity.Cinemachine.CinemachineCamera>() != null)
+                    continue;
+                l.enabled = lit;
+            }
+        }
+    }
+
+    void KillReturnLights()
+    {
+        if (lightsToFlickerAndKill != null)
+        {
+            foreach (LightSwitch sw in lightsToFlickerAndKill)
+                if (sw != null && sw.IsOn)
+                    sw.SetOnInstant(false);
+        }
+        if (extraLampsToKill != null)
+        {
+            foreach (GameObject lamp in extraLampsToKill)
+            {
+                if (lamp == null)
+                    continue;
+                foreach (Light l in lamp.GetComponentsInChildren<Light>(true))
+                    if (l != null)
+                        l.enabled = false;
+            }
+        }
+    }
+
+    IEnumerator SitUpThenLightsOut()
+    {
+        _stage = Stage.WaitingForLightsOut;
+        // Sting waits so it lands once he can be seen; sit-up motion + lights keep their timing.
+        if (sitUpStingClip != null)
+            StartCoroutine(PlaySitUpStingDelayed(0.5f));
+        if (sitUpClip != null)
+        {
+            AudioSource src = CreateSource("Corpse Sit Up Audio", _lookPoint, pinClueMinDistance);
+            src.PlayOneShot(sitUpClip, sitUpVolume);
+            Destroy(src.gameObject, sitUpClip.length + 0.25f);
+        }
+        if (sitUp != null)
+            sitUp.Play();
+
+        float hold;
+        if (sitUp != null && lightsOutAtSitUpNormalized > 0f)
+            hold = sitUp.RealtimeUntil(lightsOutAtSitUpNormalized);
+        else if (sitUpHoldBeforeLightsOut > 0f)
+            hold = sitUpHoldBeforeLightsOut;
+        else
+            hold = sitUp != null ? sitUp.PlayDurationRealtime : 0.35f;
+
+        float flickerLead = SitUpKillFlickerDuration();
+        // Land darkness sitUpLightsOutEarlyBy earlier than the authored sit-up mark;
+        // start the kill flicker just before that so it ends on the early mark.
+        float killAt = Mathf.Max(0f, hold - Mathf.Max(0f, sitUpLightsOutEarlyBy));
+        float waitBeforeFlicker = Mathf.Max(0f, killAt - flickerLead);
+        if (waitBeforeFlicker > 0f)
+            yield return new WaitForSeconds(waitBeforeFlicker);
+
+        yield return FlickerKillReturnLightsRoutine();
+        yield return LightsOutRoutine();
+    }
+
+    IEnumerator PlaySitUpStingDelayed(float delay)
+    {
+        if (delay > 0f)
+            yield return new WaitForSeconds(delay);
+        if (sitUpStingClip != null)
+            SoundManager.Instance?.PlaySFX(sitUpStingClip, sitUpStingVolume);
+    }
+
+    float SitUpKillFlickerDuration()
+    {
+        if (sitUpKillFlickerPattern == null || sitUpKillFlickerPattern.Length == 0)
+            return 0.55f;
+        float total = 0f;
+        for (int i = 0; i < sitUpKillFlickerPattern.Length; i++)
+            total += Mathf.Max(0f, sitUpKillFlickerPattern[i]);
+        return Mathf.Max(0.05f, total);
+    }
+
+    /// <summary>
+    /// Sit-up kill flicker: stutters then ends dark (unlike corridor PlayFlicker which leaves lights on).
+    /// </summary>
+    IEnumerator FlickerKillReturnLightsRoutine()
+    {
+        float[] pulse = sitUpKillFlickerPattern != null && sitUpKillFlickerPattern.Length > 0
+            ? sitUpKillFlickerPattern
+            : new[] { 0.05f, 0.08f, 0.04f, 0.12f, 0.05f, 0.09f, 0.04f, 0.15f };
+
+        // Start from lit so the first pulse reads as a blink.
+        bool lit = true;
+        foreach (float duration in pulse)
+        {
+            SetReturnLightsLit(lit);
+            yield return new WaitForSeconds(Mathf.Max(0.01f, duration));
+            lit = !lit;
+        }
+
+        // Always finish dark — never leave the corridor-style "end on" state.
+        KillReturnLights();
+    }
+
+    void SetReturnLightsLit(bool lit)
+    {
+        if (lightsToFlickerAndKill != null)
+        {
+            foreach (LightSwitch sw in lightsToFlickerAndKill)
+            {
+                if (sw == null)
+                    continue;
+                // Visual only — rocker / IsOn settle in KillReturnLights.
+                sw.PulseLit(lit);
+            }
+        }
+        SetExtraLampsLit(lit);
     }
 
     void PlayDoorwayClip()
@@ -764,8 +1047,8 @@ public class CorpseVanishEvent : MonoBehaviour
         offset.y = 0f;
         if (offset.magnitude > nextDoorDistance)
             return;
-        _stage = Stage.WaitingForLightsOut;
-        StartCoroutine(LightsOutRoutine());
+        _wasOutsideRoom = true;
+        _stage = Stage.WaitingForReturn;
     }
 
     void BeginCinematic()
@@ -791,9 +1074,16 @@ public class CorpseVanishEvent : MonoBehaviour
 
     IEnumerator LightsOutRoutine()
     {
-        if (lightsOutDelay > 0f)
+        // Snap on the return sit-up scare; keep the authored delay for any other callers.
+        if (lightsOutDelay > 0f && !_returnScareStarted)
             yield return new WaitForSeconds(lightsOutDelay);
         _stage = Stage.Done;
+
+        // Sit-up path already ran FlickerKillReturnLightsRoutine; keep this as a hard settle.
+        KillReturnLights();
+        foreach (Renderer r in bodyRenderers)
+            if (r != null)
+                r.enabled = false;
 
         Camera cam = Camera.main;
         if (blowOutClip != null && cam != null)
@@ -801,13 +1091,9 @@ public class CorpseVanishEvent : MonoBehaviour
             AudioSource gust = CreateSource("Lights Out Gust Audio", cam.transform.TransformPoint(blowOutOffset), blowOutMinDistance);
             gust.PlayOneShot(blowOutClip, blowOutVolume);
             Destroy(gust.gameObject, blowOutClip.length + 0.25f);
-            if (blowOutLead > 0f)
+            if (blowOutLead > 0f && !_returnScareStarted)
                 yield return new WaitForSeconds(blowOutLead);
         }
-
-        foreach (Renderer r in bodyRenderers)
-            if (r != null)
-                r.enabled = false;
 
         // Also when the lighter isn't in hand: its view stays in the scene, so the misfires wait for the next draw.
         HeldLighter lighter = FindFirstObjectByType<HeldLighter>(FindObjectsInactive.Include);
@@ -832,6 +1118,17 @@ public class CorpseVanishEvent : MonoBehaviour
             yield return new WaitForSeconds(runDelay);
         yield return RunRoutine();
         _runFinished = true;
+        // Walk stays capped at sneak until WallStanderChase starts.
+        if (barBehindHim != null)
+        {
+            barBehindHim.SetActive(true);
+            _barShown = true;
+        }
+        AppearWallStanderAfterLightsOut();
+    }
+
+    void AppearWallStanderAfterLightsOut()
+    {
         if (!wallStanderWaitsForCall || _wallStanderCalled)
             SetWallStanderActive(true);
     }
@@ -917,9 +1214,11 @@ public class CorpseVanishEvent : MonoBehaviour
             yield return new WaitForSeconds(delay);
         if (_stage == Stage.Done)
             yield break;
-        AudioSource clue = CreateSource("Corpse Clue Audio", _lookPoint, pinClueMinDistance);
+        // Interactive spatial (no reflection wash / occlusion choke) so rustles read in the room cleanly.
+        AudioSource clue = SpatialAudio.Create("Corpse Clue Audio", transform, _lookPoint, mixerGroup, 1.25f, 20f,
+            AudioRolloffMode.Logarithmic, atmospheric: false);
         clue.PlayOneShot(clip, volume);
-        Destroy(clue.gameObject, clip.length + 0.25f);
+        Destroy(clue.gameObject, clip.length + 0.85f);
     }
 
     // Body first, then the run path points.
@@ -980,4 +1279,58 @@ public class CorpseVanishEvent : MonoBehaviour
         src.spatialBlend = 0f;
         return src;
     }
+
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+    /// <summary>Dev shortcut: return scare and wall reveal are done; the bar is still in the world.</summary>
+    public void DebugPrepareForBarPickup()
+    {
+        RestoreAfterWallReveal(barTaken: false);
+        PrepareDoorOpen(cageDoor);
+        if (nextDoor != null)
+        {
+            SimpleOpenClose door = nextDoor.GetComponent<SimpleOpenClose>()
+                                   ?? nextDoor.GetComponentInParent<SimpleOpenClose>();
+            PrepareDoorOpen(door);
+        }
+    }
+
+    public bool TryGetBarApproachPose(out Vector3 feet, out float yaw)
+    {
+        feet = default;
+        yaw = 0f;
+        if (!WallStanderShown && wallStander == null)
+            return false;
+
+        Vector3 bar = WallStanderPosition;
+        if (barBehindHim != null && barBehindHim.activeInHierarchy)
+        {
+            Renderer barRenderer = barBehindHim.GetComponentInChildren<Renderer>();
+            bar = barRenderer != null ? barRenderer.bounds.center : barBehindHim.transform.position;
+        }
+
+        Vector3 towardBar = bar - WallStanderPosition;
+        towardBar.y = 0f;
+        Vector3 approach = towardBar.sqrMagnitude > 0.04f ? towardBar.normalized : Vector3.forward;
+        Vector3 spot = bar + approach * 1.65f;
+        if (Physics.Raycast(spot + Vector3.up * 0.75f, Vector3.down, out RaycastHit hit, 2.5f, ~0, QueryTriggerInteraction.Ignore))
+            feet = hit.point;
+        else
+            feet = spot;
+        yaw = Quaternion.LookRotation(-approach, Vector3.up).eulerAngles.y;
+        return true;
+    }
+
+    static void PrepareDoorOpen(SimpleOpenClose door)
+    {
+        if (door == null)
+            return;
+        if (door.isLocked)
+            door.UnlockSilently();
+        if (!door.objectOpen)
+            door.SnapOpenState(true);
+        DoorController ai = door.GetComponentInParent<DoorController>();
+        if (ai != null)
+            ai.SetLocked(false);
+    }
+#endif
 }

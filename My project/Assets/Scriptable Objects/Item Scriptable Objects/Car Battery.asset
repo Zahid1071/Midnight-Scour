@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b3fb6c1c8058a749b2a30a3514c38f4, type: 3}
+  m_Name: Car Battery
+  m_EditorClassIdentifier: 
+  itemName: Car Battery
+  icon: {fileID: 21300000, guid: 9f7d60ff5899482d97c777e07320da40, type: 3}
+  worldPrefab: {fileID: 2125611608886636381, guid: 0b34cfe0ca98cd246b1e72dd2e9f56e0, type: 3}
+  dropLandSFX: {fileID: 8300000, guid: f5dc1aebb3da41d46a8bece3122fd117, type: 3}
+  canDrop: 1
+  pickUpSFX: {fileID: 8300000, guid: cbc348ec1887a00448ae87b973b4a024, type: 3}
+  useSuccessSound: {fileID: 0}
+  consumeOnUse: 1
+  maxStack: 1
+  interactionReachBonus: 0
+  reachAttemptFailMessage: 
+  hasPrimaryAction: 0
+  breaksOnWrongUse: 0
+  breakOnWrongUseSound: {fileID: 0}
+  breakOnWrongUseMessage: The screwdriver snapped.
+  nameKey: 
+  pickupKey: 
+  breakMessageKey: 
+  pickUpText: 
+  description: 

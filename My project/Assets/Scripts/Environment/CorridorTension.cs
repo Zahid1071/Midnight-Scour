@@ -2,19 +2,17 @@ using UnityEngine;
 using UnityEngine.Audio;
 
 /// <summary>
-/// The corridor in the dark, from the lights going out until the player walks out through the far door:
-/// - a low drone that swells while they force the lock, and drops to dead silence just before the steps come;
-/// - sparse creaks, drips and rattles somewhere behind them, never while the lock scenes play;
-/// - walking out through the door: the room lights flick on by themselves and the corridor falls quiet.
-/// Coming back for the bar: once the player is back in the cage room with the guy standing there, the drone and the
-/// sounds come back around them, until the bar is picked up (then dead silence).
+/// Basement corridor atmosphere:
+/// - First leave through the far door: room lights flick on (cage + corridor lamps) and the corridor falls quiet.
+/// - Optional dark drone while forcing the lock (only if the corpse event has already finished its return scare).
+/// - Coming back for the bar: once the guy stands at the wall, the drone returns until the bar is taken.
 /// </summary>
 [DisallowMultipleComponent]
 public class CorridorTension : MonoBehaviour
 {
     enum State { Waiting, Active, Left, Return, Done }
 
-    [Tooltip("Starts when this event is done (the lights went out).")]
+    [Tooltip("Used for return music / wall-stander checks, and optional dark-drone after the scare.")]
     [SerializeField] CorpseVanishEvent startAfter;
     [SerializeField] ScrewdriverLockBreakMinigame lockMinigame;
     [SerializeField] DoorBreakScare doorScare;
@@ -50,6 +48,10 @@ public class CorridorTension : MonoBehaviour
     [SerializeField] Transform exitPlane;
     [SerializeField] float exitMargin = 1f;
     [SerializeField] LightSwitch lightsOnExit;
+    [Tooltip("Extra light switches turned on with the exit (if the basement has more than one).")]
+    [SerializeField] LightSwitch[] extraLightsOnExit;
+    [Tooltip("Lamp roots turned on with the exit (cage / corridor wall lamps not wired to a switch).")]
+    [SerializeField] GameObject[] extraLampsOnExit;
 
     [Header("Back in the cage room")]
     [Tooltip("The cage room (world space): stepping back into it while the guy stands there brings the drone and the sounds back, kept inside this box.")]
@@ -122,19 +124,30 @@ public class CorridorTension : MonoBehaviour
             return;
         }
 
-        if (_state == State.Waiting)
-        {
-            if (startAfter != null && startAfter.CurrentStage != CorpseVanishEvent.Stage.Done)
-                return;
-            Begin();
-        }
-
         if (_player == null)
         {
             GameObject p = GameObject.FindWithTag("Player");
             if (p == null)
                 return;
             _player = p.transform;
+        }
+
+        // First walk-out turns the lights on even before any dark-drone beat.
+        if ((_state == State.Waiting || _state == State.Active)
+            && exitPlane != null
+            && Vector3.Dot(_player.position - exitPlane.position, exitPlane.forward) > exitMargin)
+        {
+            Leave();
+            return;
+        }
+
+        if (_state == State.Waiting)
+        {
+            // Dark drone only after the return scare (lights already went out once).
+            if (startAfter != null && startAfter.CurrentStage == CorpseVanishEvent.Stage.Done
+                && startAfter.WallStanderShown)
+                Begin();
+            return;
         }
 
         if (_state == State.Left)
@@ -281,7 +294,37 @@ public class CorridorTension : MonoBehaviour
     void Leave()
     {
         _state = State.Left;
-        if (lightsOnExit != null && !lightsOnExit.IsOn)
-            lightsOnExit.Interact();
+        TurnLightsOn(lightsOnExit);
+        if (extraLightsOnExit != null)
+        {
+            foreach (LightSwitch sw in extraLightsOnExit)
+                TurnLightsOn(sw);
+        }
+        if (extraLampsOnExit != null)
+        {
+            foreach (GameObject lamp in extraLampsOnExit)
+                SetLampLit(lamp, true);
+        }
+    }
+
+    static void TurnLightsOn(LightSwitch sw)
+    {
+        if (sw != null && !sw.IsOn)
+            sw.Interact();
+    }
+
+    static void SetLampLit(GameObject lamp, bool lit)
+    {
+        if (lamp == null)
+            return;
+        foreach (Light l in lamp.GetComponentsInChildren<Light>(true))
+        {
+            if (l == null)
+                continue;
+            // Skip cinematic fill lights hanging under cameras.
+            if (l.GetComponentInParent<Unity.Cinemachine.CinemachineCamera>() != null)
+                continue;
+            l.enabled = lit;
+        }
     }
 }

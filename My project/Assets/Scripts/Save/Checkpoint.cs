@@ -18,11 +18,18 @@ public static class Checkpoint
     /// <summary>The next gameplay scene load restores the saved checkpoint instead of starting fresh.</summary>
     public static bool RestorePending { get; private set; }
 
+    /// <summary>True while <see cref="CheckpointManager"/> is rebuilding the world from a save (suppress OnDestroy SFX, etc.).</summary>
+    public static bool IsRestoring { get; set; }
+
     /// <summary>A readable save of the current version is on disk.</summary>
     public static bool Exists => TryRead(out _);
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-    static void ResetStatics() => RestorePending = false;
+    static void ResetStatics()
+    {
+        RestorePending = false;
+        IsRestoring = false;
+    }
 
     public static void RequestRestore() => RestorePending = Exists;
 
@@ -142,6 +149,7 @@ public class CheckpointData
     public bool corridorLeft;
     public bool returnMusicPlaying;
     public bool mapFound;
+    public bool carShotPlayed;
 
     [Header("Hints")]
     public List<string> hintsShown = new List<string>();

@@ -8,6 +8,8 @@ using UnityEngine;
 /// After the linked window is open, looking through the gap shows the normal hand interact icon.
 /// Interacting plays a weighted climb-through cinematic: the camera heaves over the sill, the player
 /// body/colliders teleport to the far side halfway through, then the view blends back onto the head.
+/// First half (pre-teleport) keeps the player catchable in the start-side room; capture aborts the climb
+/// immediately. Second-story windows cannot be climbed.
 /// Object must be named "Window Climb Camera" (or point <see cref="climbCamera"/> at one) for the brain's
 /// custom blends to cut in and ease out by name.
 /// </summary>
@@ -24,6 +26,8 @@ public class WindowClimbThrough : MonoBehaviour, IInteractable
     [SerializeField, Range(0.1f, 1f)] float minOpenAmount = 0.75f;
     [Tooltip("Collider in the open gap (this object or a child). Enabled only while the window is open enough.")]
     [SerializeField] Collider gapCollider;
+    [Tooltip("Local Y above the farmhouse root treated as second story (story height is 3m; half = 1.5).")]
+    [SerializeField] float secondStoryYThreshold = 1.5f;
 
     [Header("Climb Path")]
     [Tooltip("Blue axis should point out of the house. Empty = this transform.")]
@@ -63,10 +67,21 @@ public class WindowClimbThrough : MonoBehaviour, IInteractable
 
     static CinemachineCamera _sharedCam;
     static bool _busy;
+    static WindowClimbThrough _active;
 
     bool _locked;
     bool _climbing;
+    bool _teleportedPast;
     readonly List<Renderer> _hiddenViewmodel = new List<Renderer>();
+
+    /// <summary>True while any window climb cinematic is running.</summary>
+    public static bool IsClimbing => _active != null && _active._climbing;
+
+    /// <summary>
+    /// First half of the climb (body still on the start-side room). Player remains catchable here.
+    /// </summary>
+    public static bool IsCatchablePhase =>
+        _active != null && _active._climbing && !_active._teleportedPast;
 
     void Awake()
     {
@@ -98,6 +113,13 @@ public class WindowClimbThrough : MonoBehaviour, IInteractable
     {
         if (_busy || _climbing || PlayerControlGate.IsInputBlocked)
             return false;
+
+        // Ground-floor windows only — second story is climb-blocked by design.
+        if (IsSecondStoryWindow())
+        {
+            InteractionFeedback.Fail();
+            return false;
+        }
 
         if (!IsWindowOpenEnough())
         {
@@ -154,9 +176,38 @@ public class WindowClimbThrough : MonoBehaviour, IInteractable
     {
         if (gapCollider == null)
             return;
-        bool open = IsWindowOpenEnough();
+        // Second-story gaps stay inert — no interact prompt, no climb.
+        bool open = !IsSecondStoryWindow() && IsWindowOpenEnough();
         if (gapCollider.enabled != open)
             gapCollider.enabled = open;
+    }
+
+    bool IsSecondStoryWindow()
+    {
+        // Farmhouse-local Y so a raised house root doesn't mis-classify ground windows
+        // (ground sills ~1.1m local; second story ~4.1m local).
+        Transform root = FindFarmhouseRoot();
+        float y = root != null
+            ? root.InverseTransformPoint(transform.position).y
+            : transform.position.y;
+        return y > secondStoryYThreshold;
+    }
+
+    static Transform FindFarmhouseRoot()
+    {
+        var named = GameObject.Find("Farmhouse");
+        return named != null ? named.transform : null;
+    }
+
+    /// <summary>
+    /// Abort an in-progress climb the instant capture starts so the climb cam/gate
+    /// hand off immediately to the jumpscare with no leftover blend delay.
+    /// </summary>
+    public static void AbortForCapture()
+    {
+        if (_active == null || !_active._climbing)
+            return;
+        _active.EndClimbForCapture();
     }
 
     bool EnsureClimbCamera()
@@ -187,6 +238,8 @@ public class WindowClimbThrough : MonoBehaviour, IInteractable
     {
         _busy = true;
         _climbing = true;
+        _teleportedPast = false;
+        _active = this;
         Begin(main);
 
         Vector3 outward = Flat(outwardAxis != null ? outwardAxis.forward : transform.forward);
@@ -244,6 +297,14 @@ public class WindowClimbThrough : MonoBehaviour, IInteractable
         float cameraEnd = Mathf.Min(duration, releaseAt);
         for (float t = 0f; t < cameraEnd; t += Time.deltaTime)
         {
+            // Capture owns the camera/gate now — stop without finishing the climb blend.
+            if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured)
+                || JumpscareManager.CaptureUiActive)
+            {
+                EndClimbForCapture();
+                yield break;
+            }
+
             float linear = Mathf.Clamp01(t / duration);
             float u = WeightedClimb(linear);
 
@@ -262,6 +323,7 @@ public class WindowClimbThrough : MonoBehaviour, IInteractable
             if (!teleported && linear >= teleportAt)
             {
                 teleported = true;
+                _teleportedPast = true;
                 TeleportPlayer(player, body, toFeet, faceThrough);
                 RestorePlayerCollision(hider, body, capsule, capsuleWasEnabled);
                 collisionRestored = true;
@@ -276,6 +338,8 @@ public class WindowClimbThrough : MonoBehaviour, IInteractable
 
         if (!teleported)
         {
+            teleported = true;
+            _teleportedPast = true;
             TeleportPlayer(player, body, toFeet, faceThrough);
             RestorePlayerCollision(hider, body, capsule, capsuleWasEnabled);
             collisionRestored = true;
@@ -291,6 +355,13 @@ public class WindowClimbThrough : MonoBehaviour, IInteractable
         climbCamera.Priority = 0;
         for (float t = cameraEnd; t < releaseAt; t += Time.deltaTime)
         {
+            if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured)
+                || JumpscareManager.CaptureUiActive)
+            {
+                EndClimbForCapture();
+                yield break;
+            }
+
             if (collisionRestored)
                 TickLockedGravity(body, ref fallVelocity);
             yield return null;
@@ -390,6 +461,40 @@ public class WindowClimbThrough : MonoBehaviour, IInteractable
 
     void EndClimb()
     {
+        FinishClimb(showHud: true);
+    }
+
+    void EndClimbImmediate()
+    {
+        StopAllCoroutines();
+        RestorePlayerCollisionForAbort();
+        FinishClimb(showHud: true);
+    }
+
+    /// <summary>
+    /// Drop climb cam/gate instantly for capture. Skips HUD restore — capture UI owns visibility.
+    /// </summary>
+    void EndClimbForCapture()
+    {
+        StopAllCoroutines();
+        RestorePlayerCollisionForAbort();
+        FinishClimb(showHud: false);
+    }
+
+    void RestorePlayerCollisionForAbort()
+    {
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player == null)
+            return;
+        RestorePlayerCollision(
+            player.GetComponent<PlayerHider>(),
+            player.GetComponent<CharacterController>(),
+            player.GetComponent<CapsuleCollider>(),
+            true);
+    }
+
+    void FinishClimb(bool showHud)
+    {
         foreach (Renderer r in _hiddenViewmodel)
             if (r != null)
                 r.enabled = true;
@@ -399,27 +504,16 @@ public class WindowClimbThrough : MonoBehaviour, IInteractable
         if (_locked)
         {
             _locked = false;
-            GameplayHudVisibility.Instance?.ShowGameplayHud();
+            if (showHud)
+                GameplayHudVisibility.Instance?.ShowGameplayHud();
             PlayerControlGate.Release(LockReason);
         }
         _climbing = false;
+        _teleportedPast = false;
         _busy = false;
+        if (_active == this)
+            _active = null;
         RefreshGap();
-    }
-
-    void EndClimbImmediate()
-    {
-        StopAllCoroutines();
-        GameObject player = GameObject.FindWithTag("Player");
-        if (player != null)
-        {
-            RestorePlayerCollision(
-                player.GetComponent<PlayerHider>(),
-                player.GetComponent<CharacterController>(),
-                player.GetComponent<CapsuleCollider>(),
-                true);
-        }
-        EndClimb();
     }
 
     void Pose(Vector3 position, Quaternion rotation, float fov)

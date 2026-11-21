@@ -5,12 +5,14 @@ public class CarEscapePoint : MonoBehaviour, IInteractable
 {
     [Header("Demo")]
     [Tooltip("Demo build: the car door is just locked, and the part slots and part pickups are switched off.")]
-    [SerializeField] bool repairDisabledForDemo = true;
+    [SerializeField] bool repairDisabledForDemo = false;
     [SerializeField] AudioClip lockedSfx;
     [SerializeField, Range(0f, 1f)] float lockedVolume = 1f;
     [SerializeField] float lockedFeedbackCooldown = 1f;
 
     [Header("Locked → window scare")]
+    [Tooltip("Off by default: the butcher zoom after the first locked-car click. Re-enable only if that beat is wanted again.")]
+    [SerializeField] bool playLockedWindowScare = false;
     [Tooltip("After the first locked feedback (once the leave-basement car shot has finished), wait this long then play the butcher-in-the-window beat.")]
     [SerializeField] float lockedWindowScareDelay = 1f;
 
@@ -73,7 +75,7 @@ public class CarEscapePoint : MonoBehaviour, IInteractable
             SoundManager.Instance.PlaySFXAt(lockedSfx, transform.position, lockedVolume);
 
         // Once out of the basement (car shot done): first locked click arms the window stare → car investigate.
-        if (!_windowScareStarted && ButcherWindowShot.HasFinished)
+        if (playLockedWindowScare && !_windowScareStarted && ButcherWindowShot.HasFinished)
         {
             _windowScareStarted = true;
             StartCoroutine(DelayedWindowScare());

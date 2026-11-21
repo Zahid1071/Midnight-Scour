@@ -20,7 +20,72 @@ public class InteractionController : MonoBehaviour
 
     static readonly HashSet<string> BasementRooms = new() { "Basement_Main_Room", "Basement_Cage_Room", "Cage" };
 
-    static bool IsBasementRoom(string roomAnchorId) => roomAnchorId != null && BasementRooms.Contains(roomAnchorId);
+    public static bool IsBasementRoom(string roomAnchorId) => roomAnchorId != null && BasementRooms.Contains(roomAnchorId);
+
+    /// <summary>
+    /// True when the player is in a basement room. Prefers the same path vote as NPC room detection;
+    /// falls back to nearest <see cref="RoomAnchor"/> on the same floor so yard/car height can't fake it.
+    /// </summary>
+    public static bool IsPlayerInBasementRoom(Vector3 worldPosition, string zoneId = "Demo_Environment")
+    {
+        if (TryGetPlayerRoomId(worldPosition, zoneId, out string roomId))
+            return IsBasementRoom(roomId);
+        return false;
+    }
+
+    public static bool TryGetPlayerRoomId(Vector3 worldPosition, string zoneId, out string roomId)
+    {
+        roomId = null;
+
+        if (NPCAnchorManager.Instance != null && !string.IsNullOrEmpty(zoneId))
+        {
+            Transform anchor = NPCAnchorManager.Instance.FindClosestOwnedAnchorByPath(
+                worldPosition, zoneId, NavMesh.AllAreas, isNpcSelf: false);
+            if (anchor != null)
+            {
+                var room = anchor.GetComponent<RoomAnchor>();
+                roomId = room != null
+                    ? (string.IsNullOrEmpty(room.roomID) ? room.name : room.roomID)
+                    : anchor.name;
+                if (!string.IsNullOrEmpty(roomId))
+                    return true;
+            }
+        }
+
+        // Fallback: nearest room anchor on this floor (no NavMesh). Yard/car can't steal basement by Y alone.
+        RoomAnchor nearest = FindNearestRoomAnchorOnFloor(worldPosition);
+        if (nearest == null)
+            return false;
+        roomId = string.IsNullOrEmpty(nearest.roomID) ? nearest.name : nearest.roomID;
+        return !string.IsNullOrEmpty(roomId);
+    }
+
+    static RoomAnchor FindNearestRoomAnchorOnFloor(Vector3 worldPosition)
+    {
+        // Horizontal nearest — yard/car share basement Y, so floor filters would mis-label Outside as basement.
+#if UNITY_2023_1_OR_NEWER
+        var rooms = UnityEngine.Object.FindObjectsByType<RoomAnchor>(FindObjectsSortMode.None);
+#else
+        var rooms = UnityEngine.Object.FindObjectsOfType<RoomAnchor>();
+#endif
+        RoomAnchor best = null;
+        float bestDist = float.PositiveInfinity;
+        for (int i = 0; i < rooms.Length; i++)
+        {
+            RoomAnchor room = rooms[i];
+            if (room == null)
+                continue;
+            Vector3 delta = room.transform.position - worldPosition;
+            delta.y = 0f;
+            float d = delta.sqrMagnitude;
+            if (d < bestDist)
+            {
+                bestDist = d;
+                best = room;
+            }
+        }
+        return best;
+    }
 
     [Tooltip("After the player leaves the cage, Natural routines wait this long before the butcher may pick/enter the basement. Chase from noise is not blocked.")]
     [SerializeField] float basementRoutineDelaySeconds = 30f;
@@ -313,6 +378,12 @@ public class InteractionController : MonoBehaviour
     [SerializeField]
     private Transform visualRoot;
 
+    [Header("Animator locomotion (Adam blend tree Speed thresholds)")]
+    [Tooltip("Must match Idle / Walk / Run thresholds on the NPC animator blend tree.")]
+    [SerializeField] float animIdleThreshold = 0f;
+    [SerializeField] float animWalkThreshold = 2.5f;
+    [SerializeField] float animRunThreshold = 3f;
+
     [Header("Interpolation Settings")]
     public AnimationCurve interpolationCurveEnter = AnimationCurve.EaseInOut(0, 0, 1, 1);
     public AnimationCurve interpolationCurveExit = AnimationCurve.EaseInOut(0, 0, 1, 1);
@@ -357,13 +428,19 @@ public class InteractionController : MonoBehaviour
     private void SetCurrentMovementState()
     {
         float velocity = agent.velocity.magnitude;
+        float walk = npc != null ? npc.walkSpeed : animWalkThreshold;
+        float run = npc != null ? npc.runSpeed : animRunThreshold;
+        // Classify run once past the midpoint between SO walk/run speeds (not a hard-coded 2.6).
+        float runGate = walk + Mathf.Max(0.01f, (run - walk) * 0.5f);
 
         if (agent.pathPending || agent.remainingDistance > 0.1f)
         {
-            if (velocity > 2.6f)
+            if (velocity > runGate)
                 currentMovementState = MovementState.Running;
-            else
+            else if (velocity > 0.05f)
                 currentMovementState = MovementState.Walking;
+            else
+                currentMovementState = MovementState.Idle;
         }
         else
         {
@@ -375,7 +452,27 @@ public class InteractionController : MonoBehaviour
     {
         if (animator == null || agent == null) return;
 
-        float targetSpeed = IsPerformingHotspotAction ? 0f : agent.velocity.magnitude;
+        // Remap m/s onto the blend-tree thresholds so SO walk/run changes don't idle-blend
+        // (Speed < walk threshold looks like slow-motion walking).
+        float targetSpeed = 0f;
+        if (!IsPerformingHotspotAction)
+        {
+            float v = agent.velocity.magnitude;
+            if (v > 0.05f)
+            {
+                float walk = npc != null ? Mathf.Max(0.01f, npc.walkSpeed) : animWalkThreshold;
+                float run = npc != null ? Mathf.Max(walk + 0.01f, npc.runSpeed) : animRunThreshold;
+
+                if (v <= walk)
+                    targetSpeed = Mathf.Lerp(animIdleThreshold, animWalkThreshold, v / walk);
+                else
+                    targetSpeed = Mathf.Lerp(
+                        animWalkThreshold,
+                        animRunThreshold,
+                        Mathf.InverseLerp(walk, run, v));
+            }
+        }
+
         animSpeed = Mathf.Lerp(animSpeed, targetSpeed, Time.deltaTime * 6f);
 
         if (animSpeed < 0.01f) animSpeed = 0f;
@@ -687,7 +784,7 @@ public class InteractionController : MonoBehaviour
         IsPerformingHotspotAction = true;
 
         Transform anchor = NPCAnchorManager.Instance.GetAnchor(hotspot.hotspotID);
-        Transform actionPoint = anchor != null ? anchor.GetChild(0) : null;
+        Transform actionPoint = anchor != null && anchor.childCount > 0 ? anchor.GetChild(0) : null;
 
         if (hotspot.requiresVisualOffset && actionPoint != null && visualRoot != null)
         {
@@ -742,12 +839,14 @@ public class InteractionController : MonoBehaviour
 
         if (!isCancelled && hotspot.requiresVisualOffset)
         {
-            animator.SetTrigger("StandUp");
+            SafeSetAnimTrigger("StandUp");
             yield return InterpolateBackToStandingPosition();
         }
 
         IsPerformingHotspotAction = false;
-        animator.SetInteger("Behaviour", -1);
+        SafeSetAnimInt("Behaviour", -1);
+        if (HasAnimParam("Awake"))
+            animator.SetBool("Awake", true);
         interactionRoutine = null;
 
         StartNextRoutine();
@@ -855,14 +954,14 @@ public class InteractionController : MonoBehaviour
 
         if (hasVisualOffset)
         {
-            if (animator != null)
-                animator.SetTrigger("StandUp");
+            SafeSetAnimTrigger("StandUp");
             yield return InterpolateBackToStandingPosition();
         }
 
         IsPerformingHotspotAction = false;
-        if (animator != null)
-            animator.SetInteger("Behaviour", -1);
+        SafeSetAnimInt("Behaviour", -1);
+        if (HasAnimParam("Awake"))
+            animator.SetBool("Awake", true);
 
         NPCController.AIState nextState = _stateAfterStandUp
             ?? NPCController.AIState.Natural;
@@ -876,8 +975,40 @@ public class InteractionController : MonoBehaviour
         if (animator == null) return;
 
         int baseBehaviour = (int)hotspot.actionType;
+        if (HasAnimParam("Behaviour"))
+            animator.SetInteger("Behaviour", baseBehaviour);
 
-        animator.SetInteger("Behaviour", baseBehaviour);
+        // Dog (and similar) controllers use Awake instead of Behaviour sit/idle ints.
+        if (HasAnimParam("Awake"))
+            animator.SetBool("Awake", !IsSleepHotspot(hotspot.actionType));
+    }
+
+    static bool IsSleepHotspot(HotspotActionType action) =>
+        action == HotspotActionType.Nap
+        || action == HotspotActionType.GlitchNap
+        || action == HotspotActionType.SeizureNap;
+
+    bool HasAnimParam(string paramName)
+    {
+        if (animator == null) return false;
+        for (int i = 0; i < animator.parameterCount; i++)
+        {
+            if (animator.GetParameter(i).name == paramName)
+                return true;
+        }
+        return false;
+    }
+
+    void SafeSetAnimInt(string paramName, int value)
+    {
+        if (HasAnimParam(paramName))
+            animator.SetInteger(paramName, value);
+    }
+
+    void SafeSetAnimTrigger(string paramName)
+    {
+        if (HasAnimParam(paramName))
+            animator.SetTrigger(paramName);
     }
 
     public bool IsBusyWithRoutine()
@@ -895,8 +1026,9 @@ public class InteractionController : MonoBehaviour
             interactionRoutine = null;
         }
         IsPerformingHotspotAction = false;
-        if (animator != null)
-            animator.SetInteger("Behaviour", -1);
+        SafeSetAnimInt("Behaviour", -1);
+        if (HasAnimParam("Awake"))
+            animator.SetBool("Awake", true);
 
         // Hard cancel without stand-up left him offset on the seat forever in Natural.
         SnapVisualRootToAgent();

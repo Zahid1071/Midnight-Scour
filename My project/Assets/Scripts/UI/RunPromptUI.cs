@@ -49,13 +49,10 @@ public class RunPromptUI : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     static void ResetStatics() => s_instance = null;
 
-    public static void Show()
-    {
-        RunPromptUI prompt = Instance();
-        if (prompt != null)
-            prompt.Open();
-    }
+    /// <summary>Retired — RUN overlay is removed from gameplay. Kept as a no-op for any leftover callers.</summary>
+    public static void Show() { }
 
+    /// <summary>Retired — RUN overlay is removed from gameplay.</summary>
     public static void Hide()
     {
         if (s_instance != null)

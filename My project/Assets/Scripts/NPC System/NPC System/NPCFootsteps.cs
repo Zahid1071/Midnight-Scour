@@ -96,6 +96,7 @@ public class NPCFootsteps : MonoBehaviour
     Animator _animator;
     Foot _left, _right;
     AudioSource _source;
+    Transform _listener;
 #if STEAMAUDIO_ENABLED
     SteamAudioSource _steam;
     SteamAudioProbeBatch[] _batches;
@@ -149,14 +150,21 @@ public class NPCFootsteps : MonoBehaviour
         if (dt <= 0f)
             return;
 
+        // Steam Audio pathing can keep footsteps audible past Max Distance when the listener is outside the
+        // baked probe volume (dog pen / field). Hard-mute past the rolloff end as a backstop.
+        if (_source != null)
+            _source.mute = !ListenerInRange(_source.transform.position);
+
 #if STEAMAUDIO_ENABLED
         // Pathing only works inside the batch the source uses, so follow the NPC between buildings.
-        if (_steam != null && _steam.pathing && Time.time >= _nextBatchCheck)
+        // Also kill pathing when the listener leaves that volume — otherwise farmhouse pathing leaks outdoors.
+        if (_steam != null && pathing && Time.time >= _nextBatchCheck)
         {
             _nextBatchCheck = Time.time + 0.5f;
             SteamAudioProbeBatch batch = FindProbeBatch();
             if (batch != null)
                 _steam.pathingProbeBatch = batch;
+            _steam.pathing = batch != null && ListenerInsideProbeBatch(batch);
         }
 #endif
 
@@ -227,6 +235,8 @@ public class NPCFootsteps : MonoBehaviour
     void Step(Vector3 footPosition)
     {
         if (bank == null || _source == null)
+            return;
+        if (!ListenerInRange(footPosition))
             return;
 
         FootstepSurfaceType type = FootstepSurface.Detect(footPosition, _root, bank.fallback);
@@ -305,6 +315,32 @@ public class NPCFootsteps : MonoBehaviour
         go.SetActive(true);
     }
 
+    bool ListenerInRange(Vector3 from)
+    {
+        if (!TryGetListenerPosition(out Vector3 listener))
+            return true;
+        float max = Mathf.Max(0.01f, maxDistance);
+        return (listener - from).sqrMagnitude <= max * max;
+    }
+
+    bool TryGetListenerPosition(out Vector3 position)
+    {
+        if (_listener == null || !_listener.gameObject.activeInHierarchy)
+        {
+            AudioListener found = FindFirstObjectByType<AudioListener>();
+            _listener = found != null ? found.transform : null;
+        }
+
+        if (_listener == null)
+        {
+            position = default;
+            return false;
+        }
+
+        position = _listener.position;
+        return true;
+    }
+
 #if STEAMAUDIO_ENABLED
     SteamAudioProbeBatch FindProbeBatch()
     {
@@ -315,11 +351,21 @@ public class NPCFootsteps : MonoBehaviour
                 continue;
             if (first == null)
                 first = batch;
-            Vector3 local = batch.transform.InverseTransformPoint(_root.position);
-            if (Mathf.Abs(local.x) <= 0.5f && Mathf.Abs(local.y) <= 0.5f && Mathf.Abs(local.z) <= 0.5f)
+            if (PointInsideProbeBatch(batch, _root.position))
                 return batch;
         }
         return first;
+    }
+
+    static bool PointInsideProbeBatch(SteamAudioProbeBatch batch, Vector3 world)
+    {
+        Vector3 local = batch.transform.InverseTransformPoint(world);
+        return Mathf.Abs(local.x) <= 0.5f && Mathf.Abs(local.y) <= 0.5f && Mathf.Abs(local.z) <= 0.5f;
+    }
+
+    bool ListenerInsideProbeBatch(SteamAudioProbeBatch batch)
+    {
+        return TryGetListenerPosition(out Vector3 listener) && PointInsideProbeBatch(batch, listener);
     }
 #endif
 }

@@ -7,9 +7,11 @@ using UnityEngine.Audio;
 using UnityEngine.Serialization;
 
 /// <summary>
-/// The guy at the wall, once the bar behind him is taken: the moment the player turns their back on him and faces the
-/// way out, the lighter dies and he turns and screams. A second after the scream ends (at once if they look back at him)
-/// he comes after them with the Butcher's run, faster than the player walks but slower than they sprint. The cage room door can't be closed behind them. If he reaches the
+/// The guy at the wall, once the bar behind him is taken: with Hold Chase Until External Start, turning away only
+/// signals WouldStartChase (BasementBarEscapeTrap bangs the door shut for another screwdriver break). Call
+/// BeginChaseNow when that lock finally breaks — then the lighter dies and he turns and screams. A second after the
+/// scream ends (at once if they look back at him) he comes after them with the Butcher's run, faster than the player
+/// walks but slower than they sprint. The cage room door can't be closed behind them. If he reaches the
 /// corridor doorway before it's shut he shoves it back open and comes on faster than they can sprint.
 /// Shutting it with him on the other side: he pounds on it while a shot shows the player where to hide, and keeps
 /// pounding until they've hidden (or run out of time), then breaks in. Hidden, they're safe: he runs in, checks the
@@ -35,6 +37,8 @@ public class WallStanderChase : MonoBehaviour
     [SerializeField] AudioMixerGroup mixerGroup;
 
     [Header("Trigger")]
+    [Tooltip("When on, turning away / mic noise only raises WouldStartChase — call BeginChaseNow after the escape lock break.")]
+    [SerializeField] bool holdChaseUntilExternalStart = true;
     [Tooltip("The way out of the cage room.")]
     [SerializeField] Transform exitPoint;
     [Tooltip("Starts once the view is within this many degrees (flat) of the way out...")]
@@ -127,6 +131,14 @@ public class WallStanderChase : MonoBehaviour
     [Tooltip("No shake from this far away.")]
     [SerializeField] float bangShakeMaxDistance = 15f;
 
+    [Header("Escape look-back reveal")]
+    [Tooltip("Where he stands for the screwdriver look-back (cage doorframe). Empty = Exit Point.")]
+    [SerializeField] Transform escapeRevealPoint;
+    [Tooltip("World offset from Escape Reveal Point / Exit Point when placing him.")]
+    [SerializeField] Vector3 escapeRevealOffset = new Vector3(0.7f, 0f, 0f);
+    [Tooltip("Idle / stand animator state while revealed at the doorframe (not Wall Pose).")]
+    [SerializeField] string escapeRevealState = "Base Blend";
+
     [Header("Shut out: hide, he breaks in and searches")]
     [Tooltip("Shows the player where to hide as the pounding starts.")]
     [SerializeField] HideOptionsShot hideShot;
@@ -207,10 +219,12 @@ public class WallStanderChase : MonoBehaviour
     bool _haveBarSpot;
     Vector3 _barSpot;
     AudioSource _music;
+    AudioSource _roarSource;
     float _musicTarget;
     float _musicRate;
     float _effectLevel;
     bool _owningEffects;
+    KinoGlitch.AnalogGlitchController _glitch;
     float _baseAcceleration;
     bool _breached;
     bool _doorShutting;
@@ -234,8 +248,66 @@ public class WallStanderChase : MonoBehaviour
     public bool IsChasing => _state == State.Chasing;
     /// <summary>He's behind the shut escape door, pounding on it.</summary>
     public bool IsShutOut => _state == State.Pounding;
+    /// <summary>Waiting, and hold-chase is on — walk-away / mic would normally start him.</summary>
+    public bool IsHoldingForExternalStart =>
+        holdChaseUntilExternalStart && _state == State.Waiting;
     /// <summary>The door is shut on him and the hide shot is over (the auto-save checkpoint).</summary>
     public event System.Action ShutOut;
+    /// <summary>Player turned away / backed off / made noise while chase is held for the escape lock break.</summary>
+    public event System.Action WouldStartChase;
+
+    bool _wouldStartRaised;
+
+    /// <summary>Starts the roar / run after the escape lock breakthrough (or deadline).</summary>
+    public void BeginChaseNow()
+    {
+        if (_state != State.Waiting || _routine != null)
+            return;
+        _routine = StartCoroutine(RoarRoutine());
+    }
+
+    /// <summary>
+    /// Moves him to the cage doorframe facing the player for the escape screwdriver look-back.
+    /// Stays there until chase / reset.
+    /// </summary>
+    public void PlaceForEscapeReveal()
+    {
+        if (_state != State.Waiting)
+            return;
+
+        Transform anchor = escapeRevealPoint != null ? escapeRevealPoint : exitPoint;
+        Vector3 spot = anchor != null
+            ? anchor.position + escapeRevealOffset
+            : transform.position + Vector3.left * 0.5f;
+        spot.y = transform.position.y;
+        if (NavMesh.SamplePosition(spot, out NavMeshHit hit, 2.5f, NavMesh.AllAreas))
+            spot = hit.position;
+
+        Vector3 face = _player != null
+            ? Flat(_player.position - spot)
+            : (escapeDoor != null ? Flat(escapeDoor.transform.position - spot) : -transform.right);
+        if (face.sqrMagnitude < 1e-4f)
+            face = Vector3.left;
+
+        if (keepAwayBarrier != null)
+            keepAwayBarrier.enabled = false;
+
+        transform.SetPositionAndRotation(spot, Quaternion.LookRotation(face));
+        if (animator != null)
+        {
+            animator.applyRootMotion = false;
+            int hash = Animator.StringToHash(escapeRevealState);
+            if (animator.HasState(0, hash))
+            {
+                animator.Play(escapeRevealState, 0, 0f);
+                if (_hasSpeed)
+                    animator.SetFloat(_speedId, 0f);
+            }
+            animator.Update(0f);
+        }
+        _locomotion = escapeRevealState;
+        _stillFor = 0f;
+    }
 
     void Awake()
     {
@@ -261,6 +333,25 @@ public class WallStanderChase : MonoBehaviour
                 _hasRunSpeed |= p.nameHash == _runSpeedId && p.type == AnimatorControllerParameterType.Float;
                 _hasSpeed |= p.nameHash == _speedId && p.type == AnimatorControllerParameterType.Float;
             }
+        // Decode / build Steam Audio sources up front so the scream frame isn't a hitch.
+        WarmChaseAudio();
+    }
+
+    /// <summary>
+    /// Prefetch roar + chase music and build the roar source. Safe to call again during the
+    /// escape lock window so Streaming/Compressed clips are Loaded before BeginChaseNow.
+    /// </summary>
+    public void WarmChaseAudio()
+    {
+        SoundManager.EnsureClipReady(roarClip);
+        SoundManager.EnsureClipReady(chaseMusic);
+        if (bangClips != null)
+        {
+            for (int i = 0; i < bangClips.Length; i++)
+                SoundManager.EnsureClipReady(bangClips[i]);
+        }
+        EnsureRoarSource();
+        EnsureMusicSource();
     }
 
     void OnEnable()
@@ -280,7 +371,6 @@ public class WallStanderChase : MonoBehaviour
         }
         ReleaseEffects();
         StopMusic();
-        RunPromptUI.Hide();
         StopShake();
         StopHideShot();
     }
@@ -328,7 +418,7 @@ public class WallStanderChase : MonoBehaviour
         }
         if (Flat(_player.position - _barSpot).magnitude >= backAwayDistance)
         {
-            _routine = StartCoroutine(RoarRoutine());
+            RaiseOrStartChase();
             return;
         }
 
@@ -341,6 +431,21 @@ public class WallStanderChase : MonoBehaviour
         if (Vector3.Angle(view, Flat(exitPoint.position - cam.transform.position)) > facingExitAngle
             || Vector3.Angle(view, Flat(transform.position - cam.transform.position)) < awayFromHimAngle)
             return;
+        RaiseOrStartChase();
+    }
+
+    void RaiseOrStartChase()
+    {
+        if (holdChaseUntilExternalStart)
+        {
+            if (_wouldStartRaised)
+                return;
+            _wouldStartRaised = true;
+            // Escape lock still ahead — use that window to finish audio decode / Steam setup.
+            WarmChaseAudio();
+            WouldStartChase?.Invoke();
+            return;
+        }
         _routine = StartCoroutine(RoarRoutine());
     }
 
@@ -353,6 +458,19 @@ public class WallStanderChase : MonoBehaviour
             _stamina.NoiseAlert += OnNoise;
     }
 
+    /// <summary>Checkpoint / outdoor Continue: mic bar stays off for the rest of the run.</summary>
+    public void MarkMicDone()
+    {
+        _mic = Mic.Done;
+        if (_stamina != null)
+            _stamina.SetOpenListening(false);
+        else
+        {
+            FindStamina();
+            _stamina?.SetOpenListening(false);
+        }
+    }
+
     void TickMic()
     {
         if (_mic == Mic.Done || wallStanderEvent == null || escapeSide == null || _stamina == null)
@@ -360,9 +478,24 @@ public class WallStanderChase : MonoBehaviour
 
         if (_mic == Mic.Off)
         {
-            // A checkpoint picks up after the reveal, already past the corridor.
-            if (!wallStanderEvent.WallStanderShown || (!InCorridor() && !wallStanderEvent.WallRevealPlayed))
+            if (!wallStanderEvent.WallStanderShown)
                 return;
+
+            bool inCorridor = InCorridor();
+            // Mid-return checkpoint (reveal done, bar still there): bar is already past the corridor.
+            bool midReturnNoBar = wallStanderEvent.WallRevealPlayed && !wallStanderEvent.BarTaken;
+            // After bar, only while still waiting on him in the basement — never outdoors / post-escape.
+            bool postBarWait = wallStanderEvent.WallRevealPlayed && wallStanderEvent.BarTaken
+                               && _state == State.Waiting && !IsOutOfBasement();
+
+            if (!inCorridor && !midReturnNoBar && !postBarWait)
+            {
+                // Leave-basement Continue: WallRevealPlayed is true outdoors — lock the bar off.
+                if (wallStanderEvent.WallRevealPlayed && wallStanderEvent.BarTaken)
+                    MarkMicDone();
+                return;
+            }
+
             _mic = Mic.Shown;
             _stamina.SetOpenListening(true);
             if (TutorialPopupUI.ShowOnce(micTutorialId, micTutorialTitleKey, micTutorialBodyKey,
@@ -373,11 +506,21 @@ public class WallStanderChase : MonoBehaviour
 
         bool after = _state != State.Waiting && _state != State.Captured;
         if (_state == State.Pounding || _state == State.Gone
-            || (after && Flat(_player.position - escapeSide.position).magnitude <= micRemoveDistance))
+            || (after && Flat(_player.position - escapeSide.position).magnitude <= micRemoveDistance)
+            || (wallStanderEvent.BarTaken && wallStanderEvent.WallRevealOver && IsOutOfBasement()))
         {
-            _mic = Mic.Done;
-            _stamina.SetOpenListening(false);
+            MarkMicDone();
         }
+    }
+
+    bool IsOutOfBasement()
+    {
+        ButcherWindowShot shot = FindFirstObjectByType<ButcherWindowShot>(FindObjectsInactive.Include);
+        if (shot == null || _player == null)
+            return false;
+        Camera cam = Camera.main;
+        Vector3 eye = cam != null ? cam.transform.position : _player.position + Vector3.up * 1.6f;
+        return shot.IsOutOfBasement(eye);
     }
 
     bool InCorridor()
@@ -399,7 +542,7 @@ public class WallStanderChase : MonoBehaviour
             || PlayerControlGate.IsInputBlocked || ThunderManager.ArePlayerNoisesMasked
             || _player == null || Cage.IsPlayerInsideAnyCage(_player))
             return;
-        _routine = StartCoroutine(RoarRoutine());
+        RaiseOrStartChase();
     }
 
     // Loud in their spot while he searches or heads home: he runs to it and the chase drags them out.
@@ -419,7 +562,18 @@ public class WallStanderChase : MonoBehaviour
     IEnumerator RoarRoutine()
     {
         _state = State.Roaring;
-        RunPromptUI.Show();
+        WarmChaseAudio();
+
+        // Finish any in-flight decode before Play — assigning a still-loading clip freezes the main thread.
+        float wait = 0f;
+        while (wait < 1.5f
+               && ((roarClip != null && roarClip.loadState == AudioDataLoadState.Loading)
+                   || (chaseMusic != null && chaseMusic.loadState == AudioDataLoadState.Loading)))
+        {
+            wait += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
         HeldLighter lighter = FindFirstObjectByType<HeldLighter>(FindObjectsInactive.Include);
         if (lighter != null)
         {
@@ -428,15 +582,16 @@ public class WallStanderChase : MonoBehaviour
             lighter.MisfireNextStrikes(lighterMisfires);
         }
 
+        // Music first, then roar on the next frame so crossfade + scream aren't one hitch.
+        StartMusic();
+        yield return null;
+
         if (roarClip != null)
         {
-            Transform mouth = _head != null ? _head : transform;
-            AudioSource src = SpatialAudio.Create("Wall Stander Roar Audio", mouth, mouth.position, mixerGroup,
-                roarMinDistance, 30f);
-            src.PlayOneShot(roarClip, roarVolume * roarBoost);
-            Destroy(src.gameObject, roarClip.length + 0.25f);
+            EnsureRoarSource();
+            if (_roarSource != null)
+                _roarSource.PlayOneShot(roarClip, roarVolume * roarBoost);
         }
-        StartMusic();
 
         // He turns to the player and screams, running a moment into it or the instant they look at him.
         // Watched from the start (they backed away), he skips the scream and the agent turns him as he runs.
@@ -461,6 +616,16 @@ public class WallStanderChase : MonoBehaviour
         _routine = null;
     }
 
+    void EnsureRoarSource()
+    {
+        if (_roarSource != null || roarClip == null)
+            return;
+        Transform mouth = _head != null ? _head : transform;
+        _roarSource = SpatialAudio.Create("Wall Stander Roar Audio", mouth, mouth.position, mixerGroup,
+            roarMinDistance, 30f, atmospheric: false);
+        _roarSource.playOnAwake = false;
+    }
+
     bool PlayerLooksAtHim()
     {
         Camera cam = Camera.main;
@@ -472,6 +637,9 @@ public class WallStanderChase : MonoBehaviour
 
     void StartChase()
     {
+        // Return scare walk-cap ends once he actually chases.
+        if (wallStanderEvent != null)
+            wallStanderEvent.SetReturnWalkSlow(false);
         if (keepAwayBarrier != null)
             keepAwayBarrier.enabled = false;
         _locomotion = null;
@@ -491,28 +659,40 @@ public class WallStanderChase : MonoBehaviour
         TickChase();
     }
 
+    void EnsureMusicSource()
+    {
+        if (chaseMusic == null || _music != null)
+            return;
+        var go = new GameObject("Wall Stander Chase Music");
+        go.transform.SetParent(transform, false);
+        _music = go.AddComponent<AudioSource>();
+        _music.playOnAwake = false;
+        _music.loop = true;
+        _music.spatialBlend = 0f;
+        _music.outputAudioMixerGroup = musicGroup;
+        _music.clip = chaseMusic;
+        _music.volume = 0f;
+    }
+
     void StartMusic()
     {
-        if (chaseMusic == null)
+        // Route through SoundManager so chase never stacks with basement / house beds.
+        if (chaseMusic == null || SoundManager.Instance == null)
             return;
-        if (_music == null)
+        SoundManager.EnsureClipReady(chaseMusic);
+        SoundManager.Instance.SetChaseMusicActive(true, chaseMusic);
+        // Keep legacy local source silent if it was created earlier.
+        if (_music != null)
         {
-            var go = new GameObject("Wall Stander Chase Music");
-            _music = go.AddComponent<AudioSource>();
-            _music.playOnAwake = false;
-            _music.loop = true;
-            _music.spatialBlend = 0f;
-            _music.outputAudioMixerGroup = musicGroup;
-            _music.clip = chaseMusic;
-            _music.volume = 0f;
-            _music.Play();
+            _music.Stop();
+            _musicTarget = 0f;
         }
-        _musicTarget = chaseMusicVolume;
-        _musicRate = chaseMusicVolume / Mathf.Max(0.01f, chaseMusicFadeIn);
     }
 
     void FadeOutMusic(float seconds)
     {
+        if (SoundManager.Instance != null && SoundManager.Instance.IsChaseMusicActive)
+            SoundManager.Instance.SetChaseMusicActive(false);
         if (_music == null)
             return;
         _musicTarget = 0f;
@@ -530,6 +710,8 @@ public class WallStanderChase : MonoBehaviour
 
     void StopMusic()
     {
+        if (SoundManager.Instance != null && SoundManager.Instance.IsChaseMusicActive)
+            SoundManager.Instance.SetChaseMusicActive(false);
         if (_music != null)
             Destroy(_music.gameObject);
         _music = null;
@@ -589,10 +771,15 @@ public class WallStanderChase : MonoBehaviour
             SoundManager.Instance.StopSearchTension();
     }
 
-    static KinoGlitch.AnalogGlitchController Glitch()
+    KinoGlitch.AnalogGlitchController Glitch()
     {
+        if (_glitch != null)
+            return _glitch;
         Camera cam = Camera.main;
-        return cam != null ? cam.GetComponent<KinoGlitch.AnalogGlitchController>() : null;
+        if (cam == null)
+            return null;
+        _glitch = cam.GetComponent<KinoGlitch.AnalogGlitchController>();
+        return _glitch;
     }
 
     void TickChase()
@@ -653,23 +840,29 @@ public class WallStanderChase : MonoBehaviour
 
     float SideOfEscape(Vector3 point) => Vector3.Dot(point - escapeSide.position, escapeSide.forward);
 
-    // True once the escape door has finished swinging shut with him still wholly on the far side. Reaching the
-    // doorway first (or being through already) means he made it.
+    // True once the escape door has finished swinging shut with him still on the far side → pound.
+    // He only "makes it through" if he is already clearly on the player's side when it shuts.
     bool TickEscapeDoor()
     {
-        if (escapeDoor.objectOpen || SideOfEscape(_player.position) <= 0f)
+        if (escapeDoor == null)
+            return false;
+
+        if (escapeDoor.objectOpen)
         {
             _doorShutting = false;
             return false;
         }
 
         float his = SideOfEscape(transform.position);
-        if (his > -_agent.radius - breachReach)
+        // Clearly past the door plane onto the escape side — he got through before it shut.
+        if (his > Mathf.Max(0.25f, _agent != null ? _agent.radius : 0.25f))
         {
             MakeItThrough(his);
             return false;
         }
 
+        // Door is shut and he is still on the corridor / cage side → wait for it to settle, then pound.
+        // Do not open it from this side.
         Transform leaf = escapeDoor.transform;
         if (!_doorShutting)
         {
@@ -693,8 +886,10 @@ public class WallStanderChase : MonoBehaviour
         _agent.speed = breachSpeed;
         _agent.acceleration = Mathf.Max(_baseAcceleration, breachAcceleration);
         _nextRepath = 0f;
-        escapeDoor.PlayerCanClose = false;
-        if (side < _agent.radius + 0.3f && !escapeDoor.objectOpen)
+        if (escapeDoor != null)
+            escapeDoor.PlayerCanClose = false;
+        // Only shove open if he's already through — never from the far side.
+        if (side > 0f && escapeDoor != null && !escapeDoor.objectOpen)
         {
             escapeDoor.ForceOpenAfterUnlock();
             if (_escapeDoorAI != null)
@@ -737,7 +932,6 @@ public class WallStanderChase : MonoBehaviour
     IEnumerator PoundRoutine(bool resumed = false)
     {
         _state = State.Pounding;
-        RunPromptUI.Hide();
 
         // Behind the shut door, out of sight.
         if (_agent.isOnNavMesh)
@@ -1027,7 +1221,6 @@ public class WallStanderChase : MonoBehaviour
         _breached = true;
         _state = State.Chasing;
         StartMusic();
-        RunPromptUI.Show();
     }
 
     void SetVisible(bool visible)
@@ -1115,16 +1308,21 @@ public class WallStanderChase : MonoBehaviour
     void OpenDoorsInTheWay()
     {
         foreach (DoorController door in FindObjectsByType<DoorController>(FindObjectsSortMode.None))
-            if (!door.IsOpen && (_breached || door != _escapeDoorAI)
-                && Vector3.Distance(door.transform.position, transform.position) <= doorOpenDistance)
+        {
+            if (door == null || door.IsOpen)
+                continue;
+            // Never AI-open the escape door while shut-out / pounding — that skips the bash.
+            if (door == _escapeDoorAI && !_breached)
+                continue;
+            if (Vector3.Distance(door.transform.position, transform.position) <= doorOpenDistance)
                 door.RequestOpen(bypassLock: true);
+        }
     }
 
     // Same order as the Butcher's capture (FSMController.CapturePlayerRoutine / DoCaptureNow).
     IEnumerator CaptureRoutine(PlayerHider hider, bool hidden)
     {
         _state = State.Captured;
-        RunPromptUI.Hide();
         FadeOutMusic(chaseMusicFadeOut);
         if (_agent.isOnNavMesh)
         {
@@ -1231,7 +1429,6 @@ public class WallStanderChase : MonoBehaviour
         _locomotion = wallState;
         _stillFor = 0f;
         StopMusic();
-        RunPromptUI.Hide();
         ReleaseEffects();
         StopShake();
         _breached = false;
@@ -1241,6 +1438,7 @@ public class WallStanderChase : MonoBehaviour
         _state = State.Waiting;
         _needsCageExit = true;
         _haveBarSpot = false;
+        _wouldStartRaised = false;
         if (_mic == Mic.Done)
             _mic = Mic.Off;
     }

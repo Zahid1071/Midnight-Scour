@@ -164,7 +164,9 @@ public class InteractionUIManager : MonoBehaviour
         if (dotCrosshairImage == null)
             return;
 
+        bool holdActive = InventoryUI.Instance != null && InventoryUI.Instance.IsHoldInteractActive;
         bool show = _crosshairState == CrosshairState.Default
+            && !holdActive
             && !PlayerControlGate.IsInputBlocked
             && (_cachedPlayerHider == null || (!_cachedPlayerHider.isHidden && !_cachedPlayerHider.IsHidingEngaged));
         SetCrosshairActive(dotCrosshairImage, show);
@@ -214,6 +216,13 @@ public class InteractionUIManager : MonoBehaviour
         }
 
         if (PlayerControlGate.IsInputBlocked)
+        {
+            ClearDetection(true);
+            return;
+        }
+
+        // Hold ring replaces the hand / door / out-of-reach crosshair while active.
+        if (InventoryUI.Instance != null && InventoryUI.Instance.IsHoldInteractActive)
         {
             ClearDetection(true);
             return;

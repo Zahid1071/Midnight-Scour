@@ -41,11 +41,10 @@ public static class FarmMapSetup
     // Anchored just outside each drawing so the name never covers it.
     static readonly Label[] Labels =
     {
-        new Label("map.small_house", -89.2f, 126.5f, new Vector2(0.5f, 1f), -3f),
+        new Label("map.small_house", 75.5f, 29.5f, new Vector2(0.5f, 1f), -2f),
         new Label("map.farmhouse", -13f, 69.8f, new Vector2(0.5f, 1f), 2f),
         new Label("map.basement", 1.5f, 5f, new Vector2(0.5f, 1f), -2f),
-        new Label("map.truck", 8f, 49.1f, new Vector2(0f, 0.5f), 3f),
-        new Label("map.dog_pen", 76f, 33f, new Vector2(0.5f, 1f), -2.5f),
+        new Label("map.truck", -58f, 44.6f, new Vector2(0f, 0.5f), 3f),
     };
 
     static readonly string[] Locales = { "en", "zh-Hans", "fr", "ja", "pl", "pt-BR", "ru", "tr", "es-419", "th" };
@@ -56,7 +55,6 @@ public static class FarmMapSetup
         { "map.farmhouse", new[] { "Farmhouse", "农舍", "Ferme", "農家", "Dom na farmie", "Casa da fazenda", "Фермерский дом", "Çiftlik evi", "Casa de la granja", "บ้านไร่" } },
         { "map.basement", new[] { "Basement", "地下室", "Sous-sol", "地下室", "Piwnica", "Porão", "Подвал", "Bodrum", "Sótano", "ห้องใต้ดิน" } },
         { "map.truck", new[] { "Truck", "皮卡", "Pick-up", "トラック", "Pikap", "Caminhonete", "Пикап", "Kamyonet", "Camioneta", "รถกระบะ" } },
-        { "map.dog_pen", new[] { "Dog Pen", "狗圈", "Enclos du chien", "犬の囲い", "Kojec psa", "Canil", "Собачий загон", "Köpek ağılı", "Corral del perro", "คอกสุนัข" } },
         { "map.pickup", new[]
             {
                 "A hand-drawn map of the farm. Press M to look at it again.",
@@ -187,6 +185,7 @@ public static class FarmMapSetup
             so.FindProperty("entryKey").stringValue = l.key;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
+
         UIFont.ApplyTree(map.transform);
 
         // Same "press any key" footer as the letters.

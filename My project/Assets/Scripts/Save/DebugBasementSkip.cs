@@ -14,7 +14,9 @@ using UnityEngine.Playables;
 /// Ctrl+2 does the same, then once the shot hands back control drops the player in the farmhouse living room
 /// on the Captive layer with the hunt called off, so the butcher roams freely and ignores them (listening test).
 /// While listening the Captive layer is held and every player AudioSource (footsteps, breathing) is muted.
-/// Ctrl+1 afterwards puts the player back on the Player layer and unmutes them.
+/// Ctrl+1 afterwards ends listen mode in place (Player layer + unmute) without teleporting again.
+/// Ctrl+3 (top-row or numpad) skips to the cage room after the return scare and wall reveal, with the bar still
+/// behind him ready to pick up (same beat as walking back before the auto-save).
 /// </summary>
 public class DebugBasementSkip : MonoBehaviour
 {
@@ -46,12 +48,33 @@ public class DebugBasementSkip : MonoBehaviour
     void Update()
     {
         Keyboard kb = Keyboard.current;
-        if (kb == null || !kb.ctrlKey.isPressed || _busy)
+        if (kb == null || !kb.ctrlKey.isPressed)
             return;
-        if (kb.digit1Key.wasPressedThisFrame || kb.numpad1Key.wasPressedThisFrame)
+
+        bool press1 = kb.digit1Key.wasPressedThisFrame || kb.numpad1Key.wasPressedThisFrame;
+        bool press2 = kb.digit2Key.wasPressedThisFrame || kb.numpad2Key.wasPressedThisFrame;
+        bool press3 = kb.digit3Key.wasPressedThisFrame || kb.numpad3Key.wasPressedThisFrame;
+        if (!press1 && !press2 && !press3)
+            return;
+
+        // Ctrl+1 while listening: become visible again in place (do not re-run the outdoor skip).
+        if (press1 && _listenPlayer != null)
+        {
+            ExitListenModeVisible();
+            return;
+        }
+
+        // A new shortcut cancels an in-flight skip (Ctrl+2 used to hold _busy through the whole leave shot).
+        if (_busy)
+            StopAllCoroutines();
+        _busy = false;
+
+        if (press1)
             StartCoroutine(Run(listenInside: false));
-        else if (kb.digit2Key.wasPressedThisFrame || kb.numpad2Key.wasPressedThisFrame)
+        else if (press2)
             StartCoroutine(Run(listenInside: true));
+        else
+            StartCoroutine(RunBarPickup());
     }
 
     void LateUpdate()
@@ -81,6 +104,20 @@ public class DebugBasementSkip : MonoBehaviour
             yield return SkipOutOfBasement();
             if (listenInside && _skipped)
                 yield return ListenFromInsideHouse();
+        }
+        finally
+        {
+            _busy = false;
+        }
+    }
+
+    IEnumerator RunBarPickup()
+    {
+        StopListening();
+        _busy = true;
+        try
+        {
+            yield return SkipToBarPickup();
         }
         finally
         {
@@ -155,6 +192,85 @@ public class DebugBasementSkip : MonoBehaviour
         {
             Debug.LogWarning("[DebugBasementSkip] Teleported outside, but no ButcherWindowShot to trigger.");
         }
+    }
+
+    IEnumerator SkipToBarPickup()
+    {
+        GameObject player = GameObject.FindWithTag("Player");
+        if (player == null)
+        {
+            Debug.LogWarning("[DebugBasementSkip] No Player in the scene.");
+            yield break;
+        }
+
+        if (PlayerControlGate.IsAcquired(PlayerControlGate.ReasonCaptured) || JumpscareManager.CaptureUiActive)
+        {
+            Debug.LogWarning("[DebugBasementSkip] Can't skip while captured.");
+            yield break;
+        }
+
+        CorpseVanishEvent corpse = FindFirstObjectByType<CorpseVanishEvent>(FindObjectsInactive.Include);
+        if (corpse == null)
+        {
+            Debug.LogWarning("[DebugBasementSkip] No CorpseVanishEvent in the scene.");
+            yield break;
+        }
+
+        SkipIntroCinematic();
+        ReleaseBlockingLocks();
+
+        int playerLayer = LayerMask.NameToLayer("Player");
+        if (playerLayer >= 0)
+            player.layer = playerLayer;
+
+        var hider = player.GetComponent<PlayerHider>();
+        if (hider != null)
+        {
+            if (hider.isHidden && hider.CurrentHidingSpot != null)
+                hider.CurrentHidingSpot.RevealPlayer(player);
+            hider.ClearSearchMemory();
+            hider.EnableControls();
+            hider.RestoreCollision();
+        }
+
+        corpse.DebugPrepareForBarPickup();
+
+        if (!corpse.TryGetBarApproachPose(out Vector3 feet, out float yaw))
+        {
+            Debug.LogWarning("[DebugBasementSkip] Could not resolve a stand point for the bar.");
+            yield break;
+        }
+
+        // Match the post-return-scare beat: corridor already left, return door trip finished, cage open.
+        FindFirstObjectByType<CorridorTension>(FindObjectsInactive.Include)?.RestoreLeft();
+        FindFirstObjectByType<BasementReturnDoorTrap>(FindObjectsInactive.Include)?.DebugSkipReturnTripComplete();
+
+        foreach (PadlockLockpickMinigame padlock in FindObjectsByType<PadlockLockpickMinigame>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            padlock.RestoreUnlocked();
+
+        // Open cage / cage-room access only — leave the corridor escape door alone so
+        // BasementBarEscapeTrap can re-stick it after the bar is taken.
+        foreach (Cage cage in FindObjectsByType<Cage>(FindObjectsSortMode.None))
+        {
+            OpenDoor(cage.cageDoor);
+            cage.SyncDoorState();
+            if (cage.cageDoor != null)
+            {
+                foreach (ScrewdriverLockBreakMinigame screwdriver in cage.cageDoor.GetComponentsInChildren<ScrewdriverLockBreakMinigame>(true))
+                    screwdriver.ResetProgress();
+            }
+        }
+
+        yield return null;
+
+        Teleport(player, feet, yaw);
+        Cage.RebindAllAfterContinueTeleport(player);
+
+        InteractionController interaction = FindFirstObjectByType<InteractionController>();
+        InteractionController.ArmBasementGraceUntilCageExit(interaction != null ? interaction.BasementRoutineDelaySeconds : 30f);
+        CinematicPlayerControlLock.KickNpcNaturalRoutines();
+
+        Debug.Log("[DebugBasementSkip] Bar pickup skip — he's at the wall, the bar is still there. Take it to test the escape.");
     }
 
     IEnumerator ListenFromInsideHouse()
@@ -236,6 +352,18 @@ public class DebugBasementSkip : MonoBehaviour
         }
         _mutedSources.Clear();
         _listenPlayer = null;
+    }
+
+    void ExitListenModeVisible()
+    {
+        GameObject player = _listenPlayer;
+        StopListening();
+        if (player == null)
+            return;
+        int playerLayer = LayerMask.NameToLayer("Player");
+        if (playerLayer >= 0)
+            player.layer = playerLayer;
+        Debug.Log("[DebugBasementSkip] Listen mode ended — back on the Player layer, audio unmuted.");
     }
 
     static void Teleport(GameObject player, Vector3 feet, float yaw)
@@ -323,6 +451,11 @@ public class DebugBasementSkip : MonoBehaviour
 
         var door = doorGo.GetComponentInChildren<SimpleOpenClose>()
                    ?? doorGo.GetComponentInParent<SimpleOpenClose>();
+        OpenDoor(door);
+    }
+
+    static void OpenDoor(SimpleOpenClose door)
+    {
         if (door == null)
             return;
 

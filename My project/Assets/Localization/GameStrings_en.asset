@@ -762,7 +762,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296751
-    m_Localized: Hold right mouse click to apply pressure
+    m_Localized: Right-click to apply pressure
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296752
@@ -810,8 +810,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 34365368158781440
-    m_Localized: Find the right direction, then pull the screwdriver that way until
-      the lock breaks.
+    m_Localized: Find the right direction, then push slowly that way until the lock
+      breaks.
     m_Metadata:
       m_Items: []
   - m_Id: 34392063293128704
@@ -907,6 +907,14 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 46856169052831748
     m_Localized: A hand-drawn map of the farm. Press M to look at it again.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 49832862310858752
+    m_Localized: Climb Through Windows
+    m_Metadata:
+      m_Items: []
+  - m_Id: 49832862424104960
+    m_Localized: You can climb through open windows to get into the farmhouse.
     m_Metadata:
       m_Items: []
   references:

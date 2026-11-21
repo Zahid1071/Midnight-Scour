@@ -10,11 +10,11 @@ using UnityEngine.UI;
 /// <summary>
 /// Auto-save for the gameplay scene. Saves a <see cref="Checkpoint"/> when the bar behind the man at the wall
 /// (<see cref="CorpseVanishEvent"/>) is picked up, again once the escape door is shut on him after the chase and
-/// the hide shot is over (<see cref="WallStanderChase"/>), and again as the player steps out of the basement, just
-/// before the leave-basement car shot (<see cref="ButcherWindowShot"/>). On a load that asked for it (capture retry, main
+/// the hide shot is over (<see cref="WallStanderChase"/>), and again after the leave-basement car shot finishes
+/// (<see cref="ButcherWindowShot"/>). On a load that asked for it (capture retry, main
 /// menu Continue) puts the fresh scene back the way it was: the corpse scare finished, the bar in hand with him waiting
 /// at the wall (or pounding on the shut door), items taken or dropped, doors, padlocks, lights, inventory, the player
-/// where they stood. The butcher starts his day over; loaded outside the basement, the car shot plays again.
+/// where they stood. The butcher starts his day over; if the car shot already played, it is skipped on restore.
 /// Installs itself in any scene with a CorpseVanishEvent. Loading that scene without a pending restore starts a new
 /// run, so the old checkpoint is deleted.
 /// </summary>
@@ -91,7 +91,7 @@ public class CheckpointManager : MonoBehaviour
             _chase.ShutOut += Save;
         _windowShot = FindFirstObjectByType<ButcherWindowShot>(FindObjectsInactive.Include);
         if (_windowShot != null)
-            _windowShot.Triggered += Save;
+            _windowShot.Finished += Save;
 
         if (Checkpoint.RestorePending)
         {
@@ -110,7 +110,7 @@ public class CheckpointManager : MonoBehaviour
         if (_chase != null)
             _chase.ShutOut -= Save;
         if (_windowShot != null)
-            _windowShot.Triggered -= Save;
+            _windowShot.Finished -= Save;
     }
 
     void Save()
@@ -248,6 +248,7 @@ public class CheckpointManager : MonoBehaviour
         TensionMusicCues music = FindFirstObjectByType<TensionMusicCues>();
         d.returnMusicPlaying = music != null && music.ReturnMusicPlaying;
         d.mapFound = FarmMapView.Instance != null && FarmMapView.Instance.HasMap;
+        d.carShotPlayed = ButcherWindowShot.HasFinished;
 
         if (GameplayHintManager.Instance != null)
             d.hintsShown = GameplayHintManager.Instance.GetShownHints();
@@ -308,6 +309,32 @@ public class CheckpointManager : MonoBehaviour
 
     void Restore(CheckpointData d)
     {
+        Checkpoint.IsRestoring = true;
+        try
+        {
+            RestoreBody(d);
+        }
+        catch
+        {
+            Checkpoint.IsRestoring = false;
+            throw;
+        }
+
+        // Destroy() runs OnDestroy at end of frame — keep the flag up so pickup scare SFX stay quiet.
+        if (isActiveAndEnabled)
+            StartCoroutine(ClearRestoringAfterDestroys());
+        else
+            Checkpoint.IsRestoring = false;
+    }
+
+    IEnumerator ClearRestoringAfterDestroys()
+    {
+        yield return new WaitForEndOfFrame();
+        Checkpoint.IsRestoring = false;
+    }
+
+    void RestoreBody(CheckpointData d)
+    {
         SkipIntro();
 
         if (d.wallStanderRevealed && _corpse != null)
@@ -338,7 +365,12 @@ public class CheckpointManager : MonoBehaviour
         if (d.mapFound)
             FarmMapView.Instance?.RestoreCollected();
 
+        // Return-door quiet-close + knock must not restart on Continue.
+        if (d.barTaken || d.carShotPlayed || d.wallStanderShutOut)
+            FindFirstObjectByType<BasementReturnDoorTrap>(FindObjectsInactive.Include)?.MarkSequenceDone();
+
         RestorePlayer(d);
+        RestoreCarShot(d);
 
         GameplayHintManager.Instance?.RestoreShownHints(d.hintsShown);
         foreach (string id in d.tutorialsShown)
@@ -349,6 +381,16 @@ public class CheckpointManager : MonoBehaviour
         // After the doors and the player: he pounds on the door as it was saved, at the distance they stand from it.
         if (d.wallStanderShutOut && _chase != null && _chase.isActiveAndEnabled)
             _chase.RestoreShutOut();
+        else if (_chase != null && (d.carShotPlayed || d.barTaken))
+        {
+            // Outdoor / post-bar Continue: never reopen the return-trip mic bar.
+            CinemachineMouseLook look = FindFirstObjectByType<CinemachineMouseLook>();
+            ButcherWindowShot windowShot = FindFirstObjectByType<ButcherWindowShot>(FindObjectsInactive.Include);
+            bool outdoors = d.carShotPlayed
+                || (look != null && windowShot != null && windowShot.IsOutOfBasement(look.transform.position));
+            if (outdoors || d.carShotPlayed)
+                _chase.MarkMicDone();
+        }
 
         CinematicPlayerControlLock.KickNpcNaturalRoutines();
     }
@@ -435,12 +477,41 @@ public class CheckpointManager : MonoBehaviour
             body.enabled = true;
         Physics.SyncTransforms();
 
-        FindFirstObjectByType<CinemachineMouseLook>()?.SetLook(Quaternion.Euler(d.cameraPitch, d.playerYaw, 0f));
+        CinemachineMouseLook look = FindFirstObjectByType<CinemachineMouseLook>();
+        look?.SetLook(Quaternion.Euler(d.cameraPitch, d.playerYaw, 0f));
 
         // Never walked out of the cage this load, so start the butcher's basement grace from here.
         Cage.RebindAllAfterContinueTeleport(player);
         InteractionController interaction = FindFirstObjectByType<InteractionController>();
         InteractionController.ArmBasementGraceUntilCageExit(interaction != null ? interaction.BasementRoutineDelaySeconds : 30f);
+
+        // Outdoor leave-basement saves: treat them as already through the exit (same as DebugBasementSkip) so
+        // grace isn't stuck waiting for a cage leave that never happens this load.
+        ButcherWindowShot windowShot = FindFirstObjectByType<ButcherWindowShot>(FindObjectsInactive.Include);
+        if (windowShot != null && look != null && windowShot.IsOutOfBasement(look.transform.position))
+            InteractionController.ForcePlayerLeftBasement();
+
+        // Clear any leftover tension walk from the previous run / scene default.
+        var fpc = player.GetComponent<StarterAssets.FirstPersonController>();
+        if (fpc != null)
+        {
+            fpc.TensionWalk = false;
+            fpc.SpeedLimit = float.PositiveInfinity;
+        }
+    }
+
+    static void RestoreCarShot(CheckpointData d)
+    {
+        ButcherWindowShot windowShot = FindFirstObjectByType<ButcherWindowShot>(FindObjectsInactive.Include);
+        if (windowShot == null)
+            return;
+
+        // New saves set carShotPlayed after the cinematic. Older outdoor leave-basement saves still skip
+        // so Continue does not force the "that's my car" shot again.
+        CinemachineMouseLook look = FindFirstObjectByType<CinemachineMouseLook>();
+        bool outdoors = look != null && windowShot.IsOutOfBasement(look.transform.position);
+        if (d.carShotPlayed || outdoors)
+            windowShot.MarkPlayed();
     }
 
     static void RestoreInventory(CheckpointData d)

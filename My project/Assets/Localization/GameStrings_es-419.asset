@@ -755,7 +755,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296751
-    m_Localized: "Mant\xE9n clic derecho para aplicar presi\xF3n"
+    m_Localized: "Clic derecho para aplicar presi\xF3n"
     m_Metadata:
       m_Items: []
   - m_Id: 5707318296752
@@ -803,8 +803,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 34365368158781440
-    m_Localized: "Encuentra la direcci\xF3n correcta y luego jala el destornillador
-      hacia ese lado hasta que la cerradura se rompa."
+    m_Localized: "Encuentra la direcci\xF3n correcta y luego empuja el destornillador
+      lentamente hacia ese lado hasta que la cerradura se rompa."
     m_Metadata:
       m_Items: []
   - m_Id: 34392063293128704
@@ -900,6 +900,14 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 46856169052831748
     m_Localized: Un mapa de la granja dibujado a mano. Presiona M para volver a mirarlo.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 49832862310858752
+    m_Localized: Entra por las ventanas
+    m_Metadata:
+      m_Items: []
+  - m_Id: 49832862424104960
+    m_Localized: Puedes entrar a la casa de la granja por las ventanas abiertas.
     m_Metadata:
       m_Items: []
   references:
